@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Middlewares\" />
+    <Folder Include="Filters\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KnowledgeSharingApi.Domain\KnowledgeSharingApi.Domains.csproj" />
+    <ProjectReference Include="..\KnowledgeSharingApi.Infrastructure\KnowledgeSharingApi.Infrastructures.csproj" />
+    <ProjectReference Include="..\KnowledgeSharingApi.Service\KnowledgeSharingApi.Services.csproj" />
+  </ItemGroup>
+
+</Project>

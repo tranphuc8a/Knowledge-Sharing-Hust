@@ -1,0 +1,6 @@
+@KnowledgeSharingApi_HostAddress = http://localhost:5133
+
+GET {{KnowledgeSharingApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
