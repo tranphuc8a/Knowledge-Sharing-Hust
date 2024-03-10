@@ -7,21 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DbContexts\" />
     <Folder Include="Interfaces\" />
-    <Folder Include="Emails\" />
-    <Folder Include="Caches\" />
-    <Folder Include="Storages\" />
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.1" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\KnowledgeSharingApi.Domain\KnowledgeSharingApi.Domains.csproj" />
+    <ProjectReference Include="..\KnowledgeSharingApi.Infrastructure\KnowledgeSharingApi.Infrastructures.csproj" />
   </ItemGroup>
 
 </Project>

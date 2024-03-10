@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Vietnamese\ViConstantResources.cs~RF43951fb5.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Interfaces\ResourcesInterfaces\" />
+    <Folder Include="Models\ApiRequestModels\" />
+    <Folder Include="Models\ApiResponseModels\" />
+    <Folder Include="Models\Dtos\" />
+    <Folder Include="Resources\English\" />
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-﻿# KnowledgeSharing
+# KnowledgeSharing
 
 ## Mạng xã hội chia sẻ kiến thức cho sinh viên Bách Khoa
 
@@ -12,3 +12,4 @@ Project gồm 2 sub-projects:
 
 - Backend: KnowledgeSharingApi
 - Frontend: KnowledgeSharingVue
+
