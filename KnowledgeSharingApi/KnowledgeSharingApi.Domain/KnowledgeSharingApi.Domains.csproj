@@ -11,11 +11,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\ResourcesInterfaces\" />
     <Folder Include="Models\ApiRequestModels\" />
     <Folder Include="Models\ApiResponseModels\" />
-    <Folder Include="Models\Dtos\" />
     <Folder Include="Resources\English\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>
