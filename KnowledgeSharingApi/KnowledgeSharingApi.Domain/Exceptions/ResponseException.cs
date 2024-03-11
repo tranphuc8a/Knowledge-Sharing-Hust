@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KnowledgeSharingApi.Domains.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ namespace KnowledgeSharingApi.Domains.Exceptions
     /// MOdified: None
     public class ResponseException : Exception
     {
-        public int StatusCode { get; set; }
+        public EStatusCode StatusCode { get; set; }
         public string? UserMessage { get; set; }
         public string? DevMessage { get; set; }
         public object? Body { get; set; }

@@ -8,14 +8,15 @@
 
   <ItemGroup>
     <Folder Include="DbContexts\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Emails\" />
-    <Folder Include="Caches\" />
-    <Folder Include="Storages\" />
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="EPPlus" Version="7.0.9" />
+    <PackageReference Include="MailKit" Version="4.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.2" />
+    <PackageReference Include="MimeKit" Version="4.4.0" />
+    <PackageReference Include="MySqlConnector" Version="2.3.5" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.1" />
   </ItemGroup>
 
