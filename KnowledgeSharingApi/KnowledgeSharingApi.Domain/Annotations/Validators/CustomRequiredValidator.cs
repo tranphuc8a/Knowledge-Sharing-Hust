@@ -13,9 +13,9 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
     /// </summary>
     /// Created: PhucTV (27/12/23)
     /// Modified: None
-    public class CustomeRequiredValidator : ValidationAttribute
+    public class CustomRequiredValidator : ValidationAttribute
     {
-        public CustomeRequiredValidator() { }
+        public CustomRequiredValidator() { }
 
         public override bool IsValid(object? value)
         {

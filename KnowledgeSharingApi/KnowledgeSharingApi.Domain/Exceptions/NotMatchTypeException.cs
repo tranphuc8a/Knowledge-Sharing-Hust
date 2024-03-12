@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace KnowledgeSharingApi.Domains.Exceptions
+{
+    public class NotMatchTypeException(string? message = null) : Exception(message ?? UserMessage)
+    {
+        const string UserMessage = "Không khớp kiểu dữ liệu";
+    }
+}

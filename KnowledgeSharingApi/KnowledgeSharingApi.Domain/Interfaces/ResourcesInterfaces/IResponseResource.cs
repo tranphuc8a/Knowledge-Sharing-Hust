@@ -174,9 +174,11 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces
         string WrongVerifyCode(int remailAttemps);
         string VerifyCodeSuccess();
         string ResetPasswordSuccess();
+        string ResetPasswordFailure();
         string RegistrationEmailSubject();
         string RegistrationEmailContent(string code, int durationInMinutes = 3);
         string AddNewUserSuccess();
+        string AddNewUserFailure();
         string RegisterAdminSuccess();
         string CaptchaCreated();
         string LimitLoginTime(); // "Đăng nhập quá số lần cho phép"

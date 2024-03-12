@@ -356,6 +356,11 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
             return "Đặt lại mật khẩu thành công";
         }
 
+        public string ResetPasswordFailure()
+        {
+            return "Đặt lại mật khẩu thất bại";
+        }
+
         public string RegistrationEmailSubject()
         {
             return "Mã xác minh đăng ký tài khoản Misa Cukcuk";
@@ -372,6 +377,11 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         public string AddNewUserSuccess()
         {
             return "Đăng ký tài khoản mới thành công";
+        }        
+        
+        public string AddNewUserFailure()
+        {
+            return "Đăng ký tài khoản mới thất bại";
         }
 
         public string RegisterAdminSuccess()

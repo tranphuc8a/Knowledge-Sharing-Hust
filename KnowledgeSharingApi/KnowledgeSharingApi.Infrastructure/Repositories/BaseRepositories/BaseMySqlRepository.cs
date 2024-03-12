@@ -20,12 +20,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public IDbContext DbContext;
         protected readonly string TableName;
         protected readonly string NameField;
-        protected IDbConnection Connection;
+        public IDbConnection Connection { get; set; }
+        public IDbTransaction? Transaction { get; set; }
+
         public BaseMySqlRepository(IDbContext dbContext)
         {
             if (dbContext is not MySqlDbContext)
             {
-                throw new DbContextNotMatchingException();
+                throw new DbContextNotMatchTypeException();
             }
             DbContext = dbContext;
             Connection = dbContext.Connection;
@@ -38,20 +40,20 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public virtual async Task<IEnumerable<T>> Get()
         {
             string sqlCommand = $"Select * from {TableName}";
-            return await Connection.QueryAsync<T>(sqlCommand, transaction: DbContext.Transaction);
+            return await Connection.QueryAsync<T>(sqlCommand, transaction: Transaction);
         }
 
         public virtual async Task<IEnumerable<T>> Get(int limit, int offset)
         {
             // Get with pagination
             string sqlCommand = $"Select * from {TableName} limit @limit offset @offset";
-            return await Connection.QueryAsync<T>(sqlCommand, new { limit, offset }, transaction: DbContext.Transaction);
+            return await Connection.QueryAsync<T>(sqlCommand, new { limit, offset }, transaction: Transaction);
         }
 
         public virtual async Task<T?> Get(string id)
         {
             string sqlCommand = $"Select * from {TableName} where {TableName}Id = @id";
-            return await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id }, transaction: DbContext.Transaction);
+            return await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id }, transaction: Transaction);
         }
 
         #endregion
@@ -59,17 +61,41 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
         #region Insert New Record
 
+        //public virtual async Task<string?> Insert(T entity)
+        //{
+        //    string entityId = $"{TableName}Id";
+        //    List<string> props = entity.GetProperties().Select(p => p.Name).ToList()
+        //                                .Where(p => p != entityId).ToList();
+        //    string entityColumns = string.Join(", ", props);
+        //    string entityParams = string.Join(", ", props.Select(p => $"@{p}").ToList());
+        //    string sqlCommand = $"Set @id = UUID(); " +
+        //                        $"Insert into {TableName}({entityId}, {entityColumns}) value(@id, {entityParams}); " +
+        //                        $"Select @id;";
+        //    return await Connection.QueryFirstOrDefaultAsync<string>(sqlCommand, entity, transaction: Transaction);
+        //}
+        
         public virtual async Task<string?> Insert(T entity)
         {
+            // Set new Guid for Id of entity
             string entityId = $"{TableName}Id";
-            List<string> props = entity.GetProperties().Select(p => p.Name).ToList()
-                                        .Where(p => p != entityId).ToList();
+            Guid newId = Guid.NewGuid();
+            PropertyInfo propertyInfo = typeof(T).GetProperty(entityId) 
+                ?? throw new NotMatchTypeException();
+            propertyInfo.SetValue(entity, newId);
+
+            // Create sql Command
+            List<string> props = entity.GetProperties().Select(p => p.Name).ToList();
             string entityColumns = string.Join(", ", props);
             string entityParams = string.Join(", ", props.Select(p => $"@{p}").ToList());
-            string sqlCommand = $"Set @id = UUID(); " +
-                                $"Insert into {TableName}({entityId}, {entityColumns}) value(@id, {entityParams}); " +
-                                $"Select @id;";
-            return await Connection.QueryFirstOrDefaultAsync<string>(sqlCommand, entity, transaction: DbContext.Transaction);
+            string sqlCommand = $"Insert into {TableName}({entityColumns}) value({entityParams}); ";
+
+            // Excute and return result:
+            int res = await Connection.ExecuteAsync(sqlCommand, entity, transaction: Transaction);
+            if (res > 0)
+            {
+                return newId.ToString();
+            }
+            return null;
         }
         #endregion
 
@@ -84,7 +110,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public virtual async Task<int> Delete(string[] ids)
         {
             string sqlCommand = $"Delete from {TableName} where {TableName}Id in @ids";
-            return await Connection.ExecuteAsync(sqlCommand, new { ids }, transaction: DbContext.Transaction);
+            return await Connection.ExecuteAsync(sqlCommand, new { ids }, transaction: Transaction);
         }
         #endregion
 
@@ -93,7 +119,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public virtual async Task<int> Update(string id, T entity)
         {
             // prepare params
-            DynamicParameters parameters = new DynamicParameters();
+            DynamicParameters parameters = new();
             parameters.Add("id", id);
             PropertyInfo[] listProps = entity.GetProperties();
             foreach (var item in listProps)
@@ -109,7 +135,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             string sqlCommand = $"Update {TableName} set {setCommands} where {TableName}Id = @id";
 
             // execute:
-            return await Connection.ExecuteAsync(sqlCommand, parameters, transaction: DbContext.Transaction);
+            return await Connection.ExecuteAsync(sqlCommand, parameters, transaction: Transaction);
         }
         #endregion
 
@@ -132,7 +158,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             return await Connection.QueryAsync<T>(sqlCommand, new { text, templateText, limit, offset });
         }
 
-     
+
+
+
         #endregion
+
+        public virtual void RegisterTransaction(IDbTransaction transaction)
+        {
+            this.Transaction = transaction;
+        }
     }
 }

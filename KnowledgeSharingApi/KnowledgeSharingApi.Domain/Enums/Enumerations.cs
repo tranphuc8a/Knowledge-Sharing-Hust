@@ -122,7 +122,8 @@ namespace KnowledgeSharingApi.Domains.Enums
     public enum EVerifyCodeType
     {
         Register = 0,
-        ForgotPassword = 1
+        ForgotPassword = 1,
+        Payment = 2
     }
 
     

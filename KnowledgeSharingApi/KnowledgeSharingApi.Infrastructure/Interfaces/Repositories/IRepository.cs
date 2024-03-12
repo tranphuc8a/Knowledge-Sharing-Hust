@@ -1,6 +1,8 @@
 ﻿using KnowledgeSharingApi.Domains.Models.Entities;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +11,10 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
 {
     public interface IRepository<T> where T : Entity
     {
+        IDbConnection Connection { get; set; }
+        IDbTransaction? Transaction { get; set; }
+
+
         /// <summary>
         /// Hàm thực hiện lấy tất cả bản ghi của bảng trong CSDL
         /// </summary>
@@ -102,5 +108,13 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Modified: PhucTV (10/1/24) move up to IBaseRepo
         Task<IEnumerable<T>> Filter(string text, int limit, int offset);
 
+
+        /// <summary>
+        /// Đăng ký transaction
+        /// </summary>
+        /// <param name="transaction"> transaction cần đăng ký </param>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        public void RegisterTransaction(IDbTransaction transaction);
     }
 }

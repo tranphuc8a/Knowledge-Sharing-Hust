@@ -10,6 +10,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities
     {
         public Guid ConservationId { get; set; } = Guid.Empty;
         public string ConservationName { get; set; } = String.Empty;
+        public string? Thumbnail {  get; set; }
         protected override Conservation Init()
         {
             return new Conservation();

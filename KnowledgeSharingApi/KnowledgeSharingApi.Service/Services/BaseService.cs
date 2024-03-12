@@ -65,7 +65,7 @@ namespace KnowledgeSharingApi.Services.Services
             var repository = GetRepository();
             // Kiểm tra xem Entity với id có tồn tại?
             T? entity = await repository.Get(id);
-            string msg = "";
+            string msg;
             if (entity == null)
             {
                 msg = CrudResource.NotExist(ResponseTableName);
