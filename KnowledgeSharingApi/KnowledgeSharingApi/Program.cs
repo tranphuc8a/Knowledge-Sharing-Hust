@@ -1,15 +1,21 @@
 ﻿using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Resources.Vietnamese;
 using KnowledgeSharingApi.Infrastructures.Caches;
+using KnowledgeSharingApi.Infrastructures.Captcha;
 using KnowledgeSharingApi.Infrastructures.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Emails;
+using KnowledgeSharingApi.Infrastructures.Encrypts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Caches;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Captcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Emails;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
+using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories;
 using KnowledgeSharingApi.Infrastructures.Storages;
+using KnowledgeSharingApi.Infrastructures.UnitOfWorks;
 using KnowledgeSharingApi.Services.Interfaces;
 using KnowledgeSharingApi.Services.Middlewares;
 using KnowledgeSharingApi.Services.Services;
@@ -98,7 +104,9 @@ builder.Services.AddScoped<ICache, MemoryCache>();
 builder.Services.AddScoped<IDbContext, MySqlDbContext>();
 builder.Services.AddScoped<IEmail, Email>();
 builder.Services.AddScoped<IStorage, FirebaseStorage>();
-
+builder.Services.AddScoped<IEncrypt, KSEncript>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ICaptcha, KSCaptcha>();
 
 // Injection Repositories
 builder.Services.AddScoped<IUserRepository, UserMySqlRepository>();

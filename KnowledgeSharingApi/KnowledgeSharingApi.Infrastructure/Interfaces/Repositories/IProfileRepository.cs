@@ -9,5 +9,8 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
 {
     public interface IProfileRepository : IRepository<Profile>
     {
+        public Task<Profile?> GetByUserId(string userId);
+        public Task<Profile?> GetByUsername(string username);
+        public Task<Profile?> GetByEmail(string email);
     }
 }
