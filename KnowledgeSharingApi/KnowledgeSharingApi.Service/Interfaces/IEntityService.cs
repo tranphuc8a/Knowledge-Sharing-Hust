@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Services.Interfaces
 {
-    public interface IService<T> where T : Entity
+    public interface IEntityService<T> where T : Entity
     {
         /// <summary>
         /// Dịch vụ lấy về dữ liệu theo trường id
