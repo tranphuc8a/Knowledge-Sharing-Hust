@@ -13,9 +13,11 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
+using KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets;
 using KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories;
 using KnowledgeSharingApi.Infrastructures.Storages;
 using KnowledgeSharingApi.Infrastructures.UnitOfWorks;
+using KnowledgeSharingApi.Infrastructures.WebSockets;
 using KnowledgeSharingApi.Services.Interfaces;
 using KnowledgeSharingApi.Services.Middlewares;
 using KnowledgeSharingApi.Services.Services;
@@ -100,24 +102,35 @@ builder.Services.AddCors(options =>
 #region Cấu hình Builder Dependency Injection
 
 // Injection Infrastructures
-builder.Services.AddScoped<ICache, MemoryCache>();
 builder.Services.AddScoped<IDbContext, MySqlDbContext>();
-builder.Services.AddScoped<IEmail, Email>();
-builder.Services.AddScoped<IStorage, FirebaseStorage>();
-builder.Services.AddScoped<IEncrypt, KSEncript>();
+builder.Services.AddSingleton<ICache, MemoryCache>();
+builder.Services.AddSingleton<IEmail, Email>();
+builder.Services.AddSingleton<IStorage, FirebaseStorage>();
+builder.Services.AddSingleton<IEncrypt, KSEncript>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ICaptcha, KSCaptcha>();
+builder.Services.AddSingleton<ICaptcha, KSCaptcha>();
+//builder.Services.AddSingleton<ISocketSessionManager, SocketSessionManager>();
+builder.Services.AddSingleton<INotificationSocketSessionManager, NotificationSocketSessionManager>();
+builder.Services.AddSingleton<ILiveChatSocketSessionManager, LiveChatSocketSessionManager>();
+builder.Services.AddSingleton<INewMessageNotificationSocketSessionManager, NewMessageNotificationSocketSessionManager>();
 
 // Injection Repositories
 builder.Services.AddScoped<IUserRepository, UserMySqlRepository>();
-
+builder.Services.AddScoped<IProfileRepository, ProfileMySqlRepository>();
 
 // Injection Services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
+builder.Services.AddScoped<IRegisterNewUserService, RegisterNewUserService>();
+//builder.Services.AddScoped<ISocketService, SocketService>();
+builder.Services.AddScoped<INotificationSocketService, NotificationSocketService>();
+builder.Services.AddScoped<ILiveChatSocketService, LiveChatSocketService>();
+builder.Services.AddScoped<INewMessageNotificationSocketService, NewMessageNotificationSocketService>();
+
 
 
 // Injection Domains
-builder.Services.AddScoped<IResourceFactory, ViResourceFactory>();
+builder.Services.AddSingleton<IResourceFactory, ViResourceFactory>();
 
 
 
@@ -144,6 +157,13 @@ app.UseMiddleware<DefaultExceptionMiddleware>();
 app.UseMiddleware<ResponseExceptionMiddleware>();
 app.UseMiddleware<ValidatorExceptionMiddleware>();
 
+// Config WebSocket
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+
+app.UseWebSockets(webSocketOptions);
 
 app.UseCors("AllowAnyOrigin");
 app.UseAuthentication();

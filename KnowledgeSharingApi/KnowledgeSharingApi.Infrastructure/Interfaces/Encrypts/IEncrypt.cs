@@ -47,5 +47,14 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts
         /// Created: PhucTV (12/3/24)
         /// Modified: None
         string Sha256HashPassword(string username, string password);
+
+
+        /// <summary>
+        /// Tùy chỉnh xem có validate theo expired của jwt không
+        /// </summary>
+        /// <param name="isValidateJwtTokenLifeTime"> true - có, false - không </param>
+        /// Created: PhucTV (13/3/24)
+        /// Modified: None
+        IEncrypt SetIsValidateJwtTokenLifeTime(bool isValidateJwtTokenLifeTime);
     }
 }

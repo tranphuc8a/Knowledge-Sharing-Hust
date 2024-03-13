@@ -93,6 +93,12 @@ namespace KnowledgeSharingApi.Infrastructures.Encrypts
             return null;
         }
 
+        public IEncrypt SetIsValidateJwtTokenLifeTime(bool isValidateJwtTokenLifeTime)
+        {
+            this.tokenValidationParameters.ValidateLifetime = isValidateJwtTokenLifeTime;
+            return this;
+        }
+
         public virtual string Sha256HashPassword(string username, string password)
         {
             string combineUser = $"{username} - {password} - {_passwordHashSecretKey}";

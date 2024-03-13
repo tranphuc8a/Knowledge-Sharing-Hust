@@ -36,7 +36,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns> Trả về Service của Controller </returns>
         /// Created: PhucTV (8/1/24)
         /// Modified: None
-        protected abstract IService<T> GetService();
+        protected abstract IEntityService<T> GetService();
         #endregion
 
 

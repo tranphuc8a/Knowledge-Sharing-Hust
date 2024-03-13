@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Services.Services
 {
-    public abstract class BaseService<T>(IResourceFactory resourceFactory) : IService<T> where T : Entity
+    public abstract class BaseService<T>(IResourceFactory resourceFactory) : IEntityService<T> where T : Entity
     {
         #region Attributes and Constructor
         protected readonly IResourceFactory _ResourceFactory = resourceFactory;
