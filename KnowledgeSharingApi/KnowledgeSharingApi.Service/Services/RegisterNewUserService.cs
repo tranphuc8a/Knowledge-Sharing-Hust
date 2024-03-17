@@ -3,10 +3,10 @@ using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
-using KnowledgeSharingApi.Domains.Models.Entities;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Caches;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Emails;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Services.Interfaces;
 using MimeKit.Encodings;
@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using ZstdSharp.Unsafe;
 
 namespace KnowledgeSharingApi.Services.Services
 {
@@ -32,6 +33,9 @@ namespace KnowledgeSharingApi.Services.Services
         protected IProfileRepository profileRepository = profileRepository;
         protected IUnitOfWork UnitOfWork = unitOfWork;
 
+        protected override EVerifyCodeType VerifyCodeType { get; set; } = EVerifyCodeType.Register;
+        protected override string EmailSubject { get; set; } = resourceFactory.GetResponseResource().RegistrationEmailSubject();
+
         public override async Task CheckEmailIsValid(string? email)
         {
             // Check email is valid
@@ -43,21 +47,19 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
 
-        public override async Task<ServiceResult> Action(VerifyCodeModel codeModel)
+        public override async Task<ServiceResult> Action(ActiveCodeModel codeModel)
         {
+            await CheckActiveCode(codeModel);
+
             ServiceResult insertFailure = ServiceResult.ServerError(responseResource.AddNewUserSuccess());
-            // Verify codeModel
-            ServiceResult res = await CheckVerifyCode(codeModel);
-            if (!res.IsSuccess) return res;
 
-            // cast codemodel to VerifyCodeRegisterModel
-            if (codeModel is VerifyCodeRegisterModel model)
+            // Kiểm tra một lần nữa email chưa được đăng ký
+            // ...
+
+            // cast codemodel to ActiveCodeRegisterModel
+            if (codeModel is ActiveCodeRegisterModel model)
             {
-                // Begin transaction
-                UnitOfWork.BeginTransaction();
-                UnitOfWork.RegisterRepository(userRepository).RegisterRepository(profileRepository);
-
-                // Add new User and return user with new UserId
+                // Create new user to add
                 User user = new()
                 {
                     Email = model.Email!,
@@ -65,39 +67,70 @@ namespace KnowledgeSharingApi.Services.Services
                     Role = UserRoles.User
                 };
 
-                ValidatorException insertFailedException = new(responseResource.AddNewUserFailure());
-                try
+                ServiceResult res = await AddNewUser(user, model.Password!, model.FullName!);
+
+                if (res.IsSuccess)
                 {
-                    // Step 1: Create user
-                    string? insertId = await userRepository.Insert(user)
-                        ?? throw insertFailedException;
-
-                    // Step 2: Update password
-                    int rowEffects = await userRepository.UpdatePassword(model.Username!, model.Password!);
-                    if (rowEffects <= 0) throw insertFailedException;
-
-                    // Step 3: Create Profile
-                    string? profileId = await profileRepository.Insert(new Profile()
-                    {
-                        UserId = user.UserId,
-                        FullName = model.FullName!
-                    }) ?? throw insertFailedException;
-
-                    // Step 4: Commit
-                    UnitOfWork.CommitTransaction();
+                    // Thành công, xóa cache
+                    // ...
                 }
-                catch (Exception)
-                {
-                    UnitOfWork.RollbackTransaction();
-                    throw;
-                }
-
-                // return success
-                return ServiceResult.Success(responseResource.AddNewUserSuccess());
+                return res;
             }
 
             // failure: Server error
             return insertFailure;
+        }
+
+        /// <summary>
+        /// Thực hiện thêm mới user vào database
+        /// </summary>
+        /// <param name="user">user muốn thêm</param>
+        /// <param name="password"> Mật khẩu người dùng </param>
+        /// <param name="fullName"> Tên đầy đủ </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        protected virtual async Task<ServiceResult> AddNewUser(User user, string password, string fullName)
+        {
+            ValidatorException insertFailedException = new(responseResource.AddNewUserFailure());
+
+            // Begin transaction
+            UnitOfWork.BeginTransaction();
+            UnitOfWork.RegisterRepository(userRepository).RegisterRepository(profileRepository);
+
+            try
+            {
+                // Step 1: Insert user to db
+                string? insertId = await userRepository.Insert(user)
+                    ?? throw insertFailedException;
+
+                // Step 2: Update password
+                int rowEffects = await userRepository.UpdatePassword(user.Username, password);
+                if (rowEffects <= 0) throw insertFailedException;
+
+                // Step 3: Insert Profile
+                string? profileId = await profileRepository.Insert(new Profile()
+                {
+                    UserId = user.UserId,
+                    FullName = fullName
+                }) ?? throw insertFailedException;
+
+                // Step 4: Commit
+                UnitOfWork.CommitTransaction();
+            }
+            catch (Exception)
+            {
+                UnitOfWork.RollbackTransaction();
+                throw;
+            }
+
+            // return success
+            return ServiceResult.Success(responseResource.AddNewUserSuccess());
+        }
+
+        protected override string EmailContent(string verifyCode)
+        {
+            return responseResource.RegistrationEmailContent(verifyCode);
         }
     }
 }

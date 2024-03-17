@@ -1,5 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
@@ -7,6 +8,7 @@ using KnowledgeSharingApi.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -97,16 +99,22 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> GetService(int? limit, int? offset)
         {
             var repository = GetRepository();
-            List<T> entities;
+            PaginationResponseModel<T> paginationResponseModel;
             if (limit != null)
             {
-                entities = (await repository.Get(limit ?? 0, offset ?? 0)).ToList();
+                paginationResponseModel = await repository.Get(limit ?? 0, offset ?? 0);
             }
             else
             {
-                entities = (await repository.Get()).ToList();
+                IEnumerable<T> entities = await repository.Get();
+                paginationResponseModel = new() {
+                    Total = entities.Count(),
+                    Limit = entities.Count(),
+                    Offset = 0,
+                    Results = entities
+                };
             }
-            return new ServiceResult(entities.Count, entities);
+            return new ServiceResult(paginationResponseModel.Count, paginationResponseModel);
         }
 
         public virtual async Task<ServiceResult> GetService(string id)
@@ -170,7 +178,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Insert Entity
             entity.CreatedBy = AuthorName;
-            entity.CreatedDate = DateTime.Now;
+            entity.CreatedTime = DateTime.Now;
             string? insertedId = await repository.Insert(entity);
             if (String.IsNullOrEmpty(insertedId))
             {
@@ -220,7 +228,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Update customer infor
             entity.ModifiedBy = ModifierName;
-            entity.ModifiedDate = DateTime.Now;
+            entity.ModifiedTime = DateTime.Now;
             int res = await repository.Update(id, entity);
             if (res > 0)
             {
@@ -276,16 +284,25 @@ namespace KnowledgeSharingApi.Services.Services
 
         public virtual async Task<ServiceResult> FilterService(string search, int? limit = null, int? offset = null)
         {
-            List<T> entities;
-            if (limit == null)
+            var repository = GetRepository();
+            PaginationResponseModel<T> paginationResponseModel;
+            if (limit != null)
             {
-                entities = (await GetRepository().Filter(search)).ToList();
+                paginationResponseModel = await repository.Filter(search, limit ?? 0, offset ?? 0);
             }
             else
             {
-                entities = (await GetRepository().Filter(search, limit ?? 0, offset ?? 0)).ToList();
+                IEnumerable<T> entities = await repository.Filter(search);
+                paginationResponseModel = new()
+                {
+                    Total = entities.Count(),
+                    Limit = entities.Count(),
+                    Offset = 0,
+                    Results = entities
+                };
             }
-            return new ServiceResult(1, entities);
+            return new ServiceResult(paginationResponseModel.Count, paginationResponseModel);
+
         }
         #endregion
     }

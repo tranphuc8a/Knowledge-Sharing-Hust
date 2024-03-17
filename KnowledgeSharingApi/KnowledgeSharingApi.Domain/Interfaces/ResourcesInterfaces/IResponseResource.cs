@@ -179,6 +179,13 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces
         string RegistrationEmailContent(string code, int durationInMinutes = 3);
         string AddNewUserSuccess();
         string AddNewUserFailure();
+        string CancelUserEmailSubject();
+        string CancelUserEmailContent(string code, int durationInMinutes = 3);
+        string CancelUserRespomseEmailSubject();
+        string CancelUserFailureProcessResponseEmailContent(string name);
+        string CancelUserSuccessProcessResponseEmailContent(string name);
+        string CancelUserSuccess();
+        string CancelUserFailure();
         string RegisterAdminSuccess();
         string CaptchaCreated();
         string LimitLoginTime(); // "Đăng nhập quá số lần cho phép"

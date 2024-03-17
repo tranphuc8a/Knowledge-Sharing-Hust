@@ -10,7 +10,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Captcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Emails;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets;
@@ -18,6 +18,7 @@ using KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories;
 using KnowledgeSharingApi.Infrastructures.Storages;
 using KnowledgeSharingApi.Infrastructures.UnitOfWorks;
 using KnowledgeSharingApi.Infrastructures.WebSockets;
+using KnowledgeSharingApi.Options;
 using KnowledgeSharingApi.Services.Interfaces;
 using KnowledgeSharingApi.Services.Middlewares;
 using KnowledgeSharingApi.Services.Services;
@@ -52,7 +53,9 @@ builder.Services.AddSession();
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 
-builder.Services.AddDbContext<MySqlDbContext>(); 
+builder.Services.AddDbContext<MySqlDbContext>();
+
+builder.Services.ConfigureOptions<ConfigSwaggerOptions>();
 #endregion
 
 #region Cấu hình Authentication Bearer Jwt cho Builder
@@ -101,23 +104,32 @@ builder.Services.AddCors(options =>
 
 #region Cấu hình Builder Dependency Injection
 
+//
 // Injection Infrastructures
-builder.Services.AddScoped<IDbContext, MySqlDbContext>();
 builder.Services.AddSingleton<ICache, MemoryCache>();
 builder.Services.AddSingleton<IEmail, Email>();
 builder.Services.AddSingleton<IStorage, FirebaseStorage>();
-builder.Services.AddSingleton<IEncrypt, KSEncript>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddSingleton<IEncrypt, KSEncrypt>();
 builder.Services.AddSingleton<ICaptcha, KSCaptcha>();
+builder.Services.AddScoped<IDbContext, MySqlDbContext>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //builder.Services.AddSingleton<ISocketSessionManager, SocketSessionManager>();
 builder.Services.AddSingleton<INotificationSocketSessionManager, NotificationSocketSessionManager>();
 builder.Services.AddSingleton<ILiveChatSocketSessionManager, LiveChatSocketSessionManager>();
 builder.Services.AddSingleton<INewMessageNotificationSocketSessionManager, NewMessageNotificationSocketSessionManager>();
 
+//
+//
 // Injection Repositories
 builder.Services.AddScoped<IUserRepository, UserMySqlRepository>();
 builder.Services.AddScoped<IProfileRepository, ProfileMySqlRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionMySqlRepository>();
+builder.Services.AddScoped<IUserRelationRepository, UserRelationMySqlRepository>();
 
+
+
+//
+//
 // Injection Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
@@ -126,9 +138,12 @@ builder.Services.AddScoped<IRegisterNewUserService, RegisterNewUserService>();
 builder.Services.AddScoped<INotificationSocketService, NotificationSocketService>();
 builder.Services.AddScoped<ILiveChatSocketService, LiveChatSocketService>();
 builder.Services.AddScoped<INewMessageNotificationSocketService, NewMessageNotificationSocketService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IUserRelationService, UserRelationService>();
 
 
-
+//
+//
 // Injection Domains
 builder.Services.AddSingleton<IResourceFactory, ViResourceFactory>();
 

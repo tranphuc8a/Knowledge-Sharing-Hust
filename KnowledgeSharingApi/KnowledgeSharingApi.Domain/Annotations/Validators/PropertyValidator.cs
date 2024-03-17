@@ -15,10 +15,6 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
     /// Modified: None
     public static class PropertyValidator
     {
-        public const int MAX_CODE_LENGTH = CodeLengthValidator.MIN_CODE_LENGTH;
-        public const int MIN_CODE_LENGTH = CodeLengthValidator.MAX_CODE_LENGTH;
-        private static readonly List<EGender> LIST_GENDER = [EGender.Male, EGender.Female, EGender.Other];
-
         /// <summary>
         /// Check if date is greater than today
         /// </summary>
@@ -72,7 +68,7 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
 
         public static bool CheckFormatGender(EGender? gender)
         {
-            return gender == null || LIST_GENDER.Contains((EGender)gender);
+            return gender == null || GenderValidator.ListGender.Contains((EGender)gender);
         }
 
 
@@ -99,7 +95,8 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
         /// Modified: None
         public static bool CheckFormatCodeLength(string? code)
         {
-            return code == null || (code.Length >= MIN_CODE_LENGTH && code.Length <= MAX_CODE_LENGTH);
+            return code == null || 
+                   (code.Length >= CodeLengthValidator.MIN_CODE_LENGTH && code.Length <= CodeLengthValidator.MAX_CODE_LENGTH);
         }
 
         /// <summary>
@@ -132,10 +129,25 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
         /// Kiểm tra đúng định dạng password hay không?
         /// </summary>
         /// <param name="password"></param>
-        /// <returns></returns>
+        /// <returns> true - đúng định dạng, false - sai định dạng </returns>
+        /// Created: PhucTV (15/3/24)
+        /// Modified: None
         public static bool CheckFormatPassword(string? password)
         {
             return password == null || Regex.IsMatch(password, RegexValidator.PASSWORD_REGEX_PATTERN);
+        }
+
+
+        /// <summary>
+        /// Kiểm tra đúng định dạng role hay không?
+        /// </summary>
+        /// <param name="role"></param>
+        /// <returns> true - đúng định dạng, false - sai định dạng </returns>
+        /// Created: PhucTV (15/3/24)
+        /// Modified: None
+        public static bool CheckFormatRole(string? role)
+        {
+            return role == null || RoleValidator.ListRole.Contains(role);
         }
     }
 }

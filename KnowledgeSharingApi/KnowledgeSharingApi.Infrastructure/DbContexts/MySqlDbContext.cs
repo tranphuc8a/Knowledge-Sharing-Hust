@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities;
+﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,8 +16,8 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
     public class MySqlDbContext : DbContext, IDbContext
     {
         //private readonly IConfiguration Configuration = configuration;
+        //private readonly string MySqlVersion = "10.4.32-MariaDB";
         private readonly string ConnectionString;
-        private readonly string MySqlVersion = "10.4.32-MariaDB";
         public IDbConnection Connection { get; set; }
         public MySqlDbContext(IConfiguration configuration)
         {
@@ -25,7 +26,7 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql(ConnectionString, ServerVersion.AutoDetect(MySqlVersion));
+            optionsBuilder.UseMySQL(ConnectionString);
         }
 
         public override void Dispose()
@@ -63,5 +64,7 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<UserConservation> UserConservations { get; set; }
         public DbSet<UserItem> UserItems { get; set; }
         public DbSet<UserRelation> UserRelations { get; set; }
+        public DbSet<ViewUserRelation> ViewUserRelations { get; set; }
+        public DbSet<ViewUser> ViewUsers { get; set; }
     }
 }

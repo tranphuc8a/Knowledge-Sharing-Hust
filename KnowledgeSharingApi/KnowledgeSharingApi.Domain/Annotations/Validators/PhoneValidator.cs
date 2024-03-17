@@ -15,7 +15,7 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
     {
         public PhoneValidator()
         {
-            Pattern = RegexValidator.PHONE_REGEX_PATTERN;
+            Pattern = PHONE_REGEX_PATTERN;
         }
     }
 }

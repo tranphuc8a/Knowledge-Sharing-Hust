@@ -320,7 +320,7 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
 
         public string ForgotPasswordEmailContent(string code, int durationInMinutes = 3)
         {
-            return $"Bạn vừa gửi yêu cầu đặt lại mật khẩu tài khoản của bạn trên Misa Cukcuk. <br/>" +
+            return $"Bạn vừa gửi yêu cầu đặt lại mật khẩu tài khoản của bạn trên Knowledge Sharing. <br/>" +
                     $"Nhập mã <h1>{code}</h1> để đặt lại mật khẩu. <br/> " +
                     $"Lưu ý không để lộ mã này cho người khác biết. <br/>" +
                     $"Mã có thời hạn trong {durationInMinutes} phút.";
@@ -363,15 +363,15 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
 
         public string RegistrationEmailSubject()
         {
-            return "Mã xác minh đăng ký tài khoản Misa Cukcuk";
+            return "Mã xác minh đăng ký tài khoản Knowledge Sharing";
         }
 
         public string RegistrationEmailContent(string code, int durationInMinutes = 3)
         {
-            return $"Bạn vừa gửi yêu cầu đăng ký tài khoản mới trên Misa Cukcuk. <br/> " +
+            return $"Bạn vừa gửi yêu cầu đăng ký tài khoản mới trên Knowledge Sharing. <br/> " +
                     $"Nhập mã <h1>{code}</h1> để đăng ký tài khoản. <br/> " +
                     $"Lưu ý không để lộ mã này cho người khác biết. <br/>" +
-                    $"Mã có thời hạn trong {durationInMinutes} phút."; ;
+                    $"Mã có thời hạn trong {durationInMinutes} phút.";
         }
 
         public string AddNewUserSuccess()
@@ -421,12 +421,64 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
 
         public string LimitLoginTime()
         {
-            return $"";
+            return $"Đăng nhập quá nhiều lần, vui lòng nhập mã captcha để tiếp tục";
         }
 
         public string InvalidCaptcha()
         {
             return $"Mã captcha không hợp lệ";
+        }
+
+        public string CancelUserEmailSubject()
+        {
+            return $"Mã xác minh HỦY tài khoản Knowledge Sharing";
+        }
+
+        public string CancelUserEmailContent(string code, int durationInMinutes = 3)
+        {
+            return $"Bạn vừa gửi yêu cầu hủy bỏ tài khoản của bạn trên Knowledge Sharing. <br/> " +
+                    $"Nhập mã <h1>{code}</h1> để xác nhận hủy bỏ tài khoản. <br/> " +
+                    $"Lưu ý không để lộ mã này cho người khác biết. <br/>" +
+                    $"Mã có thời hạn trong {durationInMinutes} phút.";
+        }
+
+        public string CancelUserSuccess()
+        {
+            return $"Yêu cầu của bạn đã được đưa vào tiến trình xử lý. Chúng tôi sẽ gửi email tới bạn ngay khi tiến trình hoàn tất.";
+        }
+
+        public string CancelUserFailure()
+        {
+            return $"Hủy bỏ tài khoản thất bại";
+        }
+
+        public string CancelUserRespomseEmailSubject()
+        {
+            return $"Kết quả xử lý yêu cầu hủy bỏ tài khoản của bạn trên Knowledge Sharing";
+        }
+
+        public string CancelUserFailureProcessResponseEmailContent(string name)
+        {
+            return 
+                $"Xin chào <b>{name}</b>, <br><br> " +
+                $"Bạn đã gửi cho chúng tôi yêu cầu hủy tài khoản được đăng ký bởi email này của bạn trên <b>Knowledge Sharing</b>. <br> " +
+                $"Chúng tôi rất tiếc phải thông báo rằng tiến trình đã gặp sự cố vì một số lý do. <br> " +
+                $"Vui lòng thực hiện lại yêu cầu hoặc báo lại với chúng tôi bằng cách phản hồi lại email " +
+                $"này để chúng tôi có thể trợ giúp bạn trong thời gian sớm nhất. <br><br> " +
+                $"Rất xin lỗi bạn vì sự bất tiện này,<br> " +
+                $"Đội ngũ <b>Knowledge Sharing</b> ";
+        }
+
+        public string CancelUserSuccessProcessResponseEmailContent(string name)
+        {
+            return
+                $"Xin chào <b>{name}</b>, <br><br> " +
+                $"Bạn đã gửi cho chúng tôi yêu cầu hủy tài khoản được đăng ký bởi email này của bạn trên <b>Knowledge Sharing</b>. <br> " +
+                $"Yêu cầu của bạn đã được xử lý thành công: <i>Tài khoản của bạn đã bị xóa vĩnh viễn và không thể khôi phục</i>. <br> " +
+                $"Giờ đây, bạn có thể dùng email này để đăng ký tài khoản mới trên <b>Knowledge Sharing</b>. <br><br> " +
+                $"Hi vọng bạn đã có những trải nghiệm thú vị,<br> " +
+                $"Cảm ơn bạn đã tham gia,<br> " +
+                $"Đội ngũ <b>Knowledge Sharing</b> ";
         }
     }
 }

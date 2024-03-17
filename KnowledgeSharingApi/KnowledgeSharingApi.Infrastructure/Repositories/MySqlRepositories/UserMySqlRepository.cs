@@ -1,13 +1,18 @@
 ﻿using Dapper;
+using KnowledgeSharingApi.Domains.Exceptions;
+using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Entities;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Emails;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +32,56 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return hashPassword == user.HashPassword;
         }
 
+        public async Task<int> UpdatePassword(string username, string newPassword)
+        {
+            string hashPassword = encrypt.Sha256HashPassword(username, newPassword);
+            string sqlCommand = "update User set HashPassword = @hashPassword where Username = @username;";
+            int res = await Connection.ExecuteAsync(sqlCommand, new { username, hashPassword }, Transaction);
+            return res;
+        }
+
+        public Task<IEnumerable<ViewUser>> GetDetail()
+        {
+            return Task.FromResult(DbContext.ViewUsers.AsEnumerable());
+        }
+
+        public Task<IEnumerable<ViewUser>> GetDetail(int limit, int offset)
+        {
+            return Task.FromResult(DbContext.ViewUsers.Skip(offset).Take(limit).AsEnumerable());
+        }
+
+        public Task<ViewUser?> GetDetail(string userId)
+        {
+            var query = from user in DbContext.ViewUsers
+                        where (user.UserId.ToString() == userId)
+                        select user;
+            return Task.FromResult(query.FirstOrDefault());
+        }
+
+        public Task<ViewUser?> GetDetailByEmail(string email)
+        {
+            var query = from viewUser in DbContext.ViewUsers
+                        where (viewUser.Email == email)
+                        select viewUser;
+            return Task.FromResult(query.FirstOrDefault());
+        }
+
+        public Task<ViewUser?> GetDetailByUsername(string username)
+        {
+            var query = from user in DbContext.ViewUsers
+                        where (user.Username == username)
+                        select user;
+            return Task.FromResult(query.FirstOrDefault());
+        }
+
+        public Task<ViewUser?> GetDetailByUsernameOrUserId(string unOruid)
+        {
+            var query = from user in DbContext.ViewUsers
+                        where (user.Username == unOruid || user.UserId.ToString() == unOruid)
+                        select user;
+            return Task.FromResult(query.FirstOrDefault());
+        }
+
         public Task<User?> GetByEmail(string email)
         {
             var query = from user in DbContext.Users
@@ -43,11 +98,29 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public async Task<int> UpdatePassword(string username, string newPassword)
+        public async Task<PaginationResponseModel<T>> GetByUserId<T>(string userId, int limit, int offset) where T : Entity
         {
-            string hashPassword = encrypt.Sha256HashPassword(username, newPassword);
-            string sqlCommand = "update User set HashPassword = @hashPassword where Username = @username;";
-            int res = await Connection.ExecuteAsync(sqlCommand, new { username, hashPassword}, Transaction);
+            string tableName = typeof(T).Name;
+            // Check bảng T phải có trường UserId:
+            _ = typeof(T).GetProperty("UserId") ?? throw new NotMatchTypeException();
+            string sqlCommand = $"Select * from {tableName} " +
+                                $"where UserId = @userId; ";
+            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, new { userId, limit, offset });
+            res.Limit = limit;
+            res.Offset = offset;
+            return res;
+        }
+
+        public async Task<PaginationResponseModel<T>> GetByUsername<T>(string username, int limit, int offset) where T : Entity
+        {
+            string tableName = typeof(T).Name;
+            // Check bảng T phải có trường UserId:
+            _ = typeof(T).GetProperty("UserId") ?? throw new NotMatchTypeException();
+            string sqlCommand = $"Select * from {tableName} " +
+                                $"where UserId in (Select UserId from User where Username = @username); ";
+            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, new { username, limit, offset });
+            res.Limit = limit;
+            res.Offset = offset;
             return res;
         }
     }

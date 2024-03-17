@@ -151,8 +151,7 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 if (token == null) return null;
 
-                ClaimsPrincipal? claimsPrincipal =
-                        Encrypt.SetIsValidateJwtTokenLifeTime(true).JwtDecryptToClaimsPrincipal(token);
+                ClaimsPrincipal? claimsPrincipal = Encrypt.JwtDecryptToClaimsPrincipal(token, isValidateLifeTime: true);
                 if (claimsPrincipal == null) return null;
 
                 return claimsPrincipal.Identity?.Name;

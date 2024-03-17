@@ -41,7 +41,7 @@ namespace KnowledgeSharingApi.Domains.Models.Dtos
             HttpResponse response = context.HttpContext.Response;
             response.ContentType = "application/json";
             response.StatusCode = (int)StatusCode;
-            var errorResponse = new { StatusCode, UserMessage, DevMessage, MoreInfo, TraceId, Body };
+            var errorResponse = new { StatusCode = (int) StatusCode, UserMessage, DevMessage, MoreInfo, TraceId, Body };
             return response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(errorResponse));
         }
 
