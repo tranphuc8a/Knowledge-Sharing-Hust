@@ -123,10 +123,25 @@ namespace KnowledgeSharingApi.Domains.Enums
     {
         Register = 0,
         ForgotPassword = 1,
-        Payment = 2
+        CancelUser = 2,
+        Payment = 3
     }
 
-    
+
+
+    /// <summary>
+    /// Danh sách các bước trong một pipe, procedure nào đó
+    /// Gồm: step 1 -> step 5
+    /// </summary>
+    /// Created: PhucTV (17/3/24)
+    /// Modified: None
+    public enum EProcedureStep
+    {
+        Step1, Step2, Step3, Step4, Step5,
+        Step6, Step7, Step8, Step9, Step10
+    }
+
+
     /// <summary>
     /// Danh sách phân loại quan hệ user
     /// Gồm: Bạn bè, lời mời kết bạn, theo dõi, chặn

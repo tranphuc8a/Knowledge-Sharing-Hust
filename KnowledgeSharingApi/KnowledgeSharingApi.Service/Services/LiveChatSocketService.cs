@@ -36,7 +36,7 @@ namespace KnowledgeSharingApi.Services.Services
         //                UserConservationId = messageFromClient.UserConservationId,
         //                Content = messageFromClient.Content,
         //                Time = DateTime.Now,
-        //                CreatedDate = DateTime.Now,
+        //                CreatedTime = DateTime.Now,
         //                CreatedBy = socket.Username,
         //                IsEdited = false,
         //                ReplyId = messageFromClient.ReplyId

@@ -1,6 +1,6 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities;
+﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
 using System;
 using System.Collections.Generic;

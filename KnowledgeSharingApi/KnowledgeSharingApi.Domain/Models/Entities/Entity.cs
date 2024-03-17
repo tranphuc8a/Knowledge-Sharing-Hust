@@ -25,13 +25,13 @@ namespace KnowledgeSharingApi.Domains.Models.Entities
 
         [JsonConverter(typeof(CustomDateTimeConverter))]
         [GreaterThanTodayValidator(ErrorMessage = ViConstantResource.CREATED_DATE_GREATER_THAN_TODAY)]
-        public DateTime? CreatedDate { get; set; }
+        public DateTime? CreatedTime { get; set; }
 
         public string? ModifiedBy { get; set; }
 
         [JsonConverter(typeof(CustomDateTimeConverter))]
         [GreaterThanTodayValidator(ErrorMessage = ViConstantResource.MODIFIED_DATE_GREATER_THAN_TODAY)]
-        public DateTime? ModifiedDate { get; set; }
+        public DateTime? ModifiedTime { get; set; }
 
         /// <summary>
         /// Lấy về mảng các props của entity
@@ -75,7 +75,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities
         /// <param name="entity"> Đối tượng được copy </param>
         /// Created: PhucTV (30/1/24)
         /// Modified: None
-        public virtual void Copy(Entity entity)
+        public virtual void Copy(object entity)
         {
             PropertyInfo[] listProps = GetProperties();
             foreach (var prop in listProps)

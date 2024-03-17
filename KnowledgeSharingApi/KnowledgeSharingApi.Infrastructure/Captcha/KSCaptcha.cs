@@ -37,7 +37,7 @@ namespace KnowledgeSharingApi.Infrastructures.Captcha
         public virtual string? DecodeCaptcha(string token)
         {
             // Step 1. Decode token
-            List<Claim>? listClaims = JwtService.JwtDecrypt(token)?.ToList();
+            List<Claim>? listClaims = JwtService.JwtDecryptToListClaims(token, false)?.ToList();
             if (listClaims == null) return null;
 
             // Step 2. Lấy ra trường EXPIRED

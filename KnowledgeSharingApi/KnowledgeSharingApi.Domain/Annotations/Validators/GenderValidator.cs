@@ -16,7 +16,7 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
     /// Modified: None
     public class GenderValidator : ValidationAttribute
     {
-        private static readonly List<EGender> _ListGender = [EGender.Male, EGender.Female, EGender.Other];
+        public static readonly List<EGender> ListGender = [EGender.Male, EGender.Female, EGender.Other];
         public override bool IsValid(object? value)
         {
             if (value == null)
@@ -25,7 +25,7 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
             }
             if (int.TryParse(value.ToString(), out int gender))
             {
-                if (!_ListGender.Contains((EGender)gender))
+                if (!ListGender.Contains((EGender)gender))
                 {
                     throw new ValidatorException(ErrorMessage ?? GetType().Name);
                 }

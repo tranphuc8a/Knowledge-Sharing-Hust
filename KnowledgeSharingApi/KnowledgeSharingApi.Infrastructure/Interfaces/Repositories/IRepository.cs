@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities;
+﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -32,7 +33,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Danh sách bản ghi </returns>
         /// Created: PhucTV (26/12/23)
         /// Modified: None
-        Task<IEnumerable<T>> Get(int limit, int offset);
+        Task<PaginationResponseModel<T>> Get(int limit, int offset);
 
 
 
@@ -53,6 +54,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
          * Modified: None
          */
         Task<string?> Insert(T entity);
+
+        /**
+         * Hàm thực hiện thêm mới một bản ghi
+         * Params {*} entity - bản ghi cần thêm mới
+         * Returns: Số lượng bản ghi bị ảnh hưởng
+         * Created: PhucTV (26/12/23)
+         * Modified: None
+         */
+        Task<string?> Insert(string id, T entity);
 
 
         /// <summary>
@@ -106,7 +116,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Danh sách bản ghi </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: PhucTV (10/1/24) move up to IBaseRepo
-        Task<IEnumerable<T>> Filter(string text, int limit, int offset);
+        Task<PaginationResponseModel<T>> Filter(string text, int limit, int offset);
 
 
         /// <summary>

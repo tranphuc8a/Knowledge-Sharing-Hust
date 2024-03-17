@@ -46,6 +46,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        public Task<ServiceResult> Action(VerifyCodeModel codeModel);
+        public Task<ServiceResult> Action(ActiveCodeModel codeModel);
     }
 }

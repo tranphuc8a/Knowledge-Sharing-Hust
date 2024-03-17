@@ -27,6 +27,8 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         public const string EXCEL_FORMAT = "Không đúng định dạng file excel";
         public const string USERNAME_FORMAT = "Không đúng định dạng username";
         public const string PASSWORD_FORMAT = "Không đúng định dạng password";
+        public const string URL_FORMAT = "Không đúng định dạng đường dẫn URL";
+        public const string ROLE_FORMAT = "Vai trò không đúng (Admin, User, Banned)";
 
 
         public const string NAME_EMPTY = "Họ và tên không được trống";
@@ -40,10 +42,12 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         public const string USERNAME_EMPTY = "Username không được trống";
         public const string PASSWORD_EMPTY = "Password không được trống";
         public const string USERID_EMPTY = "Mã người dùng (UserId) không được trống";
+        public const string USER_EMPTY = "Vai trò tài khoản không được trống";
         public const string ROLEID_EMPTY = "Mã quyền (RoleId) không được trống";
         public const string ROLE_NAME_EMPTY = "Tên quyền (Rolename) không được trống";
         public const string ACCESS_TOKEN_EMPTY = "Access Token không được trống";
         public const string REFRESH_TOKEN_EMPTY = "Refresh Token không được trống";
+        public const string URL_EMPTY = "Đường dẫn url không được trống";
 
         public const string EMPLOYEE_CODE_EMPTY = "Mã nhân viên không được trống";
         public const string CUSTOMER_CODE_EMPTY = "Mã khách hàng không được trống";

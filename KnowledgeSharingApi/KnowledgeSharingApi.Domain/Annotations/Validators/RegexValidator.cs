@@ -24,6 +24,7 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
         public const string BANKACCOUNT_REGEX_PATTERN = @"^\d{4,20}$";
         public const string USERNAME_REGEX_PATTERN = @"^[a-zA-Z][a-zA-Z0-9_]{3,15}$";
         public const string PASSWORD_REGEX_PATTERN = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}$";
+        public const string URL_REGEX_PATTERN = @"^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$";
 
         protected string? Pattern { get; set; }
 

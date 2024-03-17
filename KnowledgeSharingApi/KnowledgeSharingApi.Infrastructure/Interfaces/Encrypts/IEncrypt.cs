@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -9,6 +10,25 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts
 {
     public interface IEncrypt
     {
+        /// <summary>
+        /// Mã hóa đối tượng JwtTokenDto thành jwt token
+        /// </summary>
+        /// <param name="tokenDto"> Token cần mã hóa </param>
+        /// <returns> jwt cần lấy </returns>
+        /// Created: PhucTV (21/2/24)
+        /// Modified: None
+        string? JwtEncrypt(JwtTokenDto tokenDto);
+
+        /// <summary>
+        /// Giải mã token về đối tượng JwtTokenDto
+        /// </summary>
+        /// <param name="token"> chuỗi token cần giải mã </param>
+        /// <returns> Mảng claim cần lấy </returns>
+        /// Created: PhucTV (21/2/24)
+        /// Modified: None
+        JwtTokenDto? JwtDecrypt(string token, bool isValidateLifeTime);
+
+
         /// <summary>
         /// Mã hóa danh sách claim thành jwt token
         /// </summary>
@@ -25,7 +45,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts
         /// <returns> Mảng claim cần lấy </returns>
         /// Created: PhucTV (21/2/24)
         /// Modified: None
-        IEnumerable<Claim>? JwtDecrypt(string token);
+        IEnumerable<Claim>? JwtDecryptToListClaims(string token, bool isValidateLifeTime);
 
 
         /// <summary>
@@ -35,7 +55,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts
         /// <returns> CLaimPrincipal cần lấy </returns>
         /// Created: PhucTV (21/2/24)
         /// Modified: None
-        ClaimsPrincipal? JwtDecryptToClaimsPrincipal(string token);
+        ClaimsPrincipal? JwtDecryptToClaimsPrincipal(string token, bool isValidateLifeTime);
 
 
         /// <summary>
@@ -48,13 +68,5 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts
         /// Modified: None
         string Sha256HashPassword(string username, string password);
 
-
-        /// <summary>
-        /// Tùy chỉnh xem có validate theo expired của jwt không
-        /// </summary>
-        /// <param name="isValidateJwtTokenLifeTime"> true - có, false - không </param>
-        /// Created: PhucTV (13/3/24)
-        /// Modified: None
-        IEncrypt SetIsValidateJwtTokenLifeTime(bool isValidateJwtTokenLifeTime);
     }
 }

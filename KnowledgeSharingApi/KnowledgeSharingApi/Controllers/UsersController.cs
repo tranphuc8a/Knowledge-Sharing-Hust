@@ -1,45 +1,280 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+using KnowledgeSharingApi.Infrastructures.Encrypts;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
 using KnowledgeSharingApi.Services.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
+using System.Security.Claims;
 
 namespace KnowledgeSharingApi.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class UsersController : BaseController<User>
+    [CustomAuthorization]
+    public class UsersController : ControllerBase
     {
         #region Fields and Constructor
-        private readonly IUserRepository _UserRepository;
-        private readonly IUserService _UserService;
+        protected readonly IUserService UserService;
+        protected readonly IResourceFactory ResourceFactory;
+        protected readonly IResponseResource ResponseResource;
+
         public UsersController(
-            IUserRepository userRepository,
             IUserService customerGroupService,
-            IResourceFactory resourceFactory) : base(resourceFactory)
+            IResourceFactory resourceFactory
+            )
         {
-            _UserRepository = userRepository;
-            _UserService = customerGroupService;
-            ResponseTableName = _EntityResource.User();
+            UserService = customerGroupService;
+            ResourceFactory = resourceFactory;
+            ResponseResource = ResourceFactory.GetResponseResource();
         }
+
+
+        /// <summary>
+        /// Xử lý yêu cầu lấy về profile của chính mình
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMeProfile(string userId)
+        {
+            string? uId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            if (uId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.GetMyUserProfile(userId);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu cập nhật ảnh đại diện
+        /// </summary
+        /// <param name="avatar"> IFormFile - file ảnh đại điện được upload lên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPatch("me/update-avatar")]
+        public async Task<IActionResult> UpdateMeProfile(string uid, [FromBody] IFormFile avatar)
+        {
+            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            //if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.UpdateMyAvatarImage(uid, avatar);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu cập nhật ảnh bìa
+        /// </summary>
+        /// <param name="cover"> IFormFile - nội dung file ảnh bìa </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPatch("me/update-cover")]
+        public async Task<IActionResult> UpdateMeAvatar(string uid, [FromBody] IFormFile cover)
+        {
+            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            //if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.UpdateMyCoverImage(uid, cover);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu cập nhật thông tin cá nhân
+        /// </summary>
+        /// <param name="model"> Thông tin mới cần cập nhật </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPatch("me/update-profile")]
+        public async Task<IActionResult> UpdateMeProfile(string uid, [FromBody] UpdateProfileModel model)
+        {
+            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            //if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.UpdateMyUserProfile(uid, model);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu lấy về thông tin của người khác
+        /// </summary>
+        /// <param name="unOruid"> username hoặc userid của user cần lấy thông tin về </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpGet("user-detail")]
+        public async Task<IActionResult> GetMeUserDetail(string uid, string unOruid)
+        {
+            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            //if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.GetUserDetail(uid, unOruid);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+
+        /// <summary>
+        /// Người dùng tìm kiếm trang cá nhân của người khác
+        /// </summary>
+        /// <param name="searchKey"> Từ khóa tìm kiếm </param>
+        /// <param name="limit"> Thuộc tính phân trang - số lượng bản ghi cần lấy </param>
+        /// <param name="offset"> Thuộc tính phân trang - độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchMe(string uid, string searchKey, int? limit, int? offset)
+        {
+            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            //if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.SearchUser(uid, searchKey, limit, offset);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+        /// <summary>
+        /// Hàm xử lý ngoại lệ xác thực user thất bại
+        /// </summary>
+        /// <param name="user"> Thông tin user sau khi giải mã jwt token </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        protected virtual IActionResult FailedAuthentication(ClaimsPrincipal user)
+        {
+            string msg = ResponseResource.Failure();
+            ApiResponse res = new()
+            {
+                StatusCode = EStatusCode.Unauthorized,
+                UserMessage = msg,
+                DevMessage = msg,
+                Body = user
+            };
+            return StatusCode((int)res.StatusCode, res);
+        }
+
         #endregion
 
 
-        #region Template methods steps
-        protected override IUserRepository GetRepository()
+        #region Admin
+
+        /// <summary>
+        /// Xử lý yêu cầu cập nhật thông tin tài khoản của quản trị viên
+        /// </summary>
+        /// <param name="uid"> user id của tài khoản cần cập nhật thông tin </param>
+        /// <param name="model"> thông tin cập nhật </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPatch("admin/update-user")]
+        public async Task<IActionResult> AdminUpdateUser(string uid, [FromBody] UpdateUserModel model)
         {
-            return _UserRepository;
+            ServiceResult service = await UserService.AdminUpdateUserInfo(uid, model);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
         }
 
-        protected override IUserService GetService()
+        /// <summary>
+        /// Xử lý yêu cầu mở khóa một tài khoản 
+        /// </summary>
+        /// <param name="uid"> user id của tài khoản được mở khóa </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPost("admin/unblock-user")]
+        public async Task<IActionResult> AdminUnblockUser(string uid)
         {
-            return _UserService;
+            ServiceResult service = await UserService.AdminUnblockUser(uid);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
         }
+
+
+        /// <summary>
+        /// Xử lý yêu cầu khóa một tài khoản của quản trị viên
+        /// </summary>
+        /// <param name="uid"> userid của tài khoản cần được khóa </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPost("admin/block-user")]
+        public async Task<IActionResult> AdminBlockUser(string uid)
+        {
+            ServiceResult service = await UserService.AdminBlockUser(uid);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+
+        /// <summary>
+        /// Xử lý yêu cầu tìm kiếm tài khoản của quản trị viên
+        /// </summary>
+        /// <param name="searchKey"> Từ khóa tìm kiếm </param>
+        /// <param name="limit"> Thuộc tính phân trang - số lượng bản ghi cần lấy </param>
+        /// <param name="offset"> Thuộc tính phân trang - Độ lệch bản ghi đầu tiên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpGet("admin/search-user")]
+        public async Task<IActionResult> AdminSearchUser(string searchKey, int? limit, int? offset)
+        {
+            ServiceResult service = await UserService.AdminSearchUser(searchKey, limit, offset);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu lấy về thông tin chi tiết của một user khác của quản trị viên
+        /// </summary>
+        /// <param name="uid"> user id của tài khoản cần lấy thông tin </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpGet("admin/user-profile")]
+        public async Task<IActionResult> AdminGetUserProfile(string uid)
+        {
+            ServiceResult service = await UserService.AdminGetUserProfile(uid);
+            ApiResponse res = new(service);
+            return StatusCode((int) res.StatusCode, res);
+        }
+
+
+        /// <summary>
+        /// Xử lý yêu cầu khóa tài khoản của quản trị viên
+        /// </summary>
+        /// <param name="uid"> user id của tài khoản cần xóa </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpDelete("admin/delete-user")]
+        public async Task<IActionResult> AdminDeleteUser(string uid)
+        {
+            ServiceResult service = await UserService.AdminDeleteUser(uid);
+            ApiResponse res = new(service);
+        return StatusCode((int)res.StatusCode, res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu lấy về danh sách user của admin
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpGet("admin/list-user")]
+        public async Task<IActionResult> AdminGetListUser(int? limit, int? offset)
+        {
+            ServiceResult service = await UserService.AdminGetListUser(limit, offset);
+            ApiResponse res = new(service);
+            return StatusCode((int)res.StatusCode, res);
+        }
+
         #endregion
 
     }

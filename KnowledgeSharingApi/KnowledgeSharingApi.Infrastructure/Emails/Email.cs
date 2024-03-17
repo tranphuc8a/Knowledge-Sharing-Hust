@@ -8,28 +8,44 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using MimeKit;
+using KnowledgeSharingApi.Domains.Models.Entities;
 
 namespace KnowledgeSharingApi.Infrastructures.Emails
 {
-    public class Email : BaseEmail
+    public class Email : IEmail
     {
-        readonly string MISACUKCUK_CLIENT = "MisaCukcuk Client";
-        readonly string HostAddress = "smtp.gmail.com";
-        readonly int HostPort = 587;
-        readonly bool isEnableSsl = true;
+        #region Email config attributes
+        // Config constant
+        protected readonly string SenderName = "Knowledge Sharing";
+        protected readonly string ReceiverName = "Client of Knowledge Sharing";
+        protected readonly string HostAddress = "smtp.gmail.com";
+        protected readonly int HostPort = 587;
+        protected readonly bool isEnableSsl = true;
+
+        // Get values from configuration
+        protected readonly IConfiguration configuration;
+        protected readonly string FromEmail;
+        protected readonly string FromName;
+        protected readonly string FromPassword;
+
 
         // Smtp Sync
-        protected SmtpClient SmtpClient { get; set; }
-        protected MailAddress From { get; set; }
-        protected MailAddress? To { get; set; }
-
+        protected readonly SmtpClient SmtpClient;
+        protected readonly MailAddress From;
 
         // Smtp Async
-        protected MimeMessage Message;
-        protected MailKit.Net.Smtp.SmtpClient SmtpClientAsync;
+        protected readonly MailKit.Net.Smtp.SmtpClient SmtpClientAsync;
+        protected readonly MailboxAddress FromMailboxAddress;
+        #endregion
 
-        public Email(IConfiguration _configuration) : base(_configuration)
+        public Email(IConfiguration _configuration)
         {
+            // Configuration
+            configuration = _configuration;
+            FromEmail = configuration["Email:email"] ?? string.Empty;
+            FromName = configuration["Email:name"] ?? SenderName;
+            FromPassword = configuration["Email:password"] ?? string.Empty;
+
             // For Smtp Sync
             From = new MailAddress(FromEmail, FromName);
             SmtpClient = new SmtpClient
@@ -43,34 +59,36 @@ namespace KnowledgeSharingApi.Infrastructures.Emails
             };
 
             // For Smtp Async
-            Message = new MimeMessage();
-            Message.From.Add(new MailboxAddress(FromName, FromEmail));
+            FromMailboxAddress = new(FromName, FromEmail);
             SmtpClientAsync = new MailKit.Net.Smtp.SmtpClient();
             SmtpClientAsync.Connect(HostAddress, HostPort, !isEnableSsl);
             SmtpClientAsync.Authenticate(FromEmail, FromPassword);
         }
 
-        public override void Send()
+        public virtual void Send(string toEmail, string subject, string content)
         {
-            To = new MailAddress(ToEmail ?? String.Empty, MISACUKCUK_CLIENT);
+            MailAddress To = new(toEmail ?? string.Empty, ReceiverName);
             using var message = new MailMessage(From, To)
             {
-                Subject = Subject,
-                Body = Content,
+                Subject = subject,
+                Body = content,
                 IsBodyHtml = true
             };
             SmtpClient.Send(message);
         }
 
-        public override async Task SendAsync()
+        public virtual async Task SendAsync(string toEmail, string subject, string content)
         {
-            Message.Subject = Subject;
-            Message.To.Add(new MailboxAddress(MISACUKCUK_CLIENT, ToEmail));
-            Message.Body = new TextPart("html")
-            {
-                Text = Content
-            };
-            await SmtpClientAsync.SendAsync(Message);
+            MimeMessage message = new(
+                from: [FromMailboxAddress],
+                to: [new MailboxAddress(ReceiverName, toEmail)],
+                subject: subject,
+                body: new TextPart("html")
+                {
+                    Text = content
+                }
+            );
+            await SmtpClientAsync.SendAsync(message);
         }
     }
 }
