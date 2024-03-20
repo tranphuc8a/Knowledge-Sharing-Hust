@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
 {
-    [Table("Conservation")]
-    public class Conservation : Entity
+    [Table("Conversation")]
+    public class Conversation : Entity
     {
-        public Guid ConservationId { get; set; } = Guid.Empty;
-        public string ConservationName { get; set; } = string.Empty;
+        public Guid ConversationId { get; set; } = Guid.Empty;
+        public string ConversationName { get; set; } = string.Empty;
         public string? Thumbnail { get; set; }
-        protected override Conservation Init()
+        protected override Conversation Init()
         {
-            return new Conservation();
+            return new Conversation();
         }
     }
 }

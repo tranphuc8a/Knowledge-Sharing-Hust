@@ -12,51 +12,69 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
 {
     public interface IDbContext : IDisposable
     {
-        public IDbConnection Connection { get; set; }
+        IDbConnection Connection { get; set; }
 
-        //public DbSet<Block> Blocks { get; set; }
-        //public DbSet<Follow> Follows {get; set;}
-        //public DbSet<Friend> Friends {get; set;}
-        //public DbSet<RequestFriend> RequestFriends {get; set;}
+        /// <summary>
+        /// Lưu thay đổi của DbContext
+        /// </summary>
+        /// <returns> Số bản ghi ảnh hưởng </returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        int SaveChange();
+
+        /// <summary>
+        /// Lưu thay đổi của DbContext bất đồng bộ
+        /// </summary>
+        /// <returns> Số bản ghi ảnh hưởng </returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        Task<int> SaveChangeAsync();
+
+        //DbSet<Block> Blocks { get; set; }
+        //DbSet<Follow> Follows {get; set;}
+        //DbSet<Friend> Friends {get; set;}
+        //DbSet<RequestFriend> RequestFriends {get; set;}
        
         // KnowledgeDbContext
-        public DbSet<Knowledge> Knowledges {get; set;}
-        public DbSet<Category> Categoríes {get; set;}
-        public DbSet<KnowledgeCategory> KnowledgeCategories {get; set;}
-        public DbSet<Comment> Comments {get; set;}
-        public DbSet<Mark> Marks {get; set;}
-        public DbSet<StudyProgress> StudyProgresses {get; set;}
+        DbSet<Knowledge> Knowledges {get; set;}
+        DbSet<Category> Categoríes {get; set;}
+        DbSet<KnowledgeCategory> KnowledgeCategories {get; set;}
+        DbSet<Comment> Comments {get; set;}
+        DbSet<Mark> Marks {get; set;}
+        DbSet<StudyProgress> StudyProgresses {get; set;}
         
         // CourseDbContext
-        public DbSet<Course> Courses {get; set;}
-        public DbSet<CourseLesson> CourseLessons {get; set;}
-        public DbSet<CoursePayment> CoursePayments {get; set;}
-        public DbSet<CourseRegister> CourseRegisters {get; set;}
-        public DbSet<CourseRelation> CourseRelations {get; set;}
+        DbSet<Course> Courses {get; set;}
+        DbSet<CourseLesson> CourseLessons {get; set;}
+        DbSet<CoursePayment> CoursePayments {get; set;}
+        DbSet<CourseRegister> CourseRegisters {get; set;}
+        DbSet<CourseRelation> CourseRelations {get; set;}
         
         // PostDbContext
-        public DbSet<Post> Posts {get; set;}
-        public DbSet<PostEditHistory> PostEditHistories {get; set;}
-        public DbSet<Lesson> Lessons {get; set;}
-        public DbSet<Question> Questions {get; set;}
+        DbSet<Post> Posts {get; set;}
+        DbSet<PostEditHistory> PostEditHistories {get; set;}
+        DbSet<Lesson> Lessons {get; set;}
+        DbSet<Question> Questions {get; set;}
         
         // UserGeneralDbContext
-        public DbSet<User> Users {get; set;}
-        public DbSet<Session> Sessions {get; set;}
-        public DbSet<Profile> Profiles {get; set;}
-        public DbSet<ViewUser> ViewUsers { get; set;}
-        public DbSet<Notification> Notifications {get; set;}
+        DbSet<User> Users {get; set;}
+        DbSet<Session> Sessions {get; set;}
+        DbSet<Profile> Profiles {get; set;}
+        DbSet<ViewUser> ViewUsers { get; set;}
+        DbSet<Notification> Notifications {get; set;}
 
         // UserRelationDbContext
-        public DbSet<UserConservation> UserConservations {get; set;}
-        public DbSet<Conservation> Conservations {get; set;}
-        public DbSet<Message> Messages {get; set;}
-        public DbSet<UserRelation> UserRelations {get; set;}
-        public DbSet<ViewUserRelation> ViewUserRelations {get; set;}
+        DbSet<ViewMessage> ViewMessages { get; set; }
+        DbSet<ViewUserConversation> ViewUserConversations { get; set;}
+        DbSet<UserConversation> UserConversations {get; set;}
+        DbSet<Conversation> Conversations {get; set;}
+        DbSet<Message> Messages {get; set;}
+        DbSet<UserRelation> UserRelations {get; set;}
+        DbSet<ViewUserRelation> ViewUserRelations {get; set;}
         
         // UserItemDbContext
-        public DbSet<UserItem> UserItems {get; set;}
-        public DbSet<Star> Stars {get; set;}
+        DbSet<UserItem> UserItems {get; set;}
+        DbSet<Star> Stars {get; set;}
 
     }
 }

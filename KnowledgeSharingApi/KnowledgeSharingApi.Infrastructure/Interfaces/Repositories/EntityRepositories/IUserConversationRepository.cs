@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories
 {
-    public interface IConservationRepository : IRepository<Conservation>
+    public interface IUserConversationRepository : IRepository<UserConversation>
     {
     }
 }

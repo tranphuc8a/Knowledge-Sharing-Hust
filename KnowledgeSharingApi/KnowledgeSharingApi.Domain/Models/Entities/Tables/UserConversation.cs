@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
 {
-    [Table("UserConservation")]
-    public class UserConservation : Entity
+    [Table("UserConversation")]
+    public class UserConversation : Entity
     {
-        public Guid UserConservationId { get; set; } = Guid.Empty;
+        public Guid UserConversationId { get; set; } = Guid.Empty;
         public Guid UserId { get; set; } = Guid.Empty;
-        public Guid ConservationId { get; set; } = Guid.Empty;
+        public Guid ConversationId { get; set; } = Guid.Empty;
         public string? Nickname { get; set; }
         public DateTime Time { get; set; }
         public DateTime LastReadTime { get; set; }
         public DateTime LastDeleteTime { get; set; }
-        protected override UserConservation Init()
+        protected override UserConversation Init()
         {
-            return new UserConservation();
+            return new UserConversation();
         }
     }
 }

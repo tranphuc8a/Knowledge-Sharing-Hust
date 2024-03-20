@@ -35,10 +35,20 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
             base.Dispose();
         }
 
+        public int SaveChange()
+        {
+            return base.SaveChanges();
+        }
+
+        public async Task<int> SaveChangeAsync()
+        {
+            return await base.SaveChangesAsync();
+        }
+
         //public DbSet<Block> Blocks { get; set; }
         public DbSet<Category> Categoríes { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<Conservation> Conservations { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<CourseLesson> CourseLessons { get; set; }
         public DbSet<CoursePayment> CoursePayments { get; set; }
@@ -61,10 +71,12 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<Star> Stars { get; set; }
         public DbSet<StudyProgress> StudyProgresses { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<UserConservation> UserConservations { get; set; }
+        public DbSet<UserConversation> UserConversations { get; set; }
         public DbSet<UserItem> UserItems { get; set; }
         public DbSet<UserRelation> UserRelations { get; set; }
         public DbSet<ViewUserRelation> ViewUserRelations { get; set; }
         public DbSet<ViewUser> ViewUsers { get; set; }
+        public DbSet<ViewMessage> ViewMessages { get; set; }
+        public DbSet<ViewUserConversation> ViewUserConversations { get; set; }
     }
 }

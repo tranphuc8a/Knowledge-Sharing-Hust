@@ -35,7 +35,7 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
             return $"Bình luận";
         }
 
-        public string Conservation()
+        public string Conversation()
         {
             return $"Cuộc trò chuyện";
         }
@@ -220,7 +220,7 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
             return $"Người dùng";
         }
 
-        public string UserConservation()
+        public string UserConversation()
         {
             return $"Người dùng trong cuộc trò chuyện";
         }

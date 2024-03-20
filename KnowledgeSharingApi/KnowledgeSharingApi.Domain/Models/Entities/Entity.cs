@@ -75,7 +75,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities
         /// <param name="entity"> Đối tượng được copy </param>
         /// Created: PhucTV (30/1/24)
         /// Modified: None
-        public virtual void Copy(object entity)
+        public virtual Entity Copy(object entity)
         {
             PropertyInfo[] listProps = GetProperties();
             foreach (var prop in listProps)
@@ -86,6 +86,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities
                     prop.SetValue(this, tarProp.GetValue(entity));
                 }
             }
+            return this;
         }
     }
 }

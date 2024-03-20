@@ -76,10 +76,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myuid"> id của User thực hiện </param>
         /// <param name="requestId"> id của lời mời đã được gửi đi </param>
+        /// <param name="isAccept"> Có đồng ý kết bạn không </param>
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> ConfirmFriend(string myuid, string requestId);
+        Task<ServiceResult> ConfirmFriend(string myuid, string requestId, bool isAccept);
         Task<ServiceResult> DeleteRequest(string myuid, string requestId);
 
     }

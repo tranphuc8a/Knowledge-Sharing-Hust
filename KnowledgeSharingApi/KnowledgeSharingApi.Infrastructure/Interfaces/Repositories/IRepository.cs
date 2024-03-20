@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,22 +47,36 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Modified: None
         Task<T?> Get(string id);
 
-        /**
-         * Hàm thực hiện thêm mới một bản ghi
-         * Params {*} entity - bản ghi cần thêm mới
-         * Returns: Số lượng bản ghi bị ảnh hưởng
-         * Created: PhucTV (26/12/23)
-         * Modified: None
-         */
+
+        /// <summary>
+        /// Thực hiện lấy danh sách phần tử theo mảng id
+        /// </summary>
+        /// <param name="ids"> danh sách id của những bản ghi cần lấy </param>
+        /// <returns> Bản ghi cần lấy </returns>
+        /// Created: PhucTV (5/1/24)
+        /// Modified: None
+        Task<IEnumerable<T>> Get(string[] ids);
+
+        /// <summary>
+        /// Hàm thực hiện thêm mới một bản ghi
+        /// Trường id tự động cài set
+        /// </summary>
+        /// <param name="entity"> bản ghi cần thêm mới </param>
+        /// <returns> id của bản ghi đã thêm </returns>
+        /// Created: PhucTV (26/12/23)
+        /// Modified: None
         Task<string?> Insert(T entity);
 
-        /**
-         * Hàm thực hiện thêm mới một bản ghi
-         * Params {*} entity - bản ghi cần thêm mới
-         * Returns: Số lượng bản ghi bị ảnh hưởng
-         * Created: PhucTV (26/12/23)
-         * Modified: None
-         */
+
+        /// <summary>
+        /// Hàm thực hiện thêm mới một bản ghi
+        /// Trường id được custom từ tham số id
+        /// </summary>
+        /// <param name="id"> id của bản ghi </param>
+        /// <param name="entity"> bản ghi cần thêm mới </param>
+        /// <returns> id của bản ghi đã thêm </returns>
+        /// Created: PhucTV (26/12/23)
+        /// Modified: None
         Task<string?> Insert(string id, T entity);
 
 
