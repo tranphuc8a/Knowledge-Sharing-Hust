@@ -1,0 +1,172 @@
+﻿using KnowledgeSharingApi.Domains.Exceptions;
+using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Services.Interfaces;
+using Microsoft.VisualBasic;
+using Mysqlx.Crud;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace KnowledgeSharingApi.Services.Services
+{
+    public class NotificationService(
+        IResourceFactory resourceFactory,
+        INotificationRepository notificationRepository,
+        IUserRepository userRepository
+    ) : INotificationService
+    {
+        protected readonly IResourceFactory ResourceFactory = resourceFactory;
+        protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
+        protected readonly INotificationRepository NotificationRepository = notificationRepository;
+        protected readonly IUserRepository UserRepository = userRepository;
+
+        protected readonly int LimitDefault = 20;
+        protected readonly string NotificationResource = resourceFactory.GetEntityResource().Notification();
+
+
+        #region Functional methods
+        /// <summary>
+        /// Kiểm tra user tồn tại và trả về ViewUser
+        /// </summary>
+        /// <param name="userId"> Id của người dùng cần kiểm tra </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        protected virtual async Task<ViewUser> CheckUserExisted(string userId)
+        {
+            ViewUser viewUser = await UserRepository.GetDetail(userId)
+                ?? throw new ValidatorException(ResponseResource.NotExist(ResourceFactory.GetEntityResource().User()));
+            return viewUser;
+        }
+
+        /// <summary>
+        /// Kiểm tra thông báo tồn tại và trả về Notification
+        /// </summary>
+        /// <param name="userId"> Id thông báo </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        protected virtual async Task<Notification> CheckNotificationExisted(string notiId)
+        {
+            Notification notification = await NotificationRepository.Get(notiId)
+                ?? throw new ValidatorException(ResponseResource.NotExist(NotificationResource));
+            return notification;
+        }
+        #endregion
+
+        #region Delete methods
+
+        public virtual async Task<ServiceResult> DeleteNotification(string userId, string notiId)
+        {
+            // Kiểm tra người dùng tồn tại
+            ViewUser user = await CheckUserExisted(userId);
+
+            // Kiểm tra Noti tồn tại
+            Notification notification = await CheckNotificationExisted(notiId);
+
+            // Kiểm tra Noti đúng là của user
+            if (notification.UserId != user.UserId)
+                return ServiceResult.Forbidden("Đây không phải noti của bạn");
+
+            // Thực hiện xóa
+            int res = await NotificationRepository.Delete(notiId);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(NotificationResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(NotificationResource));
+        }
+
+        public virtual async Task<ServiceResult> DeleteNotifications(string userId)
+        {
+            ViewUser user = await CheckUserExisted(userId);
+            int rows = await NotificationRepository.DeleteAllNotification(user.UserId.ToString());
+            return ServiceResult.Success(ResponseResource.DeletedSomeItems(NotificationResource), string.Empty, rows);
+        }
+
+        public virtual async Task<ServiceResult> DeleteNotifications(string userId, string[] notiIds)
+        {
+            ViewUser user = await CheckUserExisted(userId);
+            IEnumerable<Notification> notifications = await NotificationRepository.Get(notiIds);
+            notifications = notifications.Where(noti => noti.UserId == user.UserId);
+            int rows = await NotificationRepository.Delete(
+                notifications.Select(noti => noti.NotificationId.ToString()).ToArray()
+            );
+            return ServiceResult.Success(ResponseResource.DeletedSomeItems(NotificationResource), string.Empty, rows);
+        }
+
+        #endregion
+
+        #region Get Methods
+
+        public virtual async Task<ServiceResult> GetNotification(string userId, string notificationId)
+        {
+            ViewUser user = await CheckUserExisted(userId);
+            Notification noti = await CheckNotificationExisted(notificationId);
+            if (noti.UserId != user.UserId)
+                return ServiceResult.Forbidden("Đây không phải là thông báo của bạn");
+            return ServiceResult.Success(ResponseResource.GetSuccess(NotificationResource), string.Empty, noti);
+        }
+
+        public virtual async Task<ServiceResult> GetNotifications(string userId, int? limit, int? offset)
+        {
+            ViewUser user = await CheckUserExisted(userId);
+            int limitValue = limit ?? LimitDefault;
+            int offsetValue = offset ?? 0;
+            IEnumerable<Notification> listNotification = 
+                await NotificationRepository.GetNotificationsByUserId(user.UserId.ToString(), limitValue, offsetValue);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(NotificationResource), string.Empty, listNotification);
+        }
+
+        public virtual async Task<ServiceResult> GetNotifications(string userId, string[] notiIds)
+        {
+            ViewUser user = await CheckUserExisted(userId);
+            IEnumerable<Notification> listNotification =
+                (await NotificationRepository.Get(notiIds))
+                .Where(noti => noti.UserId == user.UserId);
+            return ServiceResult.Success(
+                ResponseResource.GetMultiSuccess(NotificationResource), 
+                string.Empty, 
+                listNotification
+            );
+        }
+
+        #endregion
+
+        #region Set read methods
+
+        public virtual async Task<ServiceResult> SetReadNotification(string userId, string notiId)
+        {
+            ViewUser user = await CheckUserExisted(userId);
+            Notification noti = await CheckNotificationExisted(notiId);
+            if (noti.UserId == user.UserId)
+                return ServiceResult.Forbidden("Đây không phải thông báo của bạn");
+            if (noti.IsRead)
+                return ServiceResult.BadRequest("Bạn đã đọc thông báo này rồi");
+            noti.IsRead = true;
+            int res = await NotificationRepository.Update(notiId, noti);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
+            return ServiceResult.Success(ResponseResource.UpdateSuccess());
+        }
+
+        public virtual async Task<ServiceResult> SetReadNotifications(string userId)
+        {
+            ViewUser user = await CheckUserExisted(userId);
+            int effects = await NotificationRepository.SetReadNotification(user.UserId.ToString());
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, effects);
+        }
+
+        public virtual async Task<ServiceResult> SetReadNotifications(string userId, string[] notiIds)
+        {
+            ViewUser user = await CheckUserExisted(userId);
+            int effects = await NotificationRepository.SetReadNotification(user.UserId.ToString(), notiIds);
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, effects);
+        } 
+        #endregion
+    }
+}
