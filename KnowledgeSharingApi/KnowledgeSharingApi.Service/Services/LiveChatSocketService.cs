@@ -33,7 +33,7 @@ namespace KnowledgeSharingApi.Services.Services
         //            // Tạo message
         //            Message messageToDatabase = new()
         //            {
-        //                UserConservationId = messageFromClient.UserConservationId,
+        //                UserConversationId = messageFromClient.UserConversationId,
         //                Content = messageFromClient.Content,
         //                Time = DateTime.Now,
         //                CreatedTime = DateTime.Now,
@@ -43,12 +43,12 @@ namespace KnowledgeSharingApi.Services.Services
         //            };
 
 
-        //            // Lấy ra Conservation
+        //            // Lấy ra Conversation
 
 
         //            // Lấy ra người dùng thứ kia và gửi message tới họ
 
-        //            messageFromClient.UserConservationId;
+        //            messageFromClient.UserConversationId;
 
         //            // Step 2. Lưu message vào database
 

@@ -61,6 +61,8 @@ namespace KnowledgeSharingApi.Infrastructures.UnitOfWorks
             if (transaction != null)
             {
                 transaction.Rollback();
+                transaction.Dispose();
+                Transaction = null;
             }
             else
             {

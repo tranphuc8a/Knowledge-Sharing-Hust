@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
-    public class UserConservationMySqlRepository(IDbContext dbContext) 
-        : BaseMySqlRepository<UserConservation>(dbContext), IUserConservationRepository
+    public class UserConversationMySqlRepository(IDbContext dbContext) 
+        : BaseMySqlRepository<UserConversation>(dbContext), IUserConversationRepository
     {
     }
 }

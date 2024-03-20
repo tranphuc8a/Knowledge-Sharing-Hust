@@ -15,10 +15,12 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
         public string SenderUsername { get; set; } = string.Empty;
         public string SenderRole { get; set; } = string.Empty;
         public string SenderName { get; set; } = string.Empty;
+        public string SenderAvatar { get; set; } = string.Empty;
         public string ReceiverEmail { get; set; } = string.Empty;
         public string ReceiverUsername { get; set; } = string.Empty;
         public string ReceiverRole { get; set; } = string.Empty;
         public string ReceiverName { get; set; } = string.Empty;
+        public string ReceiverAvatar { get; set; } = string.Empty;
 
         protected override ViewUserRelation Init()
         {

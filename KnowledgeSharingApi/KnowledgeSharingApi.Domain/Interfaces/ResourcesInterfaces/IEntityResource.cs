@@ -19,7 +19,7 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces
         String Block();
         String Category();
         String Comment();
-        String Conservation();
+        String Conversation();
         String Course();
         String CourseLesson();
         String CoursePayment();
@@ -42,7 +42,7 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces
         String Star();
         String StudyProgress();
         String User();
-        String UserConservation();
+        String UserConversation();
         String UserItem();
         String UserRelation();
 

@@ -8,7 +8,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
 {
     public class SendMessageSocketModel
     {
-        public Guid UserConservationId { get; set; }
+        public Guid UserConversationId { get; set; }
 
         public string Content { get; set; } = string.Empty;
 

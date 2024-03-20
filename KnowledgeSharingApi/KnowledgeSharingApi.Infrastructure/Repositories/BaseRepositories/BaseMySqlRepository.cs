@@ -60,6 +60,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             return await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id });
         }
 
+        public async Task<IEnumerable<T>> Get(string[] ids)
+        {
+            string sqlCommand = $"Select * from {TableName} where {TableName}Id in @ids";
+            return await Connection.QueryAsync<T>(sqlCommand, new { ids }, transaction: Transaction);
+        }
+
         #endregion
 
 
@@ -197,5 +203,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
                 Results = multipleResults.Read<Q>()
             };
         }
+
+        
     }
 }

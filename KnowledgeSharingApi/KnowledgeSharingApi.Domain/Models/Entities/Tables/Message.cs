@@ -11,7 +11,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
     public class Message : Entity
     {
         public Guid MessageId { get; set; }
-        public Guid UserConservationId { get; set; }
+        public Guid UserConversationId { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime Time { get; set; }
         public Guid? ReplyId { get; set; }

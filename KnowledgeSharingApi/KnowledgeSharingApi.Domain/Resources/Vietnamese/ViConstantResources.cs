@@ -41,6 +41,7 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         public const string EMAIL_EMPTY = "Email không được trống";
         public const string USERNAME_EMPTY = "Username không được trống";
         public const string PASSWORD_EMPTY = "Password không được trống";
+        public const string ID_EMPTY = "Trường Id không được trống";
         public const string USERID_EMPTY = "Mã người dùng (UserId) không được trống";
         public const string USER_EMPTY = "Vai trò tài khoản không được trống";
         public const string ROLEID_EMPTY = "Mã quyền (RoleId) không được trống";
@@ -48,6 +49,8 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         public const string ACCESS_TOKEN_EMPTY = "Access Token không được trống";
         public const string REFRESH_TOKEN_EMPTY = "Refresh Token không được trống";
         public const string URL_EMPTY = "Đường dẫn url không được trống";
+        public const string CONTENT_EMPTY = "Nội dung không được trống";
+
 
         public const string EMPLOYEE_CODE_EMPTY = "Mã nhân viên không được trống";
         public const string CUSTOMER_CODE_EMPTY = "Mã khách hàng không được trống";
