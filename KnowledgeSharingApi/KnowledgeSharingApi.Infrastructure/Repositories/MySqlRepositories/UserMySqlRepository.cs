@@ -9,6 +9,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -122,6 +123,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             res.Limit = limit;
             res.Offset = offset;
             return res;
+        }
+
+        public async Task<ViewUser> CheckExistedUser(string userId, string errorMessage)
+        {
+            return await DbContext.ViewUsers.Where(user => user.UserId.ToString() == userId).FirstOrDefaultAsync()
+                ?? throw new NotExistedEntityException(errorMessage);
         }
     }
 }

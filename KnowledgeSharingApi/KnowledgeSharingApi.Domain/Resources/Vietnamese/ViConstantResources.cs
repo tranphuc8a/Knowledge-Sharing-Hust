@@ -29,6 +29,7 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         public const string PASSWORD_FORMAT = "Không đúng định dạng password";
         public const string URL_FORMAT = "Không đúng định dạng đường dẫn URL";
         public const string ROLE_FORMAT = "Vai trò không đúng (Admin, User, Banned)";
+        public const string PRIVACY_FORMAT = "Quyền riêng tư không hợp lệ (0 - private, 1 - public)";
 
 
         public const string NAME_EMPTY = "Họ và tên không được trống";
@@ -50,6 +51,11 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         public const string REFRESH_TOKEN_EMPTY = "Refresh Token không được trống";
         public const string URL_EMPTY = "Đường dẫn url không được trống";
         public const string CONTENT_EMPTY = "Nội dung không được trống";
+        public const string TITLE_EMPTY = "Tiêu đề không được trống";
+        public const string PRIVACY_EMPTY = "Quyền riêng tư không được trống";
+        public const string COURSE_INTRODUCTION_EMPTY = "Bài giới thiệu của Khóa học không được trống";
+        public const string COURSE_FEE_EMPTY = "Giá thành của Khóa học không được trống";
+        public const string ESTIMATION_EMPTY = "Ước lượng thời gian học không được trống";
 
 
         public const string EMPLOYEE_CODE_EMPTY = "Mã nhân viên không được trống";

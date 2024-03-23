@@ -1,0 +1,69 @@
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace KnowledgeSharingApi.Services.Interfaces
+{
+    public interface IPostService
+    {
+        #region Feed
+        /// <summary>
+        /// Nhóm API lấy về danh sách bài posts trên feed
+        /// </summary>
+        /// <param name="myUid"> Id của chính mình </param>
+        /// <param name="limit"> Số lượng bài post cần lấy </param>
+        /// <param name="offset"> Độ lệch bản ghi đầu </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserGetPosts(string myUid, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset);
+        Task<ServiceResult> AdminGetPosts(int? limit, int? offset);
+
+
+        /// <summary>
+        /// Lấy về danh sách các bài post của mình
+        /// </summary>
+        /// <param name="myUid"> Id của chính mình </param>
+        /// <param name="limit"> Số lượng bài post cần lấy </param>
+        /// <param name="offset"> Độ lệch bản ghi đầu </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserGetMyPosts(string myUid, int? limit, int? offset);
+
+
+        /// <summary>
+        /// Nhóm API lấy về danh sách bài posts của user khác
+        /// </summary>
+        /// <param name="myUid"> Id của chính mình </param>
+        /// <param name="userId"> Id của user muốn lấy post </param>
+        /// <param name="limit"> Số lượng bài post cần lấy </param>
+        /// <param name="offset"> Độ lệch bản ghi đầu </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserGetUserPosts(string myUid, string userId, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetUserPosts(string userId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetUserPosts(string userId, int? limit, int? offset);
+
+        #endregion
+
+
+        #region Delete Posts
+
+        /// <summary>
+        /// Nhóm API xóa bài đăng
+        /// </summary>
+        /// <param name="myUid"> id của user yêu cầu xóa </param>
+        /// <param name="postId"> id của bài đăng cần xóa </param>
+        /// <returns></returns>
+        Task<ServiceResult> UserDeletePost(string myUid, string postId);
+        Task<ServiceResult> AdminDeletePost(string postId);
+
+        #endregion
+    }
+}
