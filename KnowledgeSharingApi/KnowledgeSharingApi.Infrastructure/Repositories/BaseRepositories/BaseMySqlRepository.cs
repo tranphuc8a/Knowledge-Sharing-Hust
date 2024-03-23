@@ -204,6 +204,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             };
         }
 
-        
+        public virtual async Task<T> CheckExisted(string entityId, string errorMessage)
+        {
+            return await Get(entityId) ?? throw new NotExistedEntityException(errorMessage);
+        }
     }
 }

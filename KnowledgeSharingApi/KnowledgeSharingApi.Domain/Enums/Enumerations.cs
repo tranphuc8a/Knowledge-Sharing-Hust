@@ -153,7 +153,21 @@ namespace KnowledgeSharingApi.Domains.Enums
         Friend = 0,
         FriendRequest = 1,
         Follow = 2,
-        Block = 3
+        Block = 3,
+
+        // Friend Request:
+        Requester = 11,
+        FriendRequester = 11,
+        Requestee = 12,
+        FriendRequestee = 12,
+
+        // Folow:
+        Follower = 21,
+        Followee = 22,
+
+        // Block:
+        Blocker = 31,
+        Blockee = 32
     }
 
 

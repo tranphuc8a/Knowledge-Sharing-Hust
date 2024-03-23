@@ -20,7 +20,9 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
 
         public string FullName { get; set; } = string.Empty;
 
-        public string? Thumbnail { get; set; } = null;
+        public string? Avatar { get; set; } = null;
+ 
+        public string? Cover { get; set; } = null;
 
 
 

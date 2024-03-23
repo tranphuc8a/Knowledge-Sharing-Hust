@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using System;
@@ -45,6 +46,11 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
             return await base.SaveChangesAsync();
         }
 
+        public async Task<IDbContextTransaction> BeginTransaction()
+        {
+            return await base.Database.BeginTransactionAsync();
+        }
+
         //public DbSet<Block> Blocks { get; set; }
         public DbSet<Category> Categoríes { get; set; }
         public DbSet<Comment> Comments { get; set; }
@@ -78,5 +84,10 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<ViewUser> ViewUsers { get; set; }
         public DbSet<ViewMessage> ViewMessages { get; set; }
         public DbSet<ViewUserConversation> ViewUserConversations { get; set; }
+        public DbSet<ViewComment> ViewComments { get; set; }
+        public DbSet<ViewPost> ViewPosts { get; set; }
+        public DbSet<ViewCourse> ViewCourses { get; set; }
+        public DbSet<ViewLesson> ViewLessons { get; set; }
+        public DbSet<ViewQuestion> ViewQuestions { get; set; }
     }
 }

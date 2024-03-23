@@ -1,6 +1,7 @@
 ﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -30,6 +31,14 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         /// Modified: None
         Task<int> SaveChangeAsync();
 
+        /// <summary>
+        /// Khởi động transation cho dbContext
+        /// </summary>
+        /// <returns> Đối tượng Transaction được tạo </returns>
+        /// Created: PhucTV (24/3/24)
+        /// Modified: None
+        Task<IDbContextTransaction> BeginTransaction();
+
         //DbSet<Block> Blocks { get; set; }
         //DbSet<Follow> Follows {get; set;}
         //DbSet<Friend> Friends {get; set;}
@@ -40,11 +49,13 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         DbSet<Category> Categoríes {get; set;}
         DbSet<KnowledgeCategory> KnowledgeCategories {get; set;}
         DbSet<Comment> Comments {get; set;}
+        DbSet<ViewComment> ViewComments {get; set;}
         DbSet<Mark> Marks {get; set;}
         DbSet<StudyProgress> StudyProgresses {get; set;}
         
         // CourseDbContext
         DbSet<Course> Courses {get; set;}
+        DbSet<ViewCourse> ViewCourses {get; set;}
         DbSet<CourseLesson> CourseLessons {get; set;}
         DbSet<CoursePayment> CoursePayments {get; set;}
         DbSet<CourseRegister> CourseRegisters {get; set;}
@@ -52,9 +63,12 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         
         // PostDbContext
         DbSet<Post> Posts {get; set;}
+        DbSet<ViewPost> ViewPosts {get; set;}
         DbSet<PostEditHistory> PostEditHistories {get; set;}
         DbSet<Lesson> Lessons {get; set;}
+        DbSet<ViewLesson> ViewLessons {get; set;}
         DbSet<Question> Questions {get; set;}
+        DbSet<ViewQuestion> ViewQuestions {get; set;}
         
         // UserGeneralDbContext
         DbSet<User> Users {get; set;}

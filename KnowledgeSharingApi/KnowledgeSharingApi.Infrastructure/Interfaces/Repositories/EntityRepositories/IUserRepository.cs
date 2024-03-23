@@ -106,6 +106,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (12/3/24)
         /// Modified: None
         Task<int> UpdatePassword(string username, string newPassword);
-        
+
+
+        /// <summary>
+        /// Kiểm tra user có tồn tại hay không
+        /// Throw Not existed enitty Exception nếu không tồn tại
+        /// </summary>
+        /// <param name="userId"> id của user cần kiểm tra </param>
+        /// <returns> Trả về view user tương ứng </returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<ViewUser> CheckExistedUser(string userId, string errorMessage);
     }
 }

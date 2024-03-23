@@ -18,6 +18,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
 
 
         /// <summary>
+        /// Kiểm tra xem entity có tồn tại không
+        /// Trả về entity nếu tồn tại, bắn ra NotExistedEntityException nếu không tồn tại
+        /// </summary>
+        /// <param name="entityId"> Id của entity cần kiểm tra </param>
+        /// <returns> Entity cần lấy </returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<T> CheckExisted(string entityId, string errorMessage);
+
+        /// <summary>
         /// Hàm thực hiện lấy tất cả bản ghi của bảng trong CSDL
         /// </summary>
         /// <returns>Danh sách bản ghi được lấy</returns>
@@ -46,7 +56,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Created: PhucTV (5/1/24)
         /// Modified: None
         Task<T?> Get(string id);
-
+        
 
         /// <summary>
         /// Thực hiện lấy danh sách phần tử theo mảng id
