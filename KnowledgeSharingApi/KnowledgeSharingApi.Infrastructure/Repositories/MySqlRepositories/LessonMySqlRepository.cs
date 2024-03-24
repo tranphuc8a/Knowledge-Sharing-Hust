@@ -1,4 +1,6 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
@@ -10,8 +12,37 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
-    public class LessonMySqlRepository(IDbContext dbContext) 
+    public class LessonMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Lesson>(dbContext), ILessonRepository
     {
+        public Task<ViewQuestion> CheckExistedLesson(string lessonId, string errorMessage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ViewLesson>> GetByUserId(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ViewLesson>> GetPublicPosts(int limit, int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ViewLesson>> GetPublicPostsByUserId(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PaginationResponseModel<ViewLesson>> GetQuestionInCourse(string courseid, int limit, int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ViewLesson>> GetViewPost(int limit, int offset)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

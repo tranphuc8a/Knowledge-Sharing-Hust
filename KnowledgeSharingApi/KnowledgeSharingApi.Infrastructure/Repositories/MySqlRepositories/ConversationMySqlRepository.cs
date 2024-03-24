@@ -79,7 +79,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
             DbContext.Messages.RemoveRange(expired_messages);
 
-            await DbContext.SaveChangeAsync();
+            await DbContext.SaveChangesAsync();
         }
     }
 }

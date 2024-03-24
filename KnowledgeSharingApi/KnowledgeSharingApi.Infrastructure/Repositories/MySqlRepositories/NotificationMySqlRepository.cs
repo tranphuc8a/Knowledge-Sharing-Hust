@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Where(notification => notification.UserId.ToString() == userId)
                 .ToListAsync();
             DbContext.Notifications.RemoveRange(notifications);
-            return await DbContext.SaveChangeAsync();
+            return await DbContext.SaveChangesAsync();
         }
 
         public async Task<int> DeleteMultiNotificationByUserId(string userId, string[] ids)
@@ -31,7 +31,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Where(noti => noti.UserId.ToString() == userId && ids.Contains(noti.NotificationId.ToString()))
                 .ToListAsync();
             DbContext.Notifications.RemoveRange(notifications);
-            return await DbContext.SaveChangeAsync();
+            return await DbContext.SaveChangesAsync();
         }
 
         public Task<IEnumerable<Notification>> GetAllNotificationsByUserId(string userId)
@@ -62,7 +62,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Where(noti => noti.UserId.ToString() == userId && !noti.IsRead)
                 .ToListAsync();
             notifications.ForEach(noti => noti.IsRead = true);
-            return await DbContext.SaveChangeAsync();
+            return await DbContext.SaveChangesAsync();
         }
 
         public async Task<int> SetReadNotification(string userId, string[] ids)
@@ -71,7 +71,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Where(noti => noti.UserId.ToString() == userId && !noti.IsRead && ids.Contains(noti.NotificationId.ToString()))
                 .ToListAsync();
             notifications.ForEach(noti => noti.IsRead = true);
-            return await DbContext.SaveChangeAsync();
+            return await DbContext.SaveChangesAsync();
         }
     }
 }
