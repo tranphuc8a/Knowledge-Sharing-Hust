@@ -36,12 +36,9 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
             base.Dispose();
         }
 
-        public int SaveChange()
-        {
-            return base.SaveChanges();
-        }
+        public override int SaveChanges() => base.SaveChanges();
 
-        public async Task<int> SaveChangeAsync()
+        public async Task<int> SaveChangesAsync()
         {
             return await base.SaveChangesAsync();
         }
@@ -89,5 +86,6 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<ViewCourse> ViewCourses { get; set; }
         public DbSet<ViewLesson> ViewLessons { get; set; }
         public DbSet<ViewQuestion> ViewQuestions { get; set; }
+        public DbSet<ViewCourseRegister> ViewCourseRegisters { get; set; }
     }
 }

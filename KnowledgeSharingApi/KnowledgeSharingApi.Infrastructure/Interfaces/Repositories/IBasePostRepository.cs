@@ -10,6 +10,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
     public interface IBasePostRepository<ReturnType> where ReturnType: class
     {
         /// <summary>
+        /// Lấy về danh sách View Post
+        /// </summary>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<IEnumerable<ReturnType>> GetViewPost(int limit, int offset);
+
+        /// <summary>
         /// Lấy về danh sách bài đăng của một user
         /// </summary>
         /// <param name="userId"> Id của user cần lấy </param>

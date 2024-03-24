@@ -1,4 +1,6 @@
-﻿using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Exceptions;
+using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
@@ -17,23 +19,44 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Services.Services
 {
-    public class QuestionService(
-        IQuestionRepository questionRepository,
-        ICourseRepository courseRepository,
-        IKnowledgeRepository knowledgeRepository,
-        IResourceFactory resourceFactory
-    ) : IQuestionService
+    public class QuestionService : IQuestionService
     {
-        protected readonly IResourceFactory ResourceFactory = resourceFactory;
-        protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
-        protected readonly IQuestionRepository QuestionRepository = questionRepository;
-        protected readonly ICourseRepository CourseRepository = courseRepository;
-        protected readonly IKnowledgeRepository KnowledgeRepository = knowledgeRepository;
-//        protected readonly IUnitOfWork UnitOfWork = unitOfWork
+        protected readonly IResourceFactory ResourceFactory;
+        protected readonly IResponseResource ResponseResource;
+        protected readonly IEntityResource EntityResource;
+        protected readonly IQuestionRepository QuestionRepository;
+        protected readonly ICourseRepository CourseRepository;
+        protected readonly IKnowledgeRepository KnowledgeRepository;
+        protected readonly IUserRepository UserRepository;
+        //        protected readonly IUnitOfWork UnitOfWork = unitOfWork
 
-        protected readonly string QuestionResource = resourceFactory.GetEntityResource().Question();
+        protected readonly string QuestionResource;
         protected readonly int DefaultLimit = 20;
         protected readonly int NumberOfTopComments = 5;
+        protected readonly string NotExistedQuestion, GetQuestionSuccess, GetMultiQuestionSuccess;
+
+        public QuestionService(
+            IQuestionRepository questionRepository,
+            ICourseRepository courseRepository,
+            IKnowledgeRepository knowledgeRepository,
+            IUserRepository userRepository,
+            IResourceFactory resourceFactory
+    )
+        {
+            ResourceFactory = resourceFactory;
+            QuestionRepository = questionRepository;
+            CourseRepository = courseRepository;
+            KnowledgeRepository = knowledgeRepository;
+            UserRepository = userRepository;
+            ResponseResource = resourceFactory.GetResponseResource();
+            EntityResource = resourceFactory.GetEntityResource();
+            QuestionResource = EntityResource.Question();
+
+            NotExistedQuestion = ResponseResource.NotExist(QuestionResource);
+            GetQuestionSuccess = ResponseResource.GetSuccess(QuestionResource);
+            GetMultiQuestionSuccess = ResponseResource.GetMultiSuccess(QuestionResource);
+        }
+
 
         /// <summary>
         /// Thêm các trường thông tin bổ sung cho Post
@@ -78,7 +101,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminDeletePost(string postId)
         {
             // Kiểm tra câu hỏi tồn tại
-            _ = await QuestionRepository.CheckExistedQuestion(postId, ResponseResource.NotExist(QuestionResource));
+            _ = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
             int res = await QuestionRepository.Delete(postId);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(QuestionResource));
@@ -105,96 +128,271 @@ namespace KnowledgeSharingApi.Services.Services
             };
 
             return ServiceResult.Success(
-                ResponseResource.GetMultiSuccess(QuestionResource),
+                GetMultiQuestionSuccess,
                 string.Empty,
                 res
             );
         }
 
-        public Task<ServiceResult> AdminGetPostDetail(string postId)
+        public async Task<ServiceResult> AdminGetPostDetail(string postId)
         {
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
+            ResponseQuestionItemModel questionItemModel = await DecoratePost(question);
+
+            return ServiceResult.Success(
+                GetQuestionSuccess, string.Empty, questionItemModel);
         }
 
-        public Task<ServiceResult> AdminGetPosts(int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetPosts(int? limit, int? offset)
         {
-
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetViewPost(limitValue, offsetValue);
+            List<ResponseQuestionItemModel> res = await DecoratePost(questions);
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
 
-        public Task<ServiceResult> AdminGetUserPosts(string userId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserPosts(string userId, int? limit, int? offset)
         {
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetByUserId(userId);
+            questions = questions.Skip(offsetValue).Take(limitValue);
+
+            List<ResponseQuestionItemModel> res = await DecoratePost(questions);
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
         #endregion
 
         #region Anonymous APIes
-        public Task<ServiceResult> AnonymousGetPostDetail(string postId)
+        public async Task<ServiceResult> AnonymousGetPostDetail(string postId)
         {
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
+            if (question.Privacy != EPrivacy.Public)
+                return ServiceResult.Forbidden("Câu hỏi này đang ở chế độ riêng tư");
+
+            return ServiceResult.Success(GetQuestionSuccess, string.Empty, await DecoratePost(question));
         }
 
-        public Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
         {
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPosts(limitValue, offsetValue);
 
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
 
-        public Task<ServiceResult> AnonymousGetUserPosts(string userId, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetUserPosts(string userId, int? limit, int? offset)
         {
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
+            IEnumerable<ViewQuestion> question = await QuestionRepository.GetPublicPostsByUserId(userId);
+            question = question.Skip(offsetValue).Take(limitValue);
+
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(question));
         }
         #endregion
 
         #region User APIes
-        public Task<ServiceResult> ConfirmQuestion(string myUid, string questionId, bool isConfirm)
+        public async Task<ServiceResult> ConfirmQuestion(string myUid, string questionId, bool isConfirm)
         {
-
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(questionId, NotExistedQuestion);
+            if (question.UserId.ToString() != myUid)
+                return ServiceResult.Forbidden("Đây không phải bài thảo luận của bạn");
+            question.IsAccept = isConfirm;
+            await QuestionRepository.Update(questionId, question);
+            return ServiceResult.Success(ResponseResource.UpdateSuccess());
         }
 
-        public Task<ServiceResult> UserCreatePost(string myUid, CreatePostModel model)
+        public async Task<ServiceResult> UserCreatePost(string myUid, CreatePostModel model)
         {
+            ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
+            if (model is not CreateQuestionModel questionModel)
+                throw new NotMatchTypeException();
+
+            // Kiểm tra Course tồn tại và user phài join course
+            if (questionModel.CourseId != null)
+            {
+                Course course = await CourseRepository.CheckExisted(questionModel.CourseId,
+                    ResponseResource.NotExist(EntityResource.Course()));
+
+                // Kiểm tra user đã join course hay chưa, đợi course repository viết
+                ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, questionModel.CourseId.ToString());
+                if (courseRegister == null)
+                    return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
+            }
+
+            // OK, tạo câu hỏi
+            Guid newId = Guid.NewGuid();
+            Question question = new()
+            {
+                UserItemId = newId,
+                CreatedBy = user.FullName,
+                CreatedTime = DateTime.Now,
+                UserId = user.UserId,
+                UserItemType = EUserItemType.Knowledge,
+                KnowledgeId = newId,
+                Views = 0,
+                KnowledgeType = EKnowledgeType.Post,
+                Privacy = questionModel.CourseId != null ? EPrivacy.Private : EPrivacy.Public,
+                PostId = newId,
+                PostType = EPostType.Question,
+                QuestionId = newId,
+                IsAccept = false
+            };
+            question.Copy(model);
+
+            // Insert câu hỏi
+            string? inserted = await QuestionRepository.Insert(question);
+            if (inserted == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(QuestionResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.InsertSuccess(QuestionResource));
         }
 
-        public Task<ServiceResult> UserDeletePost(string myUid, string postId)
+        public async Task<ServiceResult> UserDeletePost(string myUid, string postId)
         {
+            // Kiểm tra user tồn tại
+            // Không nhất thiết
 
+            // Kiểm tra post tồn tại
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+
+            // Kiểm tra user là chủ post
+            if (question.UserId.ToString() != myUid)
+                return ServiceResult.Forbidden("Đây không phải khóa học của bạn");
+
+            // OK thực hiện xóa
+            int res = await QuestionRepository.Delete(postId);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(QuestionResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(QuestionResource));
         }
 
         #region User Gets
-        public Task<ServiceResult> UserGetListPostsOfCourse(string myUid, string courseId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListPostsOfCourse(string myUid, string courseId, int? limit, int? offset)
         {
+            // Kiểm tra course tồn tại và user phải tham gia course
+            Course course = await CourseRepository.CheckExisted(courseId,
+                   ResponseResource.NotExist(EntityResource.Course()));
 
+            // Kiểm tra user đã join course hay chưa
+            ViewCourseRegister? registerCourse = await CourseRepository.GetViewCourseRegister(myUid, courseId);
+            if (registerCourse == null)
+                return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
+
+            // Lấy về danh sách câu hỏi trong course
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetQuestionInCourse(courseId);
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            questions = questions.Skip(limitValue).Take(offsetValue);
+
+            // Trả về thành công
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
 
-        public Task<ServiceResult> UserGetMyPostDetail(string myUid, string postId)
+        public async Task<ServiceResult> UserGetMyPostDetail(string myUid, string postId)
         {
+            // Kiểm tra post tồn tại
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
+            // Kiểm tra chủ nhân
+            if (question.UserId.ToString() != myUid)
+                return ServiceResult.Forbidden("Bạn không phải chủ nhân của bài thảo luận này");
+
+            // Trả về thành công
+            return ServiceResult.Success(GetQuestionSuccess, string.Empty, await DecoratePost(question));
         }
 
-        public Task<ServiceResult> UserGetMyPosts(string myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyPosts(string myUid, int? limit, int? offset)
         {
+            // Kiểm tra user tồn tại
+            _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
+            // Lấy về và trả về thành công
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetByUserId(myUid);
+            questions = questions.Skip(offsetValue).Take(limitValue);
+
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
 
-        public Task<ServiceResult> UserGetPostDetail(string myUid, string postId)
+        public async Task<ServiceResult> UserGetPostDetail(string myUid, string postId)
         {
+            // Kiểm tra user tồn tại, không nhất thiết
 
+            // Kiểm tra postId tồn tại
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+
+            // Kiểm tra nếu question là private thì có chung khóa học không
+            if (question.Privacy != EPrivacy.Public)
+            {
+                // Mặc định là không pass qua filter này
+                bool isAccessible = false;
+                if (question.CourseId != null)
+                {
+                    // Cho một cơ hội kiểm tra chung khóa học không
+                    ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, question.CourseId.ToString()!);
+                    isAccessible = courseRegister != null;
+                }
+                if (!isAccessible)
+                    return ServiceResult.Forbidden("Bài thảo luận này ở trạng thái riêng tư");
+            }
+
+            // OK pass qua bộ lọc, Trả về thành công
+            return ServiceResult.Success(GetQuestionSuccess, string.Empty, await DecoratePost(question));
         }
 
-        public Task<ServiceResult> UserGetPosts(string myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetPosts(string myUid, int? limit, int? offset)
         {
+            // Chỉ lấy public question, tính toán sắp xếp theo độ ưu tiên của riêng myUId, làm sau
 
+            // Lấy về danh sách public question
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
+
+            // Trả về thành công
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
 
-        public Task<ServiceResult> UserGetUserPosts(string myUid, string userId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetUserPosts(string myUid, string userId, int? limit, int? offset)
         {
+            // Kiểm tra myUid tồn tại (không nhất thiết) và userId tồn tại
+            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
+            // Lấy về danh sách userId question? (có lấy trong private question không?)
+            // Để đơn giản, hiện chỉ lấy public question
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId);
+            questions = questions.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+
+            // Trả về thành công
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
         #endregion
 
-        public Task<ServiceResult> UserUpdatePost(string myUid, string postId, UpdatePostModel model)
+        public async Task<ServiceResult> UserUpdatePost(string myUid, string postId, UpdatePostModel model)
         {
+            // Kiểm tra myUId tồn tại (không nhất thiết)
 
+            // Kiểm tra model đúng
+            if (model is not UpdateQuestionModel updateModel)
+                throw new NotMatchTypeException();
+
+            // Kiểm tra postId tồn tại, và chủ nhân là myUid
+            Question question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            if (question.UserId.ToString() != myUid)
+                return ServiceResult.Forbidden("Đây không phải là bài thảo luận của bạn");
+
+            // Cập nhật question
+            question.Copy(model);
+            int res = await QuestionRepository.Update(postId, question);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(QuestionResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(QuestionResource));
         }
         #endregion
     }

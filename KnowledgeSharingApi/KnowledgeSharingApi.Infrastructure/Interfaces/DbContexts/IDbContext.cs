@@ -1,6 +1,7 @@
 ﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,17 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         /// <returns> Số bản ghi ảnh hưởng </returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        int SaveChange();
+        int SaveChanges();
+
+        /// <summary>
+        /// Map tới Entry của một Entity trong DbContext
+        /// </summary>
+        /// <typeparam name="TEntity"> Kiểu của entity </typeparam>
+        /// <param name="entity"> Đối tượng </param>
+        /// <returns></returns>
+        /// Created: PhucTV (24/3/24)
+        /// Modified: None
+        EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
 
         /// <summary>
         /// Lưu thay đổi của DbContext bất đồng bộ
@@ -29,7 +40,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         /// <returns> Số bản ghi ảnh hưởng </returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<int> SaveChangeAsync();
+        Task<int> SaveChangesAsync();
 
         /// <summary>
         /// Khởi động transation cho dbContext
@@ -59,6 +70,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         DbSet<CourseLesson> CourseLessons {get; set;}
         DbSet<CoursePayment> CoursePayments {get; set;}
         DbSet<CourseRegister> CourseRegisters {get; set;}
+        DbSet<ViewCourseRegister> ViewCourseRegisters {get; set;}
         DbSet<CourseRelation> CourseRelations {get; set;}
         
         // PostDbContext

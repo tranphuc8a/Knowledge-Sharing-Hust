@@ -43,13 +43,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 DbContext.Stars.RemoveRange(DbContext.Stars.Where(item => item.UserItemId == qId));
 
                 DbContext.Questions.RemoveRange(DbContext.Questions.Where(item => item.UserItemId == qId));
-                DbContext.Posts.RemoveRange(DbContext.Posts.Where(item => item.UserItemId == qId));
-                DbContext.Knowledges.RemoveRange(DbContext.Knowledges.Where(item => item.UserItemId == qId));
-                DbContext.UserItems.RemoveRange(DbContext.UserItems.Where(item => item.UserItemId == qId));
+                //DbContext.Posts.RemoveRange(DbContext.Posts.Where(item => item.UserItemId == qId));
+                //DbContext.Knowledges.RemoveRange(DbContext.Knowledges.Where(item => item.UserItemId == qId));
+                //DbContext.UserItems.RemoveRange(DbContext.UserItems.Where(item => item.UserItemId == qId));
 
-                await DbContext.SaveChangeAsync();
+                int rows = await DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
-                return 1;
+                return rows;
             }
             catch (Exception e)
             {
@@ -57,6 +57,30 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 await transaction.RollbackAsync();
                 return 0;
             }
+        }
+
+        public override async Task<string?> Insert(string questionId, Question question)
+        {
+            Guid newGuid = Guid.Parse(questionId);
+            question.UserItemId = question.KnowledgeId = question.PostId = question.QuestionId = newGuid;
+            DbContext.Questions.Add(question);
+            int rows = await DbContext.SaveChangesAsync();
+            return rows > 0 ? newGuid.ToString() : null;
+        }
+
+        public override async Task<int> Update(string questionId, Question updatedQuestion)
+        {
+            Guid questionGuid = Guid.Parse(questionId);
+
+            Question questionToUpdate = await DbContext.Questions.FindAsync(questionGuid) 
+                ?? throw new Exception("Question not found.");
+
+            updatedQuestion.UserItemId = updatedQuestion.KnowledgeId 
+                = updatedQuestion.PostId = updatedQuestion.QuestionId = questionGuid;
+
+            DbContext.Entry(questionToUpdate).CurrentValues.SetValues(updatedQuestion);
+
+            return await DbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<ViewQuestion>> GetByUserId(string userId)
@@ -98,6 +122,22 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .OrderByDescending(post => post.CreatedTime)
                 .ToListAsync();
             return posts;
+        }
+
+
+        public async Task<ViewQuestion?> GetQuestionDetail(string questionId)
+        {
+            return await DbContext.ViewQuestions
+                .Where(ques => ques.QuestionId.ToString() == questionId)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<ViewQuestion>> GetViewPost(int limit, int offset)
+        {
+            return await DbContext.ViewQuestions
+                .OrderByDescending(question => question.CreatedTime)
+                .Skip(offset).Take(limit)
+                .ToListAsync();
         }
     }
 }

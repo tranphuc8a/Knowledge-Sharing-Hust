@@ -32,5 +32,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (24/3/24)
         /// Modified: None
         Task<IEnumerable<ViewQuestion>> GetQuestionInCourse(string courseid);
+
+
+        /// <summary>
+        /// Lấy về thông tin chi tiết một bài thảo luận
+        /// </summary>
+        /// <param name="questionId"> id của bài thảo luận cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (24/3/24)
+        /// Modified: None
+        Task<ViewQuestion?> GetQuestionDetail(string questionId);
     }
 }
