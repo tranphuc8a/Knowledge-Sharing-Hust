@@ -15,5 +15,9 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         public int NumberComments { get; set; }
 
         public IEnumerable<ViewComment> TopComments { get; set; } = [];
+
+        public bool IsMarked { get; set; }
+
+        public int? MyStar { get; set; }
     }
 }

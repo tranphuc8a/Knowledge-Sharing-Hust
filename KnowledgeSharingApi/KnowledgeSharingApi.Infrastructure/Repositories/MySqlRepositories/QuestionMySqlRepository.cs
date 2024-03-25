@@ -142,7 +142,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Select(k => k.KnowledgeId)
                 .Distinct();
             var posts = await DbContext.ViewQuestions
-                .Where(post => post.Privacy == EPrivacy.Public)
+                .Where(post => post.Privacy == EPrivacy.Public) // công khai
                 .Where(post => knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
                 .OrderByDescending(post => post.CreatedTime)
                 .Skip(offset).Take(limit)
@@ -181,9 +181,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToList(); // Dùng ToList để tải kết quả về và tránh query lại nhiều lần
 
             var posts = await DbContext.ViewQuestions
-                .Where(post => knowledgesId.Contains(post.KnowledgeId) && // Lọc post dựa vào danh sách ID đã lấy
-                    (post.CourseId == null || registeredCourseIds.Contains(post.CourseId.Value)) &&
-                    (post.CourseId != null || post.Privacy == EPrivacy.Public)
+                .Where(post => knowledgesId.Contains(post.KnowledgeId) &&
+                    (   // myUid có thể truy cập post:
+                        // post là bài thảo luận của chính mình
+                        (post.UserId == myUId) ||
+                        // hoặc post là bài thảo luận public
+                        (post.Privacy == EPrivacy.Public) ||
+                        // hoặc post là câu hỏi trong khóa học mà myUid có tham gia
+                        (post.CourseId != null && registeredCourseIds.Contains(post.CourseId.Value))
+                    )
                 )
                 .OrderByDescending(post => post.CreatedTime)
                 .Skip(offset)
@@ -193,5 +199,31 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
+        public async Task<IEnumerable<ViewQuestion>> GetMarkedPosts(Guid userId)
+        {
+            // Lấy danh sách CourseId mà User đã đăng ký
+            var registeredCourseIds = new HashSet<Guid>(
+                DbContext.CourseRegisters
+                    .Where(c => c.UserId == userId)
+                    .Select(c => c.CourseId)
+                    .Distinct()
+            );
+
+            // Định nghĩa truy vấn để lấy danh sách các ViewQuestion
+            var query =
+                from post in DbContext.ViewQuestions
+                join mark in DbContext.Marks
+                    on post.KnowledgeId equals mark.KnowledgeId
+                where mark.UserId == userId && (
+                    post.Privacy == EPrivacy.Public || // Question là public
+                    post.UserId == userId || // Hoặc question là của user
+                    (post.CourseId.HasValue && registeredCourseIds.Contains(post.CourseId.Value)) // Hoặc trong course đã đăng ký
+                )
+                orderby mark.CreatedTime descending
+                select post;
+
+            // Thực thi truy vấn và trả về kết quả
+            return await query.ToListAsync();
+        }
     }
 }

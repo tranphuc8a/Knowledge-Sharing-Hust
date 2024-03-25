@@ -32,5 +32,27 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset);
+
+
+        /// <summary>
+        /// Lấy về danh sách user đã đánh dấu knowledge
+        /// </summary>
+        /// <param name="knowledgeId"> id của phần tử kiến thức </param>
+        /// <param name="limit"> Số lượng bình luận muốn lấy </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<PaginationResponseModel<ViewUser>> GetListUserMaredKnowledge(Guid knowledgeId, int limit, int offset);
+
+        /// <summary>
+        /// Lấy về phiên mark của user và knowledgeId nếu tồn tại
+        /// </summary>
+        /// <param name="userId"> id của user </param>
+        /// <param name="knowledgeId"> id của knowledge </param>
+        /// <returns> null nếu không tìm thấy </returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<Mark?> GetMark(Guid userId, Guid knowledgeId);
     }
 }

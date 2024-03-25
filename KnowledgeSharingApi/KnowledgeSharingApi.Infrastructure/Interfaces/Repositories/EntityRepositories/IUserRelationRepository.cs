@@ -60,5 +60,25 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type);
+
+        /// <summary>
+        /// Lấy về mối quan hệ giữa hai user
+        /// </summary>
+        /// <param name="user1"> id của user 1</param>
+        /// <param name="user2"> id của user 2</param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<EUserRelationType> GetUserRelationType(Guid user1, Guid user2);
+
+        /// <summary>
+        /// Lấy về mối quan hệ giữa hai một user với danh sách user kia
+        /// </summary>
+        /// <param name="user1"> id của user 1</param>
+        /// <param name="users2"> Danh sách id của user 2</param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<Dictionary<Guid, EUserRelationType>> GetUserRelationType(Guid user1, List<Guid> users2);
     }
 }

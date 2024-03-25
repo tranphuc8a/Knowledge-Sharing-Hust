@@ -81,8 +81,6 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Admin APIes
 
-
-
         public async Task<ServiceResult> AdminDeletePost(Guid postId)
         {
             // Kiểm tra post tồn tại
@@ -127,6 +125,8 @@ namespace KnowledgeSharingApi.Services.Services
 
         #endregion
 
+
+
         #region Anonymous APIes
 
         public async Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
@@ -164,6 +164,8 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
         #endregion
+
+
 
 
         #region User APIes
@@ -229,6 +231,8 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
 
+
+
         #region Get list posts of a category
 
         public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
@@ -262,6 +266,22 @@ namespace KnowledgeSharingApi.Services.Services
                 string.Empty,
                 await DecoratePost(posts)
             );
+        }
+
+        public async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset)
+        {
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            IEnumerable<ViewPost> listed = await PostRepository.GetMarkedPosts(myUid);
+            int total = listed.Count();
+            listed = listed.Skip(offsetValue).Take(limitValue);
+            PaginationResponseModel<ResponsePostItemModel> res = new()
+            {
+                Total = total,
+                Limit = limitValue,
+                Offset = offsetValue,
+                Results = await DecoratePost(listed)
+            };
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(PostResource), string.Empty, res);
         }
         #endregion
     }

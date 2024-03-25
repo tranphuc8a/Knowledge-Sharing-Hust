@@ -64,6 +64,18 @@ namespace KnowledgeSharingApi.Services.Interfaces
         Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset);
         Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset);
 
+
+        /// <summary>
+        /// User lấy về danh sách bài đăng mà mình đã đánh dấu
+        /// </summary>
+        /// <param name="myUid">id của người lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset);
+
         #endregion
 
 

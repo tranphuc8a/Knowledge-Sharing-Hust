@@ -25,6 +25,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         protected readonly string CategoryResource, CategoryExisted, CategoryNotExisted;
         protected readonly int DefaultLimit = 20;
+        protected readonly int LimitNumberCategoryOfKnowledge = 5;
 
         public CategoryService(
             IResourceFactory resourceFactory,
@@ -166,8 +167,14 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UpdateKnowledgeCategories(Guid myUid, UpdateKnowledgeCategoriesModel model)
         {
             // Check knowledge tồn tại và phải là của chính mình làm chủ
-            Knowledge knowledge = await KnowledgeRepository.CheckExisted(model.KnowledgeId!.Value,
+            _ = await KnowledgeRepository.CheckExisted(model.KnowledgeId!.Value,
                 ResponseResource.NotExist(EntityResource.Knowledge()));
+
+            // Kiểm tra danh sách category phải nhỏ hơn số phân loại:
+            if (model.Categories!.Count > LimitNumberCategoryOfKnowledge)
+            {
+                return ServiceResult.BadRequest($"Mỗi phần tử kiến thức không được có quá {LimitNumberCategoryOfKnowledge} phân loại");
+            }
 
             // Cập nhật danh sách cate của knowledge
             int rows = await CategoryRepository.UpdateKnowledgeCategories(model.KnowledgeId!.Value, model.Categories!);

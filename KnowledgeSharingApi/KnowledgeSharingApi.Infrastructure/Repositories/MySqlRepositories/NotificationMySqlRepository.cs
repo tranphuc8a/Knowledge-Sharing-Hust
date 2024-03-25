@@ -34,25 +34,23 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<Notification>> GetAllNotificationsByUserId(Guid userId)
+        public async Task<IEnumerable<Notification>> GetAllNotificationsByUserId(Guid userId)
         {
-            IEnumerable<Notification> notifications =
+            var notifications =
                 DbContext.Notifications
                 .Where(noti => noti.UserId == userId)
-                .OrderByDescending(noti => noti.Time)
-                .AsEnumerable();
-            return Task.FromResult(notifications);
+                .OrderByDescending(noti => noti.Time);
+            return await notifications.ToListAsync();
         }
 
-        public Task<IEnumerable<Notification>> GetNotificationsByUserId(Guid userId, int limit, int offset)
+        public async Task<IEnumerable<Notification>> GetNotificationsByUserId(Guid userId, int limit, int offset)
         {
-            IEnumerable<Notification> notifications =
+            var notifications =
                 DbContext.Notifications
                 .Where(noti => noti.UserId == userId)
                 .OrderByDescending(noti => noti.Time)
-                .Skip(offset).Take(limit)
-                .AsEnumerable();
-            return Task.FromResult(notifications);
+                .Skip(offset).Take(limit);
+            return await notifications.ToListAsync();
         }
 
         public async Task<int> SetReadNotification(Guid userId)

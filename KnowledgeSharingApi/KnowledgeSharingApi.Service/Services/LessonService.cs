@@ -87,6 +87,11 @@ namespace KnowledgeSharingApi.Services.Services
             throw new NotImplementedException();
         }
 
+        public Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
         {
             throw new NotImplementedException();

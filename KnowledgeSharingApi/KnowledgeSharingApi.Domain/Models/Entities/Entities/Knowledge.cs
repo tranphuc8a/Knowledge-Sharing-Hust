@@ -18,6 +18,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
         public int Views { get; set; }
         public virtual EKnowledgeType KnowledgeType { get; set; }
         public EPrivacy Privacy { get; set; }
+        public bool IsBlockComment { get; set; }
         //public override EUserItemType UserItemType { get => EUserItemType.Knowledge; }
 
         protected override Knowledge Init()

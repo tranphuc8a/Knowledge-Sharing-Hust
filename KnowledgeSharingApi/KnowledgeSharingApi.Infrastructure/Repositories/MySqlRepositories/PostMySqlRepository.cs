@@ -90,5 +90,23 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         {
             return GetPublicPostsOfCategory(catName, limit, offset);
         }
+
+        public async Task<IEnumerable<ViewPost>> GetMarkedPosts(Guid userId)
+        {
+            IQueryable<ViewPost> query =
+                from post in DbContext.ViewPosts
+                join mark in DbContext.Marks
+                    on post.KnowledgeId equals mark.KnowledgeId
+                where mark.UserId == userId && (
+                    // userId có thể xem được post này:
+                    // post là công khai
+                    post.Privacy == EPrivacy.Public ||
+                    // post là của chính user
+                    post.UserId == userId
+                )
+                orderby mark.CreatedTime descending
+                select post;
+            return await query.ToListAsync();
+        }
     }
 }

@@ -41,14 +41,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public Task<IEnumerable<ViewUser>> GetDetail()
+        public async Task<IEnumerable<ViewUser>> GetDetail()
         {
-            return Task.FromResult(DbContext.ViewUsers.AsEnumerable());
+            return await DbContext.ViewUsers.ToListAsync();
         }
 
-        public Task<IEnumerable<ViewUser>> GetDetail(int limit, int offset)
+        public async Task<IEnumerable<ViewUser>> GetDetail(int limit, int offset)
         {
-            return Task.FromResult(DbContext.ViewUsers.Skip(offset).Take(limit).AsEnumerable());
+            return await DbContext.ViewUsers.Skip(offset).Take(limit).ToListAsync();
         }
 
         public Task<ViewUser?> GetDetail(Guid userId)

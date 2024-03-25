@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels
 {
-    public class CreateKnowledgeModel : UpdateUserItemModel
+    public class CreateKnowledgeModel : CreateUserItemModel
     {
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.TITLE_EMPTY)]
         public string? Title { get; set; }
