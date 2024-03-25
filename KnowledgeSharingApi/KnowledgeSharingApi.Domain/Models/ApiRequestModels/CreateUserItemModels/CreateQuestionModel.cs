@@ -8,6 +8,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemMode
 {
     public class CreateQuestionModel : CreatePostModel
     {
-        public string? CourseId { get; set; }
+        public Guid? CourseId { get; set; }
     }
 }

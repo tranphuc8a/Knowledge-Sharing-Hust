@@ -19,9 +19,9 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<ServiceResult> GetNotification(string userId, string notificationId);
-        Task<ServiceResult> GetNotifications(string userId, int? limit, int? offset);
-        Task<ServiceResult> GetNotifications(string userId, string[] notiIds);
+        Task<ServiceResult> GetNotification(Guid userId, Guid notificationId);
+        Task<ServiceResult> GetNotifications(Guid userId, int? limit, int? offset);
+        Task<ServiceResult> GetNotifications(Guid userId, Guid[] notiIds);
 
 
         /// <summary>
@@ -34,9 +34,9 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<ServiceResult> SetReadNotification(string userId, string notiId);
-        Task<ServiceResult> SetReadNotifications(string userId);
-        Task<ServiceResult> SetReadNotifications(string userId, string[] notiIds);
+        Task<ServiceResult> SetReadNotification(Guid userId, Guid notiId);
+        Task<ServiceResult> SetReadNotifications(Guid userId);
+        Task<ServiceResult> SetReadNotifications(Guid userId, Guid[] notiIds);
 
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<ServiceResult> DeleteNotification(string userId, string notiId);
-        Task<ServiceResult> DeleteNotifications(string userId);
-        Task<ServiceResult> DeleteNotifications(string userId, string[] notiIds);
+        Task<ServiceResult> DeleteNotification(Guid userId, Guid notiId);
+        Task<ServiceResult> DeleteNotifications(Guid userId);
+        Task<ServiceResult> DeleteNotifications(Guid userId, Guid[] notiIds);
 
     }
 }

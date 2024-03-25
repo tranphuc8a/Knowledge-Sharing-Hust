@@ -71,11 +71,11 @@ namespace KnowledgeSharingApi.Services.Services
             ResponseQuestionItemModel model = new();
             model.Copy(post);
             PaginationResponseModel<ViewComment> listComments =
-                await KnowledgeRepository.GetListComments(model.KnowledgeId.ToString(), NumberOfTopComments, 0);
+                await KnowledgeRepository.GetListComments(model.KnowledgeId, NumberOfTopComments, 0);
             model.NumberComments = listComments.Total;
             model.TopComments = listComments.Results;
 
-            model.Star = await KnowledgeRepository.GetAverageStar(model.KnowledgeId.ToString());
+            model.Star = await KnowledgeRepository.GetAverageStar(model.KnowledgeId);
             return model;
         }
 
@@ -98,7 +98,7 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
         #region Admin Apies
-        public async Task<ServiceResult> AdminDeletePost(string postId)
+        public async Task<ServiceResult> AdminDeletePost(Guid postId)
         {
             // Kiểm tra câu hỏi tồn tại
             _ = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
@@ -109,7 +109,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public async Task<ServiceResult> AdminGetListPostsOfCourse(string courseId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset)
         {
             string CourseResource = ResourceFactory.GetEntityResource().Course();
             _ = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(CourseResource));
@@ -134,7 +134,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminGetPostDetail(string postId)
+        public async Task<ServiceResult> AdminGetPostDetail(Guid postId)
         {
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
@@ -152,7 +152,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetUserPosts(string userId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset)
         {
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
@@ -166,7 +166,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region Anonymous APIes
-        public async Task<ServiceResult> AnonymousGetPostDetail(string postId)
+        public async Task<ServiceResult> AnonymousGetPostDetail(Guid postId)
         {
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
@@ -184,7 +184,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
 
-        public async Task<ServiceResult> AnonymousGetUserPosts(string userId, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset)
         {
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
@@ -197,17 +197,19 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region User APIes
-        public async Task<ServiceResult> ConfirmQuestion(string myUid, string questionId, bool isConfirm)
+        public async Task<ServiceResult> ConfirmQuestion(Guid myUid, Guid questionId, bool isConfirm)
         {
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(questionId, NotExistedQuestion);
-            if (question.UserId.ToString() != myUid)
+            if (question.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải bài thảo luận của bạn");
             question.IsAccept = isConfirm;
-            await QuestionRepository.Update(questionId, question);
+            Question questionToUpdate = new();
+            questionToUpdate.Copy(question);
+            await QuestionRepository.Update(questionId, questionToUpdate);
             return ServiceResult.Success(ResponseResource.UpdateSuccess());
         }
 
-        public async Task<ServiceResult> UserCreatePost(string myUid, CreatePostModel model)
+        public async Task<ServiceResult> UserCreatePost(Guid myUid, CreatePostModel model)
         {
             ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
@@ -215,13 +217,13 @@ namespace KnowledgeSharingApi.Services.Services
                 throw new NotMatchTypeException();
 
             // Kiểm tra Course tồn tại và user phài join course
-            if (questionModel.CourseId != null)
+            if (questionModel.CourseId.HasValue)
             {
-                Course course = await CourseRepository.CheckExisted(questionModel.CourseId,
-                    ResponseResource.NotExist(EntityResource.Course()));
+                Guid courseId = questionModel.CourseId.Value;
+                _ = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
 
                 // Kiểm tra user đã join course hay chưa, đợi course repository viết
-                ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, questionModel.CourseId.ToString());
+                ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, courseId);
                 if (courseRegister == null)
                     return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
             }
@@ -247,14 +249,14 @@ namespace KnowledgeSharingApi.Services.Services
             question.Copy(model);
 
             // Insert câu hỏi
-            string? inserted = await QuestionRepository.Insert(question);
+            Guid? inserted = await QuestionRepository.Insert(question);
             if (inserted == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(QuestionResource));
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.InsertSuccess(QuestionResource));
         }
 
-        public async Task<ServiceResult> UserDeletePost(string myUid, string postId)
+        public async Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
         {
             // Kiểm tra user tồn tại
             // Không nhất thiết
@@ -263,7 +265,7 @@ namespace KnowledgeSharingApi.Services.Services
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
             // Kiểm tra user là chủ post
-            if (question.UserId.ToString() != myUid)
+            if (question.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải khóa học của bạn");
 
             // OK thực hiện xóa
@@ -275,7 +277,7 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
         #region User Gets
-        public async Task<ServiceResult> UserGetListPostsOfCourse(string myUid, string courseId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset)
         {
             // Kiểm tra course tồn tại và user phải tham gia course
             Course course = await CourseRepository.CheckExisted(courseId,
@@ -295,20 +297,39 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
 
-        public async Task<ServiceResult> UserGetMyPostDetail(string myUid, string postId)
+        public async Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset)
+        {
+            // Kiểm tra user tồn tại (không nhất thiết)
+
+            // Kiểm tra khóa học tồn tại và phải là khóa học của mình
+            Course course = await CourseRepository.CheckExisted(courseId,
+                   ResponseResource.NotExist(EntityResource.Course()));
+            if (course.UserId != myUid)
+                return ServiceResult.Forbidden("Bạn không phải chủ của khóa học này");
+
+            // Lấy về danh sách câu hỏi trong course
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetQuestionInCourse(courseId);
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            questions = questions.Skip(limitValue).Take(offsetValue);
+
+            // Trả về thành công
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
+        }
+
+        public async Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
         {
             // Kiểm tra post tồn tại
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
             // Kiểm tra chủ nhân
-            if (question.UserId.ToString() != myUid)
+            if (question.UserId != myUid)
                 return ServiceResult.Forbidden("Bạn không phải chủ nhân của bài thảo luận này");
 
             // Trả về thành công
             return ServiceResult.Success(GetQuestionSuccess, string.Empty, await DecoratePost(question));
         }
 
-        public async Task<ServiceResult> UserGetMyPosts(string myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
         {
             // Kiểm tra user tồn tại
             _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
@@ -321,7 +342,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
 
-        public async Task<ServiceResult> UserGetPostDetail(string myUid, string postId)
+        public async Task<ServiceResult> UserGetPostDetail(Guid myUid, Guid postId)
         {
             // Kiểm tra user tồn tại, không nhất thiết
 
@@ -336,7 +357,7 @@ namespace KnowledgeSharingApi.Services.Services
                 if (question.CourseId != null)
                 {
                     // Cho một cơ hội kiểm tra chung khóa học không
-                    ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, question.CourseId.ToString()!);
+                    ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, question.CourseId.Value);
                     isAccessible = courseRegister != null;
                 }
                 if (!isAccessible)
@@ -347,7 +368,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(GetQuestionSuccess, string.Empty, await DecoratePost(question));
         }
 
-        public async Task<ServiceResult> UserGetPosts(string myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset)
         {
             // Chỉ lấy public question, tính toán sắp xếp theo độ ưu tiên của riêng myUId, làm sau
 
@@ -358,7 +379,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
         }
 
-        public async Task<ServiceResult> UserGetUserPosts(string myUid, string userId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
         {
             // Kiểm tra myUid tồn tại (không nhất thiết) và userId tồn tại
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
@@ -373,7 +394,7 @@ namespace KnowledgeSharingApi.Services.Services
         }
         #endregion
 
-        public async Task<ServiceResult> UserUpdatePost(string myUid, string postId, UpdatePostModel model)
+        public async Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
         {
             // Kiểm tra myUId tồn tại (không nhất thiết)
 
@@ -382,13 +403,14 @@ namespace KnowledgeSharingApi.Services.Services
                 throw new NotMatchTypeException();
 
             // Kiểm tra postId tồn tại, và chủ nhân là myUid
-            Question question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
-            if (question.UserId.ToString() != myUid)
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            if (question.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải là bài thảo luận của bạn");
 
             // Cập nhật question
-            question.Copy(model);
-            int res = await QuestionRepository.Update(postId, question);
+            Question toUpdate = new();
+            toUpdate.Copy(model);
+            int res = await QuestionRepository.Update(postId, toUpdate);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(QuestionResource));
 
             // Trả về thành công

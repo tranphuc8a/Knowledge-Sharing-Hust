@@ -48,7 +48,7 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<ResponseConversationModel> GetConversationDetail(string myUid, string conversationId)
+        protected virtual async Task<ResponseConversationModel> GetConversationDetail(Guid myUid, Guid conversationId)
         {
             // Lấy về cuộc hội thoại
             Conversation conv = await ConversationRepository.Get(conversationId)
@@ -80,7 +80,7 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns> Trả về user </returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<Profile> CheckExistedUser(string userId)
+        protected virtual async Task<ViewUser> CheckExistedUser(Guid userId)
         {
             return await UserRepository.GetDetail(userId)
                 ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().User()));
@@ -93,7 +93,7 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns> Trả về cuộc trò chuyện </returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<Conversation> CheckExistedConversation(string id)
+        protected virtual async Task<Conversation> CheckExistedConversation(Guid id)
         {
             return await ConversationRepository.Get(id)
                 ?? throw new ValidatorException(ResponseResource.NotFound(ConversationResource));
@@ -106,7 +106,7 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns> Trả về tin nhắn </returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<ViewMessage> CheckExistedMessage(string id)
+        protected virtual async Task<ViewMessage> CheckExistedMessage(Guid id)
         {
             return await MessageRepository.GetDetail(id)
                 ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().Message()));
@@ -120,66 +120,17 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<ServiceResult> CreateNewConversation(Profile user_1, Profile user_2)
+        protected virtual async Task<ServiceResult> CreateNewConversation(ViewUser user_1, ViewUser user_2)
         {
-            // Tạo cuộc trò chuyện
-            Conversation conversation = new()
-            {
-                ConversationId = Guid.NewGuid(),
-                ConversationName = $"{user_1.FullName} và {user_2.FullName}",
-                CreatedTime = DateTime.Now,
-                CreatedBy = user_1.FullName
-            };
-
-            // Thêm 2 thành viên
-            UserConversation userConversation1 = new()
-            {
-                UserConversationId = Guid.NewGuid(),
-                ConversationId = conversation.ConversationId,
-                UserId = user_1.UserId,
-                Time = DateTime.Now,
-                LastDeleteTime = DateTime.Now,
-                LastReadTime = DateTime.Now,
-                Nickname = user_1.FullName
-            };
-            UserConversation userConversation2 = new()
-            {
-                UserConversationId = Guid.NewGuid(),
-                ConversationId = conversation.ConversationId,
-                UserId = user_2.UserId,
-                Time = DateTime.Now,
-                LastDeleteTime = DateTime.Now,
-                LastReadTime = DateTime.Now,
-                Nickname = user_2.FullName
-            };
-
-            // Bắt đầu transaction
-            try
-            {
-                UnitOfWork.BeginTransaction();
-                UnitOfWork.RegisterRepository(ConversationRepository)
-                    .RegisterRepository(UserConversationRepository);
-
-                _ = await ConversationRepository.Insert(conversation.ConversationId.ToString(), conversation)
-                    ?? throw new Exception();
-                _ = await UserConversationRepository.Insert(userConversation1.UserConversationId.ToString(), userConversation2)
-                    ?? throw new Exception();
-                _ = await UserConversationRepository.Insert(userConversation2.UserConversationId.ToString(), userConversation2)
-                    ?? throw new Exception();
-
-                UnitOfWork.CommitTransaction();
-            }
-            catch (Exception)
-            {
-                UnitOfWork.RollbackTransaction();
-                return ServiceResult.ServerError(ResponseResource.ServerError());
-            }
+            Profile user1 = new(); user1.Copy(user_1);
+            Profile user2 = new(); user2.Copy(user_2);
+            Conversation conversation = await ConversationRepository.CreateConversation(user1, user2);
 
             // Trả về cuộc trò chuyện
             return ServiceResult.Success(
                 ResponseResource.Success(),
                 string.Empty,
-                await GetConversationDetail(user_1.UserId.ToString(), conversation.ConversationId.ToString())
+                await GetConversationDetail(user_1.UserId, conversation.ConversationId)
             );
         }
 
@@ -187,17 +138,17 @@ namespace KnowledgeSharingApi.Services.Services
 
 
         #region Get Conversation
-        public virtual async Task<ServiceResult> GetConversation(string myUId, string conversationId)
+        public virtual async Task<ServiceResult> GetConversation(Guid myUId, Guid conversationId)
         {
             // Kiểm tra userId phải tồn tại
-            Profile user = await CheckExistedUser(myUId);
+            ViewUser user = await CheckExistedUser(myUId);
 
             // Kiểm tra conversation phải tồn tại
             Conversation conversation = await CheckExistedConversation(conversationId);
 
             // Kiểm tra conversation phải chứa myUid
             IEnumerable<ViewUserConversation> participants = await ConversationRepository.GetParticipants(conversationId);
-            if (!participants.Any(participant => participant.UserId.ToString() == myUId))
+            if (!participants.Any(participant => participant.UserId == myUId))
                 return ServiceResult.Forbidden("Bạn chưa tham gia cuộc hội thoại này");
 
             // Lấy về thông tin chi tiết conservation
@@ -207,7 +158,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(ConversationResource), string.Empty, model);
         }
 
-        public virtual async Task<ServiceResult> GetConversations(string myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> GetConversations(Guid myUid, int? limit, int? offset)
         {
             // Kiểm tra user tồn tại
             await CheckExistedUser(myUid);
@@ -229,10 +180,10 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public virtual async Task<ServiceResult> GetConversationWith(string myUid, string uid)
+        public virtual async Task<ServiceResult> GetConversationWith(Guid myUid, Guid uid)
         {
-            Profile user_1 = await CheckExistedUser(myUid);
-            Profile user_2 = await CheckExistedUser(uid);
+            //ViewUser user_1 = await CheckExistedUser(myUid);
+            ViewUser _ = await CheckExistedUser(uid);
 
             Conversation? conversation = await ConversationRepository.GetConversationWithUser(myUid, uid);
             if (conversation == null)
@@ -241,17 +192,17 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.NotFound(ConversationResource),
                 string.Empty,
-                await GetConversationDetail(myUid, conversation.ConversationId.ToString())
+                await GetConversationDetail(myUid, conversation.ConversationId)
             );
         }
 
         #endregion
 
         #region Conversation Operations
-        public virtual async Task<ServiceResult> StartConversation(string myUid, string uid)
+        public virtual async Task<ServiceResult> StartConversation(Guid myUid, Guid uid)
         {
-            Profile user_1 = await CheckExistedUser(myUid);
-            Profile user_2 = await CheckExistedUser(uid);
+            ViewUser user_1 = await CheckExistedUser(myUid);
+            ViewUser user_2 = await CheckExistedUser(uid);
 
             Conversation? conversation = await ConversationRepository.GetConversationWithUser(myUid, uid);
             if (conversation != null)
@@ -259,27 +210,27 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Success(
                     ResponseResource.NotFound(ConversationResource),
                     string.Empty,
-                    await GetConversationDetail(myUid, conversation.ConversationId.ToString())
+                    await GetConversationDetail(myUid, conversation.ConversationId)
                 );
             }
 
             return await CreateNewConversation(user_1, user_2);
         }
 
-        public virtual async Task<ServiceResult> DeleteConversation(string myUid, string conversationId)
+        public virtual async Task<ServiceResult> DeleteConversation(Guid myUid, Guid conversationId)
         {
-            Profile user = await CheckExistedUser(myUid);
+            //ViewUser user = await CheckExistedUser(myUid);
             Conversation conv = await CheckExistedConversation(conversationId);
 
             // Kiểm tra đúng quyền
-            IEnumerable<ViewUserConversation> participants = await ConversationRepository.GetParticipants(conversationId);
-            ViewUserConversation userConversation =
-                participants.Where(participant => participant.UserId.ToString() == myUid).FirstOrDefault()
+            ViewUserConversation userConversation = await ConversationRepository.GetParticipant(myUid, conversationId)
                 ?? throw new ValidatorException("Bạn chưa tham gia cuộc hội thoại này");
 
             // Update Last Delete
             userConversation.LastDeleteTime = DateTime.Now;
-            int res = await UserConversationRepository.Update(userConversation.UserConversationId.ToString(), userConversation);
+            UserConversation toUpdate = new();
+            toUpdate.Copy(userConversation);
+            int res = await UserConversationRepository.Update(userConversation.UserConversationId, toUpdate);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure());
 
             // Xóa những message bị thừa (Task)
@@ -289,17 +240,14 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public virtual async Task<ServiceResult> UpdateConversation(string myUid, UpdateConversationModel updateModel)
+        public virtual async Task<ServiceResult> UpdateConversation(Guid myUid, UpdateConversationModel updateModel)
         {
             // Check existed
-            Profile user = await CheckExistedUser(myUid);
-            Conversation conv = await CheckExistedConversation(updateModel.ConversationId.ToString());
+            ViewUser user = await CheckExistedUser(myUid);
+            Conversation conv = await CheckExistedConversation(updateModel.ConversationId);
 
             // Check join
-            ViewUserConversation? participant =
-                (await ConversationRepository.GetParticipants(updateModel.ConversationId.ToString()))
-                .Where(participant => participant.UserId.ToString() == myUid)
-                .FirstOrDefault();
+            ViewUserConversation? participant = await ConversationRepository.GetParticipant(myUid, updateModel.ConversationId);
             if (participant == null) return ServiceResult.Forbidden("Bạn chưa tham gia cuộc trò chuyện này");
 
             // Update cuộc trò chuyện, upload image
@@ -313,48 +261,48 @@ namespace KnowledgeSharingApi.Services.Services
             // Trả về thành công
             conv.ModifiedTime = DateTime.Now;
             conv.ModifiedBy = user.FullName;
-            int res = await ConversationRepository.Update(conv.ConversationId.ToString(), conv);
+            int res = await ConversationRepository.Update(conv.ConversationId, conv);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(ConversationResource));
             return ServiceResult.Success(ResponseResource.UpdateSuccess(ConversationResource));
         }
 
-        public virtual async Task<ServiceResult> UpdateUserConversation(string myUid, UpdateUserConversationModel updateModel)
+        public virtual async Task<ServiceResult> UpdateUserConversation(Guid myUid, UpdateUserConversationModel updateModel)
         {
             // Kiểm tra tồn tại user 
-            Profile user = await CheckExistedUser(myUid);
+            ViewUser user = await CheckExistedUser(myUid);
 
             // Kiểm tra tồn tại participant
-            UserConversation? participant = await UserConversationRepository.Get(updateModel.UserConversationId.ToString())
+            UserConversation? participant = await UserConversationRepository.Get(updateModel.UserConversationId)
                 ?? throw new ValidatorException(ResponseResource.NotExist(ResourceFactory.GetEntityResource().UserConversation()));
 
             // Kiểm tra participant đúng là của user
-            if (participant.UserId.ToString() != myUid) return ServiceResult.Forbidden("Bạn chưa tham gia cuộc trò chuyện này");
+            if (participant.UserId != myUid) return ServiceResult.Forbidden("Bạn chưa tham gia cuộc trò chuyện này");
 
             // Update nick name
             participant.Nickname = updateModel.NickName;
             participant.ModifiedTime = DateTime.Now;
             participant.ModifiedBy = user.FullName;
-            int res = await UserConversationRepository.Update(participant.UserConversationId.ToString(), participant);
+            int res = await UserConversationRepository.Update(participant.UserConversationId, participant);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
 
             // Trả về thành công 
             return ServiceResult.Success(ResponseResource.UpdateSuccess());
         }
 
-        public async virtual Task<ServiceResult> SetReadConversation(string myUid, string conversationId)
+        public async virtual Task<ServiceResult> SetReadConversation(Guid myUid, Guid conversationId)
         {
-            Profile user = await CheckExistedUser(myUid);
+            //ViewUser user = await CheckExistedUser(myUid);
             Conversation conv = await CheckExistedConversation(conversationId);
 
             // Kiểm tra đúng quyền
-            IEnumerable<ViewUserConversation> participants = await ConversationRepository.GetParticipants(conversationId);
-            ViewUserConversation userConversation =
-                participants.Where(participant => participant.UserId.ToString() == myUid).FirstOrDefault()
+            ViewUserConversation userConversation = await ConversationRepository.GetParticipant(myUid, conversationId)
                 ?? throw new ValidatorException("Bạn chưa tham gia cuộc hội thoại này");
 
             // Update Last Read
             userConversation.LastReadTime = DateTime.Now;
-            int res = await UserConversationRepository.Update(userConversation.UserConversationId.ToString(), userConversation);
+            UserConversation toUpdate = new();
+            toUpdate.Copy(userConversation);
+            int res = await UserConversationRepository.Update(userConversation.UserConversationId, toUpdate);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.Failure());
 
             // Trả về xóa thành công
@@ -363,15 +311,13 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region Message Operations
-        public async virtual Task<ServiceResult> GetMessages(string myUid, string conversationId, int? limit, int? offset)
+        public async virtual Task<ServiceResult> GetMessages(Guid myUid, Guid conversationId, int? limit, int? offset)
         {
-            Profile user = await CheckExistedUser(myUid);
+            //ViewUser user = await CheckExistedUser(myUid);
             Conversation conv = await CheckExistedConversation(conversationId);
 
             // Kiểm tra đúng quyền
-            IEnumerable<ViewUserConversation> participants = await ConversationRepository.GetParticipants(conversationId);
-            ViewUserConversation userConversation =
-                participants.Where(participant => participant.UserId.ToString() == myUid).FirstOrDefault()
+            ViewUserConversation userConversation = await ConversationRepository.GetParticipant(myUid, conversationId)
                 ?? throw new ValidatorException("Bạn chưa tham gia cuộc hội thoại này");
 
             // Validate limit và offset
@@ -391,18 +337,15 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public virtual async Task<ServiceResult> SendMessage(string myUid, SendMessageModel model)
+        public virtual async Task<ServiceResult> SendMessage(Guid myUid, SendMessageModel model)
         {
-            Profile profile = await CheckExistedUser(myUid);
+            ViewUser profile = await CheckExistedUser(myUid);
 
             // Check Conversation phù hợp
-            Conversation conv = await CheckExistedConversation(model.ConversationId.ToString());
+            _ = await CheckExistedConversation(model.ConversationId);
 
             // Check participant
-            ViewUserConversation? participant =
-                (await ConversationRepository.GetParticipants(conv.ConversationId.ToString()))
-                .Where(part => part.UserId.ToString() == myUid)
-                .FirstOrDefault();
+            ViewUserConversation? participant = await ConversationRepository.GetParticipant(myUid, model.ConversationId);
             if (participant == null) return ServiceResult.Forbidden("Bạn chưa tham gia cuộc hội thoại này");
 
             // Thêm message
@@ -417,7 +360,7 @@ namespace KnowledgeSharingApi.Services.Services
                 IsEdited = false,
                 ReplyId = null
             };
-            string? id = await MessageRepository.Insert(msg.MessageId.ToString(), msg);
+            Guid? id = await MessageRepository.Insert(msg.MessageId, msg);
             if (id == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Gửi thông báo tới các participant khác
@@ -427,10 +370,10 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success());
         }
 
-        public virtual async Task<ServiceResult> DeleteMessage(string myUid, string messageId)
+        public virtual async Task<ServiceResult> DeleteMessage(Guid myUid, Guid messageId)
         {
             // Check myUid và messageId tồn tại
-            Profile profile = await CheckExistedUser(myUid);
+            ViewUser profile = await CheckExistedUser(myUid);
             ViewMessage message = await CheckExistedMessage(messageId);
 
             // Kiểm tra quyền messageId với uid
@@ -445,11 +388,11 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public virtual async Task<ServiceResult> UpdateMessage(string myUid, UpdateMessageModel model)
+        public virtual async Task<ServiceResult> UpdateMessage(Guid myUid, UpdateMessageModel model)
         {
             // Check myUid và messageId tồn tại
-            Profile profile = await CheckExistedUser(myUid);
-            ViewMessage message = await CheckExistedMessage(model.MessageId.ToString());
+            ViewUser profile = await CheckExistedUser(myUid);
+            ViewMessage message = await CheckExistedMessage(model.MessageId);
 
             // Kiểm tra quyền messageId với uid
             if (message.UserId != profile.UserId)
@@ -463,27 +406,24 @@ namespace KnowledgeSharingApi.Services.Services
             message1.ModifiedTime = DateTime.Now;
             message1.ModifiedBy = profile.FullName;
             message1.IsEdited = true;
-            int rows = await MessageRepository.Update(message1.MessageId.ToString(), message1);
+            int rows = await MessageRepository.Update(message1.MessageId, message1);
             if (rows <= 0) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.UpdateSuccess());
         }
 
-        public virtual async Task<ServiceResult> ReplyMessage(string myUid, ReplyMessageModel model)
+        public virtual async Task<ServiceResult> ReplyMessage(Guid myUid, ReplyMessageModel model)
         {
-            // Check myUid
-            Profile profile = await CheckExistedUser(myUid);
+            // Check myUid existed
+            ViewUser profile = await CheckExistedUser(myUid);
 
             // Check ConversationId và ReplyId tồn tại
-            Conversation conversation = await CheckExistedConversation(model.ConversationId.ToString());
-            ViewMessage message = await CheckExistedMessage(model.ReplyId.ToString());
+            Conversation conversation = await CheckExistedConversation(model.ConversationId);
+            ViewMessage message = await CheckExistedMessage(model.ReplyId);
 
             // Check participant (conversation chứa user)
-            ViewUserConversation? participant =
-                (await ConversationRepository.GetParticipants(conversation.ConversationId.ToString()))
-                .Where(p => p.UserId == profile.UserId)
-                .FirstOrDefault();
+            ViewUserConversation? participant = await ConversationRepository.GetParticipant(myUid, model.ConversationId);
             if (participant == null)
                 return ServiceResult.Forbidden("Bạn chưa tham gia cuộc trò chuyện này");
 
@@ -505,7 +445,7 @@ namespace KnowledgeSharingApi.Services.Services
                 IsEdited = false,
                 ReplyId = message.MessageId
             };
-            string? id = await MessageRepository.Insert(msg.MessageId.ToString(), msg);
+            Guid? id = await MessageRepository.Insert(msg.MessageId, msg);
             if (id == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Gửi thông báo tới các participant khác

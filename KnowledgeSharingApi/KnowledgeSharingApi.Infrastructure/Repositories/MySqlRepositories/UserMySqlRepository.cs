@@ -51,10 +51,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(DbContext.ViewUsers.Skip(offset).Take(limit).AsEnumerable());
         }
 
-        public Task<ViewUser?> GetDetail(string userId)
+        public Task<ViewUser?> GetDetail(Guid userId)
         {
             var query = from user in DbContext.ViewUsers
-                        where (user.UserId.ToString() == userId)
+                        where (user.UserId == userId)
                         select user;
             return Task.FromResult(query.FirstOrDefault());
         }
@@ -99,7 +99,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public async Task<PaginationResponseModel<T>> GetByUserId<T>(string userId, int limit, int offset) where T : Entity
+        public async Task<PaginationResponseModel<T>> GetByUserId<T>(Guid userId, int limit, int offset) where T : Entity
         {
             string tableName = typeof(T).Name;
             // Check bảng T phải có trường UserId:
@@ -125,9 +125,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public async Task<ViewUser> CheckExistedUser(string userId, string errorMessage)
+        public async Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage)
         {
-            return await DbContext.ViewUsers.Where(user => user.UserId.ToString() == userId).FirstOrDefaultAsync()
+            return await DbContext.ViewUsers.Where(user => user.UserId == userId).FirstOrDefaultAsync()
                 ?? throw new NotExistedEntityException(errorMessage);
         }
     }

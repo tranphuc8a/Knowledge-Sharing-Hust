@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<ViewQuestion> CheckExistedQuestion(string questionId, string errorMessage);
+        Task<ViewQuestion> CheckExistedQuestion(Guid questionId, string errorMessage);
 
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewQuestion>> GetQuestionInCourse(string courseid);
+        Task<IEnumerable<ViewQuestion>> GetQuestionInCourse(Guid courseid);
 
 
         /// <summary>
@@ -41,6 +41,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<ViewQuestion?> GetQuestionDetail(string questionId);
+        Task<ViewQuestion?> GetQuestionDetail(Guid questionId);
     }
 }

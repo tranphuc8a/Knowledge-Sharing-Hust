@@ -17,7 +17,29 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewUserConversation>> GetParticipants(string conversationId);
+        Task<IEnumerable<ViewUserConversation>> GetParticipants(Guid conversationId);
+
+
+        /// <summary>
+        /// Lấy về phiên người tham dự một conversation
+        /// </summary>
+        /// <param name="userId"> id của người tham dự muốn lấy </param>
+        /// <param name="conversationId"> id của cuộc hội thoại muốn lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<ViewUserConversation?> GetParticipant(Guid userId, Guid conversationId);
+
+
+        /// <summary>
+        /// Tạo cuộc hội thoại giữa hai người id1 và id2
+        /// </summary>
+        /// <param name="user1"> profile của người tham dự số 1 </param>
+        /// <param name="user2"> profile của người tham dự số 2 </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<Conversation> CreateConversation(Profile user1, Profile user2);
 
 
         /// <summary>
@@ -29,7 +51,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewMessage>> GetMessages(string userId, string conversationId, int limit, int offset);
+        Task<IEnumerable<ViewMessage>> GetMessages(Guid userId, Guid conversationId, int limit, int offset);
 
 
         /// <summary>
@@ -39,7 +61,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<Conversation>> GetListConversationByUserId(string userId);
+        Task<IEnumerable<Conversation>> GetListConversationByUserId(Guid userId);
 
         /// <summary>
         /// Lấy về cuộc trò chuyện của userId với user khác
@@ -49,7 +71,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<Conversation?> GetConversationWithUser(string userId, string id2);
+        Task<Conversation?> GetConversationWithUser(Guid userId, Guid id2);
 
         /// <summary>
         /// Xóa đi những tin nhắn bị dư thừa của cuộc trò chuyện
@@ -58,6 +80,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task DeleteExpiredMessages(string conversationId);
+        Task DeleteExpiredMessages(Guid conversationId);
     }
 }

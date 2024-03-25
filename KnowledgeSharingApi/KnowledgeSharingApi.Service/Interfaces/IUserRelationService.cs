@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> GetFriends(string userid, int? limit, int? offset);
+        Task<ServiceResult> GetFriends(Guid userid, int? limit, int? offset);
 
         /// <summary>
         /// Hàm thực hiện lấy về danh sách một loại quan hệ của user
@@ -35,7 +35,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> GetRelations(string userid, EUserRelationType relationType, bool isActive, int? limit, int? offset);
+        Task<ServiceResult> GetRelations(Guid userid, EUserRelationType relationType, bool isActive, int? limit, int? offset);
 
 
         /// <summary>
@@ -46,8 +46,8 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> Follow(string myuid, string uid);
-        Task<ServiceResult> Unfollow(string myuid, string uid);
+        Task<ServiceResult> Follow(Guid myuid, Guid uid);
+        Task<ServiceResult> Unfollow(Guid myuid, Guid uid);
 
         /// <summary>
         /// Thực hiện chặn/mở chặn
@@ -57,8 +57,8 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> Block(string myuid, string uid);
-        Task<ServiceResult> Unblock(string myuid, string uid);
+        Task<ServiceResult> Block(Guid myuid, Guid uid);
+        Task<ServiceResult> Unblock(Guid myuid, Guid uid);
 
         /// <summary>
         /// Thực hiện Thêm bạn bè/Xóa bạn bè
@@ -68,8 +68,8 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> AddFriend(string myuid, string uid);
-        Task<ServiceResult> DeleteFriend(string myuid, string uid);
+        Task<ServiceResult> AddFriend(Guid myuid, Guid uid);
+        Task<ServiceResult> DeleteFriend(Guid myuid, Guid uid);
 
         /// <summary>
         /// Thực hiện xác nhận/hủy bỏ lời mời kết bạn
@@ -80,8 +80,8 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> ConfirmFriend(string myuid, string requestId, bool isAccept);
-        Task<ServiceResult> DeleteRequest(string myuid, string requestId);
+        Task<ServiceResult> ConfirmFriend(Guid myuid, Guid requestId, bool isAccept);
+        Task<ServiceResult> DeleteRequest(Guid myuid, Guid requestId);
 
     }
 }

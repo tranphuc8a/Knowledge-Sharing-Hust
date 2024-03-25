@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Emails;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
@@ -18,51 +19,51 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class ProfileMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Profile>(dbContext), IProfileRepository
     {
-        public virtual Task<Profile?> GetByEmail(string email)
+        public virtual Task<ViewUser?> GetByEmail(string email)
         {
-            IQueryable<Profile> result = 
+            IQueryable<ViewUser> result = 
                 from profile in DbContext.ViewUsers
                 where profile.Email == email
                 select profile;
             return result.FirstOrDefaultAsync();
         }
 
-        public virtual Task<Profile?> GetByUserId(string userId)
+        public virtual Task<ViewUser?> GetByUserId(Guid userId)
         {
-            IQueryable<Profile> query = 
+            IQueryable<ViewUser> query = 
                 from profile in DbContext.ViewUsers
-                where profile.UserId.ToString() == userId
+                where profile.UserId == userId
                 select profile;
             return query.FirstOrDefaultAsync();
         }
 
-        public virtual Task<Profile?> GetByUsername(string username)
+        public virtual Task<ViewUser?> GetByUsername(string username)
         {
-            IQueryable<Profile> result = 
+            IQueryable<ViewUser> result = 
                 from profile in DbContext.ViewUsers
                 where profile.Username == username
                 select profile;
             return result.FirstOrDefaultAsync();
         }
 
-        public Task<Profile?> GetByUsernameOrUserId(string unOruid)
+        public Task<ViewUser?> GetByUsernameOrUserId(string unOruid)
         {
-            IQueryable<Profile> result =
+            IQueryable<ViewUser> result =
                 from profile in DbContext.ViewUsers
                 where profile.Username == unOruid || profile.UserId.ToString() == unOruid
                 select profile;
             return result.FirstOrDefaultAsync();
         }
 
-        //public virtual Task<PaginationResponseModel<Profile>> Search(string uid, string searchKey, int? limit, int? offset)
+        //public virtual Task<PaginationResponseModel<Profile>> Search(Guid uid, string searchKey, int? limit, int? offset)
         //{
         //    // Không bị blockee và blocked
         //    IEnumerable<Guid> lstBlockeeUid = DbContext.UserRelations
-        //        .Where(relation => relation.UserRelationType == EUserRelationType.Block && relation.ReceiverId.ToString() == uid)
+        //        .Where(relation => relation.UserRelationType == EUserRelationType.Block && relation.ReceiverI == uid)
         //        .Select(relation => relation.SenderId)
         //        .AsEnumerable();
         //    IEnumerable<Guid> lstBlockedUid = DbContext.UserRelations
-        //        .Where(relation => relation.UserRelationType == EUserRelationType.Block && relation.SenderId.ToString() == uid)
+        //        .Where(relation => relation.UserRelationType == EUserRelationType.Block && relation.SenderI == uid)
         //        .Select(relation => relation.ReceiverId)
         //        .AsEnumerable();
 

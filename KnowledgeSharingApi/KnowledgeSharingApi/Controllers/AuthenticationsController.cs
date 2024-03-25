@@ -219,7 +219,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Logout()
         {
             string sessionId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.Sid) ?? string.Empty;
-            ServiceResult res = await authenticationService.Logout(sessionId);
+            ServiceResult res = await authenticationService.Logout(Guid.Parse(sessionId));
             return new ApiResponse(res);
         }
 

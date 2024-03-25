@@ -43,11 +43,12 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpGet("me")]
-        public async Task<IActionResult> GetMeProfile(string userId)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> GetMeProfile()
         {
             string? uId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (uId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.GetMyUserProfile(userId);
+            ServiceResult service = await UserService.GetMyUserProfile(Guid.Parse(uId));
             ApiResponse res = new(service);
             return StatusCode((int) res.StatusCode, res);
         }
@@ -60,11 +61,12 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpPatch("me/update-avatar")]
-        public async Task<IActionResult> UpdateMeProfile(string uid, [FromBody] IFormFile avatar)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> UpdateMeProfile([FromBody] IFormFile avatar)
         {
-            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            //if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.UpdateMyAvatarImage(uid, avatar);
+            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.UpdateMyAvatarImage(Guid.Parse(userId), avatar);
             ApiResponse res = new(service);
             return StatusCode((int) res.StatusCode, res);
         }
@@ -77,11 +79,12 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpPatch("me/update-cover")]
-        public async Task<IActionResult> UpdateMeAvatar(string uid, [FromBody] IFormFile cover)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> UpdateMeAvatar([FromBody] IFormFile cover)
         {
-            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            //if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.UpdateMyCoverImage(uid, cover);
+            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.UpdateMyCoverImage(Guid.Parse(userId), cover);
             ApiResponse res = new(service);
             return StatusCode((int) res.StatusCode, res);
         }
@@ -94,11 +97,12 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpPatch("me/update-profile")]
-        public async Task<IActionResult> UpdateMeProfile(string uid, [FromBody] UpdateProfileModel model)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> UpdateMeProfile([FromBody] UpdateProfileModel model)
         {
-            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            //if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.UpdateMyUserProfile(uid, model);
+            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.UpdateMyUserProfile(Guid.Parse(userId), model);
             ApiResponse res = new(service);
             return StatusCode((int) res.StatusCode, res);
         }
@@ -111,11 +115,12 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpGet("user-detail")]
-        public async Task<IActionResult> GetMeUserDetail(string uid, string unOruid)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> GetMeUserDetail(string unOruid)
         {
-            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            //if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.GetUserDetail(uid, unOruid);
+            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.GetUserDetail(Guid.Parse(userId), unOruid);
             ApiResponse res = new(service);
             return StatusCode((int) res.StatusCode, res);
         }
@@ -131,11 +136,12 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpGet("search")]
-        public async Task<IActionResult> SearchMe(string uid, string searchKey, int? limit, int? offset)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> SearchMe(string searchKey, int? limit, int? offset)
         {
-            //string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            //if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.SearchUser(uid, searchKey, limit, offset);
+            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.SearchUser(Guid.Parse(userId), searchKey, limit, offset);
             ApiResponse res = new(service);
             return StatusCode((int) res.StatusCode, res);
         }
@@ -173,8 +179,9 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        [HttpPatch("admin/update-user")]
-        public async Task<IActionResult> AdminUpdateUser(string uid, [FromBody] UpdateUserModel model)
+        [HttpPatch("admin/update-user/{uid}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminUpdateUser(Guid uid, [FromBody] UpdateUserModel model)
         {
             ServiceResult service = await UserService.AdminUpdateUserInfo(uid, model);
             ApiResponse res = new(service);
@@ -188,8 +195,9 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        [HttpPost("admin/unblock-user")]
-        public async Task<IActionResult> AdminUnblockUser(string uid)
+        [HttpPost("admin/unblock-user/{uid}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminUnblockUser(Guid uid)
         {
             ServiceResult service = await UserService.AdminUnblockUser(uid);
             ApiResponse res = new(service);
@@ -204,8 +212,9 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        [HttpPost("admin/block-user")]
-        public async Task<IActionResult> AdminBlockUser(string uid)
+        [HttpPost("admin/block-user/{uid}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminBlockUser(Guid uid)
         {
             ServiceResult service = await UserService.AdminBlockUser(uid);
             ApiResponse res = new(service);
@@ -223,7 +232,8 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpGet("admin/search-user")]
-        public async Task<IActionResult> AdminSearchUser(string searchKey, int? limit, int? offset)
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminSearchUser(string searchKey, int? limit, int? offset)
         {
             ServiceResult service = await UserService.AdminSearchUser(searchKey, limit, offset);
             ApiResponse res = new(service);
@@ -237,10 +247,11 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        [HttpGet("admin/user-profile")]
-        public async Task<IActionResult> AdminGetUserProfile(string uid)
+        [HttpGet("admin/user-profile/{usernameOruid}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminGetUserProfile(string usernameOruid)
         {
-            ServiceResult service = await UserService.AdminGetUserProfile(uid);
+            ServiceResult service = await UserService.AdminGetUserProfile(usernameOruid);
             ApiResponse res = new(service);
             return StatusCode((int) res.StatusCode, res);
         }
@@ -253,8 +264,9 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        [HttpDelete("admin/delete-user")]
-        public async Task<IActionResult> AdminDeleteUser(string uid)
+        [HttpDelete("admin/delete-user/{uid}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminDeleteUser(Guid uid)
         {
             ServiceResult service = await UserService.AdminDeleteUser(uid);
             ApiResponse res = new(service);
@@ -268,7 +280,8 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpGet("admin/list-user")]
-        public async Task<IActionResult> AdminGetListUser(int? limit, int? offset)
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminGetListUser(int? limit, int? offset)
         {
             ServiceResult service = await UserService.AdminGetListUser(limit, offset);
             ApiResponse res = new(service);

@@ -38,7 +38,7 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<ViewUser> CheckUserExisted(string userId)
+        protected virtual async Task<ViewUser> CheckUserExisted(Guid userId)
         {
             ViewUser viewUser = await UserRepository.GetDetail(userId)
                 ?? throw new ValidatorException(ResponseResource.NotExist(ResourceFactory.GetEntityResource().User()));
@@ -52,7 +52,7 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<Notification> CheckNotificationExisted(string notiId)
+        protected virtual async Task<Notification> CheckNotificationExisted(Guid notiId)
         {
             Notification notification = await NotificationRepository.Get(notiId)
                 ?? throw new ValidatorException(ResponseResource.NotExist(NotificationResource));
@@ -62,7 +62,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Delete methods
 
-        public virtual async Task<ServiceResult> DeleteNotification(string userId, string notiId)
+        public virtual async Task<ServiceResult> DeleteNotification(Guid userId, Guid notiId)
         {
             // Kiểm tra người dùng tồn tại
             ViewUser user = await CheckUserExisted(userId);
@@ -82,20 +82,20 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(NotificationResource));
         }
 
-        public virtual async Task<ServiceResult> DeleteNotifications(string userId)
+        public virtual async Task<ServiceResult> DeleteNotifications(Guid userId)
         {
             ViewUser user = await CheckUserExisted(userId);
-            int rows = await NotificationRepository.DeleteAllNotification(user.UserId.ToString());
+            int rows = await NotificationRepository.DeleteAllNotification(user.UserId);
             return ServiceResult.Success(ResponseResource.DeletedSomeItems(NotificationResource), string.Empty, rows);
         }
 
-        public virtual async Task<ServiceResult> DeleteNotifications(string userId, string[] notiIds)
+        public virtual async Task<ServiceResult> DeleteNotifications(Guid userId, Guid[] notiIds)
         {
             ViewUser user = await CheckUserExisted(userId);
             IEnumerable<Notification> notifications = await NotificationRepository.Get(notiIds);
             notifications = notifications.Where(noti => noti.UserId == user.UserId);
             int rows = await NotificationRepository.Delete(
-                notifications.Select(noti => noti.NotificationId.ToString()).ToArray()
+                notifications.Select(noti => noti.NotificationId).ToArray()
             );
             return ServiceResult.Success(ResponseResource.DeletedSomeItems(NotificationResource), string.Empty, rows);
         }
@@ -104,7 +104,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Get Methods
 
-        public virtual async Task<ServiceResult> GetNotification(string userId, string notificationId)
+        public virtual async Task<ServiceResult> GetNotification(Guid userId, Guid notificationId)
         {
             ViewUser user = await CheckUserExisted(userId);
             Notification noti = await CheckNotificationExisted(notificationId);
@@ -113,17 +113,17 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(NotificationResource), string.Empty, noti);
         }
 
-        public virtual async Task<ServiceResult> GetNotifications(string userId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> GetNotifications(Guid userId, int? limit, int? offset)
         {
             ViewUser user = await CheckUserExisted(userId);
             int limitValue = limit ?? LimitDefault;
             int offsetValue = offset ?? 0;
             IEnumerable<Notification> listNotification = 
-                await NotificationRepository.GetNotificationsByUserId(user.UserId.ToString(), limitValue, offsetValue);
+                await NotificationRepository.GetNotificationsByUserId(user.UserId, limitValue, offsetValue);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(NotificationResource), string.Empty, listNotification);
         }
 
-        public virtual async Task<ServiceResult> GetNotifications(string userId, string[] notiIds)
+        public virtual async Task<ServiceResult> GetNotifications(Guid userId, Guid[] notiIds)
         {
             ViewUser user = await CheckUserExisted(userId);
             IEnumerable<Notification> listNotification =
@@ -140,7 +140,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Set read methods
 
-        public virtual async Task<ServiceResult> SetReadNotification(string userId, string notiId)
+        public virtual async Task<ServiceResult> SetReadNotification(Guid userId, Guid notiId)
         {
             ViewUser user = await CheckUserExisted(userId);
             Notification noti = await CheckNotificationExisted(notiId);
@@ -154,17 +154,17 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.UpdateSuccess());
         }
 
-        public virtual async Task<ServiceResult> SetReadNotifications(string userId)
+        public virtual async Task<ServiceResult> SetReadNotifications(Guid userId)
         {
             ViewUser user = await CheckUserExisted(userId);
-            int effects = await NotificationRepository.SetReadNotification(user.UserId.ToString());
+            int effects = await NotificationRepository.SetReadNotification(user.UserId);
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, effects);
         }
 
-        public virtual async Task<ServiceResult> SetReadNotifications(string userId, string[] notiIds)
+        public virtual async Task<ServiceResult> SetReadNotifications(Guid userId, Guid[] notiIds)
         {
             ViewUser user = await CheckUserExisted(userId);
-            int effects = await NotificationRepository.SetReadNotification(user.UserId.ToString(), notiIds);
+            int effects = await NotificationRepository.SetReadNotification(user.UserId, notiIds);
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, effects);
         } 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,48 +15,48 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Lấy về profile theo userId
         /// </summary>
         /// <param name="userId"> userId cần lấy </param>
-        /// <returns> Profile </returns>
+        /// <returns> ViewUser </returns>
         /// Created: PhucTV (16/3/24)
         /// Modified: None
-        Task<Profile?> GetByUserId(string userId);
+        Task<ViewUser?> GetByUserId(Guid userId);
 
         /// <summary>
         /// Lấy về profile theo username
         /// </summary>
         /// <param name="username"> userId cần lấy </param>
-        /// <returns> Profile </returns>
+        /// <returns> ViewUser </returns>
         /// Created: PhucTV (16/3/24)
         /// Modified: None
-        Task<Profile?> GetByUsername(string username);
+        Task<ViewUser?> GetByUsername(string username);
 
         /// <summary>
         /// Lấy về profile theo userId
         /// </summary>
         /// <param name="unOruid"> userId cần lấy </param>
-        /// <returns> Profile </returns>
+        /// <returns> ViewUser </returns>
         /// Created: PhucTV (16/3/24)
         /// Modified: None
-        Task<Profile?> GetByUsernameOrUserId(string unOruid);
+        Task<ViewUser?> GetByUsernameOrUserId(string unOruid);
 
         /// <summary>
         /// Lấy về profile theo email
         /// </summary>
         /// <param name="email"> userId cần lấy </param>
-        /// <returns> Profile </returns>
+        /// <returns> ViewUser </returns>
         /// Created: PhucTV (16/3/24)
         /// Modified: None
-        Task<Profile?> GetByEmail(string email);
+        Task<ViewUser?> GetByEmail(string email);
 
         ///// <summary>
-        ///// Tìm kiếm danh sách Profile theo search Key
+        ///// Tìm kiếm danh sách ViewUser theo search Key
         ///// </summary>
         ///// <param name="uid"> id của n </param>
         ///// <param name="searchKey"></param>
         ///// <param name="limit"></param>
         ///// <param name="offset"></param>
-        ///// <returns> Profile </returns>
+        ///// <returns> ViewUser </returns>
         ///// Created: PhucTV (16/3/24)
         ///// Modified: None
-        //Task<PaginationResponseModel<Profile>> Search(string uid, string searchKey, int? limit, int? offset);
+        //Task<PaginationResponseModel<ViewUser>> Search(string uid, string searchKey, int? limit, int? offset);
     }
 }

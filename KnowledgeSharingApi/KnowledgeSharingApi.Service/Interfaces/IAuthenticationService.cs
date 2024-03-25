@@ -46,7 +46,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (21/2/24)
         /// Modified: None
-        Task<ServiceResult> Logout(string sessionId);
+        Task<ServiceResult> Logout(Guid sessionId);
 
         
         /// <summary>

@@ -19,7 +19,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetPosts(string myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset);
         Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset);
         Task<ServiceResult> AdminGetPosts(int? limit, int? offset);
 
@@ -33,7 +33,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyPosts(string myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset);
 
 
         /// <summary>
@@ -46,9 +46,9 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetUserPosts(string myUid, string userId, int? limit, int? offset);
-        Task<ServiceResult> AnonymousGetUserPosts(string userId, int? limit, int? offset);
-        Task<ServiceResult> AdminGetUserPosts(string userId, int? limit, int? offset);
+        Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset);
 
         #endregion
 
@@ -61,8 +61,8 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="myUid"> id của user yêu cầu xóa </param>
         /// <param name="postId"> id của bài đăng cần xóa </param>
         /// <returns></returns>
-        Task<ServiceResult> UserDeletePost(string myUid, string postId);
-        Task<ServiceResult> AdminDeletePost(string postId);
+        Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId);
+        Task<ServiceResult> AdminDeletePost(Guid postId);
 
         #endregion
     }

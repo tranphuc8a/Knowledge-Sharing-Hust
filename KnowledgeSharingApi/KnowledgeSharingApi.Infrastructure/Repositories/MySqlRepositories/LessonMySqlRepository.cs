@@ -15,12 +15,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class LessonMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Lesson>(dbContext), ILessonRepository
     {
-        public Task<ViewQuestion> CheckExistedLesson(string lessonId, string errorMessage)
+        public Task<ViewQuestion> CheckExistedLesson(Guid lessonId, string errorMessage)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ViewLesson>> GetByUserId(string userId)
+        public Task<IEnumerable<ViewLesson>> GetByUserId(Guid userId)
         {
             throw new NotImplementedException();
         }
@@ -30,12 +30,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ViewLesson>> GetPublicPostsByUserId(string userId)
+        public Task<IEnumerable<ViewLesson>> GetPublicPostsByUserId(Guid userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PaginationResponseModel<ViewLesson>> GetQuestionInCourse(string courseid, int limit, int offset)
+        public Task<PaginationResponseModel<ViewLesson>> GetQuestionInCourse(Guid courseid, int limit, int offset)
         {
             throw new NotImplementedException();
         }

@@ -17,13 +17,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class UserRelationMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<UserRelation>(dbContext), IUserRelationRepository
     {
-        public Task<bool> CheckBlock(string blockerId, string blockeeId)
+        public Task<bool> CheckBlock(Guid blockerId, Guid blockeeId)
         {
             IEnumerable<UserRelation> listBlock = DbContext.UserRelations
                 .Where(relation => 
                     relation.UserRelationType == EUserRelationType.Block
-                    && relation.SenderId.ToString() == blockerId
-                    && relation.ReceiverId.ToString() == blockeeId
+                    && relation.SenderId == blockerId
+                    && relation.ReceiverId == blockeeId
                 );
             return Task.FromResult(listBlock.Any());
         }
@@ -51,47 +51,47 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(listBlock.Any());
         }
 
-        public Task<bool> CheckBlockEachOther(string user1Id, string user2Id)
+        public Task<bool> CheckBlockEachOther(Guid user1Id, Guid user2Id)
         {
             IEnumerable<UserRelation> listBlock = DbContext.UserRelations
                 .Where(relation =>
                     relation.UserRelationType == EUserRelationType.Block
-                    && (relation.SenderId.ToString() == user1Id || relation.ReceiverId.ToString() == user2Id)
-                    && (relation.SenderId.ToString() == user2Id || relation.ReceiverId.ToString() == user1Id)
+                    && (relation.SenderId == user1Id || relation.ReceiverId == user2Id)
+                    && (relation.SenderId == user2Id || relation.ReceiverId == user1Id)
                 );
             return Task.FromResult(listBlock.Any());
         }
 
-        public Task<IEnumerable<ViewUserRelation>> GetByUserId(string userId, bool isActive)
+        public Task<IEnumerable<ViewUserRelation>> GetByUserId(Guid userId, bool isActive)
         {
             if (isActive)
             {
                 var query1 =
                     from relation in DbContext.ViewUserRelations
-                    where relation.SenderId.ToString() == userId
+                    where relation.SenderId == userId
                     select relation;
                 return Task.FromResult(query1.AsEnumerable<ViewUserRelation>());
             }
             var query =
                 from relation in DbContext.ViewUserRelations
-                where relation.ReceiverId.ToString() == userId
+                where relation.ReceiverId == userId
                 select relation;
             return  Task.FromResult(query.AsEnumerable<ViewUserRelation>());
         }
 
-        public Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(string userId, bool isActive, EUserRelationType type)
+        public Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type)
         {
             if(isActive)
             {
                 var query1 =
                     from relation in DbContext.ViewUserRelations
-                    where relation.SenderId.ToString() == userId && relation.UserRelationType == type
+                    where relation.SenderId == userId && relation.UserRelationType == type
                     select relation;
                 return Task.FromResult(query1.AsEnumerable<ViewUserRelation>());
             }
             var query =
                 from relation in DbContext.ViewUserRelations
-                where relation.ReceiverId.ToString() == userId && relation.UserRelationType == type
+                where relation.ReceiverId == userId && relation.UserRelationType == type
                 select relation;
             return Task.FromResult(query.AsEnumerable<ViewUserRelation>());
         }

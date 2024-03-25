@@ -50,7 +50,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (8/1/24)
         /// Modified: None
-        //[CustomAuthorization(Roles: UserRoles.User)]
+        [CustomAuthorization(Roles: "User, Admin")]
         [HttpPost]
         public virtual async Task<IActionResult> Insert([FromBody] T entity)
         {
@@ -118,7 +118,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Miodified: None
         //[CustomAuthorization(Roles: UserRoles.User)]
         [HttpGet("{id}")]
-        public virtual async Task<IActionResult> Get(string id)
+        public virtual async Task<IActionResult> Get(Guid id)
         {
             ServiceResult res = await GetService().GetService(id);
             if (res.IsSuccess)
@@ -176,7 +176,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         //[CustomAuthorization(Roles: UserRoles.User)]
         [HttpPut("{entityId}")]
-        public virtual async Task<IActionResult> Update(string entityId, [FromBody] T entity)
+        public virtual async Task<IActionResult> Update(Guid entityId, [FromBody] T entity)
         {
             ServiceResult res = await GetService().UpdateService(entityId, entity);
             if (res.IsSuccess)
@@ -205,7 +205,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         //[CustomAuthorization(Roles: UserRoles.User)]
         [HttpDelete("{entityId}")]
-        public virtual async Task<IActionResult> Delete(string entityId)
+        public virtual async Task<IActionResult> Delete(Guid entityId)
         {
             ServiceResult res = await GetService().DeleteService(entityId);
             if (res.IsSuccess)
@@ -232,7 +232,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         //[CustomAuthorization(Roles: UserRoles.User)]
         [HttpDelete("delete-multi")]
-        public virtual async Task<IActionResult> Delete([FromBody] string[] entityIds)
+        public virtual async Task<IActionResult> Delete([FromBody] Guid[] entityIds)
         {
             ServiceResult res = await GetService().DeleteService(entityIds);
             if (res.IsSuccess)

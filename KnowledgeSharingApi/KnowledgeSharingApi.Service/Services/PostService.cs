@@ -53,11 +53,11 @@ namespace KnowledgeSharingApi.Services.Services
             ResponsePostItemModel model = new();
             model.Copy(post);
             PaginationResponseModel<ViewComment> listComments =
-                await KnowledgeRepository.GetListComments(model.KnowledgeId.ToString(), NumberOfTopComments, 0);
+                await KnowledgeRepository.GetListComments(model.KnowledgeId, NumberOfTopComments, 0);
             model.NumberComments = listComments.Total;
             model.TopComments = listComments.Results;
 
-            model.Star = await KnowledgeRepository.GetAverageStar(model.KnowledgeId.ToString());
+            model.Star = await KnowledgeRepository.GetAverageStar(model.KnowledgeId);
             return model;
         }
 
@@ -83,7 +83,7 @@ namespace KnowledgeSharingApi.Services.Services
 
 
 
-        public async Task<ServiceResult> AdminDeletePost(string postId)
+        public async Task<ServiceResult> AdminDeletePost(Guid postId)
         {
             // Kiểm tra post tồn tại
             Post post = await PostRepository.CheckExisted(postId, ResponseResource.NotExist(PostResource));
@@ -108,7 +108,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminGetUserPosts(string userId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset)
         {
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
@@ -141,13 +141,13 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AnonymousGetUserPosts(string userId, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset)
         {
             ViewUser user = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             IEnumerable<ViewPost> posts = 
-                (await PostRepository.GetPublicPostsByUserId(user.UserId.ToString()))
+                (await PostRepository.GetPublicPostsByUserId(user.UserId))
                 .Skip(offsetValue).Take(limitValue);
 
             List<ResponsePostItemModel> res = [];
@@ -167,7 +167,7 @@ namespace KnowledgeSharingApi.Services.Services
 
 
         #region User APIes
-        public async Task<ServiceResult> UserDeletePost(string myUid, string postId)
+        public async Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
         {
             Post post = await PostRepository.CheckExisted(postId, ResponseResource.NotExist(PostResource));
 
@@ -176,13 +176,13 @@ namespace KnowledgeSharingApi.Services.Services
             return await basePostService.UserDeletePost(myUid, postId);
         }
 
-        public async Task<ServiceResult> UserGetMyPosts(string myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
         {
             int offsetValue = offset ?? 0, limitValue = limit ?? DefaultLimit;
             ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
             IEnumerable<ViewPost> listPosts = 
-                (await PostRepository.GetByUserId(user.UserId.ToString()))
+                (await PostRepository.GetByUserId(user.UserId))
                 .Skip(offsetValue).Take(limitValue);
 
             return ServiceResult.Success(
@@ -192,7 +192,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> UserGetPosts(string myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset)
         {
             // Tìm kiếm và lọc thông minh hơn cho myUid
 
@@ -210,7 +210,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> UserGetUserPosts(string myUid, string userId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
         {
             _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());

@@ -101,7 +101,7 @@ namespace KnowledgeSharingApi.Services.Services
             try
             {
                 // Step 1: Insert user to db
-                string? insertId = await userRepository.Insert(user)
+                Guid? insertId = await userRepository.Insert(user)
                     ?? throw insertFailedException;
 
                 // Step 2: Update password
@@ -109,7 +109,7 @@ namespace KnowledgeSharingApi.Services.Services
                 if (rowEffects <= 0) throw insertFailedException;
 
                 // Step 3: Insert Profile
-                string? profileId = await profileRepository.Insert(new Profile()
+                Guid? profileId = await profileRepository.Insert(new Profile()
                 {
                     UserId = user.UserId,
                     FullName = fullName

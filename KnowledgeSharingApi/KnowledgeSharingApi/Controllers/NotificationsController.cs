@@ -1,7 +1,10 @@
 ﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Infrastructures.Encrypts;
+using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KnowledgeSharingApi.Controllers
 {
@@ -22,9 +25,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet]
-        public async Task<IActionResult> Get(string userId, int? limit, int? offset)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> Get(int? limit, int? offset)
         {
-            ServiceResult res = await NotificationService.GetNotifications(userId, limit, offset);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.GetNotifications(Guid.Parse(myUId), limit, offset);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 
@@ -36,9 +41,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet("{notiId}")]
-        public async Task<IActionResult> Get(string userId, string notiId)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> Get(Guid notiId)
         {
-            ServiceResult res = await NotificationService.GetNotification(userId, notiId);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.GetNotification(Guid.Parse(myUId), notiId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 
@@ -50,9 +57,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet("list")]
-        public async Task<IActionResult> Get(string userId, [FromBody] string[] ids)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> Get([FromBody] Guid[] ids)
         {
-            ServiceResult res = await NotificationService.GetNotifications(userId, ids);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.GetNotifications(Guid.Parse(myUId), ids);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 
@@ -64,9 +73,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPost("set-read-notification/{notificationId}")]
-        public async Task<IActionResult> SetReadNotification(string userId, string notificationId)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> SetReadNotification(Guid notificationId)
         {
-            ServiceResult res = await NotificationService.SetReadNotification(userId, notificationId);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.SetReadNotification(Guid.Parse(myUId), notificationId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 
@@ -78,9 +89,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPost("set-read-notification")]
-        public async Task<IActionResult> SetReadNotification(string userId, [FromBody] string[] ids)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> SetReadNotification([FromBody] Guid[] ids)
         {
-            ServiceResult res = await NotificationService.SetReadNotifications(userId, ids);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.SetReadNotifications(Guid.Parse(myUId), ids);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 
@@ -91,9 +104,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPost("set-read-all-notification")]
-        public async Task<IActionResult> SetReadNotification(string userId)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> SetReadNotification()
         {
-            ServiceResult res = await NotificationService.SetReadNotifications(userId);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.SetReadNotifications(Guid.Parse(myUId));
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 
@@ -105,9 +120,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpDelete("{notificationId}")]
-        public async Task<IActionResult> DeleteNotification(string userId, string notificationId)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> DeleteNotification(Guid notificationId)
         {
-            ServiceResult res = await NotificationService.DeleteNotification(userId, notificationId);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.DeleteNotification(Guid.Parse(myUId), notificationId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 
@@ -118,9 +135,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpDelete("all")]
-        public async Task<IActionResult> DeleteNotification(string userId)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> DeleteNotification()
         {
-            ServiceResult res = await NotificationService.DeleteNotifications(userId);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.DeleteNotifications(Guid.Parse(myUId));
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 
@@ -132,9 +151,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpDelete("list")]
-        public async Task<IActionResult> DeleteNotification(string userId, [FromBody] string[] ids)
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> DeleteNotification([FromBody] Guid[] ids)
         {
-            ServiceResult res = await NotificationService.GetNotifications(userId, ids);
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await NotificationService.GetNotifications(Guid.Parse(myUId), ids);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
     }

@@ -62,7 +62,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Template Services
 
-        public virtual async Task<ServiceResult> DeleteService(string id)
+        public virtual async Task<ServiceResult> DeleteService(Guid id)
         {
             var repository = GetRepository();
             // Kiểm tra xem Entity với id có tồn tại?
@@ -71,13 +71,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (entity == null)
             {
                 msg = CrudResource.NotExist(ResponseTableName);
-                return new ServiceResult
-                {
-                    IsSuccess = false,
-                    UserMessage = msg,
-                    DevMessage = msg,
-                    StatusCode = EStatusCode.BadRequest
-                };
+                return ServiceResult.BadRequest(msg);
             }
 
             // Tiến hành xóa Entity
@@ -87,13 +81,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return new ServiceResult(res);
             }
             msg = CrudResource.DeleteFailure(ResponseTableName);
-            return new ServiceResult
-            {
-                IsSuccess = false,
-                UserMessage = msg,
-                DevMessage = msg,
-                StatusCode = EStatusCode.ServerError
-            };
+            return ServiceResult.ServerError(msg);
         }
 
         public virtual async Task<ServiceResult> GetService(int? limit, int? offset)
@@ -107,67 +95,51 @@ namespace KnowledgeSharingApi.Services.Services
             else
             {
                 IEnumerable<T> entities = await repository.Get();
-                paginationResponseModel = new() {
+                paginationResponseModel = new()
+                {
                     Total = entities.Count(),
                     Limit = entities.Count(),
                     Offset = 0,
                     Results = entities
                 };
             }
+            // Success:
             return new ServiceResult(paginationResponseModel.Count, paginationResponseModel);
         }
 
-        public virtual async Task<ServiceResult> GetService(string id)
+        public virtual async Task<ServiceResult> GetService(Guid id)
         {
             var repository = GetRepository();
             T? entity = await repository.Get(id);
             if (entity == null)
             {
                 string msg = CrudResource.NotFound(ResponseTableName);
-                return new ServiceResult
-                {
-                    IsSuccess = false,
-                    StatusCode = EStatusCode.BadRequest,
-                    UserMessage = msg,
-                    DevMessage = msg
-                };
+                return ServiceResult.BadRequest(msg);
             }
+            // Success
             return new ServiceResult(1, entity);
         }
 
-        public virtual async Task<ServiceResult> GetService(string[] ids)
+        public virtual async Task<ServiceResult> GetService(Guid[] ids)
         {
             List<T> entities = (await GetRepository().Get()).ToList();
             var idProp = typeof(T).GetProperty($"{TableName}Id");
             if (idProp == null)
-            {
-                return new ServiceResult
-                {
-                    IsSuccess = false,
-                    StatusCode = EStatusCode.ServerError,
-                    UserMessage = CrudResource.ServerError(),
-                    DevMessage = CrudResource.NotExist($"{TableName}Id")
-                };
-            }
+                return ServiceResult.ServerError(
+                    UserMessage: CrudResource.ServerError(),
+                    DevMessage: CrudResource.NotExist($"{TableName}Id"));
             List<T?> results = ids.Select(id =>
                 entities.FirstOrDefault<T>(entity =>
                 {
                     var id2 = idProp.GetValue(entity);
-                    if (id2 == null)
-                    {
-                        return false;
-                    }
-                    return id2.ToString() == id;
+                    if (id2 != null && Guid.TryParse(id2.ToString(), out Guid value))
+                        return id == value;
+                    return false;
                 })
             ).ToList();
-            return new ServiceResult
-            {
-                IsSuccess = true,
-                StatusCode = EStatusCode.Success,
-                UserMessage = CrudResource.GetMultiSuccess(ResponseTableName),
-                DevMessage = CrudResource.GetMultiSuccess(ResponseTableName),
-                Data = results
-            };
+            // Success:
+            string msg = CrudResource.GetMultiSuccess(ResponseTableName);
+            return ServiceResult.Success(msg, msg, results);
         }
 
         public virtual async Task<ServiceResult> InsertService(T entity)
@@ -179,72 +151,45 @@ namespace KnowledgeSharingApi.Services.Services
             // Insert Entity
             entity.CreatedBy = AuthorName;
             entity.CreatedTime = DateTime.Now;
-            string? insertedId = await repository.Insert(entity);
-            if (String.IsNullOrEmpty(insertedId))
+            Guid? insertedId = await repository.Insert(entity);
+            if (insertedId == null)
             {
                 string msg = CrudResource.InsertFailure(ResponseTableName);
-                return new ServiceResult
-                {
-                    IsSuccess = false,
-                    UserMessage = msg,
-                    DevMessage = msg,
-                    StatusCode = EStatusCode.ServerError
-                };
+                return ServiceResult.ServerError(msg);
             }
+            // Success
             return new ServiceResult(1, insertedId);
         }
 
-        public virtual async Task<ServiceResult> UpdateService(string id, T entity)
+        public virtual async Task<ServiceResult> UpdateService(Guid id, T entity)
         {
             var repository = GetRepository();
             string msg;
 
-            // check if customer is exist
-            if (id == null)
-            {
-                msg = CrudResource.EmptyId(ResponseTableName);
-                return new ServiceResult
-                {
-                    IsSuccess = false,
-                    UserMessage = msg,
-                    DevMessage = msg,
-                    StatusCode = EStatusCode.BadRequest
-                };
-            }
+            // check if entity is exist
             T? ent = await repository.Get(id);
             if (ent == null)
             {
                 msg = CrudResource.NotExist(ResponseTableName);
-                return new ServiceResult
-                {
-                    IsSuccess = false,
-                    UserMessage = msg,
-                    DevMessage = msg,
-                    StatusCode = EStatusCode.BadRequest
-                };
+                return ServiceResult.BadRequest(msg);
             };
 
             ValidateBeforeUpdate(entity);
 
-            // Update customer infor
+            // Update entity infor
             entity.ModifiedBy = ModifierName;
             entity.ModifiedTime = DateTime.Now;
             int res = await repository.Update(id, entity);
             if (res > 0)
             {
+                // Success
                 return new ServiceResult(res);
             }
             msg = CrudResource.UpdateFailure(ResponseTableName);
-            return new ServiceResult
-            {
-                IsSuccess = false,
-                UserMessage = msg,
-                DevMessage = msg,
-                StatusCode = EStatusCode.ServerError
-            };
+            return ServiceResult.ServerError(msg);
         }
 
-        public virtual async Task<ServiceResult> DeleteService(string[] ids)
+        public virtual async Task<ServiceResult> DeleteService(Guid[] ids)
         {
             var repository = GetRepository();
             int res = await repository.Delete(ids);
@@ -252,34 +197,16 @@ namespace KnowledgeSharingApi.Services.Services
             if (res <= 0)
             {
                 msg = CrudResource.DeleteMultiFailure(ResponseTableName);
-                return new ServiceResult
-                {
-                    IsSuccess = false,
-                    StatusCode = EStatusCode.BadRequest,
-                    UserMessage = msg,
-                    DevMessage = msg
-                };
+                return ServiceResult.BadRequest(msg);
             }
+            
+            // Success
+            msg = CrudResource.DeleteMultiSuccess(ResponseTableName);
             if (res < ids.Length)
             {
                 msg = CrudResource.DeletedSomeItems(ResponseTableName);
-                return new ServiceResult
-                {
-                    IsSuccess = true,
-                    StatusCode = EStatusCode.Success,
-                    UserMessage = msg,
-                    DevMessage = msg
-                };
             }
-            msg = CrudResource.DeleteMultiSuccess(ResponseTableName);
-            return new ServiceResult
-            {
-                IsSuccess = true,
-                StatusCode = EStatusCode.Success,
-                UserMessage = msg,
-                DevMessage = msg,
-                Data = res
-            };
+            return ServiceResult.Success(msg);
         }
 
         public virtual async Task<ServiceResult> FilterService(string search, int? limit = null, int? offset = null)
@@ -301,6 +228,7 @@ namespace KnowledgeSharingApi.Services.Services
                     Results = entities
                 };
             }
+            // Success
             return new ServiceResult(paginationResponseModel.Count, paginationResponseModel);
 
         }

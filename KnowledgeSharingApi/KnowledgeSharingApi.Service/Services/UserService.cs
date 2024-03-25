@@ -39,7 +39,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region ForAdmin
-        public async Task<ServiceResult> AdminBlockUser(string uid)
+        public async Task<ServiceResult> AdminBlockUser(Guid uid)
         {
             // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu
             User? user = await UserRepository.Get(uid);
@@ -70,7 +70,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminDeleteUser(string uid)
+        public async Task<ServiceResult> AdminDeleteUser(Guid uid)
         {
             User? user = await UserRepository.Get(uid);
             if (user == null)
@@ -142,7 +142,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminUnblockUser(string uid)
+        public async Task<ServiceResult> AdminUnblockUser(Guid uid)
         {
             // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu
             User? user = await UserRepository.Get(uid);
@@ -173,7 +173,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminUpdateUserInfo(string uid, UpdateUserModel model)
+        public async Task<ServiceResult> AdminUpdateUserInfo(Guid uid, UpdateUserModel model)
         {
             // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu
             User? user = await UserRepository.Get(uid);
@@ -227,7 +227,7 @@ namespace KnowledgeSharingApi.Services.Services
 
 
         #region For User
-        public async Task<ServiceResult> GetMyUserProfile(string myuid)
+        public async Task<ServiceResult> GetMyUserProfile(Guid myuid)
         {
             // Lấy về profile
             ViewUser? profile = await UserRepository.GetDetail(myuid);
@@ -242,7 +242,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> GetUserDetail(string myuid, string unOruid)
+        public async Task<ServiceResult> GetUserDetail(Guid myuid, string unOruid)
         {
             // Kiểm tra profile phải tồn tại
             ViewUser? profile = await UserRepository.GetDetailByUsernameOrUserId(unOruid);
@@ -251,7 +251,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiểm tra xem có xem được profile của nhau không
             // Kiểm tra block
-            if (await UserRelationRepository.CheckBlockEachOther(myuid, unOruid))
+            if (await UserRelationRepository.CheckBlockEachOther(myuid, profile.UserId))
                 return new ServiceResult()
                 {
                     IsSuccess = false,
@@ -274,7 +274,7 @@ namespace KnowledgeSharingApi.Services.Services
             return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
         }
 
-        public async Task<ServiceResult> SearchUser(string myuid, string searchKey, int? limit, int? offset)
+        public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset)
         {
             // Format limit và offset
             int offsetValue = offset ??= 0;
@@ -307,7 +307,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UpdateMyAvatarImage(string uid, IFormFile avatar)
+        public async Task<ServiceResult> UpdateMyAvatarImage(Guid uid, IFormFile avatar)
         {
             // Kiểm tra uid tồn tại trong database
             Profile? profile = await ProfileRepository.Get(uid);
@@ -326,7 +326,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, profile);
         }
 
-        public async Task<ServiceResult> UpdateMyCoverImage(string uid, IFormFile cover)
+        public async Task<ServiceResult> UpdateMyCoverImage(Guid uid, IFormFile cover)
         {
             // Kiểm tra uid phải tồn tại trong db
             Profile? profile = await ProfileRepository.Get(uid);
@@ -345,7 +345,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, profile);
         }
 
-        public async Task<ServiceResult> UpdateMyUserProfile(string uid, UpdateProfileModel updateModel)
+        public async Task<ServiceResult> UpdateMyUserProfile(Guid uid, UpdateProfileModel updateModel)
         {
             // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu
             Profile? profile = await ProfileRepository.Get(uid);

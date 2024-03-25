@@ -17,7 +17,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (27/12/23)
         /// Modified: None
-        Task<ServiceResult> GetService(string id);
+        Task<ServiceResult> GetService(Guid id);
 
         /// <summary>
         /// Dịch vụ lấy về tất cả bản ghi 
@@ -39,7 +39,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (24/1/24)
         /// Modified: None
-        Task<ServiceResult> GetService(string[] ids);
+        Task<ServiceResult> GetService(Guid[] ids);
 
         /// <summary>
         /// Dịch vụ thêm mới một bản ghi
@@ -58,7 +58,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (27/12/23)
         /// Modified: None
-        Task<ServiceResult> UpdateService(string id, T entity);
+        Task<ServiceResult> UpdateService(Guid id, T entity);
 
         /// <summary>
         /// Dịch vụ xóa một bản ghi
@@ -67,7 +67,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (27/12/23)
         /// Modified: None
-        Task<ServiceResult> DeleteService(string id);
+        Task<ServiceResult> DeleteService(Guid id);
 
         /// <summary>
         /// Dịch vụ xóa nhiều bản ghi
@@ -76,7 +76,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (8/1/24)
         /// Modififed: None
-        Task<ServiceResult> DeleteService(string[] ids);
+        Task<ServiceResult> DeleteService(Guid[] ids);
 
 
 
