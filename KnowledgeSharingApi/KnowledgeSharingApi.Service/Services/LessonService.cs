@@ -17,6 +17,11 @@ namespace KnowledgeSharingApi.Services.Services
             throw new NotImplementedException();
         }
 
+        public Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset)
         {
             throw new NotImplementedException();
@@ -33,6 +38,11 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
         public Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
         {
             throw new NotImplementedException();
         }
@@ -58,6 +68,11 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
         public Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset)
         {
             throw new NotImplementedException();
         }

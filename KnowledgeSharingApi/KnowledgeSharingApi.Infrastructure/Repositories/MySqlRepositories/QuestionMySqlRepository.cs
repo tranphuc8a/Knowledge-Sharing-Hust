@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
@@ -133,5 +134,64 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Skip(offset).Take(limit)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<ViewQuestion>> GetPublicPostsOfCategory(string catName, int limit, int offset)
+        {
+            var knowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(k => k.CategoryName == catName)
+                .Select(k => k.KnowledgeId)
+                .Distinct();
+            var posts = await DbContext.ViewQuestions
+                .Where(post => post.Privacy == EPrivacy.Public)
+                .Where(post => knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
+                .OrderByDescending(post => post.CreatedTime)
+                .Skip(offset).Take(limit)
+                .ToListAsync();
+            return posts;
+        }
+
+        public async Task<IEnumerable<ViewQuestion>> GetPostsOfCategory(string catName, int limit, int offset)
+        {
+            var knowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(k => k.CategoryName == catName)
+                .Select(k => k.KnowledgeId)
+                .Distinct();
+
+            var posts = await DbContext.ViewQuestions
+                .Where(post => knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
+                .OrderByDescending(post => post.CreatedTime)
+                .Skip(offset).Take(limit)
+                .ToListAsync();
+
+            return posts;
+        }
+
+        public async Task<IEnumerable<ViewQuestion>> GetPostsOfCategory(Guid myUId, string catName, int limit, int offset)
+        {
+            var knowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(k => k.CategoryName == catName)
+                .Select(k => k.KnowledgeId)
+                .Distinct();
+
+            // Lấy danh sách CourseId mà User đã đăng ký
+            var registeredCourseIds = DbContext.CourseRegisters
+                .Where(c => c.UserId == myUId)
+                .Select(c => c.CourseId)
+                .Distinct()
+                .ToList(); // Dùng ToList để tải kết quả về và tránh query lại nhiều lần
+
+            var posts = await DbContext.ViewQuestions
+                .Where(post => knowledgesId.Contains(post.KnowledgeId) && // Lọc post dựa vào danh sách ID đã lấy
+                    (post.CourseId == null || registeredCourseIds.Contains(post.CourseId.Value)) &&
+                    (post.CourseId != null || post.Privacy == EPrivacy.Public)
+                )
+                .OrderByDescending(post => post.CreatedTime)
+                .Skip(offset)
+                .Take(limit)
+                .ToListAsync();
+
+            return posts;
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,43 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
 {
     public interface ICategoryRepository : IRepository<Category>
     {
+        /// <summary>
+        /// Lấy về category theo tên
+        /// </summary>
+        /// <param name="catName"> tên của category </param>
+        /// <returns> Cate | null - không tìm thấy </returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<Category?> GetByName(string catName);
+
+        /// <summary>
+        /// Lấy về danh sách knowledge của một category
+        /// </summary>
+        /// <param name="catId"> id của category </param>
+        /// <param name="catName"> name của category </param>
+        /// <returns> Danh sách view knowledge cate </returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<IEnumerable<ViewKnowledgeCategory>> GetKnowledgesByCategory(Guid catId);
+        Task<IEnumerable<ViewKnowledgeCategory>> GetKnowledgesByCategory(string catName);
+
+        /// <summary>
+        /// Lấy về danh sách categories của một knowledge
+        /// </summary>
+        /// <param name="knowledgeId"> id của knowledge </param>
+        /// <returns> Danh sách cate </returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<IEnumerable<Category>> GetByKnowledgeId(Guid knowledgeId);
+
+        /// <summary>
+        /// Cập nhật danh sách category của một knowledge
+        /// </summary>
+        /// <param name="knowledgeId"> id của knowledge cần cập nhật </param>
+        /// <param name="catNames"> Danh sách catname mới của knowledge </param>
+        /// <returns> Số bản ghi ảnh hưởng </returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<int> UpdateKnowledgeCategories(Guid knowledgeId, List<string> catNames);
     }
 }

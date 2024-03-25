@@ -75,6 +75,8 @@ namespace KnowledgeSharingApi.Services.Services
             model.NumberComments = listComments.Total;
             model.TopComments = listComments.Results;
 
+            // Lấy về danh sách categories
+
             model.Star = await KnowledgeRepository.GetAverageStar(model.KnowledgeId);
             return model;
         }
@@ -248,6 +250,9 @@ namespace KnowledgeSharingApi.Services.Services
             };
             question.Copy(model);
 
+            // Insert categories nếu có:
+            // ...
+
             // Insert câu hỏi
             Guid? inserted = await QuestionRepository.Insert(question);
             if (inserted == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(QuestionResource));
@@ -416,6 +421,44 @@ namespace KnowledgeSharingApi.Services.Services
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.UpdateSuccess(QuestionResource));
         }
+
+        #endregion
+
+        #region Get of a category
+
+        public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
+        {
+            IEnumerable<ViewQuestion> posts = await QuestionRepository.GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+
+            return ServiceResult.Success(
+                ResponseResource.GetMultiSuccess(),
+                string.Empty,
+                await DecoratePost(posts)
+            );
+        }
+
+        public async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset)
+        {
+            IEnumerable<ViewQuestion> posts = await QuestionRepository.GetPostsOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
+
+            return ServiceResult.Success(
+                ResponseResource.GetMultiSuccess(),
+                string.Empty,
+                await DecoratePost(posts)
+            );
+        }
+
+        public async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset)
+        {
+            IEnumerable<ViewQuestion> posts = await QuestionRepository.GetPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+
+            return ServiceResult.Success(
+                ResponseResource.GetMultiSuccess(),
+                string.Empty,
+                await DecoratePost(posts)
+            );
+        }
+
         #endregion
     }
 }

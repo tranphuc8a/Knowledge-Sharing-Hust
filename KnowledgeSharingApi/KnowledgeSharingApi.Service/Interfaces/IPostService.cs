@@ -50,6 +50,20 @@ namespace KnowledgeSharingApi.Services.Interfaces
         Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset);
         Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset);
 
+
+        /// <summary>
+        /// Nhóm API lấy về danh sách bài đăng công khai có gắn thẻ theo một category name
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="catName"> Tên của category cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset);
+        Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset);
+        Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset);
+
         #endregion
 
 

@@ -54,7 +54,7 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         }
 
         //public DbSet<Block> Blocks { get; set; }
-        public DbSet<Category> Categoríes { get; set; }
+        public DbSet<Category> Categories { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<Course> Courses { get; set; }
@@ -92,5 +92,6 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<ViewLesson> ViewLessons { get; set; }
         public DbSet<ViewQuestion> ViewQuestions { get; set; }
         public DbSet<ViewCourseRegister> ViewCourseRegisters { get; set; }
+        public DbSet<ViewKnowledgeCategory> ViewKnowledgeCategories { get; set; }
     }
 }

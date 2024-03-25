@@ -46,5 +46,19 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<IEnumerable<ReturnType>> GetPublicPostsByUserId(Guid userId);
+
+
+        /// <summary>
+        /// Lấy về danh sách bài đăng của một category
+        /// </summary>
+        /// <param name="catName"> Tên category </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<IEnumerable<ReturnType>> GetPublicPostsOfCategory(string catName, int limit, int offset);
+        Task<IEnumerable<ReturnType>> GetPostsOfCategory(string catName, int limit, int offset);
+        Task<IEnumerable<ReturnType>> GetPostsOfCategory(Guid myUId, string catName, int limit, int offset);
     }
 }
