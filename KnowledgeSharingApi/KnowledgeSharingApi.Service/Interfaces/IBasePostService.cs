@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> AnonymousGetPostDetail(string postId);
+        Task<ServiceResult> AnonymousGetPostDetail(Guid postId);
 
         #endregion
 
@@ -34,7 +34,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetPostDetail(string postId);
+        Task<ServiceResult> AdminGetPostDetail(Guid postId);
 
         /// <summary>
         /// Admin lấy về danh sách bài đăng của một khóa học cụ thể
@@ -45,7 +45,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetListPostsOfCourse(string courseId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset);
 
         #endregion
 
@@ -59,7 +59,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetPostDetail(string myUid, string postId);
+        Task<ServiceResult> UserGetPostDetail(Guid myUid, Guid postId);
 
         /// <summary>
         /// User Lấy về chi tiết bài đăng của chính mình
@@ -69,7 +69,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyPostDetail(string myUid, string postId);
+        Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId);
 
         /// <summary>
         /// User lấy về danh sách bài đăng của một khóa học cụ thể
@@ -81,7 +81,21 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListPostsOfCourse(string myUid, string courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset);
+
+
+        /// <summary>
+        /// User lấy về danh sách bài đăng của một khóa học cụ thể của mình
+        /// </summary>
+        /// <param name="myUid"> id user của chính mình </param>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset);
+
 
 
         /// <summary>
@@ -92,7 +106,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserCreatePost(string myUid, CreatePostModel model);
+        Task<ServiceResult> UserCreatePost(Guid myUid, CreatePostModel model);
         
 
 
@@ -104,7 +118,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserUpdatePost(string myUid, string postId, UpdatePostModel model);
+        Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model);
 
         #endregion
     }

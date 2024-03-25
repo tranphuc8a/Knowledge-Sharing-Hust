@@ -22,7 +22,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> bool - có, false - không </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<bool> CheckBlock(string blockerId, string blockeeId);
+        Task<bool> CheckBlock(Guid blockerId, Guid blockeeId);
         Task<bool> CheckBlockByUsername(string blockerUsername, string blockeeUsername);
 
 
@@ -36,7 +36,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> bool - có, false - không </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<bool> CheckBlockEachOther(string user1Id, string user2Id);
+        Task<bool> CheckBlockEachOther(Guid user1Id, Guid user2Id);
         Task<bool> CheckBlockByUsernameEachOther(string username1, string username2);
 
 
@@ -48,7 +48,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewUserRelation>> GetByUserId(string userId, bool isActive);
+        Task<IEnumerable<ViewUserRelation>> GetByUserId(Guid userId, bool isActive);
 
         /// <summary>
         /// Lấy về danh sách quan hệ theo UserId và loại quan hệ
@@ -59,6 +59,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(string userId, bool isActive, EUserRelationType type);
+        Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type);
     }
 }

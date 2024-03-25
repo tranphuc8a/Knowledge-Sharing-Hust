@@ -19,7 +19,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<double?> GetAverageStar(string knowledgeId);
+        Task<double?> GetAverageStar(Guid knowledgeId);
 
 
         /// <summary>
@@ -31,6 +31,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<PaginationResponseModel<ViewComment>> GetListComments(string knowledgeId, int limit, int offset);
+        Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset);
     }
 }

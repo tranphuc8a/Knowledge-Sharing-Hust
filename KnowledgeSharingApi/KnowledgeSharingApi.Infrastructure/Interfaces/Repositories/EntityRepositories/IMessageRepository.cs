@@ -17,6 +17,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<ViewMessage?> GetDetail(string messageId);
+        Task<ViewMessage?> GetDetail(Guid messageId);
     }
 }

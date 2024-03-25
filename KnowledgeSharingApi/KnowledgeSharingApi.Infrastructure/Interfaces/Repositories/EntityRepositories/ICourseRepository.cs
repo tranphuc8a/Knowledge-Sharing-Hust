@@ -17,7 +17,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfCourse(string courseId);
+        Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfCourse(Guid courseId);
 
         /// <summary>
         /// Lấy về danh sách khóa học đã đăng ký của một user
@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfUser(string userId);
+        Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfUser(Guid userId);
 
 
         /// <summary>
@@ -39,6 +39,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<ViewCourseRegister?> GetViewCourseRegister(string userId, string courseId); 
+        Task<ViewCourseRegister?> GetViewCourseRegister(Guid userId, Guid courseId); 
     }
 }

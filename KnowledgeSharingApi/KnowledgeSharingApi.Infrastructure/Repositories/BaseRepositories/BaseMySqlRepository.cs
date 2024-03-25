@@ -54,13 +54,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             return res;
         }
 
-        public virtual async Task<T?> Get(string id)
+        public virtual async Task<T?> Get(Guid id)
         {
             string sqlCommand = $"Select * from {TableName} where {TableName}Id = @id";
             return await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id });
         }
 
-        public async Task<IEnumerable<T>> Get(string[] ids)
+        public async Task<IEnumerable<T>> Get(Guid[] ids)
         {
             string sqlCommand = $"Select * from {TableName} where {TableName}Id in @ids";
             return await Connection.QueryAsync<T>(sqlCommand, new { ids }, transaction: Transaction);
@@ -71,13 +71,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
         #region Insert New Record
 
-        public virtual async Task<string?> Insert(string id, T entity)
+        public virtual async Task<Guid?> Insert(Guid id, T entity)
         {
             // Set new Guid for Id of entity
             string entityId = $"{TableName}Id";
             PropertyInfo propertyInfo = typeof(T).GetProperty(entityId)
                 ?? throw new NotMatchTypeException();
-            propertyInfo.SetValue(entity, Guid.Parse(id));
+            propertyInfo.SetValue(entity, id);
 
             // Create sql Command
             List<string> props = entity.GetProperties().Select(p => p.Name).ToList();
@@ -90,7 +90,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             return res > 0 ? id : null;
         }
 
-        public virtual async Task<string?> Insert(T entity)
+        public virtual async Task<Guid?> Insert(T entity)
         {
             // Set new Guid for Id of entity
             string entityId = $"{TableName}Id";
@@ -107,19 +107,19 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
             // Excute and return result:
             int res = await Connection.ExecuteAsync(sqlCommand, entity, transaction: Transaction);
-            return res > 0 ? newId.ToString() : null;
+            return res > 0 ? newId : null;
         }
         #endregion
 
 
         #region Delete A or Multi Record
 
-        public virtual async Task<int> Delete(string id)
+        public virtual async Task<int> Delete(Guid id)
         {
             string sqlCommand = $"Delete from {TableName} where {TableName}Id = @id";
             return await Connection.ExecuteAsync(sqlCommand, new { id });
         }
-        public virtual async Task<int> Delete(string[] ids)
+        public virtual async Task<int> Delete(Guid[] ids)
         {
             string sqlCommand = $"Delete from {TableName} where {TableName}Id in @ids";
             return await Connection.ExecuteAsync(sqlCommand, new { ids }, transaction: Transaction);
@@ -128,7 +128,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
 
         #region Update A Record
-        public virtual async Task<int> Update(string id, T entity)
+        public virtual async Task<int> Update(Guid id, T entity)
         {
             // prepare params
             DynamicParameters parameters = new();
@@ -204,7 +204,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             };
         }
 
-        public virtual async Task<T> CheckExisted(string entityId, string errorMessage)
+        public virtual async Task<T> CheckExisted(Guid entityId, string errorMessage)
         {
             return await Get(entityId) ?? throw new NotExistedEntityException(errorMessage);
         }

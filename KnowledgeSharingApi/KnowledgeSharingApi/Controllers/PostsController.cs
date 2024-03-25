@@ -48,8 +48,8 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        [HttpGet("/user/anonymous/posts/{userId}")]
-        public async Task<IActionResult> AnonymousGetListUserPosts(string userId, int? limit, int? offset)
+        [HttpGet("/api/v1/user/anonymous/posts/{userId}")]
+        public async Task<IActionResult> AnonymousGetListUserPosts(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await PostService.AnonymousGetUserPosts(userId, limit, offset);
             return StatusCode(res);
@@ -85,9 +85,9 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        [HttpGet("/user/admin/posts/{userId}")]
+        [HttpGet("/api/v1/user/admin/posts/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListUserPosts(string userId, int? limit, int? offset)
+        public async Task<IActionResult> AdminGetListUserPosts(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await PostService.AdminGetUserPosts(userId, limit, offset);
             return StatusCode(res);
@@ -102,7 +102,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpDelete("admin/{postId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminDeletePost(string postId)
+        public async Task<IActionResult> AdminDeletePost(Guid postId)
         {
             ServiceResult res = await PostService.AdminDeletePost(postId);
             return StatusCode(res);
@@ -126,7 +126,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> UserGetListPosts(int? limit, int? offset)
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserGetPosts(myUid, limit, offset);
+            ServiceResult res = await PostService.UserGetPosts(Guid.Parse(myUid), limit, offset);
             return StatusCode(res);
         }
 
@@ -143,7 +143,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> UserGetListMyPosts(int? limit, int? offset)
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserGetMyPosts(myUid, limit, offset);
+            ServiceResult res = await PostService.UserGetMyPosts(Guid.Parse(myUid), limit, offset);
             return StatusCode(res);
         }
 
@@ -156,12 +156,12 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        [HttpGet("/user/posts/{userId}")]
+        [HttpGet("/api/v1/user/posts/{userId}")]
         [CustomAuthorization(Roles: "Adminm, User")]
-        public async Task<IActionResult> UserGetPost(string userId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetPost(Guid userId, int? limit, int? offset)
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserGetUserPosts(myUid, userId, limit, offset);
+            ServiceResult res = await PostService.UserGetUserPosts(Guid.Parse(myUid), userId, limit, offset);
             return StatusCode(res);
         }
 
@@ -174,10 +174,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("{postId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> AdminGetListPosts(string postId)
+        public async Task<IActionResult> AdminGetListPosts(Guid postId)
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserDeletePost(myUid, postId);
+            ServiceResult res = await PostService.UserDeletePost(Guid.Parse(myUid), postId);
             return StatusCode(res);
         }
 

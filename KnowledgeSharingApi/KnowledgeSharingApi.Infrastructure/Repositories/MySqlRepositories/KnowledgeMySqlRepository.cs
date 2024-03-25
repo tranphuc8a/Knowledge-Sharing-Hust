@@ -16,21 +16,29 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class KnowledgeMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Knowledge>(dbContext), IKnowledgeRepository
     {
-        public async Task<double?> GetAverageStar(string knowledgeId)
+
+        public async Task<double?> GetAverageStar(Guid knowledgeId)
         {
-            double? star = await
+            var hasRatings = await DbContext.Stars.AnyAsync(star => star.UserItemId == knowledgeId);
+
+            if (!hasRatings)
+                return null; 
+
+            double? averageStar = await
                 DbContext.Stars
-                .Where(star => star.UserItemId.ToString() == knowledgeId)
-                .Select(star => star.Stars)
+                .Where(star => star.UserItemId == knowledgeId)
+                .Select(star => (double?)star.Stars)
                 .AverageAsync();
-            return star;
+
+            return averageStar;
         }
 
-        public async Task<PaginationResponseModel<ViewComment>> GetListComments(string knowledgeId, int limit, int offset)
+
+        public async Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset)
         {
             List<ViewComment> listComment = await
                 DbContext.ViewComments
-                .Where(comment => comment.KnowledgeId.ToString() == knowledgeId)
+                .Where(comment => comment.KnowledgeId == knowledgeId)
                 .OrderByDescending(comment => comment.CreatedTime)
                 .ToListAsync();
             PaginationResponseModel<ViewComment> res = new()

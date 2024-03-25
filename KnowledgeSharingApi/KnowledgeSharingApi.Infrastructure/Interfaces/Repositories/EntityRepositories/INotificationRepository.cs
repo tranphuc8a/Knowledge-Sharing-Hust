@@ -16,7 +16,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> Số bản ghi ảnh hưởng </returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<int> DeleteAllNotification(string userId);
+        Task<int> DeleteAllNotification(Guid userId);
 
         /// <summary>
         /// Xóa danh sách thông báo của một người dùng
@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> Số bản ghi ảnh hưởng </returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<int> DeleteMultiNotificationByUserId(string userId, string[] ids);
+        Task<int> DeleteMultiNotificationByUserId(Guid userId, Guid[] ids);
 
         /// <summary>
         /// Lấy về toàn bộ thông báo của một userId
@@ -35,7 +35,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<Notification>> GetAllNotificationsByUserId(string userId);
+        Task<IEnumerable<Notification>> GetAllNotificationsByUserId(Guid userId);
 
         /// <summary>
         /// Lấy về danh sách thông báo của một user
@@ -44,7 +44,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<Notification>> GetNotificationsByUserId(string userId, int limit, int offset);
+        Task<IEnumerable<Notification>> GetNotificationsByUserId(Guid userId, int limit, int offset);
 
         /// <summary>
         /// Cập nhật đã đọc danh sách thông báo
@@ -53,7 +53,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<int> SetReadNotification(string userId);
-        Task<int> SetReadNotification(string userId, string[] ids);
+        Task<int> SetReadNotification(Guid userId);
+        Task<int> SetReadNotification(Guid userId, Guid[] ids);
     }
 }

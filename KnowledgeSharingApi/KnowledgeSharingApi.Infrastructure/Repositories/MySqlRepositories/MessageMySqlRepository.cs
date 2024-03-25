@@ -14,11 +14,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class MessageMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Message>(dbContext), IMessageRepository
     {
-        public Task<ViewMessage?> GetDetail(string messageId)
+        public Task<ViewMessage?> GetDetail(Guid messageId)
         {
             return Task.FromResult(
                 DbContext.ViewMessages
-                .Where(message => message.MessageId.ToString() == messageId)
+                .Where(message => message.MessageId == messageId)
                 .FirstOrDefault()
             );
         }

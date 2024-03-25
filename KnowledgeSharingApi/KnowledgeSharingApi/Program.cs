@@ -126,7 +126,10 @@ builder.Services.AddScoped<IProfileRepository, ProfileMySqlRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionMySqlRepository>();
 builder.Services.AddScoped<IUserRelationRepository, UserRelationMySqlRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationMySqlRepository>();
+builder.Services.AddScoped<IKnowledgeRepository, KnowledgeMySqlRepository>();
 builder.Services.AddScoped<IPostRepository, PostMySqlRepository>();
+builder.Services.AddScoped<IQuestionRepository, QuestionMySqlRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseMySqlRepository>();
 
 
 //
@@ -143,6 +146,8 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserRelationService, UserRelationService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<ILessonService, LessonService>();
 
 
 //

@@ -57,7 +57,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> ViewUser </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<ViewUser?> GetDetail(string userId);
+        Task<ViewUser?> GetDetail(Guid userId);
 
         /// <summary>
         /// Lấy về chi tiết user bằng email
@@ -116,6 +116,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> Trả về view user tương ứng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ViewUser> CheckExistedUser(string userId, string errorMessage);
+        Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage);
     }
 }

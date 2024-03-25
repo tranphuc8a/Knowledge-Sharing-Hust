@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<IEnumerable<ReturnType>> GetByUserId(string userId);
+        Task<IEnumerable<ReturnType>> GetByUserId(Guid userId);
 
         /// <summary>
         /// Lấy về danh sách bài đăng public
@@ -45,6 +45,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<IEnumerable<ReturnType>> GetPublicPostsByUserId(string userId);
+        Task<IEnumerable<ReturnType>> GetPublicPostsByUserId(Guid userId);
     }
 }

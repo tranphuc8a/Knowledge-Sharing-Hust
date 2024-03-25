@@ -1,6 +1,9 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces;
+using KnowledgeSharingApi.Domains.Models.Entities.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;

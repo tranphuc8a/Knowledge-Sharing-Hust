@@ -191,7 +191,7 @@ namespace KnowledgeSharingApi.Services.Services
             return await LoginSuccess(user!);
         }
 
-        public virtual async Task<ServiceResult> Logout(string sessionId)
+        public virtual async Task<ServiceResult> Logout(Guid sessionId)
         {
             int rowEffect = await sessionRepository.Delete(sessionId);
 
@@ -220,7 +220,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (jwtTokenDto == null) return invalidToken;
 
             // Step 2. Kiểm tra Refresh token khớp và còn thời hạn
-            Session? session = await sessionRepository.Get(jwtTokenDto.SessionId.ToString());
+            Session? session = await sessionRepository.Get(jwtTokenDto.SessionId);
             if (session == null || session.RefreshToken != tokenModel.RefreshToken || session.Expired <= DateTime.Now)
                 return invalidToken;
         
@@ -233,7 +233,7 @@ namespace KnowledgeSharingApi.Services.Services
                 // Cập nhật refresh token vào db
                 session.RefreshToken = newRefreshToken;
                 session.Expired = DateTime.Now.AddDays(refreshTokenValidityInDays);
-                int rows = await sessionRepository.Update(session.SessionId.ToString(), session);
+                int rows = await sessionRepository.Update(session.SessionId, session);
 
                 // Lỗi không thêm được vào db
                 if (rows <= 0)
@@ -332,10 +332,10 @@ namespace KnowledgeSharingApi.Services.Services
                     CreatedBy = user.Username,
                     CreatedTime = now
                 };
-                string? newId = await sessionRepository.Insert(sessionId.ToString(), session);
+                Guid? newId = await sessionRepository.Insert(sessionId, session);
 
                 // Lỗi
-                if (String.IsNullOrEmpty(newId))
+                if (newId == null)
                 {
                     return ServiceResult.ServerError(responseResource.ServerError(), String.Empty, new
                     {

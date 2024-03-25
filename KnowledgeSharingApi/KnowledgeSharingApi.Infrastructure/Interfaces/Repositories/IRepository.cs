@@ -25,7 +25,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Entity cần lấy </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<T> CheckExisted(string entityId, string errorMessage);
+        Task<T> CheckExisted(Guid entityId, string errorMessage);
 
         /// <summary>
         /// Hàm thực hiện lấy tất cả bản ghi của bảng trong CSDL
@@ -55,7 +55,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Bản ghi cần lấy </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: None
-        Task<T?> Get(string id);
+        Task<T?> Get(Guid id);
         
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Bản ghi cần lấy </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: None
-        Task<IEnumerable<T>> Get(string[] ids);
+        Task<IEnumerable<T>> Get(Guid[] ids);
 
         /// <summary>
         /// Hàm thực hiện thêm mới một bản ghi
@@ -75,7 +75,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> id của bản ghi đã thêm </returns>
         /// Created: PhucTV (26/12/23)
         /// Modified: None
-        Task<string?> Insert(T entity);
+        Task<Guid?> Insert(T entity);
 
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> id của bản ghi đã thêm </returns>
         /// Created: PhucTV (26/12/23)
         /// Modified: None
-        Task<string?> Insert(string id, T entity);
+        Task<Guid?> Insert(Guid id, T entity);
 
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Số lượng bản ghi bị ảnh hưởng </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: None
-        Task<int> Update(string id, T entity);
+        Task<int> Update(Guid id, T entity);
 
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> số bản ghi bị xóa </returns>
         /// Created: PhucTV (3/1/24)
         /// Modified: None
-        Task<int> Delete(string id);
+        Task<int> Delete(Guid id);
 
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Số lượng bản ghi bị xóa </returns>
         /// Created: PhucTV (8/1/24)
         /// Modified: None
-        Task<int> Delete(string[] ids);
+        Task<int> Delete(Guid[] ids);
 
 
         /// <summary>

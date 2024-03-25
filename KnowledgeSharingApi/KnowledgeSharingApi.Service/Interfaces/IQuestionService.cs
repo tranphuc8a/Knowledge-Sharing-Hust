@@ -18,6 +18,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> ConfirmQuestion(string myUid, string questionId, bool isConfirm);
+        Task<ServiceResult> ConfirmQuestion(Guid myUid, Guid questionId, bool isConfirm);
     }
 }

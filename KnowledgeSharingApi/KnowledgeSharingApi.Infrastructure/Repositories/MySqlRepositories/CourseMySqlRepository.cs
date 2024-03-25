@@ -14,17 +14,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class CourseMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Course>(dbContext), ICourseRepository
     {
-        public Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfCourse(string courseId)
+        public Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfCourse(Guid courseId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfUser(string userId)
+        public Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfUser(Guid userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ViewCourseRegister?> GetViewCourseRegister(string userId, string courseId)
+        public Task<ViewCourseRegister?> GetViewCourseRegister(Guid userId, Guid courseId)
         {
             throw new NotImplementedException();
         }

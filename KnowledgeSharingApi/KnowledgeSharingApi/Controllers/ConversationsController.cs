@@ -23,7 +23,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet("my/{conversationId}")]
-        public async Task<IActionResult> GetConversation(string myUid, string conversationId)
+        public async Task<IActionResult> GetConversation(Guid myUid, Guid conversationId)
         {
             ServiceResult res = await ConversationService.GetConversation(myUid, conversationId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -38,7 +38,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet("my")]
-        public async Task<IActionResult> GetListConversations(string myUid, int? limit, int? offset)
+        public async Task<IActionResult> GetListConversations(Guid myUid, int? limit, int? offset)
         {
             ServiceResult res = await ConversationService.GetConversations(myUid, limit, offset);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -52,7 +52,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet("with/{userId}")]
-        public async Task<IActionResult> GetConversationWith(string myUid, string userId)
+        public async Task<IActionResult> GetConversationWith(Guid myUid, Guid userId)
         {
             ServiceResult res = await ConversationService.GetConversationWith(myUid, userId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -66,7 +66,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPost("with/{userId}")]
-        public async Task<IActionResult> StartConversationWith(string myUid, string userId)
+        public async Task<IActionResult> StartConversationWith(Guid myUid, Guid userId)
         {
             ServiceResult res = await ConversationService.StartConversation(myUid, userId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -81,7 +81,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpDelete("{conversationId}")]
-        public async Task<IActionResult> DeleteConversation(string myUid, string conversationId)
+        public async Task<IActionResult> DeleteConversation(Guid myUid, Guid conversationId)
         {
             ServiceResult res = await ConversationService.DeleteConversation(myUid, conversationId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -96,7 +96,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPatch]
-        public async Task<IActionResult> UpdateConversation(string myUid, [FromBody] UpdateConversationModel model)
+        public async Task<IActionResult> UpdateConversation(Guid myUid, [FromBody] UpdateConversationModel model)
         {
             ServiceResult res = await ConversationService.UpdateConversation(myUid, model);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -110,7 +110,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPatch("participant")]
-        public async Task<IActionResult> UpdateParticipant(string myUid, [FromBody] UpdateUserConversationModel model)
+        public async Task<IActionResult> UpdateParticipant(Guid myUid, [FromBody] UpdateUserConversationModel model)
         {
             ServiceResult res = await ConversationService.UpdateUserConversation(myUid, model);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -124,7 +124,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPost("set-read/{conversationId}")]
-        public async Task<IActionResult> SetReadConversation(string myUid, string conversationId)
+        public async Task<IActionResult> SetReadConversation(Guid myUid, Guid conversationId)
         {
             ServiceResult res = await ConversationService.SetReadConversation(myUid, conversationId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -140,7 +140,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet("messages/{conversationId}")]
-        public async Task<IActionResult> GetMessages(string myUid, string conversationId, int? limit, int? offset)
+        public async Task<IActionResult> GetMessages(Guid myUid, Guid conversationId, int? limit, int? offset)
         {
             ServiceResult res = await ConversationService.GetMessages(myUid, conversationId, limit, offset);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -155,7 +155,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPost("message")]
-        public async Task<IActionResult> PostMessage(string myUid, SendMessageModel model)
+        public async Task<IActionResult> PostMessage(Guid myUid, SendMessageModel model)
         {
             ServiceResult res = await ConversationService.SendMessage(myUid, model);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -169,7 +169,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPost("send-message")]
-        public async Task<IActionResult> SendMessage(string myUid, SendMessageModel model)
+        public async Task<IActionResult> SendMessage(Guid myUid, SendMessageModel model)
         {
             ServiceResult res = await ConversationService.SendMessage(myUid, model);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -183,7 +183,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpDelete("message/{messageId}")]
-        public async Task<IActionResult> DeleteMessage(string myUid, string messageId)
+        public async Task<IActionResult> DeleteMessage(Guid myUid, Guid messageId)
         {
             ServiceResult res = await ConversationService.DeleteMessage(myUid, messageId);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -197,7 +197,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPatch("message")]
-        public async Task<IActionResult> UpdateMessage(string myUid, [FromBody] UpdateMessageModel model)
+        public async Task<IActionResult> UpdateMessage(Guid myUid, [FromBody] UpdateMessageModel model)
         {
             ServiceResult res = await ConversationService.UpdateMessage(myUid, model);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
@@ -211,7 +211,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpPost("reply-message")]
-        public async Task<IActionResult> ReplyMessage(string myUid, [FromBody] ReplyMessageModel model)
+        public async Task<IActionResult> ReplyMessage(Guid myUid, [FromBody] ReplyMessageModel model)
         {
             ServiceResult res = await ConversationService.ReplyMessage(myUid, model);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));

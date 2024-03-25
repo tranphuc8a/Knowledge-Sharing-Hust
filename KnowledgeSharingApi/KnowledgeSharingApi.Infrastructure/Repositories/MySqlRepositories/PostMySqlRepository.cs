@@ -26,11 +26,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<IEnumerable<ViewPost>> GetByUserId(string userId)
+        public async Task<IEnumerable<ViewPost>> GetByUserId(Guid userId)
         {
             List<ViewPost> posts = await
                 DbContext.ViewPosts
-                .Where(post => post.UserId.ToString() == userId)
+                .Where(post => post.UserId == userId)
                 .OrderByDescending(post => post.CreatedTime)
                 .ToListAsync();
             return posts;
@@ -47,11 +47,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<IEnumerable<ViewPost>> GetPublicPostsByUserId(string userId)
+        public async Task<IEnumerable<ViewPost>> GetPublicPostsByUserId(Guid userId)
         {
             List<ViewPost> posts = await
                 DbContext.ViewPosts
-                .Where(post => post.Privacy == EPrivacy.Public && post.UserId.ToString() == userId)
+                .Where(post => post.Privacy == EPrivacy.Public && post.UserId == userId)
                 .OrderByDescending(post => post.CreatedTime)
                 .ToListAsync();
             return posts;

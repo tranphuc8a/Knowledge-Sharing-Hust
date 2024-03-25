@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns> Profile </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> GetUserDetail(string myuid, string unOruid);
+        Task<ServiceResult> GetUserDetail(Guid myuid, string unOruid);
 
         /// <summary>
         /// Tìm kiếm danh sách user theo từ khoa
@@ -34,7 +34,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns> Danh sách User tìm được </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> SearchUser(string myuid, string searchKey, int? limit, int? offset);
+        Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset);
 
         /// <summary>
         /// Lấy về chi tiết Profile của chính user
@@ -43,7 +43,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns> Profile </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> GetMyUserProfile(string myuid);
+        Task<ServiceResult> GetMyUserProfile(Guid myuid);
 
         /// <summary>
         /// Cập nhật thông tin profile của mình
@@ -51,7 +51,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> UpdateMyUserProfile(string uid, UpdateProfileModel updateModel);
+        Task<ServiceResult> UpdateMyUserProfile(Guid uid, UpdateProfileModel updateModel);
 
         /// <summary>
         /// Cập nhật ảnh đại điện
@@ -59,7 +59,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> UpdateMyAvatarImage(string uid, IFormFile avatar);
+        Task<ServiceResult> UpdateMyAvatarImage(Guid uid, IFormFile avatar);
 
         /// <summary>
         /// Cập nhật ảnh bìa
@@ -67,7 +67,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> UpdateMyCoverImage(string uid, IFormFile cover);
+        Task<ServiceResult> UpdateMyCoverImage(Guid uid, IFormFile cover);
         #endregion
 
 
@@ -102,7 +102,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminUpdateUserInfo(string uid, UpdateUserModel model);
+        Task<ServiceResult> AdminUpdateUserInfo(Guid uid, UpdateUserModel model);
 
         /// <summary>
         /// Admin khóa người dùng
@@ -110,7 +110,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminBlockUser(string uid);
+        Task<ServiceResult> AdminBlockUser(Guid uid);
 
         /// <summary>
         /// Admin mở khóa người dùng
@@ -118,7 +118,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminUnblockUser(string uid);
+        Task<ServiceResult> AdminUnblockUser(Guid uid);
 
         /// <summary>
         /// Admin xóa một user
@@ -126,7 +126,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminDeleteUser(string uid); 
+        Task<ServiceResult> AdminDeleteUser(Guid uid); 
         #endregion
     }
 }

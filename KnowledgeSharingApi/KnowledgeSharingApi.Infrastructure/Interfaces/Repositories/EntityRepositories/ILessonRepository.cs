@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<ViewQuestion> CheckExistedLesson(string lessonId, string errorMessage);
+        Task<ViewQuestion> CheckExistedLesson(Guid lessonId, string errorMessage);
 
 
         /// <summary>
@@ -33,6 +33,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<PaginationResponseModel<ViewLesson>> GetQuestionInCourse(string courseid, int limit, int offset);
+        Task<PaginationResponseModel<ViewLesson>> GetQuestionInCourse(Guid courseid, int limit, int offset);
     }
 }
