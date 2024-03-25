@@ -383,6 +383,22 @@ namespace KnowledgeSharingApi.Controllers
             return StatusCode(res);
         }
 
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài thảo luận mà mình đã mark
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        [HttpGet("/api/v1/Marks/my/questions")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserGetListMarkedQuestions(int? limit, int? offset)
+        {
+            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await QuestionService.UserGetMyMarkedPosts(Guid.Parse(myUid), limit, offset);
+            return StatusCode(res);
+        }
 
         #endregion
 

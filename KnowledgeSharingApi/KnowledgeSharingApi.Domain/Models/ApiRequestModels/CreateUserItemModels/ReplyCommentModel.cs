@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels
 {
-    public class CreateCommentModel : CreateUserItemModel
+    public class ReplyCommentModel
     {
+        [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
+        public Guid? ReplyId { get; set; }
+
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.CONTENT_EMPTY)]
         public string? Content { get; set; }
-
-        [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
-        public string? KnowledgeId { get; set; }
     }
 }

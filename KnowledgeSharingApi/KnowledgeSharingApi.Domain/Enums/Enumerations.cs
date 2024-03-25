@@ -167,7 +167,10 @@ namespace KnowledgeSharingApi.Domains.Enums
 
         // Block:
         Blocker = 31,
-        Blockee = 32
+        Blockee = 32,
+
+        // Not in Relation
+        NotInRelation = -1
     }
 
 

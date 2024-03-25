@@ -17,33 +17,29 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class ConversationMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Conversation>(dbContext), IConversationRepository
     {
-        public virtual Task<IEnumerable<ViewUserConversation>> GetParticipants(Guid conversationId)
+        public virtual async Task<IEnumerable<ViewUserConversation>> GetParticipants(Guid conversationId)
         {
-            return Task.FromResult(
-                DbContext.ViewUserConversations
+            return await DbContext.ViewUserConversations
                 .Where(participant => participant.ConversationId == conversationId)
                 .OrderBy(participant => participant.Time)
-                .AsEnumerable()
-            );
+                .ToListAsync();
         }
 
-        public virtual Task<IEnumerable<ViewMessage>> GetMessages(Guid userId, Guid conversationId, int limit, int offset)
+        public virtual async Task<IEnumerable<ViewMessage>> GetMessages(Guid userId, Guid conversationId, int limit, int offset)
         {
             ViewUserConversation userConversation =
                 DbContext.ViewUserConversations
                 .Where(user => user.UserId == userId)
                 .FirstOrDefault() ?? throw new Exception("user and conversation not match");
 
-            return Task.FromResult(
-                DbContext.ViewMessages
+            return await DbContext.ViewMessages
                 .Where(message => message.ConversationId == conversationId && message.Time >= userConversation.LastDeleteTime)
                 .OrderByDescending(message => message.Time)
                 .Skip(offset).Take(limit)
-                .AsEnumerable()
-            );
+                .ToListAsync();
         }
 
-        public virtual Task<IEnumerable<Conversation>> GetListConversationByUserId(Guid userId)
+        public virtual async Task<IEnumerable<Conversation>> GetListConversationByUserId(Guid userId)
         {
             IQueryable<Conversation> query =
                 from conversation in DbContext.Conversations
@@ -51,10 +47,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     on conversation.ConversationId equals userconversation.ConversationId
                 where userconversation.UserId == userId
                 select conversation;
-            return Task.FromResult(query.AsEnumerable());
+            return await query.ToListAsync();
         }
 
-        public virtual Task<Conversation?> GetConversationWithUser(Guid userId, Guid id2)
+        public virtual async Task<Conversation?> GetConversationWithUser(Guid userId, Guid id2)
         {
             IQueryable<Conversation> query =
             (
@@ -67,7 +63,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 select groupedConversations.First()
             );
 
-            return Task.FromResult(query.AsEnumerable().FirstOrDefault());
+            return await query.FirstOrDefaultAsync();
         }
 
 
@@ -92,23 +88,39 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Conversation> CreateConversation(Profile user1, Profile user2)
+
+        /// <summary>
+        /// Tạo mới một Conversation giữa hai user
+        /// </summary>
+        /// <param name="user1"> user 1</param>
+        /// <param name="user2"> user 2</param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        private static Conversation CreateConversationEntity(Profile user1, Profile user2)
         {
-            var currentTime = DateTime.UtcNow;
-
-            using var transaction = await DbContext.BeginTransaction();
-            try
+            return new Conversation
             {
-                var conversation = new Conversation
-                {
-                    ConversationId = Guid.NewGuid(),
-                    ConversationName = $"{user1.FullName} và {user2.FullName}",
-                    CreatedTime = currentTime,
-                    CreatedBy = user1.FullName
-                };
-
-                var userConversation1 = new UserConversation
-                {
+                ConversationId = Guid.NewGuid(),
+                ConversationName = $"{user1.FullName} và {user2.FullName}",
+                CreatedTime = DateTime.Now,
+                CreatedBy = user1.FullName
+            };
+        }
+        /// <summary>
+        /// Tạo mới một 2 participants của một conversation
+        /// </summary>
+        /// <param name="conversation"> conversation </param>
+        /// <param name="user1"> user 1 </param>
+        /// <param name="user2"> user 2 </param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        private static IEnumerable<UserConversation> CreateUserConversations(Conversation conversation, Profile user1, Profile user2)
+        {
+            DateTime currentTime = DateTime.Now;
+            return [
+                new() {
                     UserConversationId = Guid.NewGuid(),
                     ConversationId = conversation.ConversationId,
                     UserId = user1.UserId,
@@ -116,10 +128,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     LastDeleteTime = currentTime,
                     LastReadTime = currentTime,
                     Nickname = user1.FullName
-                };
-
-                var userConversation2 = new UserConversation
-                {
+                },
+                new() {
                     UserConversationId = Guid.NewGuid(),
                     ConversationId = conversation.ConversationId,
                     UserId = user2.UserId,
@@ -127,10 +137,20 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     LastDeleteTime = currentTime,
                     LastReadTime = currentTime,
                     Nickname = user2.FullName
-                };
+                }
+            ];
+        }
 
+        public async Task<Conversation> CreateConversation(Profile user1, Profile user2)
+        {
+            await using var transaction = await DbContext.BeginTransaction();
+            try
+            {
+                var conversation = CreateConversationEntity(user1, user2);
                 DbContext.Conversations.Add(conversation);
-                DbContext.UserConversations.AddRange([userConversation1, userConversation2]);
+
+                var userConversations = CreateUserConversations(conversation, user1, user2);
+                DbContext.UserConversations.AddRange(userConversations);
 
                 await DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();

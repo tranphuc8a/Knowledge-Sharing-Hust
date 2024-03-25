@@ -459,6 +459,22 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
+        public async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset)
+        {
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            IEnumerable<ViewQuestion> listed = await QuestionRepository.GetMarkedPosts(myUid);
+            int total = listed.Count();
+            listed = listed.Skip(offsetValue).Take(limitValue);
+            PaginationResponseModel<ResponseQuestionItemModel> res = new()
+            {
+                Total = total,
+                Limit = limitValue,
+                Offset = offsetValue,
+                Results = await DecoratePost(listed)
+            };
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(QuestionResource), string.Empty, res);
+        }
+
         #endregion
     }
 }

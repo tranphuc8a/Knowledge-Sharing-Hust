@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels
 {
-    public class UpdateUserItemModel
+    public class CreateUserItemModel
     {
 
     }

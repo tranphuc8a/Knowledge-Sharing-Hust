@@ -127,7 +127,7 @@ namespace KnowledgeSharingApi.Services.Services
                 })
                 .OrderByDescending(user => user.similarityScore)
                 .Select(user => user.User)
-                .AsEnumerable();
+                .ToList();
 
             // Lọc không chặn, làm sau
 
@@ -292,7 +292,7 @@ namespace KnowledgeSharingApi.Services.Services
                 })
                 .OrderByDescending(user => user.similarityScore)
                 .Select(user => user.User)
-                .AsEnumerable();
+                .ToList();
 
             // Lọc không chặn, làm sau
 

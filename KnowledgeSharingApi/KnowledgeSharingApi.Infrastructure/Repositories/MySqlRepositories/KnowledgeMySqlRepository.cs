@@ -17,7 +17,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         : BaseMySqlRepository<Knowledge>(dbContext), IKnowledgeRepository
     {
 
-        public async Task<double?> GetAverageStar(Guid knowledgeId)
+        public virtual async Task<double?> GetAverageStar(Guid knowledgeId)
         {
             var hasRatings = await DbContext.Stars.AnyAsync(star => star.UserItemId == knowledgeId);
 
@@ -34,7 +34,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         }
 
 
-        public async Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset)
+        public virtual async Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset)
         {
             List<ViewComment> listComment = await
                 DbContext.ViewComments
@@ -49,6 +49,31 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 Results = listComment
             };
             return res;
+        }
+
+        public virtual async Task<PaginationResponseModel<ViewUser>> GetListUserMaredKnowledge(Guid knowledgeId, int limit, int offset)
+        {
+            var listUserIds = DbContext.Marks.Where(mark => mark.KnowledgeId == knowledgeId)
+                .Select(mark => mark.UserId).Distinct();
+            int total = listUserIds.Count();
+            List<ViewUser> listUser = await DbContext.ViewUsers
+                .Where(user => listUserIds.Contains(user.UserId))
+                .Skip(offset).Take(limit)
+                .ToListAsync();
+            return new PaginationResponseModel<ViewUser>
+            {
+                Total = total,
+                Limit = limit,
+                Offset = offset,
+                Results = listUser
+            };
+        }
+
+        public virtual async Task<Mark?> GetMark(Guid userId, Guid knowledgeId)
+        {
+            return await DbContext.Marks
+                .Where(mark => mark.UserId == userId && mark.KnowledgeId == knowledgeId)
+                .FirstOrDefaultAsync();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// </summary>
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
-        /// <returns></returns>
+        /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<IEnumerable<ReturnType>> GetViewPost(int limit, int offset);
@@ -33,7 +33,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// </summary>
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
-        /// <returns></returns>
+        /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<IEnumerable<ReturnType>> GetPublicPosts(int limit, int offset);
@@ -42,7 +42,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Lấy về danh sách bài đăng public của một user
         /// </summary>
         /// <param name="userId"> id của user cần lấy </param>
-        /// <returns></returns>
+        /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<IEnumerable<ReturnType>> GetPublicPostsByUserId(Guid userId);
@@ -54,11 +54,21 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <param name="catName"> Tên category </param>
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
-        /// <returns></returns>
+        /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<IEnumerable<ReturnType>> GetPublicPostsOfCategory(string catName, int limit, int offset);
         Task<IEnumerable<ReturnType>> GetPostsOfCategory(string catName, int limit, int offset);
         Task<IEnumerable<ReturnType>> GetPostsOfCategory(Guid myUId, string catName, int limit, int offset);
+
+
+        /// <summary>
+        /// Lấy về danh sách bài đăng đã được mark của một user
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy  </param>
+        /// <returns> Danh sách bài đăng </returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<IEnumerable<ReturnType>> GetMarkedPosts(Guid userId);
     }
 }
