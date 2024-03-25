@@ -25,12 +25,27 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             throw new NotImplementedException();
         }
 
+        public Task<IEnumerable<ViewLesson>> GetPostsOfCategory(string catName, int limit, int offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ViewLesson>> GetPostsOfCategory(Guid myUId, string catName, int limit, int offset)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IEnumerable<ViewLesson>> GetPublicPosts(int limit, int offset)
         {
             throw new NotImplementedException();
         }
 
         public Task<IEnumerable<ViewLesson>> GetPublicPostsByUserId(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ViewLesson>> GetPublicPostsOfCategory(string catName, int limit, int offset)
         {
             throw new NotImplementedException();
         }

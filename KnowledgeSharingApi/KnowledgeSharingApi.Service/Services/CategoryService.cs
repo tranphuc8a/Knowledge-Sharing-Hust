@@ -1,0 +1,180 @@
+﻿using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
+using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ZstdSharp.Unsafe;
+
+namespace KnowledgeSharingApi.Services.Services
+{
+    public class CategoryService : ICategoryService
+    {
+        protected readonly IResourceFactory ResourceFactory;
+        protected readonly IResponseResource ResponseResource;
+        protected readonly IEntityResource EntityResource;
+        protected readonly ICategoryRepository CategoryRepository;
+        protected readonly IKnowledgeRepository KnowledgeRepository;
+
+        protected readonly string CategoryResource, CategoryExisted, CategoryNotExisted;
+        protected readonly int DefaultLimit = 20;
+
+        public CategoryService(
+            IResourceFactory resourceFactory,
+            ICategoryRepository categoryRepository,
+            IKnowledgeRepository knowledgeRepository
+        )
+        {
+            ResourceFactory = resourceFactory;
+            ResponseResource = resourceFactory.GetResponseResource();
+            EntityResource = resourceFactory.GetEntityResource();
+            CategoryRepository = categoryRepository;
+            KnowledgeRepository = knowledgeRepository;
+
+            CategoryResource = EntityResource.Category();
+            CategoryExisted = ResponseResource.ExistName(CategoryResource);
+            CategoryNotExisted = ResponseResource.NotExist(CategoryResource);
+        }
+
+        public async Task<ServiceResult> AddCategory(string catName)
+        {
+            // Check catName chưa tồn tại
+            Category? cat = await CategoryRepository.GetByName(catName);
+            if (cat != null) return ServiceResult.BadRequest(CategoryExisted);
+
+            // Thêm mới
+            Category category = new()
+            {
+                CategoryId = Guid.NewGuid(),
+                CategoryName = catName,
+                CreatedTime = DateTime.Now,
+                CreatedBy = "Knowledge Sharing admin"
+            };
+            Guid? catId = await CategoryRepository.Insert(category.CategoryId, category);
+            if (catId == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(CategoryResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.InsertSuccess(CategoryResource));
+        }
+
+        public async Task<ServiceResult> DeleteCategory(Guid catId)
+        {
+            // Check cate đã tồn tại
+            Category? cat = await CategoryRepository.Get(catId);
+            if (cat == null) return ServiceResult.BadRequest(CategoryNotExisted);
+
+            // Check category chưa gắn với knowledge nào
+            IEnumerable<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catId);
+            if (listKnowledges.Any())
+                return ServiceResult.BadRequest("Không thể xóa do có knowledge khác đang sử dụng category này");
+
+            // Xóa 
+            int res = await CategoryRepository.Delete(catId);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(CategoryResource));
+
+            // Thành công
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(CategoryResource));
+        }
+
+        public async Task<ServiceResult> DeleteCategoryByName(string catName)
+        {
+            // Check cate đã tồn tại
+            Category? cat = await CategoryRepository.GetByName(catName);
+            if (cat == null) return ServiceResult.BadRequest(CategoryNotExisted);
+
+            // Check category chưa gắn với knowledge nào
+            IEnumerable<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catName);
+            if (listKnowledges.Any())
+                return ServiceResult.BadRequest("Không thể xóa do có knowledge khác đang sử dụng category này");
+
+            // Xóa 
+            int res = await CategoryRepository.Delete(cat.CategoryId);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(CategoryResource));
+
+            // Thành công
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(CategoryResource));
+        }
+
+        public async Task<ServiceResult> GetCategory(Guid catId)
+        {
+            // Get 
+            Category? cat = await CategoryRepository.Get(catId);
+            if (cat == null) return ServiceResult.BadRequest(CategoryNotExisted);
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.GetSuccess(CategoryResource), string.Empty, cat);
+        }
+
+        public async Task<ServiceResult> GetCategory(string catName)
+        {
+            // Get 
+            Category? cat = await CategoryRepository.GetByName(catName);
+            if (cat == null) return ServiceResult.BadRequest(CategoryNotExisted);
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.GetSuccess(CategoryResource), string.Empty, cat);
+        }
+
+        public async Task<ServiceResult> GetListCategories(int? limit, int? offset)
+        {
+            // Get
+            PaginationResponseModel<Category> res = await CategoryRepository.Get(limit ?? DefaultLimit, offset ?? 0);
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CategoryResource), string.Empty, res.Results);
+        }
+
+        public async Task<ServiceResult> GetListCategoryOfKnowledge(Guid knowledgeId)
+        {
+            // Check knowledgeId tồn tại 
+            // Không nhất thiết, trường hợp knowledge không tồn tại, trả về rỗng
+
+            // Get 
+            IEnumerable<Category> res = await CategoryRepository.GetByKnowledgeId(knowledgeId);
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CategoryResource), string.Empty, res);
+        }
+
+        public async Task<ServiceResult> UpdateCategory(Guid catId, string catName)
+        {
+            // Check cate đã tồn tại
+            Category? cat = await CategoryRepository.Get(catId);
+            if (cat == null) return ServiceResult.BadRequest(CategoryNotExisted);
+
+            // Check category chưa gắn với knowledge nào
+            IEnumerable<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catId);
+            if (listKnowledges.Any())
+                return ServiceResult.BadRequest("Không thể cập nhật do có knowledge khác đang sử dụng category này");
+
+            // Cập nhật
+            cat.CategoryName = catName;
+            int res = await CategoryRepository.Update(catId, cat);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CategoryResource));
+
+            // Thành công
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(CategoryResource), string.Empty, cat);
+        }
+
+        public async Task<ServiceResult> UpdateKnowledgeCategories(Guid myUid, UpdateKnowledgeCategoriesModel model)
+        {
+            // Check knowledge tồn tại và phải là của chính mình làm chủ
+            Knowledge knowledge = await KnowledgeRepository.CheckExisted(model.KnowledgeId!.Value,
+                ResponseResource.NotExist(EntityResource.Knowledge()));
+
+            // Cập nhật danh sách cate của knowledge
+            int rows = await CategoryRepository.UpdateKnowledgeCategories(model.KnowledgeId!.Value, model.Categories!);
+            if (rows <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CategoryResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(CategoryResource));
+        }
+    }
+}

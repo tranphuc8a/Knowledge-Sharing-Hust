@@ -4,6 +4,7 @@ using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
+using KnowledgeSharingApi.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        [HttpGet("/api/v1/user/anonymous/questions/{userId}")]
+        [HttpGet("/api/v1/Users/anonymous/questions/{userId}")]
         [AllowAnonymous]
         public async Task<IActionResult> AnonymousGetUserList(Guid userId, int? limit, int? offset)
             => StatusCode(await QuestionService.AnonymousGetUserPosts(userId, limit, offset));
@@ -91,7 +92,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        [HttpGet("/api/v1/user/admin/questions/{userId}")]
+        [HttpGet("/api/v1/Users/admin/questions/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
         public async Task<IActionResult> AdminGetListUserQuestion(Guid userId, int? limit, int? offset)
             => StatusCode(await QuestionService.AdminGetUserPosts(userId, limit, offset));
@@ -117,7 +118,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        [HttpGet("/api/v1/course/admin/questions/{courseId}")]
+        [HttpGet("/api/v1/Courses/admin/questions/{courseId}")]
         [CustomAuthorization(Roles: "Admin")]
         public async Task<IActionResult> AdminGetListCourseQuestion(Guid courseId, int? limit, int? offset)
             => StatusCode(await QuestionService.AdminGetListPostsOfCourse(courseId, limit, offset));
@@ -230,7 +231,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        [HttpGet("/api/v1/course/questions/{courseId}")]
+        [HttpGet("/api/v1/Courses/questions/{courseId}")]
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListCourseQuestion(Guid courseId, int? limit, int? offset)
         {
@@ -247,7 +248,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        [HttpGet("/api/v1/course/my/questions/{courseId}")]
+        [HttpGet("/api/v1/Courses/my/questions/{courseId}")]
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListMyCourseQuestion(Guid courseId, int? limit, int? offset)
         {
@@ -268,7 +269,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpPost]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserAddNewQuestion([FromBody] CreateQuestionModel model)
+        public async Task<IActionResult> UserAddNewQuestion([FromForm] CreateQuestionModel model)
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
             return StatusCode(await QuestionService.UserCreatePost(Guid.Parse(myUid), model));
@@ -285,7 +286,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpPatch("{questionId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserUpdateQuestion(Guid questionId, [FromBody] UpdateQuestionModel model)
+        public async Task<IActionResult> UserUpdateQuestion(Guid questionId, [FromForm] UpdateQuestionModel model)
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
             return StatusCode(await QuestionService.UserUpdatePost(Guid.Parse(myUid), questionId, model));
@@ -323,6 +324,65 @@ namespace KnowledgeSharingApi.Controllers
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
             return StatusCode(await QuestionService.ConfirmQuestion(Guid.Parse(myUid), questionId, isConfirm));
         }
+
+        #endregion
+
+
+        #region Get list post of a category
+
+        /// <summary>
+        /// Xử lý yêu cầu anonymous lấy về danh sách bài thảo luận của một category
+        /// </summary>
+        /// <param name="category"> Tên loại cần lấy </param>
+        /// <param name="limit"> Số lượng bài thảo luận cần lấy </param>
+        /// <param name="offset"> Độ lệch bài thảo luận đầu tiên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        [HttpGet("/api/v1/Categories/anonymous/questions/{category}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AnonymousGetListPostsOfCategory(string category, int? limit, int? offset)
+        {
+            ServiceResult res = await QuestionService.AnonymousGetListPostsOfCategory(category, limit, offset);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu admin lấy về danh sách bài thảo luận của một category
+        /// </summary>
+        /// <param name="category"> Tên loại cần lấy </param>
+        /// <param name="limit"> Số lượng bài thảo luận cần lấy </param>
+        /// <param name="offset"> Độ lệch bài thảo luận đầu tiên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        [HttpGet("/api/v1/Categories/admin/questions/{category}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public async Task<IActionResult> AdminGetListPostsOfCategory(string category, int? limit, int? offset)
+        {
+            ServiceResult res = await QuestionService.AdminGetListPostsOfCategory(category, limit, offset);
+            return StatusCode(res);
+        }
+
+
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài thảo luận của một category
+        /// </summary>
+        /// <param name="category"> Tên loại cần lấy </param>
+        /// <param name="limit"> Số lượng bài thảo luận cần lấy </param>
+        /// <param name="offset"> Độ lệch bài thảo luận đầu tiên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        [HttpGet("/api/v1/Categories/questions/{category}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserGetListPostsOfCategory(string category, int? limit, int? offset)
+        {
+            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await QuestionService.UserGetListPostsOfCategory(Guid.Parse(myUid), category, limit, offset);
+            return StatusCode(res);
+        }
+
 
         #endregion
 

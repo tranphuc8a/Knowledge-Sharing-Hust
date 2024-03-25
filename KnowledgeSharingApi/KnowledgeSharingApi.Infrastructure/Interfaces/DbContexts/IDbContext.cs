@@ -57,8 +57,9 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
        
         // KnowledgeDbContext
         DbSet<Knowledge> Knowledges {get; set;}
-        DbSet<Category> Categoríes {get; set;}
+        DbSet<Category> Categories {get; set;}
         DbSet<KnowledgeCategory> KnowledgeCategories {get; set;}
+        DbSet<ViewKnowledgeCategory> ViewKnowledgeCategories {get; set;}
         DbSet<Comment> Comments {get; set;}
         DbSet<ViewComment> ViewComments {get; set;}
         DbSet<Mark> Marks {get; set;}

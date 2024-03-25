@@ -225,7 +225,44 @@ namespace KnowledgeSharingApi.Services.Services
                 string.Empty,
                 await DecoratePost(posts)
             );
-        } 
+        }
+        #endregion
+
+
+        #region Get list posts of a category
+
+        public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
+        {
+            IEnumerable<ViewPost> posts = await PostRepository.GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+
+            return ServiceResult.Success(
+                ResponseResource.GetMultiSuccess(),
+                string.Empty,
+                await DecoratePost(posts)
+            );
+        }
+
+        public async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset)
+        {
+            IEnumerable<ViewPost> posts = await PostRepository.GetPostsOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
+
+            return ServiceResult.Success(
+                ResponseResource.GetMultiSuccess(),
+                string.Empty,
+                await DecoratePost(posts)
+            );
+        }
+
+        public async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset)
+        {
+            IEnumerable<ViewPost> posts = await PostRepository.GetPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+
+            return ServiceResult.Success(
+                ResponseResource.GetMultiSuccess(),
+                string.Empty,
+                await DecoratePost(posts)
+            );
+        }
         #endregion
     }
 }

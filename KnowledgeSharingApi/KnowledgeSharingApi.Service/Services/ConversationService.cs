@@ -190,7 +190,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.NotFound(ResponseResource.NotFound(ConversationResource));
 
             return ServiceResult.Success(
-                ResponseResource.NotFound(ConversationResource),
+                ResponseResource.GetSuccess(ConversationResource),
                 string.Empty,
                 await GetConversationDetail(myUid, conversation.ConversationId)
             );
@@ -208,7 +208,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (conversation != null)
             {
                 return ServiceResult.Success(
-                    ResponseResource.NotFound(ConversationResource),
+                    ResponseResource.InsertSuccess(ConversationResource),
                     string.Empty,
                     await GetConversationDetail(myUid, conversation.ConversationId)
                 );

@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Infrastructures.Encrypts;
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -48,7 +49,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        [HttpGet("/api/v1/user/anonymous/posts/{userId}")]
+        [HttpGet("/api/v1/Users/anonymous/posts/{userId}")]
         public async Task<IActionResult> AnonymousGetListUserPosts(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await PostService.AnonymousGetUserPosts(userId, limit, offset);
@@ -85,7 +86,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        [HttpGet("/api/v1/user/admin/posts/{userId}")]
+        [HttpGet("/api/v1/Users/admin/posts/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
         public async Task<IActionResult> AdminGetListUserPosts(Guid userId, int? limit, int? offset)
         {
@@ -156,7 +157,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        [HttpGet("/api/v1/user/posts/{userId}")]
+        [HttpGet("/api/v1/Users/posts/{userId}")]
         [CustomAuthorization(Roles: "Adminm, User")]
         public async Task<IActionResult> UserGetPost(Guid userId, int? limit, int? offset)
         {
@@ -172,7 +173,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        [HttpGet("{postId}")]
+        [HttpDelete("{postId}")]
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> AdminGetListPosts(Guid postId)
         {
@@ -180,6 +181,64 @@ namespace KnowledgeSharingApi.Controllers
             ServiceResult res = await PostService.UserDeletePost(Guid.Parse(myUid), postId);
             return StatusCode(res);
         }
+
+        #endregion
+
+        #region Get list post of a category
+
+        /// <summary>
+        /// Xử lý yêu cầu anonymous lấy về danh sách bài đăng của một category
+        /// </summary>
+        /// <param name="category"> Tên loại cần lấy </param>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        [HttpGet("/api/v1/Categories/anonymous/posts/{category}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AnonymousGetListPostsOfCategory(string category, int? limit, int? offset)
+        {
+            ServiceResult res = await PostService.AnonymousGetListPostsOfCategory(category, limit, offset);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu admin lấy về danh sách bài đăng của một category
+        /// </summary>
+        /// <param name="category"> Tên loại cần lấy </param>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        [HttpGet("/api/v1/Categories/admin/posts/{category}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public async Task<IActionResult> AdminGetListPostsOfCategory(string category, int? limit, int? offset)
+        {
+            ServiceResult res = await PostService.AdminGetListPostsOfCategory(category, limit, offset);
+            return StatusCode(res);
+        }
+
+
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài đăng của một category
+        /// </summary>
+        /// <param name="category"> Tên loại cần lấy </param>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        [HttpGet("/api/v1/Categories/posts/{category}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserGetListPostsOfCategory(string category, int? limit, int? offset)
+        {
+            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await PostService.UserGetListPostsOfCategory(Guid.Parse(myUid), category, limit, offset);
+            return StatusCode(res);
+        }
+
 
         #endregion
     }

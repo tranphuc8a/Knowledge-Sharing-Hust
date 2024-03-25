@@ -47,7 +47,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
         public virtual async Task<PaginationResponseModel<T>> Get(int limit, int offset)
         {
-            string sqlCommand = $"Select * from {TableName}; ";
+            string sqlCommand = $"Select * from {TableName} ";
             PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, new { limit, offset });
             res.Limit = limit;
             res.Offset = offset;
@@ -62,7 +62,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
         public async Task<IEnumerable<T>> Get(Guid[] ids)
         {
-            string sqlCommand = $"Select * from {TableName} where {TableName}Id in @ids";
+            string sqlCommand = $"Select * from {TableName} where {TableName}Id in @ids ";
             return await Connection.QueryAsync<T>(sqlCommand, new { ids }, transaction: Transaction);
         }
 

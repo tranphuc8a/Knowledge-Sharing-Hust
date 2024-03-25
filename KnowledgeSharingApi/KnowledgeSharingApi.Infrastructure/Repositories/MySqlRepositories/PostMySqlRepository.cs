@@ -57,5 +57,38 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
+        public async Task<IEnumerable<ViewPost>> GetPublicPostsOfCategory(string catName, int limit, int offset)
+        {
+            var knowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(k => k.CategoryName == catName)
+                .Select(k => k.KnowledgeId)
+                .Distinct();
+            var posts = await DbContext.ViewPosts
+                .Where(post => post.Privacy == EPrivacy.Public 
+                        && knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
+                .OrderByDescending(post => post.CreatedTime)
+                .Skip(offset).Take(limit)
+                .ToListAsync();
+            return posts;
+        }
+
+        public async Task<IEnumerable<ViewPost>> GetPostsOfCategory(string catName, int limit, int offset)
+        {
+            var knowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(k => k.CategoryName == catName)
+                .Select(k => k.KnowledgeId)
+                .Distinct();
+            var posts = await DbContext.ViewPosts
+                .Where(post => knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
+                .OrderByDescending(post => post.CreatedTime)
+                .Skip(offset).Take(limit)
+                .ToListAsync();
+            return posts;
+        }
+
+        public Task<IEnumerable<ViewPost>> GetPostsOfCategory(Guid myUId, string catName, int limit, int offset)
+        {
+            return GetPublicPostsOfCategory(catName, limit, offset);
+        }
     }
 }
