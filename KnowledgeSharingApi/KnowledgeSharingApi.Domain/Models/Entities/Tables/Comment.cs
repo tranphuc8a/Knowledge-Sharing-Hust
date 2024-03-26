@@ -11,7 +11,6 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
     [Table("Comment")]
     public class Comment : UserItem
     {
-        public Guid CommentId { get; set; }
         public Guid KnowledgeId { get; set; }
         public string Content { get; set; } = string.Empty;
         public Guid? ReplyId { get; set; }

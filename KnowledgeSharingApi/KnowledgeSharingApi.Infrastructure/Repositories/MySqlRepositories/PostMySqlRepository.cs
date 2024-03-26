@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
     public class PostMySqlRepository(IDbContext dbContext)
-        : BaseMySqlRepository<Post>(dbContext), IPostRepository
+        : BaseMySqlUserItemRepository<Post>(dbContext), IPostRepository
     {
         public async Task<IEnumerable<ViewPost>> GetViewPost(int limit, int offset)
         {
@@ -65,7 +65,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Distinct();
             var posts = await DbContext.ViewPosts
                 .Where(post => post.Privacy == EPrivacy.Public 
-                        && knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
+                        && knowledgesId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
                 .OrderByDescending(post => post.CreatedTime)
                 .Skip(offset).Take(limit)
                 .ToListAsync();
@@ -79,7 +79,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Select(k => k.KnowledgeId)
                 .Distinct();
             var posts = await DbContext.ViewPosts
-                .Where(post => knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
+                .Where(post => knowledgesId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
                 .OrderByDescending(post => post.CreatedTime)
                 .Skip(offset).Take(limit)
                 .ToListAsync();
@@ -96,7 +96,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             IQueryable<ViewPost> query =
                 from post in DbContext.ViewPosts
                 join mark in DbContext.Marks
-                    on post.KnowledgeId equals mark.KnowledgeId
+                    on post.UserItemId equals mark.KnowledgeId
                 where mark.UserId == userId && (
                     // userId có thể xem được post này:
                     // post là công khai
@@ -107,6 +107,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 orderby mark.CreatedTime descending
                 select post;
             return await query.ToListAsync();
+        }
+
+        protected override DbSet<Post> GetDbSet()
+        {
+            return DbContext.Posts;
         }
     }
 }

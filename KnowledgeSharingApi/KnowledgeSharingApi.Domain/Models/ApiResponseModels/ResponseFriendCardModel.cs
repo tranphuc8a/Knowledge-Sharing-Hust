@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 {
-    public class ResponseFriendItemModel
+    public class ResponseFriendCardModel
     {
         public Guid FriendId {get; set; }
 

@@ -5,18 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
+namespace KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces
 {
-    public class ResponseQuestionItemModel : ViewQuestion
+    public interface IResponseKnowledgeModel : IResponseUserItemModel
     {
-        public double? Star { get; set; }
-
         public int NumberComments { get; set; }
 
-        public IEnumerable<ViewComment> TopComments { get; set; } = [];
+        public IEnumerable<IResponseCommentModel> TopComments { get; set; }
 
         public bool IsMarked { get; set; }
-
-        public int? MyStar { get; set; }
     }
 }

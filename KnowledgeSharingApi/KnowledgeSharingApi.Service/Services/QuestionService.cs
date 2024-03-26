@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ZstdSharp.Unsafe;
 
 namespace KnowledgeSharingApi.Services.Services
 {
@@ -66,18 +67,23 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        protected virtual async Task<ResponseQuestionItemModel> DecoratePost(ViewQuestion post)
+        protected virtual async Task<ResponseQuestionModel> DecoratePost(ViewQuestion post)
         {
-            ResponseQuestionItemModel model = new();
+            ResponseQuestionModel model = new();
             model.Copy(post);
             PaginationResponseModel<ViewComment> listComments =
-                await KnowledgeRepository.GetListComments(model.KnowledgeId, NumberOfTopComments, 0);
+                await KnowledgeRepository.GetListComments(model.UserItemId, NumberOfTopComments, 0);
             model.NumberComments = listComments.Total;
-            model.TopComments = listComments.Results;
+            model.TopComments = listComments.Results.Select(com =>
+            {
+                ResponseCommentModel comment = new();
+                comment.Copy(com);
+                return comment;
+            });
 
             // Lấy về danh sách categories
 
-            model.Star = await KnowledgeRepository.GetAverageStar(model.KnowledgeId);
+            model.AverageStars = await KnowledgeRepository.GetAverageStar(model.UserItemId);
             return model;
         }
 
@@ -89,9 +95,9 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        protected virtual async Task<List<ResponseQuestionItemModel>> DecoratePost(IEnumerable<ViewQuestion> posts)
+        protected virtual async Task<List<ResponseQuestionModel>> DecoratePost(IEnumerable<ViewQuestion> posts)
         {
-            List<ResponseQuestionItemModel> res = [];
+            List<ResponseQuestionModel> res = [];
             foreach (ViewQuestion post in posts)
             {
                 res.Add(await DecoratePost(post));
@@ -140,7 +146,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
-            ResponseQuestionItemModel questionItemModel = await DecoratePost(question);
+            ResponseQuestionModel questionItemModel = await DecoratePost(question);
 
             return ServiceResult.Success(
                 GetQuestionSuccess, string.Empty, questionItemModel);
@@ -150,7 +156,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetViewPost(limitValue, offsetValue);
-            List<ResponseQuestionItemModel> res = await DecoratePost(questions);
+            List<ResponseQuestionModel> res = await DecoratePost(questions);
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
 
@@ -162,7 +168,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetByUserId(userId);
             questions = questions.Skip(offsetValue).Take(limitValue);
 
-            List<ResponseQuestionItemModel> res = await DecoratePost(questions);
+            List<ResponseQuestionModel> res = await DecoratePost(questions);
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
         #endregion
@@ -234,18 +240,21 @@ namespace KnowledgeSharingApi.Services.Services
             Guid newId = Guid.NewGuid();
             Question question = new()
             {
-                UserItemId = newId,
+                // Entity:
                 CreatedBy = user.FullName,
                 CreatedTime = DateTime.Now,
+                // UserItem:
+                UserItemId = newId,
                 UserId = user.UserId,
                 UserItemType = EUserItemType.Knowledge,
-                KnowledgeId = newId,
-                Views = 0,
+                // Knowledge:
                 KnowledgeType = EKnowledgeType.Post,
                 Privacy = questionModel.CourseId != null ? EPrivacy.Private : EPrivacy.Public,
-                PostId = newId,
+                Views = 0,
+                IsBlockComment = false,
+                // Post:
                 PostType = EPostType.Question,
-                QuestionId = newId,
+                // Question
                 IsAccept = false
             };
             question.Copy(model);
@@ -465,7 +474,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewQuestion> listed = await QuestionRepository.GetMarkedPosts(myUid);
             int total = listed.Count();
             listed = listed.Skip(offsetValue).Take(limitValue);
-            PaginationResponseModel<ResponseQuestionItemModel> res = new()
+            PaginationResponseModel<ResponseQuestionModel> res = new()
             {
                 Total = total,
                 Limit = limitValue,

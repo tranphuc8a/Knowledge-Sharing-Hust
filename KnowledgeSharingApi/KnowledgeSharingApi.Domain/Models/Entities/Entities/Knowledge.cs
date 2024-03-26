@@ -11,7 +11,6 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
 {
     public class Knowledge : UserItem
     {
-        public Guid KnowledgeId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string? Abstract { get; set; }
         public string? Thumbnail { get; set; }

@@ -72,7 +72,7 @@
 //            IEnumerable<Course> registeresCourses =
 //                from course in DbContext.Courses
 //                join courseRegister in DbContext.CourseRegisters
-//                on course.CourseId equals courseRegister.CourseId
+//                on course.UserItemId equals courseRegister.UserItemId
 //                where courseRegister.UserId.ToString() == userId
 //                select course;
 //            //                .ToList(); // Kết thúc truy vấn và lấy kết quả dưới dạng danh sách

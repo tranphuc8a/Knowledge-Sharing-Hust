@@ -50,13 +50,13 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
 
-        protected virtual async Task<IEnumerable<ResponseUserItemModel>> DecorateUser(Guid myUid, List<ViewUser> users)
+        protected virtual async Task<IEnumerable<ResponseUserCardModel>> DecorateUser(Guid myUid, List<ViewUser> users)
         {
             Dictionary<Guid, EUserRelationType> userRelationDict = 
                 await UserRelationRepository.GetUserRelationType(myUid, users.Select(user => user.UserId).ToList());
             return users.Select(user =>
             {
-                ResponseUserItemModel res = new();
+                ResponseUserCardModel res = new();
                 res.Copy(user);
                 res.UserRelationType = userRelationDict[user.UserId];
                 return res;
@@ -75,8 +75,8 @@ namespace KnowledgeSharingApi.Services.Services
             PaginationResponseModel<ViewUser> listUsers =
                 await KnowledgeRepository.GetListUserMaredKnowledge(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
 
-            // Phân trang và trang trí cho từng ViewUser -> ResponseUserItemModel
-            PaginationResponseModel<ResponseUserItemModel> res = new()
+            // Phân trang và trang trí cho từng ViewUser -> ResponseUserCardModel
+            PaginationResponseModel<ResponseUserCardModel> res = new()
             {
                 Total = listUsers.Total,
                 Limit = listUsers.Limit,

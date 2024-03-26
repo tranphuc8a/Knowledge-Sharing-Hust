@@ -33,6 +33,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Modified: None
         Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset);
 
+        /// <summary>
+        /// Lấy về danh sách bình luận của một Phần tử kiển thức
+        /// Lấy toàn bộ, không phân trang
+        /// </summary>
+        /// <param name="knowledgeId"> id của phần tử kiến thức </param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        Task<IEnumerable<ViewComment>> GetListComments(Guid knowledgeId);
+
 
         /// <summary>
         /// Lấy về danh sách user đã đánh dấu knowledge
@@ -54,5 +64,57 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<Mark?> GetMark(Guid userId, Guid knowledgeId);
+
+        #region Kiểm tra quyền truy cập
+        /// <summary>
+        /// Kiểm tra xem user có truy cập được vào tài nguyên knowledge không
+        /// </summary>
+        /// <param name="userId"> id của user cần kiểm tra </param>
+        /// <param name="knowledgeId"> id phần tử kiến thức cần kiểm tra </param>
+        /// <returns> true - có quyền truy cập, false - không có quyền truy cập </returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        Task<bool> CheckAccessible(Guid userId, Guid knowledgeId);
+
+        /// <summary>
+        /// Kiểm tra xem user có truy cập được vào khóa học course không
+        /// </summary>
+        /// <param name="userId"> id của user cần kiểm tra </param>
+        /// <param name="courseId"> id khóa học cần kiểm tra </param>
+        /// <returns> true - có quyền truy cập, false - không có quyền truy cập </returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        Task<bool> CheckCourseAccessible(Guid userId, Guid courseId);
+
+        /// <summary>
+        /// Kiểm tra xem user có truy cập được bài viết post không
+        /// </summary>
+        /// <param name="userId"> id của user cần kiểm tra </param>
+        /// <param name="postId"> id bài đăng cần kiểm tra </param>
+        /// <returns> true - có quyền truy cập, false - không có quyền truy cập </returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        Task<bool> CheckPostAccessible(Guid userId, Guid postId);
+
+        /// <summary>
+        /// Kiểm tra xem user có truy cập được vào bài thảo luận question không
+        /// </summary>
+        /// <param name="userId"> id của user cần kiểm tra </param>
+        /// <param name="questionId"> id câu hỏi cần kiểm tra </param>
+        /// <returns> true - có quyền truy cập, false - không có quyền truy cập </returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        Task<bool> CheckQuestionAccessible(Guid userId, Guid questionId);
+
+        /// <summary>
+        /// Kiểm tra xem user có truy cập được vào bài học lesson không
+        /// </summary>
+        /// <param name="userId"> id của user cần kiểm tra </param>
+        /// <param name="lessonId"> id bài học cần kiểm tra </param>
+        /// <returns> true - có quyền truy cập, false - không có quyền truy cập </returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        Task<bool> CheckLessonAccessible(Guid userId, Guid lessonId); 
+        #endregion
     }
 }

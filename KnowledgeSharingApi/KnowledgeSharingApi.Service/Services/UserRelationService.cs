@@ -74,13 +74,13 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (19/3/24)
         /// Modified: None
-        protected virtual async Task<IEnumerable<ResponseFriendItemModel>> GetAllFriends(Guid userid)
+        protected virtual async Task<IEnumerable<ResponseFriendCardModel>> GetAllFriends(Guid userid)
         {
             // Danh sách bạn bè mà mình là người gửi lời mời
             IEnumerable<ViewUserRelation> ls1 =
                 await UserRelationRepository.GetByUserIdAndType(userid, isActive: true, EUserRelationType.Friend);
-            IEnumerable<ResponseFriendItemModel> lsFriend1 = ls1.Select(
-                relation => new ResponseFriendItemModel()
+            IEnumerable<ResponseFriendCardModel> lsFriend1 = ls1.Select(
+                relation => new ResponseFriendCardModel()
                 {
                     FriendId = relation.UserRelationId,
                     UserId = relation.ReceiverId,
@@ -95,8 +95,8 @@ namespace KnowledgeSharingApi.Services.Services
             // Danh sách bạn bè mà mình là người nhận lời mời
             IEnumerable<ViewUserRelation> ls2 =
                 await UserRelationRepository.GetByUserIdAndType(userid, isActive: false, EUserRelationType.Friend);
-            IEnumerable<ResponseFriendItemModel> lsFriend2 = ls1.Select(
-                relation => new ResponseFriendItemModel()
+            IEnumerable<ResponseFriendCardModel> lsFriend2 = ls1.Select(
+                relation => new ResponseFriendCardModel()
                 {
                     FriendId = relation.UserRelationId,
                     UserId = relation.SenderId,
@@ -109,7 +109,7 @@ namespace KnowledgeSharingApi.Services.Services
                 });
 
             // Combine and return
-            IEnumerable<ResponseFriendItemModel> listed = lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time);
+            IEnumerable<ResponseFriendCardModel> listed = lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time);
             return listed;
         }
 
@@ -124,10 +124,10 @@ namespace KnowledgeSharingApi.Services.Services
             int offsetValue = offset ?? 0;
 
             // Lấy danh sách friends của uid
-            IEnumerable<ResponseFriendItemModel> listed = await GetAllFriends(userid);
+            IEnumerable<ResponseFriendCardModel> listed = await GetAllFriends(userid);
 
             // Phân trang và trả về thành công
-            PaginationResponseModel<ResponseFriendItemModel> res = new()
+            PaginationResponseModel<ResponseFriendCardModel> res = new()
             {
                 Total = listed.Count(),
                 Limit = limitValue,
@@ -148,8 +148,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Lấy danh sách quan hệ relationType của uid
             IEnumerable<ViewUserRelation> ls1 = await UserRelationRepository.GetByUserIdAndType(userid, isActive: isActive, relationType);
-            IEnumerable<ResponseFriendItemModel> lsRelation = ls1.Select(
-                relation => new ResponseFriendItemModel()
+            IEnumerable<ResponseFriendCardModel> lsRelation = ls1.Select(
+                relation => new ResponseFriendCardModel()
                 {
                     UserId = isActive ? relation.ReceiverId : relation.SenderId,
                     Email = isActive ? relation.ReceiverEmail : relation.SenderEmail,
@@ -163,7 +163,7 @@ namespace KnowledgeSharingApi.Services.Services
 
 
             // Phân trang và trả về thành công
-            PaginationResponseModel<ResponseFriendItemModel> res = new()
+            PaginationResponseModel<ResponseFriendCardModel> res = new()
             {
                 Total = lsRelation.Count(),
                 Limit = limitValue,
@@ -259,7 +259,7 @@ namespace KnowledgeSharingApi.Services.Services
                 UnitOfWork.RegisterRepository(UserRelationRepository);
 
                 // Xóa quan hệ bạn bè
-                IEnumerable<ResponseFriendItemModel> friends =
+                IEnumerable<ResponseFriendCardModel> friends =
                     (await GetAllFriends(myuid))
                     .Where(friend => friend.UserId == uid);
                 int deleted = await UserRelationRepository.Delete(
@@ -328,7 +328,7 @@ namespace KnowledgeSharingApi.Services.Services
             await CheckBlockEachOther(myuid, uid);
 
             // Kiểm tra phải chưa phải là bạn bè
-            IEnumerable<ResponseFriendItemModel> friends = (await GetAllFriends(myuid))
+            IEnumerable<ResponseFriendCardModel> friends = (await GetAllFriends(myuid))
                 .Where(friend => friend.UserId == uid);
             if (friends.Any()) return ServiceResult.BadRequest("Các bạn đã là bạn bè của nhau rồi mà");
 
@@ -367,7 +367,7 @@ namespace KnowledgeSharingApi.Services.Services
             await CheckExistedUser(myuid, uid);
 
             // Kiểm tra có tồn tại quan hệ bạn bè không
-            IEnumerable<ResponseFriendItemModel> friends =
+            IEnumerable<ResponseFriendCardModel> friends =
                 (await GetAllFriends(myuid))
                 .Where(friend => friend.UserId == uid);
             if (!friends.Any()) return ServiceResult.BadRequest("Hai người có phải bạn bè đâu");
