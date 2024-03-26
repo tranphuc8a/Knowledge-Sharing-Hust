@@ -48,16 +48,21 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        protected virtual async Task<ResponsePostItemModel> DecoratePost(ViewPost post)
+        protected virtual async Task<ResponsePostModel> DecoratePost(ViewPost post)
         {
-            ResponsePostItemModel model = new();
+            ResponsePostModel model = new();
             model.Copy(post);
             PaginationResponseModel<ViewComment> listComments =
-                await KnowledgeRepository.GetListComments(model.KnowledgeId, NumberOfTopComments, 0);
+                await KnowledgeRepository.GetListComments(model.UserItemId, NumberOfTopComments, 0);
             model.NumberComments = listComments.Total;
-            model.TopComments = listComments.Results;
+            model.TopComments = listComments.Results.Select(com =>
+            {
+                ResponseCommentModel rescom = new();
+                rescom.Copy(com);
+                return rescom;
+            });
 
-            model.Star = await KnowledgeRepository.GetAverageStar(model.KnowledgeId);
+            model.AverageStars = await KnowledgeRepository.GetAverageStar(model.UserItemId);
             return model;
         }
 
@@ -69,9 +74,9 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        protected virtual async Task<List<ResponsePostItemModel>> DecoratePost(IEnumerable<ViewPost> posts)
+        protected virtual async Task<List<ResponsePostModel>> DecoratePost(IEnumerable<ViewPost> posts)
         {
-            List<ResponsePostItemModel> res = [];
+            List<ResponsePostModel> res = [];
             foreach (ViewPost post in posts)
             {
                 res.Add(await DecoratePost(post));
@@ -150,7 +155,7 @@ namespace KnowledgeSharingApi.Services.Services
                 (await PostRepository.GetPublicPostsByUserId(user.UserId))
                 .Skip(offsetValue).Take(limitValue);
 
-            List<ResponsePostItemModel> res = [];
+            List<ResponsePostModel> res = [];
             foreach (ViewPost post in posts)
             {
                 res.Add(await DecoratePost(post));
@@ -274,7 +279,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewPost> listed = await PostRepository.GetMarkedPosts(myUid);
             int total = listed.Count();
             listed = listed.Skip(offsetValue).Take(limitValue);
-            PaginationResponseModel<ResponsePostItemModel> res = new()
+            PaginationResponseModel<ResponsePostModel> res = new()
             {
                 Total = total,
                 Limit = limitValue,

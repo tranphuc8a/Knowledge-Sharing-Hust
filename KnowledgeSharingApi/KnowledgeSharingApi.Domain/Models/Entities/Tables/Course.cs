@@ -11,11 +11,10 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
     [Table("Course")]
     public class Course : Knowledge
     {
-        public Guid CourseId { get; set; }
         public string Introduction { get; set; } = string.Empty;
         public decimal Fee { get; set; }
         public int EstimateTimeInMinutes { get; set; }
-        public bool IsFee { get; set; }
+        public bool IsFree { get; set; }
         //public override EKnowledgeType KnowledgeType { get => EKnowledgeType.Course; }
 
         protected override Course Init()

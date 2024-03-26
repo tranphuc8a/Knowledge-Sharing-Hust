@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         /// Created: PhucTV (24/3/24)
         /// Modified: None
         EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
+        public DatabaseFacade Database { get; }
 
         /// <summary>
         /// Lưu thay đổi của DbContext bất đồng bộ
@@ -50,11 +52,13 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         /// Modified: None
         Task<IDbContextTransaction> BeginTransaction();
 
+        
+
         //DbSet<Block> Blocks { get; set; }
         //DbSet<Follow> Follows {get; set;}
         //DbSet<Friend> Friends {get; set;}
         //DbSet<RequestFriend> RequestFriends {get; set;}
-       
+
         // KnowledgeDbContext
         DbSet<Knowledge> Knowledges {get; set;}
         DbSet<Category> Categories {get; set;}

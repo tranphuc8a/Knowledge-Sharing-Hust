@@ -1,7 +1,15 @@
-﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
+﻿using KnowledgeSharingApi.Domains.Algorithms;
+using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
+using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
+using Org.BouncyCastle.Cms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,84 +20,456 @@ namespace KnowledgeSharingApi.Services.Services
 {
     public class CommentService : ICommentService
     {
-        public Task<ServiceResult> AdminBlockCommentOfKnowledge(Guid knowledgeId, bool isBlock)
+        protected readonly IResourceFactory ResourceFactory;
+        protected readonly IResponseResource ResponseResource;
+        protected readonly IEntityResource EntityResource;
+
+        protected readonly ICommentRepository CommentRepository;
+        protected readonly IKnowledgeRepository KnowledgeRepository;
+        protected readonly IStarRepository StarRepository;
+
+        protected readonly string CommentResource, KnowledgeResource;
+        protected readonly string NotExistedComment, NotExistKnowledge;
+        protected readonly int DefaultLimit = 20;
+
+
+        public CommentService(
+            IResourceFactory resourceFactory,
+            ICommentRepository commentRepository,
+            IKnowledgeRepository knowledgeRepository,
+            IStarRepository starRepository
+        )
         {
-            throw new NotImplementedException();
+            ResourceFactory = resourceFactory;
+            ResponseResource = ResourceFactory.GetResponseResource();
+            EntityResource = ResourceFactory.GetEntityResource();
+
+            CommentRepository = commentRepository;
+            KnowledgeRepository = knowledgeRepository;
+            StarRepository = starRepository;
+
+            CommentResource = EntityResource.Comment();
+            KnowledgeResource = EntityResource.Knowledge();
+            NotExistedComment = ResponseResource.NotExist(CommentResource);
+            NotExistKnowledge = ResponseResource.NotExist(KnowledgeResource);
+        }
+        
+        #region Functionality Methods
+
+        /// <summary>
+        /// Thêm các giá trị bổ sung cho mỗi comment của danh sách comment:
+        /// + trung bình số sao, tổng số sao, số sao của tôi nếu có
+        /// </summary>
+        /// <param name="myUid"> id của người dùng hiện tại </param>
+        /// <param name="viewComments"> Danh sách comment cần decorate </param
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        protected virtual async Task<IEnumerable<ResponseCommentModel>> Decorate(Guid? myUid, IEnumerable<ViewComment> viewComments, bool isDecorateReplies = true)
+        {
+            List<Guid> commentIds = viewComments.Select(com => com.UserItemId).ToList();
+            Dictionary<Guid, int?>? myStars = null;
+            if (myUid != null)
+            {
+                // calculate myStar from myUid to all comments
+                myStars = await StarRepository.CalculateUserStars(myUid.Value, commentIds);
+            }
+            // calculate total stars to all comments
+            Dictionary<Guid, int> totalStars = await StarRepository.CalculateTotalStars(commentIds);
+
+            // calculate average stars to all comments
+            Dictionary<Guid, double?> averageStars = await StarRepository.CalculateAverageStars(commentIds);
+
+            // Lấy về ds tổng số replies
+            Dictionary<Guid, int>? totalReplies = null;
+            if (isDecorateReplies)
+            {
+                totalReplies = await CommentRepository.GetTotalReplies(commentIds);
+            }
+
+            return viewComments.Select(comment =>
+            {
+                ResponseCommentModel cmt = new();
+                cmt.Copy(comment);
+                cmt.MyStars = myStars?[comment.UserItemId];
+                cmt.TotalStars = totalStars[comment.UserItemId];
+                cmt.AverageStars = averageStars[comment.UserItemId];
+                cmt.TotalReplies = totalReplies?[comment.UserItemId] ?? 0;
+                return cmt;
+            });
         }
 
-        public Task<ServiceResult> AdminDeleteComment(Guid commentId)
+        /// <summary>
+        /// Tạo mới comment từ các thông tin input của api
+        /// </summary>
+        /// <param name="myUid"> id của user là chủ comment </param>
+        /// <param name="commentModel"> Nội dung bình luận </param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        protected virtual Comment CreateNewComment(Guid myUid, CreateCommentModel commentModel)
         {
-            throw new NotImplementedException();
+            Guid newId = Guid.NewGuid();
+            Comment comment = new()
+            {
+                // Entity:
+                CreatedTime = DateTime.Now,
+                ModifiedBy = myUid.ToString(),
+                // UserItem:
+                UserItemId = newId,
+                UserItemType = EUserItemType.Comment,
+                UserId = myUid,
+                // Comment:
+                KnowledgeId = commentModel.KnowledgeId!.Value,
+                Content = commentModel.Content!,
+                ReplyId = null
+            };
+            return comment;
         }
 
-        public Task<ServiceResult> AdminGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset)
+        /// <summary>
+        /// Tạo mới comment từ các thông tin input của api
+        /// </summary>
+        /// <param name="myUid"> id của user là chủ comment </param>
+        /// <param name="commentModel"> Nội dung bình luận </param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        protected virtual Comment CreateNewComment(Guid myUid, ReplyCommentModel commentModel, Guid knowledgeId)
         {
-            throw new NotImplementedException();
+            Guid newId = Guid.NewGuid();
+            Comment comment = new()
+            {
+                // Entity:
+                CreatedTime = DateTime.Now,
+                ModifiedBy = myUid.ToString(),
+                // UserItem:
+                UserItemId = newId,
+                UserItemType = EUserItemType.Comment,
+                UserId = myUid,
+                // Comment:
+                KnowledgeId = knowledgeId,
+                Content = commentModel.Content!,
+                ReplyId = commentModel.ReplyId
+            };
+            return comment;
         }
 
-        public Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset)
+        protected virtual bool IsSimiliar(string commentContent, string searchKey)
         {
-            throw new NotImplementedException();
+            // Chuyển đổi cả hai chuỗi thành chữ thường
+            commentContent = commentContent.ToLowerInvariant();
+            searchKey = searchKey.ToLowerInvariant();
+
+            // Loại bỏ khoảng trống đầu và cuối chuỗi
+            commentContent = commentContent.Trim();
+            searchKey = searchKey.Trim();
+
+            // Kiểm tra xem chuỗi searchKey có xuất hiện trong commentContent không
+            if (commentContent.Contains(searchKey))
+                return true;
+
+            // Sử dụng độ tương đồng Levenshtein distance để xác định mức độ tương tự
+            // Coi là tương đồng nếu khoảng cách Levenshtein nhỏ hơn hoặc bằng 20% chiều dài của searchKey
+            int levenshteinDistance = Algorithm.CalculateLevenshteinDistance(commentContent, searchKey);
+            return levenshteinDistance <= (searchKey.Length * 0.2);
+        }
+        #endregion
+
+        #region Admin and Anonymous actors
+        public virtual async Task<ServiceResult> AdminBlockCommentOfKnowledge(Guid knowledgeId, bool isBlock)
+        {
+            // Kiểm tra knowledge tồn tại
+            Knowledge knowledge = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
+
+            // Update block
+            knowledge.IsBlockComment = isBlock;
+            await KnowledgeRepository.Update(knowledge.UserItemId, knowledge);
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(KnowledgeResource));
         }
 
-        public Task<ServiceResult> GetComment(Guid commentId)
+        public virtual async Task<ServiceResult> AdminDeleteComment(Guid commentId)
         {
-            throw new NotImplementedException();
+            // Check comment existed
+            Comment comment = await CommentRepository.CheckExisted(commentId, NotExistedComment);
+
+            // Delete comment
+            int res = await CommentRepository.Delete(comment.UserItemId);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(CommentResource));
+
+            // Return success
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(CommentResource));
         }
 
-        public Task<ServiceResult> GetListCommentReplies(Guid commentId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Check knowledge existed
+            _ = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
+
+            // Get list comments
+            PaginationResponseModel<ViewComment> comments =
+                await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+
+            // Return success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource));
         }
 
-        public Task<ServiceResult> UserAddComment(Guid myuid, CreateCommentModel commentModel)
+        public virtual async Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Kiểm tra knowledge tồn tại
+            Knowledge knowledge = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
+
+            // Kiểm tra knowledge public
+            if (knowledge.Privacy != EPrivacy.Public)
+                return ServiceResult.Forbidden("Phần tử kiến thức không công khai");
+
+            // Lấy về ds bình luận
+            PaginationResponseModel<ViewComment> listComments =
+                await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+
+            // Trả về thành công
+            PaginationResponseModel<ResponseCommentModel> res = new()
+            {
+                Total = listComments.Total,
+                Limit = listComments.Limit,
+                Offset = listComments.Offset,
+                Results = await Decorate(null, listComments.Results)
+            };
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserBlockKnowledgeComments(Guid myuid, Guid knowledgeId, bool isBlock)
+        public async Task<ServiceResult> GetComment(Guid commentId)
         {
-            throw new NotImplementedException();
+            // Check comment tồn tại
+            ViewComment comment = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
+
+            // Trang trí comment
+            ResponseCommentModel? res = (await Decorate(null, [comment])).FirstOrDefault();
+            if (res == null) return ServiceResult.ServerError(ResponseResource.ServerError());
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.GetSuccess(CommentResource));
         }
 
-        public Task<ServiceResult> UserDeleteComment(Guid myuid, Guid knowledgeId, int? limit, int? offset)
+        public async Task<ServiceResult> GetListCommentReplies(Guid commentId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Check comment existed
+            _ = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
+
+            // Get list replies
+            PaginationResponseModel<ViewComment> comments =
+                await CommentRepository.GetRepliesOfComment(commentId, limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate
+            PaginationResponseModel<ResponseCommentModel> res = new()
+            {
+                Total = comments.Total,
+                Limit = comments.Limit,
+                Offset = comments.Offset,
+                Results = await Decorate(null, comments.Results, isDecorateReplies: false)
+            };
+
+            // return success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
+        }
+        #endregion
+
+        #region User Actors
+
+        public async Task<ServiceResult> UserAddComment(Guid myUid, CreateCommentModel commentModel)
+        {
+            // Kiểm tra quyền truy cập user -> knowledge
+            Knowledge knowledge = await KnowledgeRepository.CheckExisted(commentModel.KnowledgeId ?? Guid.Empty, NotExistKnowledge);
+            bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, knowledge.UserItemId);
+            if (!isAccessible) return ServiceResult.Forbidden("Bạn không có quyền truy cập bài viết này");
+
+            // Kiểm tra knowledge đang mở cho phép bình luận
+            if (knowledge.IsBlockComment)
+                return ServiceResult.Forbidden("Bài viết hiện đang bị khóa bình luận, vui lòng thử lại sau");
+
+            // Thêm mới comment
+            Comment comment = CreateNewComment(myUid, commentModel);
+            Guid? res = await CommentRepository.Insert(comment.UserItemId, comment);
+            if (res == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(CommentResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.InsertSuccess(CommentResource), string.Empty, comment);
         }
 
-        public Task<ServiceResult> UserGetKnowledgeComments(Guid myuid, Guid knowledgeId, int? limit, int? offset)
+        public async Task<ServiceResult> UserBlockKnowledgeComments(Guid myUid, Guid knowledgeId, bool isBlock)
         {
-            throw new NotImplementedException();
+            // User phải là owner của knowledge
+            Knowledge knowledge = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
+            if (knowledge.UserId != myUid)
+                return ServiceResult.Forbidden("Bạn không phải chủ bài viết");
+
+            // Cập nhật block, trả về thành công
+            knowledge.IsBlockComment = isBlock;
+            await KnowledgeRepository.Update(knowledge.UserItemId, knowledge);
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(KnowledgeResource));
         }
 
-        public Task<ServiceResult> UserGetListKnowledgeComments(Guid myuid, Guid knowledgeId, int? limit, int? offset)
+        public async Task<ServiceResult> UserDeleteComment(Guid myUid, Guid commentId)
         {
-            throw new NotImplementedException();
+            // Kiểm tra user là chủ của comment hoặc comment đang nằm trong knowledge mà user đang là chủ
+            ViewComment comment = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
+            bool isDeletable = false;
+            if (comment.UserId == myUid)
+            {   // Comment này là của chủ myUid
+                isDeletable = true;
+            }
+            else
+            {   // Check comment nằm trong bài mà myUid là chủ
+                Knowledge? knowledge = await KnowledgeRepository.Get(comment.KnowledgeId);
+                if (knowledge != null && knowledge.UserId == myUid)
+                {   // OK cho phép xóa comment
+                    isDeletable = true;
+                }
+            }
+            if (!isDeletable)
+                return ServiceResult.Forbidden("Bạn không có quyền xóa comment này");
+
+            // Xóa comment
+            int res = await CommentRepository.Delete(commentId);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(CommentResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(CommentResource));
         }
 
-        public Task<ServiceResult> UserGetMyCommentsOfKnowledge(Guid myuid, Guid knowledgeId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListKnowledgeComments(Guid myUid, Guid knowledgeId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Kiểm tra user có quyền truy cập tài nguyên knowledge
+            _ = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
+            bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, knowledgeId);
+            if (!isAccessible)
+                return ServiceResult.Forbidden("Bạn không có quyền truy cập bài viết này");
+
+            // Lấy về danh sách comment
+            PaginationResponseModel<ViewComment> comments =
+                await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate comments
+            PaginationResponseModel<ResponseCommentModel> res = new()
+            {
+                Total = comments.Total,
+                Limit = comments.Limit,
+                Offset = comments.Offset,
+                Results = await Decorate(myUid, comments.Results, isDecorateReplies: true)
+            };
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myuid, Guid userId, Guid knowledgeId, int? limit, int? offset)
+        public Task<ServiceResult> UserGetMyCommentsOfKnowledge(Guid myUid, Guid knowledgeId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            return UserGetUserCommentsOfKnowledge(myUid, myUid, knowledgeId, limit, offset);
         }
 
-        public Task<ServiceResult> UserReplyComment(Guid myuid, ReplyCommentModel replyModel)
+        public async Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myUid, Guid userId, Guid knowledgeId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Kiểm tra myUid có truy cập được knowledgeId hay không
+            _ = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
+            bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, knowledgeId);
+            if (!isAccessible)
+                return ServiceResult.Forbidden("Bạn không có quyền truy cập vào bài viết này");
+
+            // Lấy về danh sách bình luận
+            PaginationResponseModel<ViewComment> comments =
+                await CommentRepository.GetCommentsOfUserInKnowledge(userId, knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate bình luận
+            PaginationResponseModel<ResponseCommentModel> res = new()
+            {
+                Total = comments.Total,
+                Limit = comments.Limit,
+                Offset = comments.Offset,
+                Results = await Decorate(myUid, comments.Results, isDecorateReplies: true)
+            };
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string search, int? limit, int? offset)
+        public async Task<ServiceResult> UserReplyComment(Guid myUid, ReplyCommentModel replyModel)
         {
-            throw new NotImplementedException();
+            // Kiểm tra tồn tại Comment và knowledge
+            ViewComment comment = await CommentRepository.CheckExistedComment(replyModel.ReplyId ?? Guid.Empty, NotExistedComment);
+            Knowledge knowledge = await KnowledgeRepository.CheckExisted(comment.KnowledgeId, NotExistKnowledge);
+
+            // Kiểm tra quyền truy cập vào knowledge
+            bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, knowledge.UserItemId);
+            if (!isAccessible)
+                return ServiceResult.Forbidden("Bạn không có quyền truy cập được bài viết này");
+
+            // Kiểm tra Comment level 0 (chưa reply comment nào khác)
+            if (comment.ReplyId != null)
+                return ServiceResult.BadRequest("Chỉ có thể reply comment gốc của bài viết");
+
+            // OK thêm mới comment
+            Comment commentToAdd = CreateNewComment(myUid, replyModel, knowledge.UserItemId);
+            Guid? res = await CommentRepository.Insert(commentToAdd.UserItemId, commentToAdd);
+            if (res == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(CommentResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.InsertSuccess(CommentResource));
+
         }
 
-        public Task<ServiceResult> UserUpdateComment(Guid myuid, UpdateCommentModel commentModel)
+        public async Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myUid, Guid knowledgeId, string search, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Check từ khóa khác rỗng
+            if (String.IsNullOrEmpty(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+
+            // Check accessible
+            _ = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
+            bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, knowledgeId);
+            if (!isAccessible)
+                return ServiceResult.Forbidden("Bạn không có quyền truy cập bài viết này");
+
+            // Search
+            // Lấy về toàn bộ
+            IEnumerable<ViewComment> listComments = await KnowledgeRepository.GetListComments(knowledgeId);
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+
+            // Lọc theo từ khóa
+            listComments = listComments.Where(comment => IsSimiliar(comment.Content, search))
+                .Skip(offsetValue).Take(limitValue);
+
+            // Decorate
+            IEnumerable<ResponseCommentModel> res = await Decorate(myUid, listComments, isDecorateReplies: true);
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
         }
+
+        public async Task<ServiceResult> UserUpdateComment(Guid myUid, Guid commentId, UpdateCommentModel commentModel)
+        {
+            // Check comment tồn tại, knowledge tồn tại
+            ViewComment comment = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
+            Knowledge knowledge = await KnowledgeRepository.CheckExisted(comment.KnowledgeId, NotExistKnowledge);
+
+            // Check accessible to knowledge
+            bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, knowledge.UserItemId);
+            if (!isAccessible)
+                return ServiceResult.Forbidden("Bạn không có quyền truy cập bài viết này");
+
+            // Update
+            comment.Content = commentModel.Content!;
+            comment.ModifiedBy = myUid.ToString();
+            comment.ModifiedTime = DateTime.Now;
+            Comment commentToUpdate = new();
+            commentToUpdate.Copy(comment);
+            int res = await CommentRepository.Update(comment.UserItemId, commentToUpdate);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CommentResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(CommentResource), string.Empty, comment);
+        } 
+        #endregion
     }
 }

@@ -11,7 +11,6 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
     [Table("Lesson")]
     public class Lesson : Post
     {
-        public Guid LessonId { get; set; }
         public int EstimateTimeInMinutes { get; set; }
 
         //public override EPostType PostType { get => EPostType.Lesson; }

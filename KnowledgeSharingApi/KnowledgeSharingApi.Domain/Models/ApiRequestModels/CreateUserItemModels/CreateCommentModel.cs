@@ -14,6 +14,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemMode
         public string? Content { get; set; }
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
-        public string? KnowledgeId { get; set; }
+        public Guid? KnowledgeId { get; set; }
     }
 }

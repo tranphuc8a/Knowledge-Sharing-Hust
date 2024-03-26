@@ -11,7 +11,6 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
 {
     public class Question : Post
     {
-        public Guid QuestionId { get; set; }
         public Guid? CourseId { get; set; }
         public bool IsAccept { get; set; }
 

@@ -17,11 +17,12 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 {
-    public class BaseMySqlRepository<T> : IRepository<T> where T : Entity
+    public abstract class BaseMySqlRepository<T> : IRepository<T> where T : Entity
     {
         public IDbContext DbContext;
-        protected readonly string TableName;
-        protected readonly string NameField;
+        protected string TableName;
+        protected string TableNameId;
+        protected string NameField;
         public IDbConnection Connection { get; set; }
         public IDbTransaction? Transaction { get; set; }
 
@@ -35,6 +36,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             Connection = dbContext.Connection;
 
             TableName = typeof(T).Name;
+            TableNameId = $"{TableName}Id";
             NameField = $"{TableName}Name";
         }
 
@@ -56,13 +58,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
         public virtual async Task<T?> Get(Guid id)
         {
-            string sqlCommand = $"Select * from {TableName} where {TableName}Id = @id";
+            string sqlCommand = $"Select * from {TableName} where {TableNameId} = @id";
             return await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id });
         }
 
-        public async Task<IEnumerable<T>> Get(Guid[] ids)
+        public virtual async Task<IEnumerable<T?>> Get(Guid[] ids)
         {
-            string sqlCommand = $"Select * from {TableName} where {TableName}Id in @ids ";
+            string sqlCommand = $"Select * from {TableName} where {TableNameId} in @ids ";
             return await Connection.QueryAsync<T>(sqlCommand, new { ids }, transaction: Transaction);
         }
 
@@ -74,7 +76,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public virtual async Task<Guid?> Insert(Guid id, T entity)
         {
             // Set new Guid for Id of entity
-            string entityId = $"{TableName}Id";
+            string entityId = $"{TableNameId}";
             PropertyInfo propertyInfo = typeof(T).GetProperty(entityId)
                 ?? throw new NotMatchTypeException();
             propertyInfo.SetValue(entity, id);
@@ -93,7 +95,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public virtual async Task<Guid?> Insert(T entity)
         {
             // Set new Guid for Id of entity
-            string entityId = $"{TableName}Id";
+            string entityId = $"{TableNameId}";
             Guid newId = Guid.NewGuid();
             PropertyInfo propertyInfo = typeof(T).GetProperty(entityId)
                 ?? throw new NotMatchTypeException();
@@ -116,12 +118,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
         public virtual async Task<int> Delete(Guid id)
         {
-            string sqlCommand = $"Delete from {TableName} where {TableName}Id = @id";
+            string sqlCommand = $"Delete from {TableName} where {TableNameId} = @id";
             return await Connection.ExecuteAsync(sqlCommand, new { id });
         }
         public virtual async Task<int> Delete(Guid[] ids)
         {
-            string sqlCommand = $"Delete from {TableName} where {TableName}Id in @ids";
+            string sqlCommand = $"Delete from {TableName} where {TableNameId} in @ids";
             return await Connection.ExecuteAsync(sqlCommand, new { ids }, transaction: Transaction);
         }
         #endregion
@@ -141,10 +143,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
             // prepare sqlCommand
             string[] listCommands = listProps.Select(p => p.Name).ToArray()
-                                             .Where(p => p != $"{TableName}Id").ToArray()
+                                             .Where(p => p != $"{TableNameId}").ToArray()
                                              .Select(p => $"{p} = @{p}").ToArray();
             string setCommands = string.Join(", ", listCommands);
-            string sqlCommand = $"Update {TableName} set {setCommands} where {TableName}Id = @id";
+            string sqlCommand = $"Update {TableName} set {setCommands} where {TableNameId} = @id";
 
             // execute:
             return await Connection.ExecuteAsync(sqlCommand, parameters, transaction: Transaction);

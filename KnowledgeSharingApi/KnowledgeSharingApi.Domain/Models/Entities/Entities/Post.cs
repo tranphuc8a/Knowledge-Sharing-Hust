@@ -11,7 +11,6 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
 {
     public class Post : Knowledge
     {
-        public Guid PostId { get; set; }
         public string Content { get; set; } = string.Empty;
         public virtual EPostType PostType { get; set; }
 

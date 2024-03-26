@@ -17,12 +17,12 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
     public class QuestionMySqlRepository(IDbContext dbContext)
-        : BaseMySqlRepository<Question>(dbContext), IQuestionRepository
+        : BaseMySqlUserItemRepository<Question>(dbContext), IQuestionRepository
     {
         public async Task<ViewQuestion> CheckExistedQuestion(Guid questionId, string errorMessage)
         {
             return await DbContext.ViewQuestions
-                .Where(question => question.QuestionId == questionId)
+                .Where(question => question.UserItemId == questionId)
                 .FirstOrDefaultAsync()
                 ?? throw new NotExistedEntityException(errorMessage);
         }
@@ -59,7 +59,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public override async Task<Guid?> Insert(Guid questionId, Question question)
         {
-            question.UserItemId = question.KnowledgeId = question.PostId = question.QuestionId = questionId;
+            question.UserItemId = questionId;
             DbContext.Questions.Add(question);
             int rows = await DbContext.SaveChangesAsync();
             return rows > 0 ? questionId : null;
@@ -70,8 +70,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             Question questionToUpdate = await DbContext.Questions.FindAsync(questionId) 
                 ?? throw new Exception("Question not found.");
 
-            updatedQuestion.UserItemId = updatedQuestion.KnowledgeId 
-                = updatedQuestion.PostId = updatedQuestion.QuestionId = questionId;
+            updatedQuestion.UserItemId = questionId;
 
             DbContext.Entry(questionToUpdate).CurrentValues.SetValues(updatedQuestion);
 
@@ -123,7 +122,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public async Task<ViewQuestion?> GetQuestionDetail(Guid questionId)
         {
             return await DbContext.ViewQuestions
-                .Where(ques => ques.QuestionId == questionId)
+                .Where(ques => ques.UserItemId == questionId)
                 .FirstOrDefaultAsync();
         }
 
@@ -143,7 +142,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Distinct();
             var posts = await DbContext.ViewQuestions
                 .Where(post => post.Privacy == EPrivacy.Public) // công khai
-                .Where(post => knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
+                .Where(post => knowledgesId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
                 .OrderByDescending(post => post.CreatedTime)
                 .Skip(offset).Take(limit)
                 .ToListAsync();
@@ -158,7 +157,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Distinct();
 
             var posts = await DbContext.ViewQuestions
-                .Where(post => knowledgesId.Contains(post.KnowledgeId)) // Lọc post dựa vào danh sách ID đã lấy
+                .Where(post => knowledgesId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
                 .OrderByDescending(post => post.CreatedTime)
                 .Skip(offset).Take(limit)
                 .ToListAsync();
@@ -173,7 +172,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Select(k => k.KnowledgeId)
                 .Distinct();
 
-            // Lấy danh sách CourseId mà User đã đăng ký
+            // Lấy danh sách UserItemId mà User đã đăng ký
             var registeredCourseIds = DbContext.CourseRegisters
                 .Where(c => c.UserId == myUId)
                 .Select(c => c.CourseId)
@@ -181,7 +180,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToList(); // Dùng ToList để tải kết quả về và tránh query lại nhiều lần
 
             var posts = await DbContext.ViewQuestions
-                .Where(post => knowledgesId.Contains(post.KnowledgeId) &&
+                .Where(post => knowledgesId.Contains(post.UserItemId) &&
                     (   // myUid có thể truy cập post:
                         // post là bài thảo luận của chính mình
                         (post.UserId == myUId) ||
@@ -201,7 +200,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<IEnumerable<ViewQuestion>> GetMarkedPosts(Guid userId)
         {
-            // Lấy danh sách CourseId mà User đã đăng ký
+            // Lấy danh sách UserItemId mà User đã đăng ký
             var registeredCourseIds = new HashSet<Guid>(
                 DbContext.CourseRegisters
                     .Where(c => c.UserId == userId)
@@ -213,7 +212,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             var query =
                 from post in DbContext.ViewQuestions
                 join mark in DbContext.Marks
-                    on post.KnowledgeId equals mark.KnowledgeId
+                    on post.UserItemId equals mark.KnowledgeId
                 where mark.UserId == userId && (
                     post.Privacy == EPrivacy.Public || // Question là public
                     post.UserId == userId || // Hoặc question là của user
@@ -224,6 +223,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
             // Thực thi truy vấn và trả về kết quả
             return await query.ToListAsync();
+        }
+
+        protected override DbSet<Question> GetDbSet()
+        {
+            return DbContext.Questions;
         }
     }
 }

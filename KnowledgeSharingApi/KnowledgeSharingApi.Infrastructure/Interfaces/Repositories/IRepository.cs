@@ -65,7 +65,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Bản ghi cần lấy </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: None
-        Task<IEnumerable<T>> Get(Guid[] ids);
+        Task<IEnumerable<T?>> Get(Guid[] ids);
 
         /// <summary>
         /// Hàm thực hiện thêm mới một bản ghi

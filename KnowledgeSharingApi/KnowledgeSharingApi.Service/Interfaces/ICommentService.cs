@@ -124,18 +124,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myuid, Guid userId, Guid knowledgeId, int? limit, int? offset);
 
         /// <summary>
-        /// User lấy về danh sách bình luận của một knowledge
-        /// </summary>
-        /// <param name="myuid"> id của người lấy </param>
-        /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
-        /// <returns></returns>
-        /// Created: PhucTV (25/3/24)
-        /// Modified: None
-        Task<ServiceResult> UserGetKnowledgeComments(Guid myuid, Guid knowledgeId, int? limit, int? offset);
-
-        /// <summary>
         /// User tìm kiếm bình luận của một knowledge theo từ khóa 
         /// </summary>
         /// <param name="myuid"> id của người lấy </param>
@@ -175,12 +163,13 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// User chỉnh sửa một bình luận
         /// </summary>
-        /// <param name="myuid"> id của người chỉnh sưir </param>
+        /// <param name="myuid"> id của người chỉnh sửa </param>
+        /// <param name="commentId"> Id của comment cần update </param>
         /// <param name="commentModel"> Nội dung bình luận chỉnh sửa </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserUpdateComment(Guid myuid, UpdateCommentModel commentModel);
+        Task<ServiceResult> UserUpdateComment(Guid myuid, Guid commentId, UpdateCommentModel commentModel);
 
         /// <summary>
         /// User xóa bình luận của mình hoặc bình luận khác trong bài đăng của mình
@@ -191,7 +180,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserDeleteComment(Guid myuid, Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> UserDeleteComment(Guid myuid, Guid commentId);
 
 
         /// <summary>

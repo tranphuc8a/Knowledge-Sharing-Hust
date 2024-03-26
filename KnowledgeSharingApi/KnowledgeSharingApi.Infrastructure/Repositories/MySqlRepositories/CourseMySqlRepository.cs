@@ -3,6 +3,7 @@ using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
     public class CourseMySqlRepository(IDbContext dbContext)
-        : BaseMySqlRepository<Course>(dbContext), ICourseRepository
+        : BaseMySqlUserItemRepository<Course>(dbContext), ICourseRepository
     {
         public Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfCourse(Guid courseId)
         {
@@ -27,6 +28,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public Task<ViewCourseRegister?> GetViewCourseRegister(Guid userId, Guid courseId)
         {
             throw new NotImplementedException();
+        }
+
+        protected override DbSet<Course> GetDbSet()
+        {
+            return DbContext.Courses;
         }
     }
 }

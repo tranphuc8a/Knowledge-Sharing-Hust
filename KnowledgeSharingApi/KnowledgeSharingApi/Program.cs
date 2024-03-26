@@ -136,6 +136,8 @@ builder.Services.AddScoped<ICourseRepository, CourseMySqlRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryMySqlRepository>();
 builder.Services.AddScoped<IKnowledgeRepository, KnowledgeMySqlRepository>();
 builder.Services.AddScoped<IMarkRepository, MarkMySqlRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentMySqlRepository>();
+builder.Services.AddScoped<IStarRepository, StarMySqlRepository>();
 
 
 
@@ -158,6 +160,7 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>(); 
 builder.Services.AddScoped<IKnowledgeService, KnowledgeService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 
 //
