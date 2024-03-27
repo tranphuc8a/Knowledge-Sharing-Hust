@@ -62,8 +62,9 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task CheckExistedUser(Guid myUid, Guid uid)
         {
-            IEnumerable<User> lsUser = await UserRepository.Get([myUid, uid]);
-            if (lsUser.Count() < 2) throw new ValidatorException(ResponseResource.NotExistUser());
+            IEnumerable<User?> lsUser = await UserRepository.Get([myUid, uid]);
+            int count = lsUser.Where(user => user != null).Count();
+            if (count < 2) throw new ValidatorException(ResponseResource.NotExistUser());
         }
 
         /// <summary>

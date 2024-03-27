@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
@@ -69,6 +70,95 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             userstars.ForEach(ut => result[ut.UserItemId] = ut.Stars);
 
             return result;
+        }
+
+        public async Task<IEnumerable<Star>> GetListStarOfUser(Guid userId)
+        {
+            return await DbContext.Stars.Where(star => star.UserId == userId)
+                .OrderByDescending(star => star.Stars)
+                .ThenByDescending(star => star.CreatedTime).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Star>> GetListStarOfUserItem(Guid userItemId)
+        {
+            return await DbContext.Stars.Where(star => star.UserItemId == userItemId).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Tuple<ViewComment, Star>>> GetStaredComments(Guid userId)
+        {
+            var userStars =
+                from star in DbContext.Stars
+                where star.UserId == userId
+                select star;
+            var comments =
+                from comment in DbContext.ViewComments
+                join star in userStars on comment.UserItemId equals star.UserItemId
+                select new { Star = star, Comment = comment };
+            var res = await comments.ToListAsync();
+            return res.Select(item => Tuple.Create(item.Comment, item.Star)).ToList();
+        }
+
+        public async Task<IEnumerable<Tuple<ViewCourse, Star>>> GetStaredCourses(Guid userId)
+        {
+            var userStars =
+                from star in DbContext.Stars
+                where star.UserId == userId
+                select star;
+            var courses =
+                from course in DbContext.ViewCourses
+                join star in userStars on course.UserItemId equals star.UserItemId
+                select new { Star = star, Course = course };
+            var res = await courses.ToListAsync();
+            return res.Select(item => Tuple.Create(item.Course, item.Star)).ToList();
+        }
+
+        public async Task<IEnumerable<Tuple<ViewLesson, Star>>> GetStaredLessons(Guid userId)
+        {
+            var userStars =
+                from star in DbContext.Stars
+                where star.UserId == userId
+                select star;
+            var lessons =
+                from lesson in DbContext.ViewLessons
+                join star in userStars on lesson.UserItemId equals star.UserItemId
+                select new { Star = star, Lesson = lesson };
+            var res = await lessons.ToListAsync();
+            return res.Select(item => Tuple.Create(item.Lesson, item.Star)).ToList();
+        }
+
+        public async Task<IEnumerable<Tuple<ViewPost, Star>>> GetStaredPosts(Guid userId)
+        {
+            var userStars =
+                from star in DbContext.Stars
+                where star.UserId == userId
+                select star;
+            var posts =
+                from post in DbContext.ViewPosts
+                join star in userStars on post.UserItemId equals star.UserItemId
+                select new { Star = star, Post = post };
+            var res = await posts.ToListAsync();
+            return res.Select(item => Tuple.Create(item.Post, item.Star)).ToList();
+        }
+
+        public async Task<IEnumerable<Tuple<ViewQuestion, Star>>> GetStaredQuestions(Guid userId)
+        {
+            var userStars =
+                from star in DbContext.Stars
+                where star.UserId == userId
+                select star;
+            var questions =
+                from question in DbContext.ViewQuestions
+                join star in userStars on question.UserItemId equals star.UserItemId
+                select new { Star = star, Question = question };
+            var res = await questions.ToListAsync();
+            return res.Select(item => Tuple.Create(item.Question, item.Star)).ToList();
+        }
+
+        public async Task<Star?> GetStarOfUserAndUserItem(Guid userId, Guid itemId)
+        {
+            return await DbContext.Stars
+                .Where(star => star.UserId == userId && star.UserItemId == itemId)
+                .FirstOrDefaultAsync();
         }
     }
 }

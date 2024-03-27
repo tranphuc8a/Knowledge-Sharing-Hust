@@ -51,6 +51,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         Task<IEnumerable<ViewUser>> GetDetail(int limit, int offset);
 
         /// <summary>
+        /// Lấy về danh sách chi tiết user theo danh sách id
+        /// </summary>
+        /// <param name="userIds"> danh sách id user cần lấy </param>
+        /// <returns> ViewUser </returns>
+        /// Created: PhucTV (27/3/24)
+        /// Modified: None
+        Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds);
+
+        /// <summary>
         /// Lấy về chi tiết user
         /// </summary>
         /// <param name="userId"> userId của user cần lấy </param>

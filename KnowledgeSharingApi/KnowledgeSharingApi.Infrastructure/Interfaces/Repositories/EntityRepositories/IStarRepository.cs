@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,5 +38,49 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Modified: None
         Task<Dictionary<Guid, int>> CalculateTotalStars(List<Guid> userItemsId);
 
+
+        /// <summary>
+        /// Lấy về danh sách star của một user item
+        /// </summary>
+        /// <param name="userItemId"> id của user item cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (27/3/24)
+        /// Modified: None
+        Task<IEnumerable<Star>> GetListStarOfUserItem(Guid userItemId);
+
+        
+        /// <summary>
+        /// Lấy về danh sách các user item đã được đánh giá star của một user
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (27/3/24)
+        /// Modified: None
+        Task<IEnumerable<Star>> GetListStarOfUser(Guid userId);
+
+
+        /// <summary>
+        /// Lấy về star của user đánh giá một item
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <param name="userId"> id của item cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (27/3/24)
+        /// Modified: None
+        Task<Star?> GetStarOfUserAndUserItem(Guid userId, Guid itemId);
+
+
+        /// <summary>
+        /// Lấy về danh sách các phần tử đã được đánh giá bởi userId
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <returns> List of tuple: Item1: phần tử, Item2: star </returns>
+        /// Created: PhucTV (28/3/24)
+        /// Modified: None
+        Task<IEnumerable<Tuple<ViewComment, Star>>> GetStaredComments(Guid userId);
+        Task<IEnumerable<Tuple<ViewCourse, Star>>> GetStaredCourses(Guid userId);
+        Task<IEnumerable<Tuple<ViewPost, Star>>> GetStaredPosts(Guid userId);
+        Task<IEnumerable<Tuple<ViewQuestion, Star>>> GetStaredQuestions(Guid userId);
+        Task<IEnumerable<Tuple<ViewLesson, Star>>> GetStaredLessons(Guid userId);
     }
 }
