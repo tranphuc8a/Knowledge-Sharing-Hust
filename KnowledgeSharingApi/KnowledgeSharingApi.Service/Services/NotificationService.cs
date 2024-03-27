@@ -92,10 +92,10 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> DeleteNotifications(Guid userId, Guid[] notiIds)
         {
             ViewUser user = await CheckUserExisted(userId);
-            IEnumerable<Notification> notifications = await NotificationRepository.Get(notiIds);
-            notifications = notifications.Where(noti => noti.UserId == user.UserId);
+            IEnumerable<Notification?> notifications = await NotificationRepository.Get(notiIds);
+            notifications = notifications.Where(noti => noti?.UserId == user.UserId);
             int rows = await NotificationRepository.Delete(
-                notifications.Select(noti => noti.NotificationId).ToArray()
+                notifications.Select(noti => noti?.NotificationId ?? Guid.Empty).ToArray()
             );
             return ServiceResult.Success(ResponseResource.DeletedSomeItems(NotificationResource), string.Empty, rows);
         }
@@ -126,9 +126,9 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> GetNotifications(Guid userId, Guid[] notiIds)
         {
             ViewUser user = await CheckUserExisted(userId);
-            IEnumerable<Notification> listNotification =
+            IEnumerable<Notification?> listNotification =
                 (await NotificationRepository.Get(notiIds))
-                .Where(noti => noti.UserId == user.UserId);
+                .Where(noti => noti?.UserId == user.UserId);
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(NotificationResource), 
                 string.Empty, 

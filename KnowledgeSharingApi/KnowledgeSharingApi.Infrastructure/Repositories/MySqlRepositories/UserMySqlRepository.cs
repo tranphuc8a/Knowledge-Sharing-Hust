@@ -130,5 +130,20 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.ViewUsers.Where(user => user.UserId == userId).FirstOrDefaultAsync()
                 ?? throw new NotExistedEntityException(errorMessage);
         }
+
+        public async Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds)
+        {
+            Dictionary<Guid, ViewUser?> res = userIds.ToDictionary(id => id, id => (ViewUser?)null);
+
+            IEnumerable<ViewUser> users = await DbContext.ViewUsers
+                .Where(user => userIds.Contains(user.UserId))
+                .ToListAsync();
+
+            foreach (var item in users)
+            {
+                res[item.UserId] = item;
+            }
+            return res;
+        }
     }
 }

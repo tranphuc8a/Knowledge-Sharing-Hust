@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 {
-    public class PaginationResponseModel<T> where T : class
+    public class PaginationResponseModel<T>(int total, int limit, int offset, IEnumerable<T> result) where T : class
     {
-        public int Total { get; set; }
-        public int Limit { get; set; }
-        public int Offset { get; set; }
+        public PaginationResponseModel() : this(0, 0, 0, [])
+        {
+        }
+        public int Total { get; set; } = total; 
+        public int Limit { get; set; } = limit; 
+        public int Offset { get; set; } = offset;
         public int Count { get => Results.Count<T>(); }
 
-        public IEnumerable<T> Results { get; set; } = [];
+        public IEnumerable<T> Results { get; set; } = result;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
 {
-    public class UserItem : Entity
+    public class UserItem : Entity, IUserItemView
     {
         [Key]
         public Guid UserItemId { get; set; }
