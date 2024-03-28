@@ -1,7 +1,17 @@
-﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
+﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Exceptions;
+using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
+using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Domains.Resources.Vietnamese;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Services.Interfaces;
+using Org.BouncyCastle.Asn1.Cms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,114 +22,499 @@ namespace KnowledgeSharingApi.Services.Services
 {
     public class LessonService : ILessonService
     {
-        public Task<ServiceResult> AdminDeletePost(Guid postId)
+        protected readonly IResourceFactory ResourceFactory;
+        protected readonly IResponseResource ResponseResource;
+        protected readonly IEntityResource EntityResource;
+
+        protected readonly ILessonRepository LessonRepository;
+        protected readonly IStarRepository StarRepository;
+        protected readonly ICourseRepository CourseRepository;
+        protected readonly IUserRepository UserRepository;
+        protected readonly IStorage Storage;
+
+        protected readonly string LessonResource, NotExistedLesson, ExistedLesson;
+        protected readonly int DefaultLimit = 20;
+
+        public LessonService(
+            IResourceFactory resourceFactory,
+            ILessonRepository lessonRepository,
+            IStarRepository starRepository,
+            ICourseRepository courseRepository,
+            IUserRepository userRepository,
+            IStorage storage
+        )
         {
-            throw new NotImplementedException();
+            ResourceFactory = resourceFactory;
+            ResponseResource = ResourceFactory.GetResponseResource();
+            EntityResource = ResourceFactory.GetEntityResource();
+
+            LessonRepository = lessonRepository;
+            StarRepository = starRepository;
+            CourseRepository = courseRepository;
+            UserRepository = userRepository;
+            Storage = storage;
+
+            LessonResource = EntityResource.Lesson();
+            NotExistedLesson = ResponseResource.NotExist(LessonResource);
+            ExistedLesson = ResponseResource.ExistName(LessonResource);
         }
 
-        public Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset)
+        #region Support methods
+
+        protected virtual async Task<IEnumerable<ResponseLessonModel>> Decorate(Guid? myUid, IEnumerable<ViewLesson> lessons)
         {
-            throw new NotImplementedException();
+            List<Guid> lessonIds = lessons.Select(lesson => lesson.UserItemId).ToList();
+            Dictionary<Guid, int?>? myStars = null;
+            if (myUid != null)
+            {
+                // calculate myStar from myUid to all lessons
+                myStars = await StarRepository.CalculateUserStars(myUid.Value, lessonIds);
+            }
+            // calculate total stars to all lessons
+            Dictionary<Guid, int> totalStars = await StarRepository.CalculateTotalStars(lessonIds);
+
+            // calculate average stars to all lessons
+            Dictionary<Guid, double?> averageStars = await StarRepository.CalculateAverageStars(lessonIds);
+
+            // Number comments & Top comments
+
+            // is Mark
+
+            return lessons.Select(lesson =>
+            {
+                ResponseLessonModel les = new();
+                les.Copy(lesson);
+                les.MyStars = myStars?[lesson.UserItemId];
+                les.TotalStars = totalStars[lesson.UserItemId];
+                les.AverageStars = averageStars[lesson.UserItemId];
+                return les;
+            });
         }
 
-        public Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset)
+        protected virtual Lesson CreateLesson(ViewUser user, CreateLessonModel model, string? thumbnail)
         {
-            throw new NotImplementedException();
+            Lesson lesson = new()
+            {
+                // Entity:
+                CreatedTime = DateTime.UtcNow,
+                CreatedBy = user.FullName,
+                // UserItem:
+                UserItemId = Guid.NewGuid(),
+                UserId = user.UserId,
+                UserItemType = EUserItemType.Knowledge,
+                // Knowledge:
+                Title = model.Title!,
+                Abstract = model.Abstract,
+                Thumbnail = thumbnail,
+                Views = 0,
+                KnowledgeType = EKnowledgeType.Post,
+                Privacy = model.Privacy!.Value,
+                IsBlockComment = false,
+                // Post:
+                Content = model.Content!,
+                PostType = EPostType.Lesson,
+                // Lesson:
+                EstimateTimeInMinutes = model.EstimateTimeInMinutes!.Value
+            };
+            return lesson;
         }
 
-        public Task<ServiceResult> AdminGetPostDetail(Guid postId)
+        #endregion
+
+
+        #region Admin services
+        public virtual async Task<ServiceResult> AdminDeletePost(Guid postId)
         {
-            throw new NotImplementedException();
+            // Kiểm tra lesson tồn tại
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+
+            // OK xóa
+            // Override xóa trong repo để xóa cả những course lesson tương ứng
+            int deleted = await LessonRepository.Delete(lesson.UserItemId);
+            if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(LessonResource));
+
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(LessonResource));
         }
 
-        public Task<ServiceResult> AdminGetPosts(int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            IEnumerable<ViewLesson> listLessons =
+                await LessonRepository.GetPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource),
+                string.Empty, await Decorate(null, listLessons));
         }
 
-        public Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Check course exist
+            _ = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
+
+            // Get list lesson
+            PaginationResponseModel<ViewLesson> lessons =
+                await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> listResLessons = await Decorate(null, lessons.Results);
+
+            // Return Success
+            PaginationResponseModel<ResponseLessonModel> res =
+                new(lessons.Total, lessons.Limit, lessons.Offset, listResLessons);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetPostDetail(Guid postId)
         {
-            throw new NotImplementedException();
+            // Check lesson exist
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+
+            // Decorate
+            ResponseLessonModel res = (await Decorate(null, [lesson])).First();
+
+            // return success
+            return ServiceResult.Success(ResponseResource.GetSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> AnonymousGetPostDetail(Guid postId)
+        public async Task<ServiceResult> AdminGetPosts(int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Get all paginated
+            IEnumerable<ViewLesson> lessons =
+                await LessonRepository.GetViewPost(limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> res = await Decorate(null, lessons);
+
+            // Return Success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // CHeck user existed:
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
+
+            // Get all paginated
+            IEnumerable<ViewLesson> lessons = await LessonRepository.GetByUserId(userId);
+            lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> res = await Decorate(null, lessons);
+
+            // Return Success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
+        }
+        #endregion
+
+        #region Anonymous services
+        public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
+        {
+            // Get public list post
+            IEnumerable<ViewLesson> listLessons =
+                await LessonRepository.GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> res = await Decorate(null, listLessons);
+
+            // Return success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetPostDetail(Guid postId)
         {
-            throw new NotImplementedException();
+            // Check Lesson exist
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+
+            // Decorate
+            ResponseLessonModel res = (await Decorate(null, [lesson])).First();
+
+            // Return Success
+            return ServiceResult.Success(ResponseResource.GetSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserCreatePost(Guid myUid, CreatePostModel model)
+        public async Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Get public lessons
+            IEnumerable<ViewLesson> listLessons =
+                await LessonRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> res = await Decorate(null, listLessons);
+
+            // Return success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
+        public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Check user existed
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
+
+            // Get public lessons and Pagination
+            IEnumerable<ViewLesson> lessons =
+                await LessonRepository.GetPublicPostsByUserId(userId);
+            lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> res = await Decorate(null, lessons);
+
+            // Return Success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset)
+        #endregion
+
+
+        #region User operation services
+
+        public async Task<ServiceResult> ChangePrivacy(Guid myUid, ChangeKnowledgePrivacyModel model)
         {
-            throw new NotImplementedException();
+            // Check lesson existed and owner
+            Lesson lesson = await LessonRepository.CheckExisted(model.KnowledgeId ?? Guid.Empty, NotExistedLesson);
+            if (lesson.UserId != myUid)
+                return ServiceResult.Forbidden("Đây không phải bài giảng của bạn");
+
+            // update privacy
+            if (model.Privacy == null)
+                return ServiceResult.BadRequest(ViConstantResource.PRIVACY_EMPTY);
+            lesson.Privacy = model.Privacy.Value;
+            int res = await LessonRepository.Update(lesson.UserItemId, lesson);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
+
+            // return success
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(LessonResource));
         }
 
-        public Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset)
+        public async Task<ServiceResult> UserCreatePost(Guid myUid, CreatePostModel model)
         {
-            throw new NotImplementedException();
+            // Check Create Lesson Model type:
+            if (model is not CreateLessonModel lessonModel) throw new NotMatchTypeException();
+
+            // CHeck user existed:
+            ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+
+            // Post thumbnail if existed:
+            string? thumbnail = model.Thumbnail != null ? await Storage.SaveImage(model.Thumbnail) : null;
+
+            // Tạo mới Lesson
+            Lesson lesson = CreateLesson(user, lessonModel, thumbnail);
+
+            // Insert Lesson
+            Guid? res = await LessonRepository.Insert(lesson.UserItemId, lesson);
+            if (res == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(LessonResource));
+
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.InsertSuccess(LessonResource), string.Empty, lesson);
         }
 
-        public Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset)
+        public async Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
         {
-            throw new NotImplementedException();
+            // Check lesson exist and owner
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+            if (lesson.UserId != myUid) return ServiceResult.Forbidden("Bài giảng không phải của bạn");
+
+            // Check lesson not in any course
+            IEnumerable<Tuple<CourseLesson, ViewCourse>> listCourses = await LessonRepository.GetListCoursesOfLesson(postId);
+            if (listCourses.Any())
+                return ServiceResult.BadRequest("Không thể xóa do bài giảng hiện đang ở trong khóa học khác");
+
+            // Delete
+            int deleted = await LessonRepository.Delete(lesson.UserItemId);
+            if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(LessonResource));
+
+            // Return Success
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(LessonResource));
         }
 
-        public Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
         {
-            throw new NotImplementedException();
+            // Kiểm tra lesson tồn tại và do user làm chủ
+            Lesson lesson = await LessonRepository.CheckExisted(postId, NotExistedLesson);
+            if (lesson.UserId != myUid)
+                return ServiceResult.Forbidden("Không phải bài giảng của bạn");
+
+            // cập nhật 
+            lesson.Copy(model);
+            int updated = await LessonRepository.Update(lesson.UserItemId, lesson);
+            if (updated <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
+
+            // Trả về thành công
+            return ServiceResult.ServerError(ResponseResource.UpdateSuccess(LessonResource), string.Empty, lesson);
+        } 
+        
+        #endregion
+
+
+        #region User get services
+
+        public async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset)
+        {
+            IEnumerable<ViewLesson> listLessons =
+                await LessonRepository.GetPostsOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource),
+                string.Empty, await Decorate(null, listLessons));
         }
 
-        public Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
+        public async Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Check course exist
+            _ = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
+
+            // Check joined course
+            ViewCourseRegister? registered = await CourseRepository.GetViewCourseRegister(myUid, courseId);
+            if (registered == null) return ServiceResult.Forbidden("Bạn chưa tham gia khóa học này");
+
+            // Get list lesson
+            PaginationResponseModel<ViewLesson> lessons =
+                await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> listResLessons = await Decorate(null, lessons.Results);
+
+            // Return Success
+            PaginationResponseModel<ResponseLessonModel> res =
+                new(lessons.Total, lessons.Limit, lessons.Offset, listResLessons);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Check course exist and owner
+            Course course = 
+                await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
+            if (course.UserId != myUid)
+                return ServiceResult.Forbidden("Đây không phải là khóa học của bạn");
+
+            // Get list lesson
+            PaginationResponseModel<ViewLesson> lessons =
+                await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> listResLessons = await Decorate(null, lessons.Results);
+
+            // Return Success
+            PaginationResponseModel<ResponseLessonModel> res =
+                new(lessons.Total, lessons.Limit, lessons.Offset, listResLessons);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserGetPostDetail(Guid myUid, Guid postId)
+        public async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // GEt list về
+            IEnumerable<ViewLesson> listLessons = await LessonRepository.GetMarkedPosts(myUid);
+
+            // Pagination
+            int total = listLessons.Count();
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            listLessons = listLessons.Skip(offsetValue).Take(limitValue);
+
+            // Decorate 
+            IEnumerable<ResponseLessonModel> listResLesson = await Decorate(myUid, listLessons);
+
+            // Trả về thành công
+            PaginationResponseModel<ResponseLessonModel> res = new(total, limitValue, offsetValue, listResLesson);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
         {
-            throw new NotImplementedException();
+            // Check lesson existed and owner
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(myUid, NotExistedLesson);
+            if (lesson.UserId != myUid)
+                return ServiceResult.Forbidden("Bài giảng này không phải của bạn");
+
+            // Decorate
+            ResponseLessonModel resLesson = (await Decorate(myUid, [lesson])).First();
+
+            // return Success
+            return ServiceResult.Success(ResponseResource.GetSuccess(LessonResource), string.Empty, resLesson);
         }
 
-        public Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
         {
-            throw new NotImplementedException();
+            // Get all paginated
+            IEnumerable<ViewLesson> lessons = await LessonRepository.GetByUserId(myUid);
+            lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> res = await Decorate(myUid, lessons);
+
+            // Return Success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
+        public async Task<ServiceResult> UserGetPostDetail(Guid myUid, Guid postId)
         {
-            throw new NotImplementedException();
+            // Check lesson exist
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+
+            // Decorate
+            ResponseLessonModel res = (await Decorate(myUid, [lesson])).First();
+
+            // return success
+            return ServiceResult.Success(ResponseResource.GetSuccess(LessonResource), string.Empty, res);
         }
+
+        public async Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset)
+        {
+            // Get all paginated
+            IEnumerable<ViewLesson> lessons =
+                await LessonRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> res = await Decorate(null, lessons);
+
+            // Return Success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
+        }
+
+        public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
+        {
+            // CHeck user existed:
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
+
+            // Get all paginated
+            IEnumerable<ViewLesson> lessons = await LessonRepository.GetPublicPostsByUserId(userId);
+            lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+
+            // Decorate
+            IEnumerable<ResponseLessonModel> res = await Decorate(null, lessons);
+
+            // Return Success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
+        }
+
+        public async Task<ServiceResult> UserGetListCourseOfLesson(Guid myUId, Guid lessonId, int? limit, int? offset)
+        {
+            // Kiểm tra lesson tồn tại và là của myUId
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(lessonId, NotExistedLesson);
+            if (lesson.UserId != myUId)
+                return ServiceResult.Forbidden("Bài giảng không phải của bạn");
+
+            // Lấy về danh sách khóa học (ViewCourse)
+            IEnumerable<Tuple<CourseLesson, ViewCourse>> listCourses = await LessonRepository.GetListCoursesOfLesson(lessonId);
+
+            // Phân trang
+            int total = listCourses.Count();
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            listCourses = listCourses.Skip(offsetValue).Take(limitValue);
+            
+            // Decorate:
+            // Thêm chi tiết xem bài học hiện tại là bài học thứ bao nhiêu của khóa học
+            // Nên trả về ViewCourseLesson không ?? --> Hay lại sử dụng ResponseCourseLessonModel
+            // -> Nên trả về ResponseCourseLessonModel hơn
+            IEnumerable<ResponseCourseLessonModel> listParticipants = listCourses.Select(participant =>
+            {
+                ResponseCourseLessonModel resItem = 
+                    (ResponseCourseLessonModel)new ResponseCourseLessonModel().Copy(participant.Item1);
+                resItem.Lesson = (ResponseLessonModel)new ResponseLessonModel().Copy(lesson);
+                resItem.Course = (ResponseCourseModel)new ResponseCourseModel().Copy(participant.Item2);
+                return resItem;
+            }).ToList();
+
+            // Trả về OK
+            PaginationResponseModel<ResponseCourseLessonModel> res = new(total, limitValue, offsetValue, listParticipants);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+        #endregion
+
     }
 }

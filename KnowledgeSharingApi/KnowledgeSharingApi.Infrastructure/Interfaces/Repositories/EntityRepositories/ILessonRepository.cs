@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<ViewQuestion> CheckExistedLesson(Guid lessonId, string errorMessage);
+        Task<ViewLesson> CheckExistedLesson(Guid lessonId, string errorMessage);
 
 
         /// <summary>
@@ -33,6 +33,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<PaginationResponseModel<ViewLesson>> GetQuestionInCourse(Guid courseid, int limit, int offset);
+        Task<PaginationResponseModel<ViewLesson>> GetLessonsInCourse(Guid courseid, int limit, int offset);
+
+
+        /// <summary>
+        /// Lấy về danh sách tất cả khóa học mà có sử dụng bài giảng hiện tại
+        /// </summary>
+        /// <param name="lessonId"> id của bài giảng cần lấy</param>
+        /// <returns></returns>
+        /// Created: PhucTV (28/3/24)
+        /// Modified: None
+        Task<IEnumerable<Tuple<CourseLesson, ViewCourse>>> GetListCoursesOfLesson(Guid lessonId);
     }
 }
