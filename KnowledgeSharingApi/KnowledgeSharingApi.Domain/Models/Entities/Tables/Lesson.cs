@@ -14,7 +14,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
         public int EstimateTimeInMinutes { get; set; }
 
         //public override EPostType PostType { get => EPostType.Lesson; }
-        protected override Post Init()
+        protected override Lesson Init()
         {
             return new Lesson();
         }

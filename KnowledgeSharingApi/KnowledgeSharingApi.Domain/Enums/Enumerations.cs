@@ -205,8 +205,8 @@ namespace KnowledgeSharingApi.Domains.Enums
     /// Modified: None
     public enum EKnowledgeType
     {
-        Course = 1,
-        Post = 0
+        Post = 0,
+        Course = 1
     }
 
 

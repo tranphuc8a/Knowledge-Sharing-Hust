@@ -243,7 +243,24 @@ namespace KnowledgeSharingApi.Services.Services
 
         public async Task<ServiceResult> UserGetMyScoredUserItems(Guid myUid, int? limit, int? offset)
         {
-            return await UserGetMyScoredPosts(myUid, limit, offset);
+            // Get về và phân trang
+            IEnumerable<Star> listStars = await StarRepository.GetListStarOfUser(myUid);
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            int total = listStars.Count();
+            listStars = listStars.Skip(offsetValue).Take(limitValue);
+
+            // Decorate
+            List<ResponseStarModel> res = [];
+            foreach (Star star in listStars)
+            {
+                ResponseStarModel resStar = (ResponseStarModel)new ResponseStarModel().Copy(star);
+                resStar.Item = await UserItemRepository.GetExactlyResponseUserItemModel(star.UserItemId);
+                res.Add(resStar);
+            }
+
+            // Return Response
+            PaginationResponseModel<ResponseStarModel> pageRes = new(total, limitValue, offsetValue, res);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(StarResourcse), string.Empty, pageRes);
         }
 
         public async Task<ServiceResult> UserGetUserItemStars(Guid myUid, Guid userItemId, int? limit, int? offset)
@@ -252,7 +269,7 @@ namespace KnowledgeSharingApi.Services.Services
             UserItem item = await UserItemRepository.CheckExisted(userItemId, NotExistedItem);
             if (item.UserItemType == EUserItemType.Knowledge)
             {
-                Knowledge knowledge = await KnowledgeRepository.CheckExisted(userItemId, NotExistedItem);
+                _ = await KnowledgeRepository.CheckExisted(userItemId, NotExistedItem);
                 bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, userItemId);
                 if (!isAccessible)
                     return ServiceResult.Forbidden("Bạn không có quyền truy cập tài nguyên này");

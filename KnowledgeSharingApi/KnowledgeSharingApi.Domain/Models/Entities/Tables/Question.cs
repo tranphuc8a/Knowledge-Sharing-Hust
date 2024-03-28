@@ -16,7 +16,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
 
 
         //public override EPostType PostType { get => EPostType.Question; }
-        protected override Post Init()
+        protected override Question Init()
         {
             return new Question();
         }

@@ -24,8 +24,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public async Task<bool> CheckAccessible(Guid userId, Guid knowledgeId)
         {
             Knowledge knowledge = await DbContext.Knowledges.FindAsync(knowledgeId) ?? throw notExistedException;
-            // public -> true
-            if (knowledge.Privacy == EPrivacy.Public) return true;
+            // public, owner -> true
+            if (knowledge.Privacy == EPrivacy.Public || knowledge.UserId == userId) return true;
             // Private: 
             if (knowledge.KnowledgeType == EKnowledgeType.Course)
             {
@@ -40,8 +40,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public async Task<bool> CheckCourseAccessible(Guid userId, Guid courseId)
         {
             Course course = await DbContext.Courses.FindAsync(courseId) ?? throw notExistedException;
-            // course public --> true
-            if (course.Privacy == EPrivacy.Public) return true;
+            // course public, owner --> true
+            if (course.Privacy == EPrivacy.Public || course.UserId == userId) return true;
             // private: join
             ViewCourseRegister? courseRegister = await DbContext.ViewCourseRegisters
                 .Where(cr => cr.UserId == userId && cr.CourseId == courseId)
@@ -51,12 +51,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<bool> CheckLessonAccessible(Guid userId, Guid lessonId)
         {
-            Lesson? lesson = await DbContext.Lessons
-                .Where(l => l.UserItemId == lessonId)
-                .FirstOrDefaultAsync() ?? throw notExistedException;
+            Lesson lesson = await DbContext.Lessons.FindAsync(lessonId) ?? throw notExistedException;
 
-            // public : true
-            if (lesson.Privacy == EPrivacy.Public) return true;
+            // public, owner : true
+            if (lesson.Privacy == EPrivacy.Public || lesson.UserId == userId) return true;
 
             // Kiểm tra xem người dùng có đăng ký cho bất kỳ khóa học nào có chứa bài học này không.
             bool isRegistered = await DbContext.CourseLessons
@@ -71,8 +69,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public async Task<bool> CheckPostAccessible(Guid userId, Guid postId)
         {
             Post post = await DbContext.Posts.FindAsync(postId) ?? throw notExistedException;
-            // public: OK
-            if (post.Privacy == EPrivacy.Public) return true;
+            // public, owner: OK
+            if (post.Privacy == EPrivacy.Public || post.UserId == userId) return true;
+
             // private: switch type
             if (post.PostType == EPostType.Lesson)
             {
@@ -91,8 +90,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Where(q => q.UserItemId == questionId)
                 .FirstOrDefaultAsync() ?? throw notExistedException;
 
-            // public: true.
-            if (question.Privacy == EPrivacy.Public) return true;
+            // public, owner: true.
+            if (question.Privacy == EPrivacy.Public || question.UserId == userId) return true;
 
             // private: same course.
             if (question.CourseId == null) return false;
