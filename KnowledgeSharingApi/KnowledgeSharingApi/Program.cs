@@ -139,6 +139,7 @@ builder.Services.AddScoped<IMarkRepository, MarkMySqlRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentMySqlRepository>();
 builder.Services.AddScoped<IStarRepository, StarMySqlRepository>();
 builder.Services.AddScoped<IUserItemRepository, UserItemMySqlRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonMySqlRepository>();
 
 
 
