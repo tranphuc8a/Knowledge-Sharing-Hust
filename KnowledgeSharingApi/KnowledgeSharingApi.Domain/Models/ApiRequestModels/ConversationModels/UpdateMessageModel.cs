@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
+namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.ConversationModels
 {
-    public class UpdateUserConversationModel
+    public class UpdateMessageModel
     {
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
-        public Guid UserConversationId { get; set; }
+        public Guid MessageId { get; set; }
 
-        [CustomRequiredValidator(ErrorMessage = ViConstantResource.NAME_EMPTY)]
-        public string? NickName { get; set; }
+        [CustomRequiredValidator(ErrorMessage = ViConstantResource.CONTENT_EMPTY)]
+        public string? Content { get; set; }
     }
 }

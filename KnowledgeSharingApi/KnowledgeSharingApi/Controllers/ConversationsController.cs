@@ -1,4 +1,4 @@
-﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.ConversationModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;

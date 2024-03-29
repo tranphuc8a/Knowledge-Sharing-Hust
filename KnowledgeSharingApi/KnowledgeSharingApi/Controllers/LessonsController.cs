@@ -18,7 +18,7 @@ namespace KnowledgeSharingApi.Controllers
         ILessonService lessonService   
     ) : ControllerBase
     {
-        public ILessonService LessonService;
+        public ILessonService LessonService = lessonService;
 
         protected virtual IActionResult StatusCode(ServiceResult result)
         {
@@ -57,9 +57,9 @@ namespace KnowledgeSharingApi.Controllers
         /// <summary>
         /// Yêu cầu lấy về chi tiết bài giảng
         /// </summary>
-        /// <param name="lessonId"> id của question cần lấy </param>
+        /// <param name="lessonId"> id của lesson cần lấy </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("anonymous/{lessonId}")]
         public async Task<IActionResult> AnonymousGetDetail(Guid lessonId)
@@ -75,7 +75,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("admin")]
         [CustomAuthorization(Roles: "Admin")]
@@ -89,7 +89,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Users/admin/lessons/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
@@ -99,10 +99,9 @@ namespace KnowledgeSharingApi.Controllers
         /// <summary>
         /// Yêu cầu admin lấy về chi tiết bài giảng
         /// </summary>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="lessonId"> id của lesson cần lấy </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("admin/{lessonId}")]
         [CustomAuthorization(Roles: "Admin")]
@@ -115,7 +114,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Courses/admin/lessons/{courseId}")]
         [CustomAuthorization(Roles: "Admin")]
@@ -127,7 +126,7 @@ namespace KnowledgeSharingApi.Controllers
         /// </summary>
         /// <param name="lessonId"> id của bài giảng </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpDelete("admin/{lessonId}")]
         [CustomAuthorization(Roles: "Admin")]
@@ -144,7 +143,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -161,9 +160,9 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="offset"> Độ lệch </param>
         /// <param name="userId"> id của user cần lấy </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
-        [HttpGet("api/v1/user/lessons/{userId}")]
+        [HttpGet("/api/v1/Users/lessons/{userId}")]
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListUserLesson(Guid userId, int? limit, int? offset)
         {
@@ -177,7 +176,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("my")]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -192,7 +191,7 @@ namespace KnowledgeSharingApi.Controllers
         /// </summary>
         /// <param name="lessonId"> id của bài giảng cần lấy </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("{lessonId}")]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -207,7 +206,7 @@ namespace KnowledgeSharingApi.Controllers
         /// </summary>
         /// <param name="lessonId"> id của bài giảng cần lấy </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("my/{lessonId}")]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -224,7 +223,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="offset"> Độ lệch </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Courses/lessons/{courseId}")]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -241,7 +240,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="offset"> Độ lệch </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Courses/my/lessons/{courseId}")]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -258,7 +257,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="offset"> Độ lệch </param>
         /// <param name="lessonId"> id của bài giảng cần lấy </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("my/courses/{lessonId}")]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -280,7 +279,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng bài giảng cần lấy </param>
         /// <param name="offset"> Độ lệch bài giảng đầu tiên </param>
         /// <returns></returns>
-        /// Created: PhucTV (25/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Categories/anonymous/lessons/{category}")]
         [AllowAnonymous]
@@ -297,7 +296,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng bài giảng cần lấy </param>
         /// <param name="offset"> Độ lệch bài giảng đầu tiên </param>
         /// <returns></returns>
-        /// Created: PhucTV (25/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Categories/admin/lessons/{category}")]
         [CustomAuthorization(Roles: "Admin")]
@@ -315,7 +314,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng bài giảng cần lấy </param>
         /// <param name="offset"> Độ lệch bài giảng đầu tiên </param>
         /// <returns></returns>
-        /// Created: PhucTV (25/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Categories/lessons/{category}")]
         [CustomAuthorization(Roles: "User, Admin")]
@@ -332,7 +331,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="limit"> Số lượng bài đăng cần lấy </param>
         /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
         /// <returns></returns>
-        /// Created: PhucTV (25/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Marks/my/lessons")]
         [CustomAuthorization(Roles: "User, Admin")]
@@ -353,7 +352,7 @@ namespace KnowledgeSharingApi.Controllers
         /// </summary>
         /// <param name="model"> thông tin bài giảng mới được tạo ra </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpPost]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -370,7 +369,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="lessonId"> id của bài giảng được cập nhật </param>
         /// <param name="model"> thông tin bài giảng mới được cập nhật </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpPatch("{lessonId}")]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -386,7 +385,7 @@ namespace KnowledgeSharingApi.Controllers
         /// </summary>
         /// <param name="lessonId"> Id của bài giảng cần xóa </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpDelete("{lessonId}")]
         [CustomAuthorization(Roles: "Admin, User")]
@@ -402,7 +401,7 @@ namespace KnowledgeSharingApi.Controllers
         /// </summary>
         /// <param name="model"> thông tin quyền riêng tư mới cần cập nhật </param>
         /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
+        /// Created: PhucTV (28/3/24)
         /// Modified: None
         [HttpPatch("privacy")]
         [CustomAuthorization(Roles: "Admin, User")]

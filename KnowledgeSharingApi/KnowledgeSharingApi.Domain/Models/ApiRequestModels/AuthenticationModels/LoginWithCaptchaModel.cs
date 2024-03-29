@@ -6,20 +6,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
+namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels
 {
-    public class ChangePasswordModel
+    public class LoginWithCaptchaModel
     {
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.USERNAME_EMPTY)]
-        [UsernameValidator(ErrorMessage = ViConstantResource.USERNAME_FORMAT)]
         public string? Username { get; set; }
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.PASSWORD_EMPTY)]
-        [PasswordValidator(ErrorMessage = ViConstantResource.PASSWORD_FORMAT)]
         public string? Password { get; set; }
 
-        [CustomRequiredValidator(ErrorMessage = ViConstantResource.PASSWORD_EMPTY)]
-        [PasswordValidator(ErrorMessage = ViConstantResource.PASSWORD_FORMAT)]
-        public string? NewPassword { get; set; }
+        [CustomRequiredValidator(ErrorMessage = ViConstantResource.ACCESS_TOKEN_EMPTY)]
+        public string? Token { get; set; }
+
+        [CustomRequiredValidator(ErrorMessage = ViConstantResource.ACCESS_CODE_EMPTY)]
+        public string? Captcha { get; set; }
     }
 }
