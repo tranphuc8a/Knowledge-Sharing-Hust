@@ -6,15 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
+namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels
 {
-    public class LoginModel
+    public class ActiveCodeForgotPasswordModel : ActiveCodeModel
     {
-        [CustomRequiredValidator(ErrorMessage = ViConstantResource.USERNAME_EMPTY)]
-        public string? Username { get; set; }
-
-
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.PASSWORD_EMPTY)]
-        public string? Password { get; set; }
+        [PasswordValidator(ErrorMessage = ViConstantResource.PASSWORD_FORMAT)]
+        public string? NewPassword { get; set; }
+
     }
 }

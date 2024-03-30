@@ -1,21 +1,19 @@
 ﻿using KnowledgeSharingApi.Domains.Annotations.Validators;
 using KnowledgeSharingApi.Domains.Resources.Vietnamese;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
+namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CourseRelationModels
 {
-    public class UpdateConversationModel
+    public class DeleteRegisterModel
     {
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
-        public Guid ConversationId { get; set; }
+        public Guid? UserId { get; set; }
 
-        public string? ConversationName { get; set; } = string.Empty;
-
-        public IFormFile? Thumbnail { get; set; }
+        [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
+        public Guid? CourseId { get; set; }
     }
 }

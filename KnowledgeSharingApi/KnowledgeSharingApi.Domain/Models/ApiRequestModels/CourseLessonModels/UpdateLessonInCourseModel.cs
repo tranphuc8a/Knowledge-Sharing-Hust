@@ -6,17 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
+namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CourseLessonModels
 {
-    public class ReplyMessageModel
+    public class UpdateLessonInCourseModel
     {
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
-        public Guid ConversationId { get; set; }
-
-        [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
-        public Guid ReplyId { get; set; }
+        public Guid? ParticipantId { get; set; }
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.CONTENT_EMPTY)]
-        public string? Content { get; set; }
+        public int? Offset { get; set; }
+
+        [CustomRequiredValidator(ErrorMessage = ViConstantResource.CONTENT_EMPTY)]
+        public string? LessonTitle { get; set; }
     }
 }

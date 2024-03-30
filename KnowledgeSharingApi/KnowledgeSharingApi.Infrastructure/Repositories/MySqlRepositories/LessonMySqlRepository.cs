@@ -23,7 +23,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             using var transaction = await DbContext.BeginTransaction();
             try
             {
-                // Xóa các Course lesson trước
+                // Xóa các Member lesson trước
                 IQueryable<CourseLesson> courseLessons = DbContext.CourseLessons
                     .Where(cl => cl.LessonId == lessonId);
                 DbContext.CourseLessons.RemoveRange(courseLessons);

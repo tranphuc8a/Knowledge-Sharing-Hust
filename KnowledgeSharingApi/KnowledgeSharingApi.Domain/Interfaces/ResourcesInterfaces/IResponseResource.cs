@@ -190,6 +190,8 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces
         string CaptchaCreated();
         string LimitLoginTime(); // "Đăng nhập quá số lần cho phép"
         string InvalidCaptcha();
+        string CoursePaymentEmailSubject();
+        string CoursePaymentEmailContent(string code, int durationInMinutes = 3);
         #endregion
 
     }

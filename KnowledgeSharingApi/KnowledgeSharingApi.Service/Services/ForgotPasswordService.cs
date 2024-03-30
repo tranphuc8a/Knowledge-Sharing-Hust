@@ -1,7 +1,7 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
-using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Caches;
@@ -34,15 +34,12 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiểm tra email phải đã tồn tại trong cơ sở dữ liệu rồi
             _ = await userRepository.GetByEmail(email!)
-                ?? throw new ValidatorException(responseResource.NotExistUser());
+                ?? throw new ValidatorException(ResponseResource.NotExistUser());
         }
 
 
-        public override async Task<ServiceResult> Action(ActiveCodeModel codeModel)
+        protected override async Task<ServiceResult> ActionHook(ActiveCodeModel codeModel)
         {
-            // Verify code
-            await CheckActiveCode(codeModel);
-
             // Kiểm tra codeModel phải là ActiveCodeForgotPassModel
             if (codeModel is ActiveCodeForgotPasswordModel model)
             {
@@ -50,7 +47,7 @@ namespace KnowledgeSharingApi.Services.Services
                 User? user = await userRepository.GetByEmail(model.Email!);
                 if (user == null)
                 {
-                    return ServiceResult.ServerError(responseResource.NotExistUser());
+                    return ServiceResult.ServerError(ResponseResource.NotExistUser());
                 }
 
                 // OK, thực hiện reset password
@@ -76,15 +73,15 @@ namespace KnowledgeSharingApi.Services.Services
                 int updated = await userRepository.UpdatePassword(username, newPassword);
                 if (updated <= 0)
                 {
-                    return ServiceResult.ServerError(responseResource.ResetPasswordFailure());
+                    return ServiceResult.ServerError(ResponseResource.ResetPasswordFailure());
                 }
                 
-                return ServiceResult.Success(responseResource.ChangePasswordSuccess());
+                return ServiceResult.Success(ResponseResource.ChangePasswordSuccess());
             }
             catch (Exception error)
             {
                 return ServiceResult.ServerError(
-                    responseResource.ResetPasswordFailure(),
+                    ResponseResource.ResetPasswordFailure(),
                     error.Message,
                     error.ToString()
                 );
@@ -93,7 +90,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         protected override string EmailContent(string verifyCode)
         {
-            return responseResource.ForgotPasswordEmailContent(verifyCode);
+            return ResponseResource.ForgotPasswordEmailContent(verifyCode);
         }
     }
 }

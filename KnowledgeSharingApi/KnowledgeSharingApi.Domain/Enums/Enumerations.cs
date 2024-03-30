@@ -232,4 +232,27 @@ namespace KnowledgeSharingApi.Domains.Enums
         Invite = 1
     }
 
+
+    /// <summary>
+    /// Các lại vai trò của một user thường với một khóa học
+    /// </summary>
+    /// Created: PhucTV (29/3/24)
+    /// Modified: None
+    public enum ECourseRoleType
+    {
+        // Không có quyền truy cập
+        // Khóa học private và không có bất kỳ quan hệ nào (member|invite)
+        InAccessible = 0,
+
+        // Chỉ được phép xem trang thông tin giới thiệu khóa học
+        // Chưa đăng ký, khóa học public hoặc (khóa học private + được chủ khóa học invite)
+        Guest = 1,
+
+        // Được phép truy cập mọi tài nguyên trong khóa học
+        // Đã đăng ký là thành viên khóa học
+        Member = 2,
+
+        // Chủ nhân của khóa học
+        Owner = 3
+    }
 }

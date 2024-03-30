@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
+﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         public double? AverageStars { get; set; }
         public double? MyStars { get; set; }
         public int TotalStars { get; set; }
+        public ECourseRoleType Role { get; set; }
     }
 }

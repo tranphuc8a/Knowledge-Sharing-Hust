@@ -1,6 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
-using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
 using KnowledgeSharingApi.Services.Filters;

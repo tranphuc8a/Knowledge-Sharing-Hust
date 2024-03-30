@@ -1,4 +1,4 @@
-﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         public Task CheckEmailIsValid(string? email);
 
         /// <summary>
-        /// Thực hiện verify email, tạo random code và gửi code tới email
+        /// Thực hiện verify email, tạo Random code và gửi code tới email
         /// </summary>
         /// <param name="email"> email cần gửi code </param>
         /// <returns></returns>

@@ -74,6 +74,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         DbSet<ViewCourse> ViewCourses {get; set;}
         DbSet<CourseLesson> CourseLessons {get; set;}
         DbSet<CoursePayment> CoursePayments {get; set;}
+        DbSet<ViewCoursePayment> ViewCoursePayments {get; set;}
         DbSet<CourseRegister> CourseRegisters {get; set;}
         DbSet<ViewCourseRegister> ViewCourseRegisters {get; set;}
         DbSet<CourseRelation> CourseRelations {get; set;}

@@ -10,6 +10,8 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
 {
     public interface ICourseRepository : IRepository<Course>
     {
+        #region Course Register
+
         /// <summary>
         /// Lấy về danh sách user đã đăng ký tham gia khóa học
         /// </summary>
@@ -17,7 +19,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfCourse(Guid courseId);
+        Task<IEnumerable<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId);
 
         /// <summary>
         /// Lấy về danh sách khóa học đã đăng ký của một user
@@ -26,8 +28,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourseRegister>> GetCourseRegisterOfUser(Guid userId);
-
+        Task<IEnumerable<ViewCourseRegister>> GetRegistersOfUser(Guid userId);
 
         /// <summary>
         /// Kiểm tra một user có tham gia khóa học không
@@ -40,5 +41,144 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (24/3/24)
         /// Modified: None
         Task<ViewCourseRegister?> GetViewCourseRegister(Guid userId, Guid courseId); 
+        #endregion
+
+        #region Get View Courses
+
+        /// <summary>
+        /// Kiểm tra khóa học tồn tại và trả về chính khóa học
+        /// </summary>
+        /// <param name="courseId"> id của khóa học cần kiểm tra </param>
+        /// <param name="errorMessage"> Cảnh báo lỗi </param>
+        /// <returns> ViewCourse | throw NotExistedEntityException </returns>
+        /// Created: PhucTV (24/3/24)
+        /// Modified: None
+        Task<ViewCourse> CheckExistedCourse(Guid courseId, string errorMessage);
+
+        /// <summary>
+        /// Lấy về ViewCourse theo id
+        /// </summary>
+        /// <param name="courseId"> id của course cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<ViewCourse?> GetViewCourse(Guid courseId);
+
+        /// <summary>
+        /// Lấy về Danh sách ViewCourse theo danh sách id
+        /// </summary>
+        /// <param name="courseIds"> danh sách id của các khóa học cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse?>> GetViewCourse(Guid[] courseIds);
+
+        /// <summary>
+        /// Lấy về Danh sách view course
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi của trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetViewCourse(int limit, int offset);
+
+        /// <summary>
+        /// Lấy về Danh sách view course
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="limit"> Số lượng bản ghi của trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetViewCourse(Guid myUid, int limit, int offset);
+
+        /// <summary>
+        /// Lấy về Danh sách view course công khai
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi của trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetPublicViewCourse(int limit, int offset);
+
+        /// <summary>
+        /// Lấy về Danh sách view course công khai của một user
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetPublicViewCourseOfUser(Guid userId);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một user (cho admin)
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetViewCourseOfUser(Guid userId);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một user cho một user khác
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetViewCourseOfUser(Guid myUid, Guid userId);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một catefories
+        /// </summary>
+        /// <param name="catName"> tên category muốn lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetViewCourseOfCategory(string catName, int limit, int offset);
+
+        /// <summary>
+        /// Lấy về Danh sách view course public của một catefories
+        /// </summary>
+        /// <param name="catName"> tên category muốn lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetPublicViewCourseOfCategory(string catName, int limit, int offset);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một catefories theo user
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="catName"> tên category muốn lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetViewCourseOfCategory(Guid myUid, string catName, int limit, int offset);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một user đã mark
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<IEnumerable<ViewCourse>> GetMarkedCoursesOfUse(Guid userId, int limit, int offset);
+
+        #endregion
+
+
     }
 }

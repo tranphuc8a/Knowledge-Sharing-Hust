@@ -12,8 +12,8 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
     public class CourseRelation : Entity
     {
         public Guid CourseRelationId { get; set; }
-        public Guid Sender { get; set; }
-        public Guid Receiver { get; set; }
+        public Guid SenderId { get; set; }
+        public Guid ReceiverId { get; set; }
         public Guid CourseId { get; set; }
         public ECourseRelationType CourseRelationType { get; set; }
 

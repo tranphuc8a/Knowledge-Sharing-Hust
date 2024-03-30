@@ -6,14 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
+namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels
 {
-    public class UpdateUserConversationModel
+    public class ActiveCodePaymentCourseModel : ActiveCodeModel
     {
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
-        public Guid UserConversationId { get; set; }
-
-        [CustomRequiredValidator(ErrorMessage = ViConstantResource.NAME_EMPTY)]
-        public string? NickName { get; set; }
+        public Guid? CourseId { get; set; }
     }
 }

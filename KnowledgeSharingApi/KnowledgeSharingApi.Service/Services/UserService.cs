@@ -333,7 +333,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (profile == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
 
             // Upload file ảnh ra storage và lấy về url của ảnh
-            string coverUrl = await Storage.SaveImage(cover);
+            string? coverUrl = await Storage.SaveImage(cover);
             if (coverUrl == null) return ServiceResult.BadRequest(ResponseResource.UpdateFailure());
 
             // Cập nhật url của cover image vào database

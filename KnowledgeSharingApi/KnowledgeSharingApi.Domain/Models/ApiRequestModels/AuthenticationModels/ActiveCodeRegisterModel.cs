@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
+namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels
 {
     public class ActiveCodeRegisterModel : ActiveCodeModel
     {

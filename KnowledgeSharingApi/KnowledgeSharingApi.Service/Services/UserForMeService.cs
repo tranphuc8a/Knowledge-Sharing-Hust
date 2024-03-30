@@ -15,12 +15,12 @@
 //{
 //    public class UserForMeService(
 //            IDbContext dbContext,
-//            IResourceFactory resourceFactory
+//            IResourceFactory ResourceFactory
 //        ) : IUserService
 //    {
 //        protected IDbContext DbContext = dbContext;
-//        protected IResourceFactory ResourceFactory = resourceFactory;
-//        protected IResponseResource ResponseResource = resourceFactory.GetResponseResource();
+//        protected IResourceFactory ResourceFactory = ResourceFactory;
+//        protected IResponseResource ResponseResource = ResourceFactory.GetResponseResource();
 
 //        public virtual Task<ServiceResult> GetUserLessons(string userId, int? limit, int? offset)
 //        {
@@ -69,7 +69,7 @@
 
 //        public Task<ServiceResult> GetUserRegisteredCourses(string userId, int? limit, int? offset)
 //        {
-//            IEnumerable<Course> registeresCourses =
+//            IEnumerable<Member> registeresCourses =
 //                from course in DbContext.Courses
 //                join courseRegister in DbContext.CourseRegisters
 //                on course.UserItemId equals courseRegister.UserItemId
@@ -90,7 +90,7 @@
 //            return Task.FromResult(ServiceResult.Success(
 //                UserMessage: ResponseResource.Success(),
 //                DevMessage: string.Empty,
-//                Data: new PaginationResponseModel<Course>()
+//                Data: new PaginationResponseModel<Member>()
 //                {
 //                    Total = totalCount,
 //                    Offset = offset ?? 0,

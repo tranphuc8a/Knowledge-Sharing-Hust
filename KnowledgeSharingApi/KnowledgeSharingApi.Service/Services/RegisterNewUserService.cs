@@ -1,7 +1,7 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
-using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Caches;
@@ -29,7 +29,7 @@ namespace KnowledgeSharingApi.Services.Services
             IUnitOfWork unitOfWork
         ) : BaseVerifyByEmailService(cache, resourceFactory, emailService), IRegisterNewUserService
     {
-        protected IUserRepository userRepository = userRepository;
+        protected IUserRepository UserRepository = userRepository;
         protected IProfileRepository profileRepository = profileRepository;
         protected IUnitOfWork UnitOfWork = unitOfWork;
 
@@ -42,19 +42,19 @@ namespace KnowledgeSharingApi.Services.Services
             await base.CheckEmailIsValid(email);
 
             // Check email is not in database
-            User? user = await userRepository.GetByEmail(email!);
-            if (user != null) throw new ValidatorException(responseResource.ExistedUser());
+            User? user = await UserRepository.GetByEmail(email!);
+            if (user != null) throw new ValidatorException(ResponseResource.ExistedUser());
         }
 
 
-        public override async Task<ServiceResult> Action(ActiveCodeModel codeModel)
+        protected override async Task<ServiceResult> ActionHook(ActiveCodeModel codeModel)
         {
-            await CheckActiveCode(codeModel);
-
-            ServiceResult insertFailure = ServiceResult.ServerError(responseResource.AddNewUserSuccess());
+            ServiceResult insertFailure = ServiceResult.ServerError(ResponseResource.AddNewUserSuccess());
 
             // Kiểm tra một lần nữa email chưa được đăng ký
-            // ...
+            User? tempUser = await UserRepository.GetByEmail(codeModel.Email!);
+            if (tempUser != null)
+                return ServiceResult.BadRequest(ResponseResource.ExistedUser());
 
             // cast codemodel to ActiveCodeRegisterModel
             if (codeModel is ActiveCodeRegisterModel model)
@@ -69,11 +69,6 @@ namespace KnowledgeSharingApi.Services.Services
 
                 ServiceResult res = await AddNewUser(user, model.Password!, model.FullName!);
 
-                if (res.IsSuccess)
-                {
-                    // Thành công, xóa cache
-                    // ...
-                }
                 return res;
             }
 
@@ -91,21 +86,21 @@ namespace KnowledgeSharingApi.Services.Services
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         protected virtual async Task<ServiceResult> AddNewUser(User user, string password, string fullName)
-        {
-            ValidatorException insertFailedException = new(responseResource.AddNewUserFailure());
+        {       // --> Tốt nhất nên viết vào repository
+            ValidatorException insertFailedException = new(ResponseResource.AddNewUserFailure());
 
             // Begin transaction
             UnitOfWork.BeginTransaction();
-            UnitOfWork.RegisterRepository(userRepository).RegisterRepository(profileRepository);
+            UnitOfWork.RegisterRepository(UserRepository).RegisterRepository(profileRepository);
 
             try
             {
                 // Step 1: Insert user to db
-                Guid? insertId = await userRepository.Insert(user)
+                Guid? insertId = await UserRepository.Insert(user)
                     ?? throw insertFailedException;
 
                 // Step 2: Update password
-                int rowEffects = await userRepository.UpdatePassword(user.Username, password);
+                int rowEffects = await UserRepository.UpdatePassword(user.Username, password);
                 if (rowEffects <= 0) throw insertFailedException;
 
                 // Step 3: Insert Profile
@@ -125,12 +120,12 @@ namespace KnowledgeSharingApi.Services.Services
             }
 
             // return success
-            return ServiceResult.Success(responseResource.AddNewUserSuccess());
+            return ServiceResult.Success(ResponseResource.AddNewUserSuccess());
         }
 
         protected override string EmailContent(string verifyCode)
         {
-            return responseResource.RegistrationEmailContent(verifyCode);
+            return ResponseResource.RegistrationEmailContent(verifyCode);
         }
     }
 }

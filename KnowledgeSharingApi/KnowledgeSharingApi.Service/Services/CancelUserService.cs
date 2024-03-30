@@ -1,6 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
-using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Caches;
@@ -30,25 +30,22 @@ namespace KnowledgeSharingApi.Services.Services
         protected override string EmailSubject { get; set; } = resourceFactory.GetResponseResource().CancelUserEmailSubject();
         protected readonly IUserRepository UserRepository = userRepository;
 
-        public override async Task<ServiceResult> Action(ActiveCodeModel codeModel)
+        protected override async Task<ServiceResult> ActionHook(ActiveCodeModel codeModel)
         {
-            // Step 1. Verify code
-            await CheckActiveCode(codeModel);
-
-            // Step 2. Kiểm tra lại email phải có tồn tại
+            // Step 1. Kiểm tra lại email phải có tồn tại
             User? user = await UserRepository.GetByEmail(codeModel.Email!);
-            if (user == null) return ServiceResult.BadRequest(responseResource.NotExistUser());
+            if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
 
-            // Step 3. Thực hiện xóa tài khoản back ground
+            // Step 2. Thực hiện xóa tài khoản back ground
             _ = DoDeleteUserBackground(user!);
 
-            // Step 4. Trả về thành công
-            return ServiceResult.Success(responseResource.CancelUserSuccess());
+            // Step 3. Trả về thành công
+            return ServiceResult.Success(ResponseResource.CancelUserSuccess());
         }
 
         protected override string EmailContent(string verifyCode)
         {
-            return responseResource.CancelUserEmailContent(verifyCode, VerifyCodeExpiredInMinutes);
+            return ResponseResource.CancelUserEmailContent(verifyCode, VerifyCodeExpiredInMinutes);
         }
 
         protected virtual Task DoDeleteUserBackground(User user)
@@ -75,10 +72,10 @@ namespace KnowledgeSharingApi.Services.Services
                 Console.WriteLine(ex.ToString());
 
                 // Gửi email thất bại tới user
-                emailService.Send(
+                EmailService.Send(
                     toEmail: user.Email,
-                    subject: responseResource.CancelUserRespomseEmailSubject(),
-                    content: responseResource.CancelUserFailureProcessResponseEmailContent(user.Username)
+                    subject: ResponseResource.CancelUserRespomseEmailSubject(),
+                    content: ResponseResource.CancelUserFailureProcessResponseEmailContent(user.Username)
                 );
             }
             return Task.CompletedTask;

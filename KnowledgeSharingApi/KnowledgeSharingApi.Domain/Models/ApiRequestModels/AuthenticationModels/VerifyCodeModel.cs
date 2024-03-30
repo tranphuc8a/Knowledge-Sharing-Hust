@@ -6,15 +6,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels
+namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels
 {
-    public class ActiveCodeModel
+    public class VerifyCodeModel
     {
-        [EmailValidator(ErrorMessage = ViConstantResource.EMAIL_FORMAT)]
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.EMAIL_EMPTY)]
-        public string Email { get; set; } = string.Empty;
+        [EmailValidator(ErrorMessage = ViConstantResource.EMAIL_FORMAT)]
+        public string? Email { get; set; }
+
+        [CustomRequiredValidator(ErrorMessage = ViConstantResource.VERIFY_CODE_EMPTY)]
+        public string? Code { get; set; }
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ACCESS_CODE_EMPTY)]
-        public string ActiveCode { get; set; } = string.Empty;
+        public string? AccessCode { get; set; }
+
     }
 }
