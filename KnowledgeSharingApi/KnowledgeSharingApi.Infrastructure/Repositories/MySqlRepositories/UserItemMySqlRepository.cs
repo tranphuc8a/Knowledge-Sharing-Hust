@@ -36,7 +36,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             Knowledge? knowledge = await DbContext.Knowledges.FindAsync(userItemId);
             if (knowledge == null) return null;
 
-            // Course
+            // Member
             if (knowledge.KnowledgeType == EKnowledgeType.Course)
             {
                 ViewCourse? course = await DbContext.ViewCourses
@@ -75,7 +75,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             Knowledge? knowledge = await DbContext.Knowledges.FindAsync(userItemId);
             if (knowledge == null) return null;
             
-            // Course
+            // Member
             if (knowledge.KnowledgeType == EKnowledgeType.Course)
             {
                 return await DbContext.ViewCourses

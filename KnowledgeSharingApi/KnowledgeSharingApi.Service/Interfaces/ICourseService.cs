@@ -201,10 +201,12 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Yêu cầu user get về danh sách khóa học mà mình đã đăng ký
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyRegisteredCourses(Guid myUid);
+        Task<ServiceResult> UserGetMyRegisteredCourses(Guid myUid, int? limit, int? offset);
 
 
         #endregion

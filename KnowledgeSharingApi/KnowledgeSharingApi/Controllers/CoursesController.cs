@@ -297,15 +297,17 @@ namespace KnowledgeSharingApi.Controllers
         /// <summary>
         /// Yêu cầu user get về danh sách khóa học mà mình đã đăng ký
         /// </summary>
+        /// <param name="limit"> Kích thước trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         [HttpGet("my/registered-courses")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetMyRegisteredCourse()
+        public async Task<IActionResult> UserGetMyRegisteredCourse(int? limit, int? offset)
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserGetMyRegisteredCourses(Guid.Parse(myUid)));
+            return StatusCode(await CourseService.UserGetMyRegisteredCourses(Guid.Parse(myUid), limit, offset));
         }
 
         #endregion

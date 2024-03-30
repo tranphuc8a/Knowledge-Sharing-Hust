@@ -49,7 +49,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSession();
 
 
-// Sử dụng memory cache:
+// Sử dụng memory Cache:
 builder.Services.AddMemoryCache();
 builder.Services.AddDistributedMemoryCache();
 
@@ -140,6 +140,9 @@ builder.Services.AddScoped<ICommentRepository, CommentMySqlRepository>();
 builder.Services.AddScoped<IStarRepository, StarMySqlRepository>();
 builder.Services.AddScoped<IUserItemRepository, UserItemMySqlRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonMySqlRepository>();
+builder.Services.AddScoped<ICourseRegisterRepository, CourseRegisterMySqlRepository>();
+builder.Services.AddScoped<ICourseRelationRepository, CourseRelationMySqlRepository>();
+builder.Services.AddScoped<ICoursePaymentRepository, CoursePaymentMySqlRepository>();
 
 
 
@@ -164,6 +167,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IKnowledgeService, KnowledgeService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IStarService, StarService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
 
 
 //

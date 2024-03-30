@@ -78,6 +78,7 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         public const string EXISTED_EMPLOYEE_CODE = "Mã nhân viên đã tồn tại trong hệ thống";
         public const string EXISTED_PHONE_NUMBER = "Số điện thoại đã tồn tại trong hệ thống";
         public const string NOT_EXISTED_KEY_CACHE = "Khóa cache đã hết hạn hoặc không tồn tại";
+        public const string INVALID_EMAIL = "Email không hợp lệ";
 
         public const string SERVER_ERROR = "Lỗi máy chủ, vui lòng liên hệ admin để được hỗ trợ.";
         public const string UNAUTHORIZED = "Bạn chưa đăng nhập. Vui lòng đăng nhập để thực hiện chức năng này.";

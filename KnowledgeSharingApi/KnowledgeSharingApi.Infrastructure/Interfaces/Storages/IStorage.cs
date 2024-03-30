@@ -16,7 +16,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Storages
         /// <returns> url của ảnh </returns>
         /// Created: PhucTV (5/3/24)
         /// Modified: None
-        public Task<string> SaveImage(IFormFile image);
+        public Task<string?> SaveImage(IFormFile image);
 
         /// <summary>
         /// Hàm thực hiện lấy Url của ảnh được lưu trữ khi chỉ biết tên ảnh

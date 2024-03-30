@@ -224,7 +224,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (model is not CreateQuestionModel questionModel)
                 throw new NotMatchTypeException();
 
-            // Kiểm tra Course tồn tại và user phài join course
+            // Kiểm tra Member tồn tại và user phài join course
             if (questionModel.CourseId.HasValue)
             {
                 Guid courseId = questionModel.CourseId.Value;

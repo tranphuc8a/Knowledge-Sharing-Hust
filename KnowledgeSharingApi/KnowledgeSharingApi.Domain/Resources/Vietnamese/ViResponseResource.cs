@@ -480,5 +480,18 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
                 $"Cảm ơn bạn đã tham gia,<br> " +
                 $"Đội ngũ <b>Knowledge Sharing</b> ";
         }
+
+        public string CoursePaymentEmailSubject()
+        {
+            return $"Mã xác minh thanh toán khóa học Knowledge Sharing";
+        }
+
+        public string CoursePaymentEmailContent(string code, int durationInMinutes = 3)
+        {
+            return $"Bạn vừa gửi yêu cầu thanh toán một khóa học trên Knowledge Sharing. <br/> " +
+                    $"Nhập mã <h1>{code}</h1> để xác minh thanh toán. <br/> " +
+                    $"Lưu ý không để lộ mã này cho người khác biết. <br/>" +
+                    $"Mã có thời hạn trong {durationInMinutes} phút.";
+        }
     }
 }

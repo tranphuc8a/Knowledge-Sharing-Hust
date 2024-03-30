@@ -79,7 +79,7 @@ namespace KnowledgeSharingApi.Services.Services
             CheckLoginAttackCacheDto? cacheModel = CacheGet(username);
             if (cacheModel == null)
             {
-                // Lần đầu đăng nhập, khởi tạo cache và lưu lại, cho pass
+                // Lần đầu đăng nhập, khởi tạo Cache và lưu lại, cho pass
                 cacheModel = new CheckLoginAttackCacheDto()
                 {
                     Username = username,
@@ -136,7 +136,7 @@ namespace KnowledgeSharingApi.Services.Services
             bool isPasswordValid = await userRepository.CheckPassword(user.Username, userLogin.Password!);
             if (!isPasswordValid)
             {
-                // Cập nhật lại Check login model trong cache, đảm bảo đã có trong cache
+                // Cập nhật lại Check login model trong Cache, đảm bảo đã có trong Cache
                 CheckLoginAttackCacheDto checkLogin = CacheGet(user.Username)!;
                 checkLogin.NumberFailedAttempt++;
                 checkLogin.LastAccessTime = DateTime.Now;

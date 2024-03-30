@@ -1,4 +1,6 @@
-﻿using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -10,21 +12,65 @@ namespace KnowledgeSharingApi.Infrastructures.Storages
 {
     public class FirebaseStorage : IStorage
     {
-        public Task<string?> GetImageUrl(string filename)
+        protected readonly StorageClient storageClient;
+        protected readonly string BucketName;
+        private const string FirebaseStorageBaseUrl = "https://storage.googleapis.com/";
+
+        public FirebaseStorage()
         {
-            //// Tạo bucket Firebase Storage
-            //var bucket = FirebaseAdmin.Storage.Bucket("your-firebase-bucket-name");
+            // Đọc file cấu hình của Firebase từ đường dẫn
+            var googleCredential = GoogleCredential.FromFile("firebase.json");
 
-            //// Lấy URL của file ảnh
-            //var url = await bucket.GetFileDownloadUrlAsync(fileName);
+            // Sử dụng khóa để tạo StorageClient
+            storageClient = StorageClient.Create(googleCredential);
 
-            //return url;
-            throw new NotImplementedException();
+            // Đặt tên cho bucket, nhớ bỏ tiền tố 'gs://'
+            BucketName = "bksnet-e46a7.appspot.com";
         }
 
-        public Task<string> SaveImage(IFormFile image)
+        public async Task<string?> GetImageUrl(string filename)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Tạo URL trực tiếp cho file dựa vào tên bucket và tên file
+                // URL dạng: https://storage.googleapis.com/bucket_name/file_name
+                var url = $"{FirebaseStorageBaseUrl}{BucketName}/{Uri.EscapeDataString(filename)}"; 
+                return await Task.FromResult(url);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu không thể tạo được URL
+                Console.WriteLine($"Error getting image URL: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<string?> SaveImage(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+            {
+                return null;
+            }
+
+            var filename = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+            using var memoryStream = new MemoryStream();
+            await image.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+
+            try
+            {
+                // Cố gắng tải file lên Firebase
+                await storageClient.UploadObjectAsync(BucketName, filename, image.ContentType, memoryStream);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during image upload: {ex.Message}");
+                return null; // Trả về null nếu có lỗi xảy ra trong quá trình upload
+            }
+
+            // Nếu không có lỗi, tạo và trả về URL của file ảnh
+            var imageUrl = await GetImageUrl(filename);
+            return imageUrl;
         }
     }
 }
