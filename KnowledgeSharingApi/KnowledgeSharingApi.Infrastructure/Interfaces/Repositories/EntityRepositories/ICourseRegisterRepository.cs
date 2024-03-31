@@ -28,6 +28,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/3/24)
         /// Modfied: None
-        Task<CourseRegister?> GetCourseRegister(Guid registerId);
+        Task<ViewCourseRegister?> GetCourseRegister(Guid registerId);
     }
 }

@@ -33,6 +33,8 @@ namespace KnowledgeSharingApi.Controllers
             return StatusCode((int)result.StatusCode, new ApiResponse(result));
         }
 
+        #region Functionality methods
+
         /// <summary>
         /// Thực hiện kiểm tra email có trùng khớp với current user hay không
         /// </summary>
@@ -59,7 +61,8 @@ namespace KnowledgeSharingApi.Controllers
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
             return Guid.Parse(myUid);
-        }
+        } 
+        #endregion
 
         #region Admin apies
         /// <summary>
@@ -191,110 +194,9 @@ namespace KnowledgeSharingApi.Controllers
         #endregion
 
 
-        #region Payment course apies
-
-        /// <summary>
-        /// Yêu cầu chủ khóa học lấy về danh sách payment của khóa học
-        /// Owner
-        /// </summary>
-        /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        [HttpGet("payments/{courseId}")]
-        [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetCoursePayments(Guid courseId, int? limit, int? offset)
-        {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseRelationService.UserGetCoursePayments(Guid.Parse(myUid), courseId, limit, offset));
-        }
-
-        /// <summary>
-        /// Yêu cầu user lấy về danh sách các payment mà mình đã thanh toán
-        /// Owner của payments
-        /// </summary>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        [HttpGet("payments/my")]
-        [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetMyPayments(int? limit, int? offset)
-        {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseRelationService.UserGetMyPayments(Guid.Parse(myUid), limit, offset));
-        }
-
-        /// <summary>
-        /// Yêu cầu user lấy về chi tiết một payment
-        /// Owner của payment hoặc owner của course của payment
-        /// </summary>
-        /// <param name="paymentId"> id của payment cần lấy </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        [HttpGet("registers/{paymentId}")]
-        [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetPayment(Guid paymentId)
-        {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseRelationService.UserGetPayment(Guid.Parse(myUid), paymentId));
-        }
-
-
-        /// <summary>
-        /// Yêu cầu user gửi mã xác minh thanh toán khóa học về email
-        /// </summary>
-        /// <param name="email"> email của user cần thanh toán </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        [HttpGet("send-payment-verification-code/{email}")]
-        [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> SendPaymentVerificationCode(string email)
-        {
-            await CheckMatchEmail(email);
-            return StatusCode(await CoursePaymentService.SendVerifyCode(email));
-        }
-
-
-        /// <summary>
-        /// Yêu cầu user kiểm tra mã xác minh thanh toán khóa học
-        /// </summary>
-        /// <param name="model"> thông tin mã xác minh cần kiểm tra </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        [HttpGet("check-payment-verification-code")]
-        [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> CheckPaymentVerificationCode([FromBody] VerifyCodeModel model)
-        {
-            await CheckMatchEmail(model.Email ?? string.Empty);
-            return StatusCode(await CoursePaymentService.CheckVerifyCode(model));
-        }
-
-
-        /// <summary>
-        /// Tiến hành thanh toán và đăng ký khóa học
-        /// </summary>
-        /// <param name="model"> thông tin thanh toán và đăng ký khóa học </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        [HttpGet("pay-course")]
-        [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> CheckPaymentVerificationCode([FromBody] ActiveCodePaymentCourseModel model)
-        {
-            await CheckMatchEmail(model.Email ?? string.Empty);
-            return StatusCode(await CoursePaymentService.Action(model));
-        }
-
-        #endregion
-
         #region User operation apies
+
+        #region Registers
 
         /// <summary>
         /// Yêu cầu user đăng ký tham gia một khóa học miễn phí
@@ -307,24 +209,44 @@ namespace KnowledgeSharingApi.Controllers
         [HttpPost("register/{courseId}")]
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserRegisterCourse(Guid courseId)
-        { 
+        {
             return StatusCode(await CourseRelationService.UserRegisterCourse(GetCurrentUserId(), courseId));
         }
 
         /// <summary>
-        /// Yêu cầu user hủy đăng ký tham gia một khóa học miễn phí
+        /// Yêu cầu user hủy đăng ký tham gia một khóa học
         /// Guest
         /// </summary>
         /// <param name="courseId"> id của khóa học cần hủy đăng ký </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        [HttpPost("register/{courseId}")]
+        [HttpPost("unregister/{courseId}")]
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserUnregisterCourse(Guid courseId)
         {
             return StatusCode(await CourseRelationService.UserUnregisterCourse(GetCurrentUserId(), courseId));
         }
+
+        /// <summary>
+        /// Yêu cầu user kick user khác khỏi khóa học hiện tại của mình
+        /// Sẽ có nhiều điều kiện ràng buộc
+        /// </summary>
+        /// <param name="registerId"> id của phiên user đăng ký khóa học </param>
+        /// <returns></returns>
+        /// Created: PhucTV (29/3/24)
+        /// Modified: None
+        [HttpDelete("register/{registerId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserDeleteRegister(Guid registerId)
+        {
+            return StatusCode(await CourseRelationService.UserDeleteRegister(GetCurrentUserId(), registerId));
+        }
+
+        #endregion
+
+
+        #region Request
 
         /// <summary>
         /// Yêu cầu user yêu cầu tham gia một khóa học
@@ -370,6 +292,10 @@ namespace KnowledgeSharingApi.Controllers
             return StatusCode(await CourseRelationService.UserConfirmCourseRequest(GetCurrentUserId(), requestId, isAccept));
         }
 
+        #endregion
+
+        #region Invite
+
         /// <summary>
         /// Yêu cầu user invite một user khác tham gia khóa học
         /// </summary>
@@ -412,7 +338,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserConfirmInvite(Guid inviteId, bool isAccept)
         {
-            return StatusCode(await CourseRelationService.UserConfirmInvite(GetCurrentUserId(), inviteId, isAccept));
+            return StatusCode(await CourseRelationService.UserConfirmCourseInvite(GetCurrentUserId(), inviteId, isAccept));
         }
 
         /// <summary>
@@ -426,25 +352,10 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserDeleteInvite(Guid inviteId)
         {
-            return StatusCode(await CourseRelationService.UserDeleteInvite(GetCurrentUserId(), inviteId));
+            return StatusCode(await CourseRelationService.UserDeleteCourseInvite(GetCurrentUserId(), inviteId));
         }
 
-        /// <summary>
-        /// Yêu cầu user kick user khác khỏi khóa học hiện tại của mình
-        /// Sẽ có nhiều điều kiện ràng buộc
-        /// </summary>
-        /// <param name="registerId"> id của phiên user đăng ký khóa học </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        [HttpDelete("register/{registerId}")]
-        [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserDeleteRegister(Guid registerId)
-        {
-            return StatusCode(await CourseRelationService.UserDeleteRegister(GetCurrentUserId(), registerId));
-        }
-
-
+        #endregion
 
         #endregion
     }

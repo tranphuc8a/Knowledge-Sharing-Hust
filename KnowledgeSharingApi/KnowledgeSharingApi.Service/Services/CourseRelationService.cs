@@ -117,11 +117,11 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminDeleteUserFromCourse(Guid registerId)
         {
             // Check register is existed
-            CourseRegister? register = await CourseRegisterRepository.GetCourseRegister(registerId);
+            ViewCourseRegister? register = await CourseRegisterRepository.GetCourseRegister(registerId);
             if (register == null) return ServiceResult.BadRequest(NotExistedMember);
 
             // Check register has payment
-            IEnumerable<CoursePayment> payments =
+            IEnumerable<ViewCoursePayment> payments =
                 await CoursePaymentRepository.GetCoursePayment(register.UserId, register.CourseId);
             if (payments.Any())
                 return ServiceResult.BadRequest("Không thể xóa thành viên đã thanh toán khóa học");
@@ -177,28 +177,6 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetCoursePayments(Guid myUid, Guid courseId, int? limit, int? offset)
-        {
-            // Check course is existed
-            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
-
-            // Check owner
-            if (course.UserId != myUid)
-                return ServiceResult.Forbidden(NotBeCourseOnwner);
-
-            // Get list payment
-            IEnumerable<ViewCoursePayment> listPayments = await CoursePaymentRepository.GetByCourse(courseId);
-
-            // pagination
-            int total = listPayments.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listPayments = listPayments.Skip(offsetValue).Take(limitValue);
-
-            // return success
-            PaginationResponseModel<ViewCoursePayment> res = new(total, limitValue, offsetValue, listPayments);
-            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
-        }
-
         public async Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, int? limit, int? offset)
         {
             // Check course is existed
@@ -245,49 +223,6 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyPayments(Guid myUid, int? limit, int? offset)
-        {
-            // Get list payment
-            IEnumerable<ViewCoursePayment> listPayments = await CoursePaymentRepository.GetByUser(myUid);
-
-            // pagination
-            int total = listPayments.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listPayments = listPayments.Skip(offsetValue).Take(limitValue);
-
-            // return success
-            PaginationResponseModel<ViewCoursePayment> res = new(total, limitValue, offsetValue, listPayments);
-            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
-        }
-
-        public async Task<ServiceResult> UserGetPayment(Guid myUid, Guid paymentId)
-        {
-            // Check payment exist
-            ViewCoursePayment? coursePayment = await CoursePaymentRepository.GetCoursePayment(paymentId);
-            if (coursePayment == null)
-                return ServiceResult.BadRequest(ResponseResource.NotExist(EntityResource.CoursePayment()));
-
-            // Check accessible: owner or owner of course
-            bool isAccessible = false;
-            if (coursePayment.UserId == myUid)
-            {
-                isAccessible = true;
-            }
-            else
-            {
-                Course? course = await CourseRepository.Get(coursePayment.CourseId);
-                if (course != null && course.UserId == myUid)
-                {
-                    isAccessible = true;
-                }
-            }
-            if (!isAccessible) return ServiceResult.Forbidden("Bạn không có quyền truy cập vào hóa đơn thanh toán này");
-
-            // return success
-            return ServiceResult.Success(
-                ResponseResource.GetSuccess(EntityResource.CoursePayment()), string.Empty, coursePayment);
-        }
-
         public async Task<ServiceResult> UserGetRegisters(Guid myUid, Guid courseId, int? limit, int? offset)
         {
             // Check course existed
@@ -315,6 +250,8 @@ namespace KnowledgeSharingApi.Services.Services
 
         #endregion
 
+
+        #region User Operations apies
         #region Requestation
         public async Task<ServiceResult> UserRequestCourse(Guid myUid, Guid courseId)
         {
@@ -328,7 +265,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Check Role is Guest
             ECourseRoleType roleType = await CourseRelationRepository.GetRole(myUid, courseId);
-            if (roleType == ECourseRoleType.InAccessible)
+            if (roleType == ECourseRoleType.NotAccessible)
                 return ServiceResult.Forbidden(NotAccessibleCourse);
             if (roleType == ECourseRoleType.Member)
                 return ServiceResult.BadRequest("Bạn đã tham gia khóa học này rồi");
@@ -410,9 +347,6 @@ namespace KnowledgeSharingApi.Services.Services
 
         #endregion
 
-
-
-
         #region Invitation
 
         public async Task<ServiceResult> UserInviteUserToCourse(Guid myUid, Guid courseId, Guid userId)
@@ -477,7 +411,7 @@ namespace KnowledgeSharingApi.Services.Services
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResult> UserDeleteInvite(Guid myUid, Guid inviteId)
+        public async Task<ServiceResult> UserDeleteCourseInvite(Guid myUid, Guid inviteId)
         {
             // Kiem tra relation ton tai
             CourseRelation? invite = await CourseRelationRepository.Get(inviteId);
@@ -495,7 +429,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public async Task<ServiceResult> UserConfirmInvite(Guid myUid, Guid inviteId, bool isAccept)
+        public async Task<ServiceResult> UserConfirmCourseInvite(Guid myUid, Guid inviteId, bool isAccept)
         {
             // Check course relation is existed
             CourseRelation? courseRelation = await CourseRelationRepository.GetRelation(inviteId);
@@ -524,7 +458,6 @@ namespace KnowledgeSharingApi.Services.Services
         }
         #endregion
 
-
         #region Register
         public async Task<ServiceResult> UserRegisterCourse(Guid myUid, Guid courseId)
         {
@@ -539,7 +472,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiem tra role la Guest
             ECourseRoleType roleType = await CourseRelationRepository.GetRole(myUid, courseId);
-            if (roleType == ECourseRoleType.InAccessible)
+            if (roleType == ECourseRoleType.NotAccessible)
                 return ServiceResult.Forbidden(NotAccessibleCourse);
             if (roleType == ECourseRoleType.Member)
                 return ServiceResult.BadRequest("Bạn đã tham gia khóa học này rồi");
@@ -567,7 +500,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserDeleteRegister(Guid myUid, Guid registerId)
         {
             // Check register is existed
-            CourseRegister? register = await CourseRegisterRepository.GetCourseRegister(registerId);
+            ViewCourseRegister? register = await CourseRegisterRepository.GetCourseRegister(registerId);
             if (register == null) return ServiceResult.BadRequest(NotExistedMember);
 
             // Check is owner of course
@@ -576,7 +509,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden(NotBeCourseOnwner);
 
             // Check register has payment
-            IEnumerable<CoursePayment> payments =
+            IEnumerable<ViewCoursePayment> payments =
                 await CoursePaymentRepository.GetCoursePayment(register.UserId, register.CourseId);
             if (payments.Any())
                 return ServiceResult.BadRequest("Không thể xóa thành viên đã thanh toán khóa học");
@@ -606,6 +539,8 @@ namespace KnowledgeSharingApi.Services.Services
             // Tra ve thanh cong
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
+        #endregion
+
         #endregion
     }
 }

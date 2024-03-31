@@ -39,7 +39,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/3/24)
         /// Modfied: None
-        Task<IEnumerable<CoursePayment>> GetCoursePayment(Guid userId, Guid courseId);
+        Task<IEnumerable<ViewCoursePayment>> GetCoursePayment(Guid userId, Guid courseId);
 
         /// <summary>
         /// Thực hiện thanh toán userId cho khóa học courseId

@@ -57,7 +57,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <summary>
         /// Confirm a course relation
         /// </summary>
-        /// <param name="userRelationId"> if cua course relation can confirm </param>
+        /// <param name="userRelationId"> id cua course relation can confirm </param>
         /// <returns></returns>
         /// Created: PhucTV (30/3/24)
         /// Modified: None
