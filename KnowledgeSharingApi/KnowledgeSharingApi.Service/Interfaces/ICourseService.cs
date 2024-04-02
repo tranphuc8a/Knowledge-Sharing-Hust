@@ -186,7 +186,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserGetCourseDetail(Guid myUid, Guid courseId);
 
-
         /// <summary>
         /// Yêu cầu user get về chi tiết khóa học của mình
         /// </summary>
@@ -223,7 +222,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserCreateCourse(Guid myUid, CreateCourseModel model);
 
-
         /// <summary>
         /// Yêu cầu user cập nhật thông tin của một khóa học
         /// </summary>
@@ -235,7 +233,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserUpdateCourse(Guid myUid, Guid courseId, UpdateCourseModel model);
 
-
         /// <summary>
         /// Yêu cầu user xóa khóa học
         /// </summary>
@@ -245,7 +242,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (28/3/24)
         /// Modified: None
         Task<ServiceResult> UserDeleteCourse(Guid myUid, Guid courseId);
-
 
         /// <summary>
         /// Yêu cầu user cập nhật quyền riêng tư của khóa học

@@ -118,18 +118,16 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             if (course.UserId == userId) return ECourseRoleType.Owner;
 
             // Check member:
-            if (DbContext.CourseRegisters
-                .Where(cr => cr.UserId == userId && cr.CourseId == courseId)
-                .Any())
-                return ECourseRoleType.Member;
+            bool isMember = await DbContext.CourseRegisters
+                .AnyAsync(cr => cr.UserId == userId && cr.CourseId == courseId);
+            if (isMember) return ECourseRoleType.Member;
 
             // Check Guest:
             if (course.Privacy == EPrivacy.Public) return ECourseRoleType.Guest;
-            if (DbContext.CourseRelations
-                .Where(relation => relation.CourseRelationType == ECourseRelationType.Invite
-                    && relation.ReceiverId == userId && relation.CourseId == courseId)
-                .Any())
-                return ECourseRoleType.Guest;
+            bool isGuest = await DbContext.CourseRelations
+                .AnyAsync(relation => relation.CourseRelationType == ECourseRelationType.Invite
+                    && relation.ReceiverId == userId && relation.CourseId == courseId);
+            if (isGuest) return ECourseRoleType.Guest;
 
             // other cases: Not accessible
             return ECourseRoleType.NotAccessible;

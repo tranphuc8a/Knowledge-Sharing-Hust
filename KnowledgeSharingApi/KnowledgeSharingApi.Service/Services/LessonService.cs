@@ -367,7 +367,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
 
             // Decorate
-            IEnumerable<ResponseLessonModel> listResLessons = await Decorate(null, lessons.Results);
+            IEnumerable<ResponseLessonModel> listResLessons = await Decorate(myUid, lessons.Results);
 
             // Return Success
             PaginationResponseModel<ResponseLessonModel> res =

@@ -465,18 +465,32 @@ namespace KnowledgeSharingApi.Controllers
         /// <summary>
         /// Yêu cầu user cập nhật danh sách bài học trong khóa học
         /// </summary>
-        /// <param name="listParticipantIds"> Danh sách id của course-lesson cần xóa </param>
+        /// <param name="model"> Thông tin cập nhật danh sách khóa học trong bài học </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         [HttpPatch("list-lessons")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserUpdateListLessonInCourse([FromBody] UpdateListLessonInCourseModel model)
+        public async Task<IActionResult> UserUpdateListLessonInCourse([FromBody] IEnumerable<UpdateLessonInCourseModel> model)
         {
             string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
             return StatusCode(await CourseLessonService.UpdateListLessonInCourse(Guid.Parse(myUid), model));
         }
 
+        /// <summary>
+        /// Yêu cầu user cập nhật thứ tự các bài học trong khóa học
+        /// </summary>
+        /// <param name="listParticipantIds"> Danh sách id của course-lesson theo thứ tự cần sắp xếp </param>
+        /// <returns></returns>
+        /// Created: PhucTV (01/04/24)
+        /// Modified: None
+        [HttpPatch("update-offsets")]
+        [CustomAuthorization(Roles: "Admin, User")]
+        public async Task<IActionResult> UserUpdateOffsetOfListLessonInCourse([FromBody] Guid[] listParticipantIds)
+        {
+            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            return StatusCode(await CourseLessonService.UpdateOffsetOfListLessonInCourse(Guid.Parse(myUid), listParticipantIds));
+        }
 
         #endregion
     }
