@@ -13,7 +13,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         [ResponseUserItemConverter]
         public ResponseLessonModel? Lesson { get; set; }
 
-        [ResponseUserItemConverter]
-        public ResponseCourseModel? Course { get; set; }
+        public ResponseCourseCardModel? Course { get; set; }
     }
 }
