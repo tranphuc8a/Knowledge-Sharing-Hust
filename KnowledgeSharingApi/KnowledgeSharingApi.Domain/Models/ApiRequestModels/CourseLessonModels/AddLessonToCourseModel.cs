@@ -15,10 +15,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CourseLessonModels
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ID_EMPTY)]
         public Guid? LessonId { get; set; }
-
-        [CustomRequiredValidator(ErrorMessage = ViConstantResource.CONTENT_EMPTY)]
-        public int? Offset { get; set; }
-
+        
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.CONTENT_EMPTY)]
         public string? LessonTitle { get; set; }
     }

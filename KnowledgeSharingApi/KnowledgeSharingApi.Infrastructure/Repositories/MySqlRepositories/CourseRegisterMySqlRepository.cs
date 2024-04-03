@@ -3,6 +3,7 @@ using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +15,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class CourseRegisterMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<CourseRegister>(dbContext), ICourseRegisterRepository
     {
-        public Task<CourseRegister?> GetCourseRegister(Guid registerId)
+        public async Task<ViewCourseRegister?> GetCourseRegister(Guid registerId)
         {
-            throw new NotImplementedException();
+            return await DbContext.ViewCourseRegisters.FindAsync(registerId);
         }
 
-        public Task<IEnumerable<ViewCourseRegister>> GetCourseRegisters(Guid courseId)
+        public async Task<IEnumerable<ViewCourseRegister>> GetCourseRegisters(Guid courseId)
         {
-            throw new NotImplementedException();
+            return await DbContext.ViewCourseRegisters
+                .Where(cr => cr.CourseId == courseId)
+                .OrderByDescending(cr => cr.CreatedTime)
+                .ToListAsync();
         }
     }
 }

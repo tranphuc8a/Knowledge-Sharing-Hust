@@ -262,7 +262,7 @@ namespace KnowledgeSharingApi.Services.Services
             PaginationResponseModel<ViewComment> comments =
                 await CommentRepository.GetRepliesOfComment(commentId, limit ?? DefaultLimit, offset ?? 0);
 
-            // Decorate
+            // DecorateResponseLessonModel
             PaginationResponseModel<ResponseCommentModel> res = new()
             {
                 Total = comments.Total,
@@ -351,7 +351,7 @@ namespace KnowledgeSharingApi.Services.Services
             PaginationResponseModel<ViewComment> comments =
                 await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
 
-            // Decorate comments
+            // DecorateResponseLessonModel comments
             PaginationResponseModel<ResponseCommentModel> res = new()
             {
                 Total = comments.Total,
@@ -381,7 +381,7 @@ namespace KnowledgeSharingApi.Services.Services
             PaginationResponseModel<ViewComment> comments =
                 await CommentRepository.GetCommentsOfUserInKnowledge(userId, knowledgeId, limit ?? DefaultLimit, offset ?? 0);
 
-            // Decorate bình luận
+            // DecorateResponseLessonModel bình luận
             PaginationResponseModel<ResponseCommentModel> res = new()
             {
                 Total = comments.Total,
@@ -440,7 +440,7 @@ namespace KnowledgeSharingApi.Services.Services
             listComments = listComments.Where(comment => IsSimiliar(comment.Content, search))
                 .Skip(offsetValue).Take(limitValue);
 
-            // Decorate
+            // DecorateResponseLessonModel
             IEnumerable<ResponseCommentModel> res = await Decorate(myUid, listComments, isDecorateReplies: true);
 
             // Trả về thành công

@@ -26,6 +26,7 @@ namespace KnowledgeSharingApi.Services.Services
         #region Attributes
         protected readonly ICache Cache = cache;
         protected readonly IResourceFactory ResourceFactory = resourceFactory;
+        protected readonly IEntityResource EntityResource = resourceFactory.GetEntityResource();
         protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
         protected readonly IEmail EmailService = emailService;
         protected readonly Random Random = new();

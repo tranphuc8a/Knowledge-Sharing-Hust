@@ -242,7 +242,7 @@ namespace KnowledgeSharingApi.Domains.Enums
     {
         // Không có quyền truy cập
         // Khóa học private và không có bất kỳ quan hệ nào (member|invite)
-        InAccessible = 0,
+        NotAccessible = 0,
 
         // Chỉ được phép xem trang thông tin giới thiệu khóa học
         // Chưa đăng ký, khóa học public hoặc (khóa học private + được chủ khóa học invite)

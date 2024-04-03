@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationModels;
+using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
@@ -26,6 +27,9 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly ICoursePaymentRepository CoursePaymentRepository;
         protected readonly ICourseRepository CourseRepository;
 
+        protected readonly string CourseResource, NotExistedCourse;
+        protected readonly int DefaultLimit = 20;
+
         public CoursePaymentService(
             ICache cache,
             IResourceFactory resourceFactory,
@@ -42,7 +46,12 @@ namespace KnowledgeSharingApi.Services.Services
             UserRepository = userRepository;
             VerifyCodeType = EVerifyCodeType.Payment;
             EmailSubject = ResponseResource.CoursePaymentEmailSubject();
+
+            CourseResource = EntityResource.Course();
+            NotExistedCourse = ResponseResource.NotExist(CourseResource);
         }
+
+        #region User payments
 
         public override async Task CheckEmailIsValid(string? email)
         {
@@ -50,7 +59,7 @@ namespace KnowledgeSharingApi.Services.Services
             await base.CheckEmailIsValid(email);
 
             // Lấy về user phải tồn tại
-            User? user = await UserRepository.GetByEmail(email!) 
+            User? user = await UserRepository.GetByEmail(email!)
                 ?? throw new ValidatorException(ResponseResource.NotExistUser());
         }
 
@@ -78,7 +87,6 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success());
         }
 
-        
         /// <summary>
         /// Kiểm tra xem user có thể thanh toán khóa học course hay không
         /// </summary>
@@ -109,10 +117,80 @@ namespace KnowledgeSharingApi.Services.Services
             // Số dư còn lại >= Phí tham gia khóa học (bỏ qua)
         }
 
-
         protected override string EmailContent(string verifyCode)
         {
             return ResponseResource.CoursePaymentEmailContent(verifyCode);
         }
+
+        #endregion
+
+        #region User get payments
+
+        public async Task<ServiceResult> UserGetCoursePayments(Guid myUid, Guid courseId, int? limit, int? offset)
+        {
+            // Check course is existed
+            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+
+            // Check owner
+            if (course.UserId != myUid)
+                return ServiceResult.Forbidden("Bạn không phải là chủ của khóa học này");
+
+            // Get list payment
+            IEnumerable<ViewCoursePayment> listPayments = await CoursePaymentRepository.GetByCourse(courseId);
+
+            // pagination
+            int total = listPayments.Count();
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            listPayments = listPayments.Skip(offsetValue).Take(limitValue);
+
+            // return success
+            PaginationResponseModel<ViewCoursePayment> res = new(total, limitValue, offsetValue, listPayments);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public async Task<ServiceResult> UserGetMyPayments(Guid myUid, int? limit, int? offset)
+        {
+            // Get list payment
+            IEnumerable<ViewCoursePayment> listPayments = await CoursePaymentRepository.GetByUser(myUid);
+
+            // pagination
+            int total = listPayments.Count();
+            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            listPayments = listPayments.Skip(offsetValue).Take(limitValue);
+
+            // return success
+            PaginationResponseModel<ViewCoursePayment> res = new(total, limitValue, offsetValue, listPayments);
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+        
+        public async Task<ServiceResult> UserGetPayment(Guid myUid, Guid paymentId)
+        {
+            // Check payment exist
+            ViewCoursePayment? coursePayment = await CoursePaymentRepository.GetCoursePayment(paymentId);
+            if (coursePayment == null)
+                return ServiceResult.BadRequest(ResponseResource.NotExist(EntityResource.CoursePayment()));
+
+            // Check accessible: owner or owner of course
+            bool isAccessible = false;
+            if (coursePayment.UserId == myUid)
+            {
+                isAccessible = true;
+            }
+            else
+            {
+                Course? course = await CourseRepository.Get(coursePayment.CourseId);
+                if (course != null && course.UserId == myUid)
+                {
+                    isAccessible = true;
+                }
+            }
+            if (!isAccessible) return ServiceResult.Forbidden("Bạn không có quyền truy cập vào hóa đơn thanh toán này");
+
+            // return success
+            return ServiceResult.Success(
+                ResponseResource.GetSuccess(EntityResource.CoursePayment()), string.Empty, coursePayment);
+        }
+
+        #endregion
     }
 }

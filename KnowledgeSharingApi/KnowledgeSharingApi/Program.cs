@@ -10,10 +10,12 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Captcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Emails;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets;
+using KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories;
 using KnowledgeSharingApi.Infrastructures.Storages;
 using KnowledgeSharingApi.Infrastructures.UnitOfWorks;
@@ -143,6 +145,7 @@ builder.Services.AddScoped<ILessonRepository, LessonMySqlRepository>();
 builder.Services.AddScoped<ICourseRegisterRepository, CourseRegisterMySqlRepository>();
 builder.Services.AddScoped<ICourseRelationRepository, CourseRelationMySqlRepository>();
 builder.Services.AddScoped<ICoursePaymentRepository, CoursePaymentMySqlRepository>();
+builder.Services.AddScoped<IDecorationRepository, DecorationRepository>();
 
 
 
@@ -169,6 +172,8 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IStarService, StarService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
+builder.Services.AddScoped<ICourseLessonService, CourseLessonService>();
+
 
 
 //

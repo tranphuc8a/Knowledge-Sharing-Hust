@@ -41,8 +41,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
 
         #endregion
 
-
-
         #region Get APies
 
         /// <summary>
@@ -57,7 +55,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         Task<ServiceResult> UserGetRegisters(Guid myUId, Guid courseId, int? limit, int? offset);
-
 
         /// <summary>
         /// Yêu cầu chủ khóa học lấy về danh sách invite của một khóa học
@@ -85,7 +82,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, int? limit, int? offset);
 
-
         /// <summary>
         /// Yêu cầu chủ khóa học lấy về danh sách invite của một khóa học
         /// Owner
@@ -110,52 +106,10 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserGetMyCourseRequests(Guid myUId, int? limit, int? offset);
 
-
         #endregion
 
 
-        #region Payment course apies
-
-        /// <summary>
-        /// Yêu cầu chủ khóa học lấy về danh sách payment của khóa học
-        /// Owner
-        /// </summary>
-        /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        Task<ServiceResult> UserGetCoursePayments(Guid myUid, Guid courseId, int? limit, int? offset);
-
-
-        /// <summary>
-        /// Yêu cầu user lấy về danh sách các payment mà mình đã thanh toán
-        /// Owner của payments
-        /// </summary>
-        /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        Task<ServiceResult> UserGetMyPayments(Guid myUid, int? limit, int? offset);
-
-        /// <summary>
-        /// Yêu cầu user lấy về chi tiết một payment
-        /// Owner của payment hoặc owner của course của payment
-        /// </summary>
-        /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="paymentId"> id của payment cần lấy </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        Task<ServiceResult> UserGetPayment(Guid myUid, Guid paymentId);
-
-        #endregion
-
-        #region User operation apies
+        #region User Register apies
 
         /// <summary>
         /// Yêu cầu user đăng ký tham gia một khóa học miễn phí
@@ -168,7 +122,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserRegisterCourse(Guid myUid, Guid courseId);
 
-
         /// <summary>
         /// Yêu cầu user hủy đăng ký tham gia một khóa học miễn phí
         /// Guest
@@ -180,6 +133,20 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserUnregisterCourse(Guid myUid, Guid courseId);
 
+        /// <summary>
+        /// Yêu cầu user kick user khác khỏi khóa học hiện tại của mình
+        /// Sẽ có nhiều điều kiện ràng buộc
+        /// </summary>
+        /// <param name="myUid"> id của user muốn thực hiện </param>
+        /// <param name="registerId"> id của phiên user đăng ký khóa học </param>
+        /// <returns></returns>
+        /// Created: PhucTV (29/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserDeleteRegister(Guid myUid, Guid registerId);
+
+        #endregion
+
+        #region User Request apies
 
         /// <summary>
         /// Yêu cầu user yêu cầu tham gia một khóa học
@@ -213,6 +180,10 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserConfirmCourseRequest(Guid myUid, Guid requestId, bool isAccept);
 
+        #endregion
+
+        #region User Invite Apies
+
         /// <summary>
         /// Yêu cầu user invite một user khác tham gia khóa học
         /// </summary>
@@ -244,7 +215,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserConfirmInvite(Guid myUid, Guid inviteId, bool isAccept);
+        Task<ServiceResult> UserConfirmCourseInvite(Guid myUid, Guid inviteId, bool isAccept);
 
         /// <summary>
         /// Yêu cầu user xóa lời mời tham gia khóa học
@@ -254,18 +225,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserDeleteInvite(Guid myUid, Guid inviteId);
-
-        /// <summary>
-        /// Yêu cầu user kick user khác khỏi khóa học hiện tại của mình
-        /// Sẽ có nhiều điều kiện ràng buộc
-        /// </summary>
-        /// <param name="myUid"> id của user muốn thực hiện </param>
-        /// <param name="registerId"> id của phiên user đăng ký khóa học </param>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        Task<ServiceResult> UserDeleteRegister(Guid myUid, Guid registerId);
+        Task<ServiceResult> UserDeleteCourseInvite(Guid myUid, Guid inviteId);
 
         #endregion
 
