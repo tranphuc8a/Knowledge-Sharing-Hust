@@ -482,7 +482,7 @@ namespace KnowledgeSharingApi.Services.Services
                 ResponseCourseLessonModel resItem = 
                     (ResponseCourseLessonModel)new ResponseCourseLessonModel().Copy(participant.Item1);
                 resItem.Lesson = (ResponseLessonModel)new ResponseLessonModel().Copy(lesson);
-                resItem.Course = (ResponseCourseModel)new ResponseCourseModel().Copy(participant.Item2);
+                resItem.Course = (ResponseCourseCardModel)new ResponseCourseCardModel().Copy(participant.Item2);
                 return resItem;
             }).ToList();
 

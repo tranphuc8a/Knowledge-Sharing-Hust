@@ -10,7 +10,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 {
     public class ResponseCourseCardModel : Entity
     {
-        public Guid CourseId { get; set; }
+        public Guid UserItemId { get; set; }
 
         public string Title { get; set; } = string.Empty;
 

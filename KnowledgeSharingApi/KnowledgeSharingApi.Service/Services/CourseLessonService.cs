@@ -1,4 +1,6 @@
-﻿using KnowledgeSharingApi.Domains.Enums;
+﻿
+using KnowledgeSharingApi.Domains.Algorithms;
+using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CourseLessonModels;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
@@ -234,6 +236,12 @@ namespace KnowledgeSharingApi.Services.Services
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
             if (course.UserId != myUId)
                 return ServiceResult.Forbidden(NotBeCourseOwner);
+
+            // Kiểm tra listParticipantIds phải là hoán vị của danh sách participant của course:
+            IEnumerable<Guid> courseParticipantIds = (await CourseLessonRepository.GetCourseParticipant(courseId))
+                .Select(cl => cl.CourseLessonId);
+            if (!Algorithm.IsPermutation(courseParticipantIds, listParticipantIds.AsEnumerable()))
+                return ServiceResult.BadRequest("Danh sách yêu cầu không phải là hoán vị của một danh sách bài giảng");
 
             // Thực hiện cập nhật
             int updated = await CourseLessonRepository.UpdateOffsetOfListLessonInCourse(listParticipantIds);
