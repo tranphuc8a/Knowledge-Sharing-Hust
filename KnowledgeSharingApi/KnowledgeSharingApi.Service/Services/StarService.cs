@@ -144,7 +144,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return model;
             });
 
-            // Decorate
+            // DecorateResponseLessonModel
             PaginationResponseModel<ResponseStarModel> res = new()
             {
                 Total = total,
@@ -171,7 +171,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return model;
             });
 
-            // Decorate
+            // DecorateResponseLessonModel
             PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
 
             // Trả về thành công
@@ -192,7 +192,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return model;
             });
 
-            // Decorate
+            // DecorateResponseLessonModel
             PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
 
             // Trả về thành công
@@ -213,7 +213,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return model;
             });
 
-            // Decorate
+            // DecorateResponseLessonModel
             PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
 
             // Trả về thành công
@@ -234,7 +234,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return model;
             });
 
-            // Decorate
+            // DecorateResponseLessonModel
             PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
 
             // Trả về thành công
@@ -249,7 +249,7 @@ namespace KnowledgeSharingApi.Services.Services
             int total = listStars.Count();
             listStars = listStars.Skip(offsetValue).Take(limitValue);
 
-            // Decorate
+            // DecorateResponseLessonModel
             List<ResponseStarModel> res = [];
             foreach (Star star in listStars)
             {

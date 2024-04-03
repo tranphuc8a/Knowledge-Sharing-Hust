@@ -16,6 +16,35 @@ namespace KnowledgeSharingApi.Services.Interfaces
 {
     public interface ICourseLessonService
     {
+        #region Get APIes
+        /// <summary>
+        /// Yêu cầu user lấy về danh sách các bài học đang có trong khóa học
+        /// Owner, Member
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <param name="limit"> Kích thước trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (3/4/24)
+        /// Modified: None
+        Task<ServiceResult> UserGetListCourseParticipants(Guid myUid, Guid courseId, int? limit, int? offset);
+
+        /// <summary>
+        /// Yêu cầu Admin lấy về danh sách các bài học đang có trong khóa học
+        /// Owner, Member
+        /// </summary>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <param name="limit"> Kích thước trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (3/4/24)
+        /// Modified: None
+        Task<ServiceResult> AdminGetListCourseParticipants(Guid courseId, int? limit, int? offset);
+        #endregion
+
+        #region Create apies
+
         /// <summary>
         /// Yêu cầu user thêm một bài giảng vào một khóa học
         /// </summary>
@@ -36,8 +65,10 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         Task<ServiceResult> AddListLessonToCourse(Guid myUid, AddListLessonToCourseModel model);
+        #endregion
 
 
+        #region Delete apies
         /// <summary>
         /// Yêu cầu user xóa một bài học khỏi khóa học
         /// </summary>
@@ -58,7 +89,9 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> DeleteListLessonFromCourse(Guid myUid, IEnumerable<Guid> listParticipantIds);
 
+        #endregion
 
+        #region Update apies
         /// <summary>
         /// Yêu cầu user cập nhật thông tin một bài học trong khóa học
         /// </summary>
@@ -88,6 +121,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (01/04/24)
         /// Modified: None
-        Task<ServiceResult> UpdateOffsetOfListLessonInCourse(Guid myUId, Guid[] listParticipantIds);
+        Task<ServiceResult> UpdateOffsetOfListLessonInCourse(Guid myUId, Guid[] listParticipantIds); 
+        #endregion
     }
 }

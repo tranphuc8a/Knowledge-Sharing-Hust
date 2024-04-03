@@ -11,6 +11,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
 {
     public interface ICourseLessonRepository : IRepository<CourseLesson>
     {
+        #region Create
         /// <summary>
         /// Yêu cầu user thêm một bài giảng vào một khóa học
         /// </summary>
@@ -29,8 +30,10 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         Task<IEnumerable<CourseLesson>?> AddListLessonToCourse(AddListLessonToCourseModel model);
+        #endregion
 
 
+        #region Delete
         /// <summary>
         /// Yêu cầu user xóa một bài học khỏi khóa học
         /// </summary>
@@ -48,8 +51,22 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         Task<int> DeleteListLessonFromCourse(IEnumerable<Guid> listParticipantIds);
+        #endregion
 
+        #region Get
 
+        /// <summary>
+        /// Lay ve toan bo bai giang trong mot khoa hoc cu the
+        /// </summary>
+        /// <param name="courseId"> id cua khoa hoc muon lay</param>
+        /// <returns></returns>
+        /// Created: PhucTV (3/4/24)
+        /// Modified: None
+        Task<IEnumerable<CourseLesson>> GetCourseParticipant(Guid courseId);
+        
+        #endregion
+
+        #region Update
         /// <summary>
         /// Yêu cầu user cập nhật thông tin một bài học trong khóa học
         /// </summary>
@@ -76,6 +93,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (01/04/24)
         /// Modified: None
-        Task<int> UpdateOffsetOfListLessonInCourse(Guid[] listParticipantIds);
+        Task<int> UpdateOffsetOfListLessonInCourse(Guid[] listParticipantIds); 
+        #endregion
     }
 }

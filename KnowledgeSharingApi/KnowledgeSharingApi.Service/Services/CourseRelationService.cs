@@ -147,7 +147,7 @@ namespace KnowledgeSharingApi.Services.Services
             int total = registers.Count();
             registers = registers.Skip(offsetValue).Take(limitValue);
 
-            // Decorate (lam sau)
+            // DecorateResponseLessonModel (lam sau)
 
             // Return Success
             PaginationResponseModel<ViewCourseRegister> res = new(total, limitValue, offsetValue, registers);
@@ -241,7 +241,7 @@ namespace KnowledgeSharingApi.Services.Services
             int total = registers.Count();
             registers = registers.Skip(offsetValue).Take(limitValue);
 
-            // Decorate (lam sau)
+            // DecorateResponseLessonModel (lam sau)
 
             // Return Success
             PaginationResponseModel<ViewCourseRegister> res = new(total, limitValue, offsetValue, registers);
