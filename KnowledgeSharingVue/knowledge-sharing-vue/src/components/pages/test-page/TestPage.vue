@@ -1,36 +1,22 @@
 <template>
-    <div :style="{ width: '320px', display: 'flex', flexFlow: 'column', gap: '4px'}">
-        <Button label="Thêm mới" />
-        <Button fa="user-plus"/>
-        <Button fa="user-plus" label="Thêm mới người dùng" state="disabled" />
+    <TestButtonsPage />
 
-        <CancelButton label="Hủy bỏ" />
-        <CancelButton fa="user-minus"/>
-        <CancelButton fa="user-minus" label="Thêm mới người " state="disabled" />
+    <ImageIcon :src="require('@/assets/logo.png')" />
+    <ImageIcon :src="require('@/assets/logo.png')" state="disabled"/>
 
-        <DeleteButton label="Xóa" />
-        <DeleteButton fa="trash-can"/>
-        <DeleteButton fa="trash-can" label="Xóa bỏ người dùng" state="disabled" />
-
-        <LinkButton label="Facebook" href="https://fb.com"/>
-        <LinkButton label="Youtube" href="https://youtube.com" state="disabled" />
-
-        <ComboButton label="Facebook" fa="align-center"/>
-        <ComboButton label="Youtube" fa="align-left" state="disabled" />
-    </div>
+    <ActionIcon fa="close" />
+    <ActionIcon fa="close" state="disabled"/>
 </template>
 
 
 <script>
-import Button from '@/components/base/buttons/MButton.vue';
-import CancelButton from '@/components/base/buttons/MCancelButton';
-import DeleteButton from '@/components/base/buttons/MDeleteButton';
-import LinkButton from '@/components/base/buttons/MLinkButton';
-import ComboButton from '@/components/base/buttons/MComboButton';
+import TestButtonsPage from '@/components/base/buttons/TestButtonsPage.vue';
+import ImageIcon from '@/components/base/icons/MImageIcon.vue';
+import ActionIcon from '@/components/base/icons/MActionIcon'
 
 export default {
     name: 'KSTestPage',
-    components: { Button, CancelButton, DeleteButton, LinkButton, ComboButton },
+    components: { TestButtonsPage, ImageIcon, ActionIcon },
     data(){
         return {
         }

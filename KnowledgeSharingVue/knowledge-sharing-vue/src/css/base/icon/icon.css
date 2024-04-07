@@ -1,5 +1,5 @@
 
-@import url(@/css/base/color.css);
+@import url(@/css/main.css);
 
 .p-icon{
     color: var(--primary-color);
@@ -10,4 +10,37 @@
 .p-spinner-container{
     width: fit-content;
 }
+
+.p-icon-container{
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+    background-color: var(--transparent-color);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.p-icon-container[state='disable']{
+    opacity: 56%;
+}
+.p-icon-container:hover{
+    background-color: var(--grey-color-300);
+}
+.p-icon-container:active{
+    background-color: var(--grey-color-400);
+}
+
+.p-image-icon{
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
+    border-radius: 100%;
+}
+
 

@@ -1,7 +1,5 @@
 <template>
-    <div class="p-spinner-container">
-        <FontAwesomeIcon ref="icon" :icon="['fas', fa]" :style="style" class="p-icon" spin/>
-    </div>
+    <FontAwesomeIcon ref="icon" :icon="['fas', fa]" :style="style" class="p-icon" spin/>
 </template>
 
 <script>
