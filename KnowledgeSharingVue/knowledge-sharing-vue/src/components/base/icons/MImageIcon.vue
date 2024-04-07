@@ -1,7 +1,9 @@
 <template>
+    <!-- Coi Image Icon như một ActionIcon -->
     <div>
-        <div ref="iconContainer" class="p-icon-container" @:click="resolveOnclick">
-            <img ref="iconImage" :src="src" alt="Icon from image" class="p-image-icon">
+        <div ref="iconContainer" class="p-icon-container" :style="containerStyle"
+            @:click="resolveOnclick" :state="state">
+            <img ref="imageIcon" :src="src" alt="Icon from image" :style="iconStyle" class="p-image-icon">
         </div>
     </div>
 </template>
@@ -11,21 +13,6 @@ let icon = {
     name: "ImageIcon",
     data() {
         return {};
-    },
-    mounted() {
-        // css for icon container
-        this.iconContainer = this.$refs.iconContainer;
-        for (let key in this.style){
-            this.iconContainer.style.setProperty(`--icon-container-${key}`, String(this.style[key]));
-        }
-        for (let key in this.containerStyle){
-            this.iconContainer.style.setProperty(`--icon-container-${key}`, String(this.containerStyle[key]));
-        }
-        // CSS for icon image
-        this.iconImage = this.$refs.iconImage;
-        for (let key in this.iconStyle){
-            this.iconImage.style.setProperty(`--image-icon-${key}`, String(this.iconStyle[key]));
-        }
     },
     methods: {
         /**
@@ -40,10 +27,7 @@ let icon = {
         }
     },
     props: {
-        style: {
-            type: Object,
-            default: {}
-        },
+        state: {},
         src: {
             type: String,
             default: ""
@@ -51,10 +35,6 @@ let icon = {
         onclick: {
             type: Function,
             default: () => {}
-        },
-        style: {
-            type: Object,
-            default: {}
         },
         containerStyle: {
             type: Object,

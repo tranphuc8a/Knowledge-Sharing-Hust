@@ -1,7 +1,5 @@
 <template>
-    <div class="p-icon-container">
-        <FontAwesomeIcon ref="icon" :icon="['fas', fa]" :style="style" class="p-icon"/>
-    </div>
+    <FontAwesomeIcon ref="icon" :icon="['fas', fa]" :style="style" class="p-icon"/>
 </template>
 
 <script>
