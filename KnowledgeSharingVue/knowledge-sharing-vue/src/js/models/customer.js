@@ -6,7 +6,7 @@ import { myEnum } from "@/js/resources/enum";
 
 class Customer{
 
-    /*
+    /**
     * Khởi tạo một customer mặc định hoặc từ customer Api
     * @param {option} customerApi - đối tượng customer được lấy về từ API
     * @Author TVPhuc (28/11/23)
@@ -23,7 +23,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Khởi tạo các giá trị mặc định của Input
     * @param none
     * @Author TVPhuc (28/11/23)
@@ -40,14 +40,14 @@ class Customer{
             this.name = "Nguyễn Văn A";
             this.gender = "Nam";
             this.dob = "20/11/2023";
-            this.company = "Công ty cổ phần MISA";
+            this.company = "Công ty cổ phần KS";
             this.debt = "10000";
         } catch (error){
             console.error(error);
         }
     }
 
-    /*
+    /**
     * Trả về một đối tượng table row từ đối tượng hiện tại
     * @param none
     * @Author TVPhuc (28/11/23)
@@ -71,7 +71,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Clone dữ liệu từ một table object
     * @param {*} tableObject - đối tượng table được lấy dữ liệu
     * @Author TVPhuc (28/11/23)
@@ -91,7 +91,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Trả về một đối tượng customer form từ đối tượng hiện tại
     * @param none
     * @Author TVPhuc (19/12/23)
@@ -112,7 +112,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Clone dữ liệu từ một table object
     * @param {*} customerForm - đối tượng table được lấy dữ liệu
     * @Author TVPhuc (28/11/23)
@@ -133,7 +133,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Kiếm tra một giá trị của trường có rỗng hay không
     * @param none
     * @Author TVPhuc (19/12/23)
@@ -148,7 +148,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Định dạng lại dữ liệu
     * @param none
     * @Author TVPhuc (28/11/23)
@@ -168,7 +168,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Clone dữ liệu từ customerApi
     * @param {*} customerApi - đối tượng customer từ Api cần lấy dữ liệu
     * @Author TVPhuc (28/11/23)
@@ -191,7 +191,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Clone dữ liệu sang customerApi Obj
     * @param none
     * @Author TVPhuc (19/12/23)
@@ -236,7 +236,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Trả về định dạng của date
     * @param {*} date - date cần định dạng
     * @Author TVPhuc (28/11/23)
@@ -254,7 +254,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Định dạng lại tiền nợ
     * @param {*} debt - string/number tiền nợ
     * @Author TVPhuc (28/11/23)
@@ -273,7 +273,7 @@ class Customer{
         }
     }
 
-    /*
+    /**
     * Định dạng lại giới tính
     * @param {*} gender - string/number giới tính
     * @Author TVPhuc (28/11/23)

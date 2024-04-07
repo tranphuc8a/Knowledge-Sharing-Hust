@@ -1,0 +1,28 @@
+
+body{
+    margin: 0;
+}
+
+.p-grid-layout-container{
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 200px calc(100% - 200px);
+    grid-template-rows: 56px calc(100vh - 56px);
+}
+
+.p-header{
+    grid-column-start: 1;
+    grid-column-end: 3;
+    background-color: red;
+}
+
+.p-sidebar{
+    background-color: blue;
+}
+
+.p-content{
+    background-color: aqua;
+    margin: 24px 0px 0px 24px;
+}
+

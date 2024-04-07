@@ -1,0 +1,107 @@
+
+.pl-button-frame{
+    width: fit-content;
+    height: fit-content;
+    position: relative;
+    /* position: absolute;
+    right: 24px;
+    top: 24px; */
+    font-family: Roboto,Helvetica,Arial,sans-serif;
+    font-size: 14px;
+}
+
+.pl-button-frame .pl-button{
+    display: flex;
+    width: 120px;
+    height: 32px;
+    flex-flow: row nowrap;
+    border-radius: 4px;
+    color: #f8f8f8;
+    border: 1px solid rgba(255,255,255,.3);
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background-color: rgba(255,255,255,.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    box-sizing: border-box;
+}
+
+.pl-button-frame .pl-button:hover{
+    border: 1px solid #2680eb;
+    background-color: #2680eb;
+}
+
+
+.pl-button .pl-button-left{
+    width: 36px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+} 
+
+.pl-button-left .pl-button-flag{
+    width: 20px;
+    height: 16px;
+}
+
+.pl-button-flag.vietnam{
+    background-image: url(@/assets/login/icon-vi.svg);
+    background-size: cover;
+    background-position: center;
+}
+
+.pl-button-flag.england{
+    background-image: url(@/assets/login/icon-en.svg);
+    background-size: cover;
+    background-position: center;
+}
+
+.pl-button .pl-button-right{
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: hidden;
+}
+
+
+.pl-menu-context{
+    position: absolute;
+    width: 100%;
+    background-color: #ffffff;
+    color: #212121;
+    top: calc(100% + 4px);
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    display: flex;
+    padding: 8px 0px;
+    pad: 4px;
+    border-radius: 4px;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.pl-menu-context .pl-menu-item{
+    height: 32px;
+    line-height: 32px;
+    display: flex;
+    flex-flow: row nowrap;
+    overflow: hidden;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 0px 16px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.pl-menu-context .pl-menu-item:hover{
+    background-color: #f2f2f2;
+}

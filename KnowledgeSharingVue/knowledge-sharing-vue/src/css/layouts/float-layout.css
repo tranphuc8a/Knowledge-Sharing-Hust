@@ -1,0 +1,29 @@
+
+
+body{
+    margin: 0;
+}
+
+.p-header{
+    width: 100%;
+    height: 56px;
+    float: left;
+    background-color: red;
+}
+
+
+.p-sidebar{
+    width: 200px;
+    height: calc(100vh - 56px);
+    float: left;
+    background-color: blue;
+}
+
+.p-content{
+    width: calc(100% - 200px - 24px);
+    height: calc(100vh - 56px - 24px);
+    background-color: aqua;
+    float: left;
+    margin: 24px 0px 0px 24px;
+}
+

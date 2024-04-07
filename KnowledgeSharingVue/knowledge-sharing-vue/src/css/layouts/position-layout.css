@@ -1,0 +1,46 @@
+
+body{
+    margin: 0px;
+}
+
+.p-header{
+    width: 100%;
+    min-width: 1200px;
+    height: 56px;
+    background-color: red;
+    position: fixed;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 16px rgba(23, 27, 42, 0.24);
+}
+
+.p-header ~.p-content{
+    width: calc(100% - 200px);
+}
+
+.p-header[state='collapse'] ~.p-content{
+    width: calc(100% - 200px);
+}
+
+.p-sidebar{
+    background-color: blue;
+    width: 200px;
+    top: 56px;
+    height: calc(100vh - 56px);
+    position: fixed;
+    box-sizing: border-box;
+    transition: width 0.25s;
+}
+
+.p-content{
+    transition: left 0.25s, width .25s;
+    background-color: #E0E0E0;
+    min-width: 1000px;
+    min-height: calc(100vh - 56px);
+    height: calc(100vh - 56px);
+    position: absolute;
+    padding: 24px 24px 24px 24px;
+    top: 56px;
+    left: 200px;
+    box-sizing: border-box;
+}
+

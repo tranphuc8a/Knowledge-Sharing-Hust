@@ -1,0 +1,55 @@
+
+
+:root{
+    --white-color: #FFFFFF;
+    --black-color: #000000;
+
+    --primary-color: #9C27B0;
+    --primary-color-900: #1F0823;
+    --primary-color-800: #3E1046;
+    --primary-color-700: #5E176A;
+    --primary-color-600: #7D1F8D;
+    --primary-color-500: #9C27B0;
+    --primary-color-400: #B052C0;
+    --primary-color-300: #C47DD0;
+    --primary-color-200: #D7A9DF;
+    --primary-color-100: #EBD4EF;
+    --primary-color-50 : #F5EAF7;
+
+    --red-color: #E60000;
+    --red-color-900: #2E0000;
+    --red-color-800: #5C0000;
+    --red-color-700: #8A0000;
+    --red-color-600: #B80000;
+    --red-color-500: #E60000;
+    --red-color-400: #EB3333;
+    --red-color-300: #F06666;
+    --red-color-200: #F59999;
+    --red-color-100: #FACCCC;
+    --red-color-50 : #FCE6E6;
+
+    --grey-color: #9E9E9E;
+    --grey-color-900: #1F1F1F;
+    --grey-color-800: #424242;
+    --grey-color-700: #616161;
+    --grey-color-600: #757575;
+    --grey-color-500: #9E9E9E;
+    --grey-color-400: #BDBDBD;
+    --grey-color-300: #E0E0E0;
+    --grey-color-200: #EEEEEE;
+    --grey-color-100: #F5F5F5;
+    --grey-color-50 : #FAFAFA;
+
+    --blue-grey-color: #607D8B;
+    --blue-grey-color-900: #13191C;
+    --blue-grey-color-800: #263237;
+    --blue-grey-color-700: #3A4B54;
+    --blue-grey-color-600: #4D646F;
+    --blue-grey-color-500: #607D8B;
+    --blue-grey-color-400: #8097A2;
+    --blue-grey-color-300: #A0B1BA;
+    --blue-grey-color-200: #BFCBD0;
+    --blue-grey-color-100: #DFE5E8;
+    --blue-grey-color-50 : #EFF2F4;
+
+}

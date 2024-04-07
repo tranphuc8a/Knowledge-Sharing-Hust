@@ -64,7 +64,7 @@ class Human extends Entity{
         return this;
     }
 
-    /*
+    /**
     * Định dạng lại giới tính
     * @param {*} gender - string/number giới tính
     * @Author TVPhuc (28/11/23)

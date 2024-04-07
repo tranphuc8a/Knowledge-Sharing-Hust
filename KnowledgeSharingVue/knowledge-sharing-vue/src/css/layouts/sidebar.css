@@ -1,0 +1,108 @@
+
+@import url(../base/font.css);
+
+body .p-sidebar{
+    background-color: #041434;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 0px 0px 0px;
+    box-sizing: border-box;
+    font-family: 'KS-font-regular';
+    width: 200px;
+}
+
+.p-sidebar-menu{
+    padding: 0px 12px;
+    max-height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 4px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.p-sidebar-item{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 12px 12px 12px 0px;
+    height: 44px;
+    font-size: 14px;
+    font-family: 'KS-font-semibold';
+    /* color: #869AB8; */
+    color: white;
+    opacity: 75%;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.p-sidebar-item:hover{
+    background-color: rgba(39, 57, 94, 0.54);
+}
+
+.p-sidebar-item.router-link-active,
+.p-sidebar-item:active{
+    background-color: rgba(167, 196, 255, 0.16);
+    /* color: white; */
+    opacity: 100%;
+}
+
+.p-sidebar-item i{
+    margin: 0px 12px;
+}
+
+.p-sidebar-item i::before{
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.p-sidebar-action{
+    width: 100%;
+    border-top: solid #213553 1px;
+    box-sizing: border-box;
+    padding: 0px 12px;
+}
+
+
+
+.p-sidebar:not([state='collapse']){
+    width: 200px;
+}
+.p-sidebar:not([state='collapse']) .p-sidebar-item .p-expand{
+    display: none;
+}
+
+body .p-sidebar[state='collapse']{
+    width: 72px;
+}
+.p-sidebar[state='collapse'] .p-sidebar-item {
+    padding-right: 0px;
+}
+.p-sidebar[state='collapse'] .p-sidebar-item-title,
+.p-sidebar[state='collapse'] .p-sidebar-item .p-collapse{
+    display: none;
+}
+
+
+/* CSS for p-content depend sidebar */
+.p-content:has(~ .p-sidebar[state='collapse']){
+    width: calc(100% - 72px);
+    left: 72px
+}
+
+.p-content:has(~ .p-sidebar:not([state='collapse'])){
+    width: calc(100% - 200px);
+    left: 200px;
+}
+

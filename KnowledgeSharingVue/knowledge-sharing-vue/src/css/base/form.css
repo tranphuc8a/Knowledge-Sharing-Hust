@@ -1,0 +1,43 @@
+
+
+@import url(./textfield.css);
+
+.p-form-container{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.p-form{
+    width: 500px;
+    padding: 32px;
+    font-family: 'KS-font-regular';
+}
+
+.p-form > :not(:last-child){
+    margin-bottom: 32px;
+}
+
+.p-form-title{
+    font-family: 'KS-font-bold';
+    font-size: 24px;
+}
+
+.p-form-input>:not(:last-child){
+    margin-bottom: 24px;
+}
+
+.p-form-submit {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.p-form-buttons{
+    width: auto;
+    display: flex;
+    justify-content: space-around;
+    gap: 12px;
+}
+

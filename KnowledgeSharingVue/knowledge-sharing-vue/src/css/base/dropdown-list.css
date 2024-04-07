@@ -1,0 +1,70 @@
+
+@import url(./icon/icon.css);
+
+.p-dropdown-container{
+    padding: 0 500px;
+    width: auto;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 100px;
+}
+
+.p-dropdown{
+    display: flex;
+    font-family: 'KS-font-semibold';
+    width: 100%;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.p-dropdown-title{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.p-dropdown-note{
+    font-family: 'KS-font-italic';
+    color: #9E9E9E;
+}
+
+.p-dropdown-frame{
+    width: 100%;
+    font-family: 'KS-font-regular';
+    font-size: 14px;
+    padding: 8px 8px 8px 12px;
+    border-radius: 3px;
+    border: solid #E0E0E0 1px;
+    box-sizing: border-box;
+    outline: unset;
+}
+
+.p-dropdown-frame:hover{
+    background-color: #F6F6F6;
+    border: solid #EBEBEB 1px;
+}
+
+.p-dropdown-frame:focus{
+    background-color: #FFFFFF;
+    border: solid #50B83C 1px;
+}
+
+.p-dropdown-text{
+    font-family: 'KS-font-regular';
+    color: #E61D1D;
+    font-size: 14px;
+}
+
+.p-dropdown-frame:invalid{
+    background-color: solid #E81E1E 1px;
+}
+
+
+.p-dropdown-frame option{
+    font-size: 14px;
+}

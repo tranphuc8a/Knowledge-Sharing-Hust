@@ -11,16 +11,26 @@ const methodEnum        = myEnum.requestMethod;
 const ContentTypeEnum   = myEnum.contentType;
 // const timeOut           = 100000; // 10 seconds
 
+/**
+ * Instance axios cho các Request thông thường
+ * @Created PhucTV (23/2/24)
+ * @Modifed None
+ */
 var globalInstance = axios.create({
-    baseURL: appConfig.backendUrl,
+    baseURL: appConfig.getBackendUrl(),
     // timeout: timeOut,
     headers: {
         'Content-Type': ContentTypeEnum.JSON
     }
 });
 
+/**
+ * Instance axios cho các Request gửi formdata
+ * @Created PhucTV (23/2/24)
+ * @Modified None
+ */
 var formdataInstance = axios.create({
-    baseURL: appConfig.backendUrl,
+    baseURL: appConfig.getBackendUrl(),
     // timeout: timeOut,
     headers: {
         'Content-Type': ContentTypeEnum.FORM_DATA

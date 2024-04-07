@@ -4,7 +4,7 @@ import { MyDate } from "./mydate";
 
 // Lớp này quản lý tất cả những logic về validate input
 class Validator {
-    /*
+    /**
     * Trả về một validator
     * @param none
     * @Author TVPhuc (30/11/23)
@@ -33,7 +33,7 @@ class Validator {
         return this;
     }
 
-    /*
+    /**
     * Kiểm tra xem một giá trị có khác rỗng hay không 
     * @param {*} value
     * @Author TVPhuc (28/11/23)
@@ -50,7 +50,7 @@ class Validator {
         }
     }
 
-    /*
+    /**
     * Kiểm tra xem một giá trị có là rỗng hay không 
     * @param {*} value - giá trị cần kiểm tra
     * @Author TVPhuc (02/12/23)
@@ -67,7 +67,7 @@ class Validator {
         }
     }
 
-    /*
+    /**
     * abtract method để validate dữ liệu 
     * @param {*} value
     * @Author TVPhuc (30/11/23)
