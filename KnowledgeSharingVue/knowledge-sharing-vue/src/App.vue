@@ -38,8 +38,8 @@ export default {
          * Các hàm thực hiện lấy về đối tượng được inject cho các components con
          * @param none
          * @returns đối tượng cần inject
-         * Created: PhucTV (28/1/24)
-         * Modified: None
+         * @Created PhucTV (28/1/24)
+         * @Modified None
         */
         getToastManager(){
             return this.$refs.toastManager;
@@ -51,8 +51,8 @@ export default {
          * Hàm thực hiện thay đổi ngôn ngữ cho các component nhận inject language của trang này
          * @param {*} lang - ngôn ngữ cần thay đổi (theo enum language)
          * @returns none
-         * Created: PhucTV (20/2/24)
-         * Modified: None 
+         * @Created PhucTV (20/2/24)
+         * @Modified None 
         */
         changeLanguage(lang){
             try {

@@ -1,21 +1,21 @@
 
 
 @font-face {
-    font-family: 'KS-font-bold';
+    font-family: 'ks-font-bold';
     src: url(../../assets/fonts/notosans-bold.3ede5aff.woff2) format('woff2');
 }
 
 @font-face {
-    font-family: 'KS-font-italic';
+    font-family: 'ks-font-italic';
     src: url(../../assets/fonts/notosans-italic.1c1aaac9.woff2) format('woff2');
 }
 
 @font-face {
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     src: url(../../assets/fonts/notosans-regular.2cb88a13.woff2) format('woff2');
 }
 
 @font-face {
-    font-family: 'KS-font-semibold';
+    font-family: 'ks-font-semibold';
     src: url(../../assets/fonts/notosans-semibold.df3e6dc4.woff2) format('woff2');
 }

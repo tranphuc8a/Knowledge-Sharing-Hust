@@ -28,7 +28,7 @@
     flex: 0 0 auto;
     /* max-width: 80%; */
     overflow: visible;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     border-radius: 4px;
     box-sizing: border-box;
     box-shadow: 0px 4px 16px rgba(23, 27, 42, 0.24);
@@ -42,7 +42,7 @@
 }
 
 .p-popup-header{
-    font-family: 'KS-font-bold';
+    font-family: 'ks-font-bold';
     font-size: 24px;
     padding: 24px;
     font-weight: 700;

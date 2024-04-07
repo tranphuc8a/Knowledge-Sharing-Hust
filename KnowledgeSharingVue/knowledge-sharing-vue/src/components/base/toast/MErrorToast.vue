@@ -43,8 +43,8 @@ export default {
          * Lấy về label chứa các nhãn trong language resource
          * @param none
          * @return label
-         * Created: PhucTV (30/1/24)
-         * Modified: None
+         * @Created PhucTV (30/1/24)
+         * @Modified None
         */
         getLabel(){
             if (this.label === null || this.label === undefined){
@@ -56,8 +56,8 @@ export default {
          * Các hàm xử lý sự kiện tương ứng trên toast
          * @param  none
          * @returns none
-         * Created: PhucTV (28/1/24)
-         * Modified: None
+         * @Created PhucTV (28/1/24)
+         * @Modified None
         */
         async resolveOnUndo(){
             await this.onUndo();

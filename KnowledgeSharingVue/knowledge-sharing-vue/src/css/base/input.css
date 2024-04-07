@@ -5,7 +5,7 @@
     display: flex;
     flex-flow: column nowrap;
     gap: 8px;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
 }
 
 .p-input > div{
@@ -23,16 +23,16 @@
 }
 
 .p-input .p-input-title .p-input-label{
-    font-family: 'KS-font-semibold';
+    font-family: 'ks-font-semibold';
 }
 
 .p-input .p-input-note{
-    font-family: 'KS-font-italic';
+    font-family: 'ks-font-italic';
     color: #9E9E9E;
 }
 
 .p-input .p-input-error-message{
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     color: #E61D1D;
     font-size: 14px;
     display: none;

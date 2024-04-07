@@ -22,7 +22,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     height: 100%;
     gap: 12px;
 }
@@ -37,7 +37,7 @@
 
 .p-import-page-container .p-content-title{
     font-size: 24px;
-    font-family: 'KS-font-bold';
+    font-family: 'ks-font-bold';
 }
 
 .p-import-page-container .p-content-content{
@@ -58,7 +58,7 @@
 }
 
 .p-import-page-container .p-import-header{
-    font-family: 'KS-font-bold';
+    font-family: 'ks-font-bold';
     padding: 8px 12px 0px 12px;
 }
 
@@ -82,7 +82,7 @@
 }
 
 .p-import-navbar .p-navbar-item {
-    font-family: 'KS-font-semibold';
+    font-family: 'ks-font-semibold';
     width: auto;
     border-radius: 4px;
     border: solid #E6E6E6 1px;

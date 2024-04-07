@@ -8,7 +8,7 @@ body .p-sidebar{
     justify-content: space-between;
     padding: 24px 0px 0px 0px;
     box-sizing: border-box;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     width: 200px;
 }
 
@@ -31,7 +31,7 @@ body .p-sidebar{
     padding: 12px 12px 12px 0px;
     height: 44px;
     font-size: 14px;
-    font-family: 'KS-font-semibold';
+    font-family: 'ks-font-semibold';
     /* color: #869AB8; */
     color: white;
     opacity: 75%;

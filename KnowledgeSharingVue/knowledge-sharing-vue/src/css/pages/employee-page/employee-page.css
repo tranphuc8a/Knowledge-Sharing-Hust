@@ -22,7 +22,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     height: 100%;
     gap: 12px;
 }
@@ -37,7 +37,7 @@
 
 .p-content-title{
     font-size: 24px;
-    font-family: 'KS-font-bold';
+    font-family: 'ks-font-bold';
 }
 
 .p-content-content{

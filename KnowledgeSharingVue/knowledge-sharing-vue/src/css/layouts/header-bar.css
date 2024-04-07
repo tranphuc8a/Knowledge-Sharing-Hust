@@ -9,7 +9,7 @@ body .p-header{
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     background-color: white;
 }
 
@@ -68,7 +68,7 @@ body .p-header{
 .p-header .p-header-navbar > div{
     cursor: pointer;
     /* font-size: 14px; */
-    font-family: 'KS-font-semibold';
+    font-family: 'ks-font-semibold';
     color: #757575;
     height: 100%;
     display: flex;

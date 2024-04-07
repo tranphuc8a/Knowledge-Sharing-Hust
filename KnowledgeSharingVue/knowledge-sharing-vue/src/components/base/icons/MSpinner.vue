@@ -1,35 +1,22 @@
 <template>
-    <div>
-        <div ref="icon" :class="getClassname()"></div>
+    <div class="p-spinner-container">
+        <FontAwesomeIcon ref="icon" :icon="['fas', fa]" :style="style" class="p-icon" spin/>
     </div>
 </template>
 
 <script>
 
 let icon = {
-    name: "Spinner",
-    methods: {
-        /**
-         * Lấy className của spinner tùy vào color
-         * @param none
-         * @returns className của spinner
-         * Created: PhucTV (28/1/24)
-         * Modified: None
-        */
-        getClassname(){
-            return `pi-icon pi-spinner pi-spinner-${this.color} pi-icon-${this.size} ${this.class}`;
-        }
+    name: "Icon",
+    data() {
+        return {};
     },
     props: {
-        color: {
-            type: String,
-            default: "green"
-        },
-        size: {
-            type: String,
-            default: "small"
-        },
-        class: {}
+        fa: { default: "spinner" },
+        style: {
+            type: Object,
+            default: {}
+        }
     },
 };
 export default icon;

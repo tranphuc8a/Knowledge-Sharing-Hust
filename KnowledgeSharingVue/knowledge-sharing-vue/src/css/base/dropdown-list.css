@@ -15,7 +15,7 @@
 
 .p-dropdown{
     display: flex;
-    font-family: 'KS-font-semibold';
+    font-family: 'ks-font-semibold';
     width: 100%;
     box-sizing: border-box;
     flex-direction: column;
@@ -29,13 +29,13 @@
 }
 
 .p-dropdown-note{
-    font-family: 'KS-font-italic';
+    font-family: 'ks-font-italic';
     color: #9E9E9E;
 }
 
 .p-dropdown-frame{
     width: 100%;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     font-size: 14px;
     padding: 8px 8px 8px 12px;
     border-radius: 3px;
@@ -55,7 +55,7 @@
 }
 
 .p-dropdown-text{
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     color: #E61D1D;
     font-size: 14px;
 }

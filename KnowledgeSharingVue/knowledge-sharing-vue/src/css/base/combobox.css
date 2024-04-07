@@ -10,7 +10,7 @@
     align-items: center;
     padding: 200px;
     box-sizing: border-box;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
 }
 
 /* COMBOBOX TEXTFIELD */
@@ -75,7 +75,7 @@
     border: unset;
     height: 20px;
     width: 100%;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     font-size: 14px;
     background-color: rgba(0, 0, 0, 0);
 }
@@ -211,7 +211,7 @@
     border-radius: 4px;
     box-sizing: border-box;
     cursor: pointer;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     gap: 8px;
 }
 

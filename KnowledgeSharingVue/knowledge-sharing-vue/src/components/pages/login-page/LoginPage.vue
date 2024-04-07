@@ -140,8 +140,8 @@ export default {
          * Hàm lấy nhãn ngôn ngữ
          * @param none
          * @returns none
-         * Created: PhucTV (20/2/24)
-         * Modified: None
+         * @Created PhucTV (20/2/24)
+         * @Modified None
         */
         getLabel(){
             if (this.inject.language != null){
@@ -154,8 +154,8 @@ export default {
          * Hai hàm thực hiện ẩn hiện lỗi đăng nhập từ api
          * @param {*} msg - lỗi hiển thị
          * @returns none
-         * Created: PhucTV (20/2/24)
-         * Modified: None 
+         * @Created PhucTV (20/2/24)
+         * @Modified None 
         */
         async showErrorMsg(msg){
             try {
@@ -173,8 +173,8 @@ export default {
          * Hàm lấy dữ liệu từ form username, password đổ vào biến account
          * @param none
          * @returns - account - tài khoản lấy được
-         * Created: PhucTV (20/2/24)
-         * Modified: None
+         * @Created PhucTV (20/2/24)
+         * @Modified None
         */
         async getAccount(){
             try {
@@ -192,8 +192,8 @@ export default {
          * Xử lý sự kiện bấm enter
          * @param none
          * @returns none
-         * Created: PhucTV (01/03/24)
-         * Modified: None
+         * @Created PhucTV (01/03/24)
+         * @Modified None
         */
         async resolveEnterForm(){
             try {
@@ -211,8 +211,8 @@ export default {
          * Thực hiện lấy mã Captcha
          * @param none
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async refreshCaptcha(){
             try {
@@ -230,8 +230,8 @@ export default {
          * Hàm xử lý khi nhấn đăng nhập
          * @param none
          * @returns none
-         * Created: PhucTV (20/2/24)
-         * Modified: None
+         * @Created PhucTV (20/2/24)
+         * @Modified None
         */
         async resolveSubmitLogin(){
             try {
@@ -256,8 +256,8 @@ export default {
          * Xử lý đăng nhập thông thường
          * @param none
          * @return none
-         * Created: PhucTV (03/03/24)
-         * Modified: None
+         * @Created PhucTV (03/03/24)
+         * @Modified None
         */
         async resolveLoginNormal(){
             let account = await this.getAccount();
@@ -277,8 +277,8 @@ export default {
          * Xử lý đăng nhập bằng captcha
          * @param none
          * @return none
-         * Created: PhucTV (03/03/24)
-         * Modified: None
+         * @Created PhucTV (03/03/24)
+         * @Modified None
         */
         async resolveLoginCaptcha(){
             let account = await this.getAccount();
@@ -301,8 +301,8 @@ export default {
          * Xử lý đăng nhập thất bại
          * @param {*} error - lỗi trả về từ api
          * @returns none
-         * Created: PhucTV (21/3/24)
-         * Modified: None 
+         * @Created PhucTV (21/3/24)
+         * @Modified None 
         */
         async resolveLoginFailed(error){
             try {
@@ -350,8 +350,8 @@ export default {
          * Xử lý đăng nhập thành công
          * @param {*} tokenModel - chứa token lấy về từ api login
          * @returns none
-         * Created: PhucTV (22/2/24)
-         * Modified: None 
+         * @Created PhucTV (22/2/24)
+         * @Modified None 
          */
         async resolveLoginSuccess(tokenModel){
             try {
@@ -378,8 +378,8 @@ export default {
          * Hàm thực hiện validate username và password trước khi đăng nhập
          * @param none
          * @returns true - cả username và password hợp lệ, false - không hợp lệ
-         * Created: PhucTV (20/2/24)
-         * Modified: None
+         * @Created PhucTV (20/2/24)
+         * @Modified None
         */
         async validateForm(){
             try {

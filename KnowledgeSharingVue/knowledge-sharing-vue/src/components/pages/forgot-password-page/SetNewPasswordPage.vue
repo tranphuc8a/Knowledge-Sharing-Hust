@@ -108,8 +108,8 @@ export default {
          * Hàm lấy nhãn ngôn ngữ
          * @param none
          * @returns none
-         * Created: PhucTV (20/2/24)
-         * Modified: None
+         * @Created PhucTV (20/2/24)
+         * @Modified None
         */
         getLabel(){
             if (this.inject.language != null){
@@ -123,8 +123,8 @@ export default {
          * Xử lý sự kiện click submit button
          * @param none
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async resolveSubmit(){
             let password = this.input?.password;
@@ -176,8 +176,8 @@ export default {
         /**
          * Xử lý sự kiện submit code thành công
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async resolveSubmitSuccess(response){
             try {
@@ -194,8 +194,8 @@ export default {
          * Xử lý sự kiện nhấn enter
          * @param none
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async resolveEnterForm(){
             try {
@@ -211,8 +211,8 @@ export default {
          * Xử lý sự kiện thay đổi mật khẩu
          * @param none
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async resolveOnChangePassword(){
             try {
@@ -236,8 +236,8 @@ export default {
          * Xử lý yêu cầu ẩn lỗi
          * @param none
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async hideErrorMsg(){
             this.isShowError = false;
@@ -247,8 +247,8 @@ export default {
          * Xử lý yêu cầu hiển thị lỗi
          * @param errorMessage - lỗi cần hiển thị
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async showErrorMsg(errorMessage){
             if (Validator.isEmpty(errorMessage))

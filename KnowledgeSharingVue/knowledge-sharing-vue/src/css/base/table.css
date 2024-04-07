@@ -16,7 +16,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
 }
 
 .p-table-frame {
@@ -29,7 +29,7 @@
     justify-content: center;
     align-items: center;
     gap: 12px;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
 }
 
 .p-row-pattern{
@@ -136,7 +136,7 @@
 }
 
 .p-table{
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     border-collapse: collapse;   
     width: 100%;
     background-color: white;
@@ -318,7 +318,7 @@
 
 .p-table-footer .p-table-numrecords select{
     border: none;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     font-size: 14px;
 }
 

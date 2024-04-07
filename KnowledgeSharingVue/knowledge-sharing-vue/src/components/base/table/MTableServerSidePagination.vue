@@ -158,8 +158,8 @@ export default {
          * Lấy về label chứa các nhãn trong language resource
          * @param none
          * @return label
-         * Created: PhucTV (30/1/24)
-         * Modified: None
+         * @Created PhucTV (30/1/24)
+         * @Modified None
         */
         getLabel(){
             if (this.label === null || this.label === undefined){
@@ -432,8 +432,8 @@ export default {
          * Lấy thuộc tính phân trang hiện tại của table
          * @param: none
          * @return: object chứa thuộc tính phân trang { limit, offset }
-         * Created: PhucTV (8/3/24)
-         * Modified: None
+         * @Created PhucTV (8/3/24)
+         * @Modified None
         */
         getPagination(){
             return {

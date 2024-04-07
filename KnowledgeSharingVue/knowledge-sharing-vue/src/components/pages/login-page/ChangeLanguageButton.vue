@@ -55,8 +55,8 @@ export default {
          * Hàm thực hiện lấy về nhãn của button đổi ngôn ngữ
          * @param none
          * @return nhãn cần lấy
-         * Created: PhucTV (19/1/24)
-         * Modified: None
+         * @Created PhucTV (19/1/24)
+         * @Modified None
         */
         getLabel(){
             if (this.language != null){
@@ -69,8 +69,8 @@ export default {
          * Hàm xử lý sự kiện nhấn thay đổi ngôn ngữ
          * @param {*} lang - ngôn ngữ cần thay đổi
          * @returns none
-         * Created: PhucTV (19/1/24)
-         * Modified: None 
+         * @Created PhucTV (19/1/24)
+         * @Modified None 
         */
         resolveChangeLanguage(lang){
             try {

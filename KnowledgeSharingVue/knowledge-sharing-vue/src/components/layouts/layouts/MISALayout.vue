@@ -31,8 +31,8 @@ export default {
          * Xử lý sự kiện click bất kỳ
          * @param {*} value 
          * @returns
-         * Created: PhucTV (22/3/24)
-         * Modified: None
+         * @Created PhucTV (22/3/24)
+         * @Modified None
          */
         async resolveOnclick(value){
             this.getPopupManager().error("HEllo World" + value);

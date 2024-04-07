@@ -2,31 +2,26 @@
 
 @import url(./base/color.css);
 @import url(./base/font.css);
-@import url(./base/button.css);
-@import url(./base/textfield.css);
-@import url(./base/combobox.css);
-@import url(./base/table.css);
-@import url(./base/checkbox.css);
-@import url(./base/radiobutton.css);
-@import url(./base/form.css);
-@import url(./base/popup.css);
-@import url(./base/dialog.css);
-@import url(./base/toast.css);
-@import url(./base/icon/icon.css);
-@import url(./base/spinner.css);
-@import url(./base/dropdown-list.css);
-@import url(./base/context-menu.css);
 
-@import url(./layouts/body.css);
-@import url(./layouts/header-bar.css);
-@import url(./layouts/sidebar.css);
 
+:root{
+	--component-height: 36px;
+	--border-radius: 4px;
+	--button-padding: 0px 24px;
+
+	--font-size: 14px;
+}
 
 #app {
-	font-family: 'KS-font-regular';
+	font-family: 'ks-font-regular';
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
 	color: var(--blue-grey-color-900);
 	margin-top: 60px;
+}
+
+* {
+	box-sizing: border-box;
+	overflow: visible;
 }

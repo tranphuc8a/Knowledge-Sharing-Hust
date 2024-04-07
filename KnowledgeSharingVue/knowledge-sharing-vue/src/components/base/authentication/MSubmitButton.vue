@@ -33,8 +33,8 @@ let button = {
          * Xử lý sự kiện click chuột vào button
          * @param none
          * @returns none
-         * Created: PhucTV (28/1/24)
-         * Modified: None
+         * @Created PhucTV (28/1/24)
+         * @Modified None
         */
         async resolveOnclick() {
             if (this.data.state !== myEnum.buttonState.NORMAL){
