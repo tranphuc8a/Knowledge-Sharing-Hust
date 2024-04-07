@@ -89,8 +89,8 @@ export default {
         /**
          * Xử lý sự kiện click vào icon
          * @param none
-         * Created: PhucTV (25/1/24)
-         * Modified: None
+         * @Created PhucTV (25/1/24)
+         * @Modified None
         */
         resolveOnclickIcon(){
             let that = this;

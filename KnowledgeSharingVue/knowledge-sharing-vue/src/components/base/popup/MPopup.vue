@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import NormalButton from '@/components/base/buttons/MNormalButton.vue';
+import NormalButton from '@/components/base/buttons/MButton.vue';
 import CancelButton from '@/components/base/buttons/MCancelButton.vue';
 import ActionIcon from '@/components/base/icons/MActionIcon.vue';
 

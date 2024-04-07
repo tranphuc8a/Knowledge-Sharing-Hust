@@ -20,7 +20,7 @@
 
 .p-dialog{
     padding: 24px;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
     background-color: white;
     width: 500px;
     border-radius: 4px;
@@ -40,7 +40,7 @@
 }
 
 .p-dialog-title{
-    font-family: 'KS-font-bold';
+    font-family: 'ks-font-bold';
     font-weight: 700;
     font-size: 24px;
 }

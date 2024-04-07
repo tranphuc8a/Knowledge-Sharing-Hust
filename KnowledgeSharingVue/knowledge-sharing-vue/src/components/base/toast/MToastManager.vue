@@ -24,8 +24,8 @@ export default {
          * @param {*} description - mô tả của toast
          * @param {*} duration - thời gian của toast
          * @returns none
-         * Created: PhucTV (28/1/24)
-         * Modified: None
+         * @Created PhucTV (28/1/24)
+         * @Modified None
         */
         async addToast(type = "success", description = "This is message", duration = 3000){
             this.index += 1;
@@ -48,8 +48,8 @@ export default {
          * @param {*} description - mô tả của toast
          * @param {*} duration - thời gian của toast
          * @returns none
-         * Created: PhucTV (28/1/24)
-         * Modified: None
+         * @Created PhucTV (28/1/24)
+         * @Modified None
         */
         async success(description = "This is message", duration = 3000){
             await this.addToast("success", description, duration);

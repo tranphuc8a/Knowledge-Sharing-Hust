@@ -33,8 +33,8 @@ let icon = {
          * Xử lý sự kiện click chuột vào icon
          * @param none
          * @returns none
-         * Created: PhucTV (28/1/24)
-         * Modified: None
+         * @Created PhucTV (28/1/24)
+         * @Modified None
         */
         async resolveOnclick(){
             await this.onclick();

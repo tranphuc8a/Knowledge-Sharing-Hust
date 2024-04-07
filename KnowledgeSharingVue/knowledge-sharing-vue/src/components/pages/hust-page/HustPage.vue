@@ -8,7 +8,7 @@
 
 <script>
 
-import MButton from '@/components/base/buttons/MNormalButton.vue';
+import MButton from '@/components/base/buttons/MButton.vue';
 import Textfield from '@/components/base/inputs/MTextfield.vue';
 import { GetRequest } from '@/js/services/request';
 export default {

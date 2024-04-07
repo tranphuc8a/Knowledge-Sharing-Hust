@@ -102,8 +102,8 @@ export default {
          * Lấy về label chứa các nhãn trong language resource
          * @param none
          * @return label
-         * Created: PhucTV (30/1/24)
-         * Modified: None
+         * @Created PhucTV (30/1/24)
+         * @Modified None
         */
         getLabel(){
             if (this.label === null || this.label === undefined){
@@ -116,8 +116,8 @@ export default {
          * Lấy về menu context items
          * @param none
          * @return menuContextItems
-         * Created: PhucTV (30/1/24)
-         * Modified: None
+         * @Created PhucTV (30/1/24)
+         * @Modified None
         */
         getMenuContextItems(){
             let that = this;
@@ -135,8 +135,8 @@ export default {
          * Xử lý đăng xuất
          * @param none
          * @return none
-         * Created: PhucTV (30/1/24)
-         * Modified: None
+         * @Created PhucTV (30/1/24)
+         * @Modified None
         */
         async resolveSignOut(){
             try {

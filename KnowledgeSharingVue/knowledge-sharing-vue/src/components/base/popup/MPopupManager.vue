@@ -68,8 +68,8 @@ export default {
          * @param {*} content - Nội dung thông báo của popup
          * @param {options} onOkay - Hàm callback xử lý khi nhấn ok
          * @returns none
-         * Created: PhucTV (28/1/24)
-         * Modified: None
+         * @Created PhucTV (28/1/24)
+         * @Modified None
         */
         async show(type, content, onOkay = null){
             try {
@@ -104,7 +104,7 @@ export default {
          * Ẩn một popup khỏi danh sách popup
          * @param {*} popup - popup cần ẩn đi
          * @returns none
-         * Created: PhucTV (24/2/24)
+         * @Created PhucTV (24/2/24)
          * Modifie: None 
         */
         hidePopup(popup){
@@ -125,8 +125,8 @@ export default {
          * @param {*} content - Nội dung thông báo của popup
          * @param {options} onOkay - Hàm callback xử lý khi nhấn ok
          * @returns none
-         * Created: PhucTV (28/1/24)
-         * Modified: None
+         * @Created PhucTV (28/1/24)
+         * @Modified None
         */
         async success(content, onOkay = null){
             await this.show("success", content, onOkay);

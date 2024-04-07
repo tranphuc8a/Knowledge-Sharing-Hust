@@ -13,7 +13,7 @@
 .p-form{
     width: 500px;
     padding: 32px;
-    font-family: 'KS-font-regular';
+    font-family: 'ks-font-regular';
 }
 
 .p-form > :not(:last-child){
@@ -21,7 +21,7 @@
 }
 
 .p-form-title{
-    font-family: 'KS-font-bold';
+    font-family: 'ks-font-bold';
     font-size: 24px;
 }
 

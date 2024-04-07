@@ -3,6 +3,7 @@
 :root{
     --white-color: #FFFFFF;
     --black-color: #000000;
+    --transparent-color: rgba(255, 255, 255, 0);
 
     --primary-color: #9C27B0;
     --primary-color-900: #1F0823;

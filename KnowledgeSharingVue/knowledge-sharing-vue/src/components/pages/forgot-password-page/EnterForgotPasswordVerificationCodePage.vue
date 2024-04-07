@@ -99,8 +99,8 @@ export default {
          * Hàm lấy nhãn ngôn ngữ
          * @param none
          * @returns none
-         * Created: PhucTV (20/2/24)
-         * Modified: None
+         * @Created PhucTV (20/2/24)
+         * @Modified None
         */
         getLabel(){
             if (this.inject.language != null){
@@ -114,8 +114,8 @@ export default {
          * Xử lý sự kiện click submit button
          * @param none
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async resolveSubmit(){
             let textField = this.input?.verificationCode;
@@ -165,8 +165,8 @@ export default {
          * @param accessCode - mã token truy nhập từ api trả về
          * @param code - mã xác minh nhận được từ email
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async resolveSubmitSuccess(email, accessCode, code){
             try {
@@ -183,8 +183,8 @@ export default {
          * Xử lý sự kiện nhấn enter
          * @param none
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async resolveEnterForm(){
             try {
@@ -201,8 +201,8 @@ export default {
          * Xử lý yêu cầu ẩn lỗi
          * @param none
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async hideErrorMsg(){
             this.isShowError = false;
@@ -212,8 +212,8 @@ export default {
          * Xử lý yêu cầu hiển thị lỗi
          * @param errorMessage - lỗi cần hiển thị
          * @returns none
-         * Created: PhucTV (04/03/24)
-         * Modified: None
+         * @Created PhucTV (04/03/24)
+         * @Modified None
         */
         async showErrorMsg(errorMessage){
             if (Validator.isEmpty(errorMessage))
