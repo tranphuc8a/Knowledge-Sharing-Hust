@@ -1,0 +1,17 @@
+
+
+::-webkit-scrollbar{
+    background: transparent;
+    width: 10px;
+}
+::-webkit-scrollbar-thumb{
+    position: absolute;
+    right: 15px;
+    background: rgba(0,0,0,0.4); 
+    border-radius: 4px;
+}
+::-webkit-resizer,
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-corner { display: none; }
+
+

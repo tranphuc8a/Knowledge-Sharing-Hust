@@ -1,0 +1,60 @@
+
+.pi-icon{
+    display: block;
+    background-size: 100% 100%;
+    width: 24px;
+	height: 24px;
+}
+
+.pi-icon-tiny{
+    width: 12px;
+	height: 12px;
+}
+
+.pi-icon-smaller{
+    width: 16px;
+	height: 16px;
+}
+
+.pi-icon-small{
+    width: 24px;
+	height: 24px;
+}
+
+.pi-icon-normal{
+    width: 36px;
+	height: 36px;
+}
+
+.pi-icon-medium{
+    width: 48px;
+	height: 48px;
+}
+
+.pi-icon-large{
+    width: 56px;
+	height: 56px;
+}
+
+.pi-icon-larger{
+    width: 64px;
+	height: 64px;
+}
+
+.pi-icon-big{
+    width: 72px;
+	height: 72px;
+}
+
+.pi-icon-bigger{
+    width: 80px;
+	height: 80px;
+}
+
+.pi-icon-huge{
+    width: 96px;
+	height: 96px;
+}
+
+
+

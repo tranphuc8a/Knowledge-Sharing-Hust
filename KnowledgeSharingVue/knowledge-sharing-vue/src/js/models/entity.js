@@ -6,7 +6,7 @@ import { myEnum } from "@/js/resources/enum";
 
 class Entity{
 
-    /*
+    /**
     * Khởi tạo một entity mặc định hoặc từ entity Api
     * @param {option} entityApi - đối tượng entity được lấy về từ API
     * @Author TVPhuc (28/11/23)
@@ -23,7 +23,7 @@ class Entity{
         }
     }
 
-    /*
+    /**
     * Khởi tạo các giá trị mặc định của Entity
     * @param none
     * @Author TVPhuc (28/11/23)
@@ -37,7 +37,7 @@ class Entity{
         }
     }
 
-    /*
+    /**
     * Trả về một đối tượng table row từ đối tượng hiện tại
     * @param none
     * @Author TVPhuc (28/11/23)
@@ -112,7 +112,7 @@ class Entity{
     }
 
 
-    /*
+    /**
     * Clone dữ liệu từ một table object
     * @param {*} tableObject - đối tượng table được lấy dữ liệu
     * @Author TVPhuc (28/11/23)
@@ -133,7 +133,7 @@ class Entity{
         }
     }
 
-    /*
+    /**
     * Trả về một đối tượng entity form từ đối tượng hiện tại
     * @param none
     * @Author TVPhuc (19/12/23)
@@ -163,7 +163,7 @@ class Entity{
         entityForm['ModifiedDate'] = this.formatDate(entityForm['ModifiedDate'], false);
     }
 
-    /*
+    /**
     * Clone dữ liệu từ một table object
     * @param {*} entityForm - đối tượng table được lấy dữ liệu
     * @Author TVPhuc (28/11/23)
@@ -184,7 +184,7 @@ class Entity{
         }
     }
 
-    /*
+    /**
     * Kiếm tra một giá trị của trường có rỗng hay không
     * @param none
     * @Author TVPhuc (19/12/23)
@@ -199,7 +199,7 @@ class Entity{
         }
     }
 
-    /*
+    /**
     * Định dạng lại dữ liệu
     * @param none
     * @Author TVPhuc (28/11/23)
@@ -218,7 +218,7 @@ class Entity{
         }
     }
 
-    /*
+    /**
     * Clone dữ liệu từ entityApi
     * @param {*} entityApi - đối tượng entity từ Api cần lấy dữ liệu
     * @Author TVPhuc (28/11/23)
@@ -239,7 +239,7 @@ class Entity{
         }
     }
 
-    /*
+    /**
     * Clone dữ liệu sang entityApi Obj
     * @param none
     * @Author TVPhuc (19/12/23)
@@ -269,7 +269,7 @@ class Entity{
         apiObj.ModifiedDate = this.formatDate(apiObj.ModifiedDate, false);
     }
 
-    /*
+    /**
     * Trả về định dạng của date
     * @param {*} date - date cần định dạng
     * @Author TVPhuc (28/11/23)
@@ -291,7 +291,7 @@ class Entity{
         }
     }
 
-    /*
+    /**
     * Định dạng lại tiền
     * @param {*} money - string/number tiền
     * @Author TVPhuc (28/11/23)

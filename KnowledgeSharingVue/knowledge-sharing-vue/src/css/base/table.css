@@ -1,0 +1,339 @@
+
+@import url(./icon/icon.css);
+@import url(./checkbox.css);
+@import url(./font.css);
+@import url(./button.css);
+@import url(./textfield.css);
+
+/* TOTAL TABLE */
+.p-table-container-parent{
+    width: 100%;
+    height: 100vh;
+    padding: 200px 100px;
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'KS-font-regular';
+}
+
+.p-table-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-family: 'KS-font-regular';
+}
+
+.p-row-pattern{
+    display: none;
+}
+
+
+/* LOADING STATE */
+.p-table-loading{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    /* z-index: 100; */
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+}
+
+.p-table-frame[state='loading'] .p-table-loading{
+    visibility: visible;
+}
+
+.p-table-loading i::before{
+    font-size: 48px;
+}
+
+/* EMPTY STATE */
+.p-table-empty{
+    position: absolute;
+    width: fit-content;
+    /* z-index: 100; */
+    visibility: hidden;
+    /* font-size: 18px; */
+    font-weight: 700;
+}
+
+.p-table-frame[state='empty'] .p-table-empty{
+    visibility: visible;
+}
+
+
+/*  TABLE TOOLBAR  */
+.p-table-frame .p-table-toolbar{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+}
+
+.p-table-toolbar .p-table-left-toolbar{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    visibility: hidden;
+}
+
+.p-table-toolbar .p-table-number-chosen{
+    font-weight: 700;
+}
+
+.p-table-toolbar .p-table-right-toolbar{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+}
+
+/* .p-table-toolbar .p-table-right-toolbar > div{
+    flex-shrink: 0;
+} */
+
+
+.p-table-right-toolbar .p-refresh-icon-container{
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+
+/* TABLE CONTAINER */
+
+.p-table-container{
+    border: solid #E0E0E0 1px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+.p-table-content{
+    overflow: scroll;
+    box-sizing: border-box;
+    flex: 1 1 500px;
+}
+
+.p-table{
+    font-family: 'KS-font-regular';
+    border-collapse: collapse;   
+    width: 100%;
+    background-color: white;
+}
+
+
+/* TABLE HEADER */
+.p-table-header{
+    background-color:#E0E0E0;
+    width: auto;
+    position: sticky;
+    top: 0;
+    /* z-index: 2; */
+    flex: 0 0 48px;
+}
+
+
+
+/* TABLE COLUMN AND ROW */
+
+.p-table .p-table-column-justify-left, 
+.p-table .p-table-column-justify-left .p-table-last-cell{
+    text-align: start;
+}
+
+.p-table .p-table-column-justify-right,
+.p-table .p-table-column-justify-right .p-table-last-cell{
+    text-align: end;
+}
+
+.p-table .p-table-column-justify-center,
+.p-table .p-table-column-justify-center .p-table-last-cell{
+    text-align: center;
+}
+
+.p-table tr {
+    border-bottom: solid #E0E0E0 1px;
+    height: 48px;
+}
+
+.p-table tr:hover{
+    background-color: #F2F2F2;
+}
+
+.p-table tr:hover .p-table-actions {
+    visibility: visible;
+}
+
+.p-table tr:not(:has(th)):has(:checked){
+    background-color: #B9E2B1;
+}
+
+.p-table .p-table-column-checkbox{
+    width: 56px;
+    padding: 0px 16px;
+}
+
+.p-table-column:not(.p-table-first-column){
+    padding: 0px 16px;
+}
+
+.p-table-first-column{
+    padding: 0 16px 0 0;
+}
+
+
+/* COLUMN A: CIRCLE */
+
+.p-table-columnA div{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.p-table .p-columnA-circle{
+    background-color: #E0E0E0;
+    border-radius: 100%;
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+}
+.p-table-column-checkbox{
+    text-align: center;
+}
+
+
+/* TABLE CELL */
+.p-table td,th{
+    box-sizing: border-box;
+    width: fit-content;
+    text-align: left;
+    transition: left 0.25s, width .25s;
+}
+
+.p-table a{
+    text-decoration: none;
+}
+
+
+/* TABLE COLUMN FUNCTION */
+
+.p-table-column-function > div{
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.p-table-column-function .p-table-actions{
+    /* TABLE ROW ACTION */
+    position: absolute;
+    visibility: hidden;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.p-table-actions .p-icon-container {
+    cursor: pointer;
+    background-color: white;
+    height: 36px;
+    width: 36px;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 4px 16px rgba(23, 27, 42, 0.24);
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.p-table-actions .p-icon-container:hover{
+    background-color: #B9E2B1;
+}
+
+.p-table-actions .p-icon-container:active{
+    background-color: #96D58A;
+}
+
+.p-table-actions i::before{
+    width: 24px;
+    height: 24px;
+    font-size: 18px;
+}
+
+
+/* TABLE FOOTER */
+.p-table-footer{
+    border-top: solid #E0E0E0 1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 16px;
+}
+.p-table-footer * {
+    flex-shrink: 0;
+}
+
+.p-table-footer .p-table-right-footer{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+}
+
+.p-table-footer .p-table-numrecords{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0px;
+}
+
+.p-table-footer .p-table-numrecords select{
+    border: none;
+    font-family: 'KS-font-regular';
+    font-size: 14px;
+}
+
+.p-table-footer .p-table-navigate{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.p-table-footer .p-table-navigate > div {
+    width: 32px;
+    height: 32px;
+}
+
+
+
+

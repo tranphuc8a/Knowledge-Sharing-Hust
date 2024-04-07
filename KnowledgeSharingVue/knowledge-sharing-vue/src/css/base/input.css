@@ -1,0 +1,52 @@
+
+@import url(./icon/icon.css);
+
+.p-input{
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 8px;
+    font-family: 'KS-font-regular';
+}
+
+.p-input > div{
+    width: 100%;
+}
+
+.p-input .p-input-title{
+    width: 100%;
+    font-size: 14px;
+    height: 20px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.p-input .p-input-title .p-input-label{
+    font-family: 'KS-font-semibold';
+}
+
+.p-input .p-input-note{
+    font-family: 'KS-font-italic';
+    color: #9E9E9E;
+}
+
+.p-input .p-input-error-message{
+    font-family: 'KS-font-regular';
+    color: #E61D1D;
+    font-size: 14px;
+    display: none;
+}
+
+
+.p-input[state='error'] .p-input-error-message{
+    display: block;
+}
+
+.p-input-content{
+    position: relative;
+    min-height: 36px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}

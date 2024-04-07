@@ -1,0 +1,99 @@
+
+@import url(./form.css);
+@import url(./button.css);
+@import url(./font.css);
+@import url(./icon/icon.css);
+@import url(../layouts/body.css);
+
+.p-dialog-container{
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    z-index: 100;
+    background-color: rgba(1, 1, 1, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0; left: 0;
+}
+
+.p-dialog{
+    padding: 24px;
+    font-family: 'KS-font-regular';
+    background-color: white;
+    width: 500px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    box-shadow: 0px 4px 16px rgba(23, 27, 42, 0.24);
+    margin: 24px;
+}
+
+.p-dialog > :not(:last-child){
+    margin-bottom: 24px;
+}
+
+.p-dialog-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.p-dialog-title{
+    font-family: 'KS-font-bold';
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.p-dialog .p-dialog-header-action{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+}
+
+.p-dialog-header-action i::before{
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.p-dialog-content{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 24px;
+}
+
+.p-dialog-content .p-dialog-content-icon,
+.p-dialog-content .p-dialog-content-icon i::before{
+    width: 36px;
+    height: 36px;
+    font-size: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.p-dialog-buttons{
+    display: flex;
+    width: fit-content;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.p-dialog-actions{
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+

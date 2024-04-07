@@ -1,39 +1,34 @@
-/* eslint-disable */
-
 // Lớp Mydate này kế thừa lớp Date nhưng hỗ trợ thêm định dạng chuỗi dd/mm/yyyy
 class MyDate extends Date{
     static myDateFormat1 = /^([1-9]|0[1-9]|[12][0-9]|3[01])\/([1-9]|0[1-9]|1[0-2])\/\d{4}$/;
     static myDateFormat2 = /^([1-9]|0[1-9]|[12][0-9]|3[01])-([1-9]|0[1-9]|1[0-2])-\d{4}$/;
 
-    /*
+    /**
     * Constructor nhận date thuộc 2 format trên dd/mm/yyyy và dd-mm-yyyy
     * @param dateStr - chuỗi date
     * @Author TVPhuc (29/11/23)
     * @Edit None
     **/
     constructor(dateStr){
-        try {
-            if (dateStr === undefined || dateStr === null || dateStr === "") {
-                return super();
-            }
-            if (MyDate.myDateFormat1.test(dateStr)){
-                // Tách ngày, tháng, năm từ chuỗi
-                const dateParts = dateStr.split('/');
-                // Đưa về định dạng được hỗ trợ: yyyy-mm-dd
-                let formated = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-                super(formated);
-            } else if (MyDate.myDateFormat2.test(dateStr)){
-                const dateParts = dateStr.split('-');
-                super(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
-            }else {
-                super(dateStr);
-            }
-        } catch (error){
-            throw error;
+        if (dateStr === undefined || dateStr === null || dateStr === "") {
+            super();
+            return;
+        }
+        if (MyDate.myDateFormat1.test(dateStr)){
+            // Tách ngày, tháng, năm từ chuỗi
+            const dateParts = dateStr.split('/');
+            // Đưa về định dạng được hỗ trợ: yyyy-mm-dd
+            let formated = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+            super(formated);
+        } else if (MyDate.myDateFormat2.test(dateStr)){
+            const dateParts = dateStr.split('-');
+            super(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+        }else {
+            super(dateStr);
         }
     }
 
-    /*
+    /**
     * Trả ngày tháng về chuỗi định dạng dd/mm/yyyy
     * @param none
     * @Author TVPhuc (29/11/23)
@@ -53,7 +48,7 @@ class MyDate extends Date{
         }
     }
 
-    /*
+    /**
     * Trả ngày tháng về chuỗi định dạng yyyy-mm-dd
     * @param none
     * @Author TVPhuc (29/11/23)
@@ -79,6 +74,7 @@ class MyDate extends Date{
      * @Modified None
      */
     toFormat(format){
+        this.Get
         const mappings = {
             yyyy: this.getFullYear(),
             yy: ('' + this.getFullYear()).slice(-2),
@@ -89,7 +85,8 @@ class MyDate extends Date{
             HH: ('0' + this.getHours()).slice(-2),
             hh: ('0' + ((this.getHours() % 12) || 12)).slice(-2),
             mm: ('0' + this.getMinutes()).slice(-2),
-            ss: ('0' + this.getSeconds()).slice(-2)
+            ss: ('0' + this.getSeconds()).slice(-2),
+            day: `${this.getDay()}`
         };
         for (const key in mappings) {
             format = format.replace(key, mappings[key]);

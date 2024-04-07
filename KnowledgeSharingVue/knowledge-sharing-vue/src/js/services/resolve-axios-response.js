@@ -3,7 +3,7 @@ import statusCodeEnum from "../resources/status-code-enum";
 import appConfig from "@/app-config";
 import { myEnum } from "../resources/enum";
 import { language } from "../resources/language";
-const loginPageUrl = `${appConfig.backendUrl}/login`;
+const loginPageUrl = `${appConfig.getBackendUrl()}/login`;
 var lang = language.vi;
 
 class ResolveAxiosResponse {
