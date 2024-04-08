@@ -18,17 +18,17 @@
     >
         <div class="p-popup-content">
             <div class="p-popup-icon">
-                <Icon v-show="['info', 'infor', 'inform', 'information'].includes(type)"
-                    faClassname="pi-sprite-info-big"
+                <MIcon v-if="['info', 'infor', 'inform', 'information'].includes(popup.type)"
+                    fa="circle-info" :style="{color: 'blue', fontSize: fontSize}"
                 />
-                <Icon v-show="['warn', 'warning'].includes(type)"
-                    faClassname="pi-sprite-warn-big"
+                <MIcon v-else-if="['warn', 'warning'].includes(popup.type)"
+                    fa="triangle-exclamation" :style="{ color: 'orange', fontSize: fontSize}"
                 />
-                <Icon v-show="type=='success'"
-                    faClassname="pi-sprite-success-big" 
+                <MIcon v-else-if="popup.type=='success'"
+                    fa="circle-check" :style="{color: 'green', fontSize: fontSize}" 
                 />
-                <Icon v-show="type=='error'"
-                    faClassname="pi-sprite-error-big"                
+                <MIcon v-else-if="popup.type=='error'"
+                    fa="circle-xmark" :style="{color: 'var(--red-color)', fontSize: fontSize}"             
                 />
             </div>
             <div class="p-popup-content-text">
@@ -43,11 +43,11 @@
 import { Validator } from '@/js/utils/validator';
 import { MyRandom } from '@/js/utils/myrandom';
 import Popup from './MPopup.vue';
-import Icon from '../icons/MIcon.vue';
 
 export default {
     data(){
         return {
+            fontSize: '24px',
             listPopup: [],
             lang: this.lang.components.popupManager,
             type: "inform",
@@ -59,7 +59,7 @@ export default {
     mounted(){
     },
     components: {
-        Popup, Icon
+        Popup
     },
     methods: {
         /**
@@ -164,19 +164,21 @@ export default {
     display: flex;
     justify-content: space-between;
     flex-flow: row nowrap;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     margin: 0;
     padding: 12px 12px 24px 12px;
     gap: 8px;
-}
-
-.p-popup-content > div{
-    flex: 0 0 auto;
+    box-sizing: border-box;
 }
 
 .p-popup-content .p-popup-content-text{
-    flex: 1 0 auto;
+    width: 100%;
+    text-align: start;
+    overflow-wrap: normal;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 </style>

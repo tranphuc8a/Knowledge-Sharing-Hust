@@ -19,11 +19,23 @@
     position: fixed;
 }
 
+@media screen and (max-width: 767px){
+    .p-popup{
+        min-width: 100px; 
+        width: 80vw;  
+    }
+}
+@media screen and (min-width: 768px){
+    .p-popup{
+        min-width: 500px;   
+        width: fit-content;
+    }
+}
+
 .p-popup{
     margin: 36px;
     background-color: white;
-    min-width: 500px;
-    width: fit-content;
+    max-width: 80vw;
     flex: 0 0 auto;
     /* max-width: 80%; */
     overflow: visible;

@@ -5,8 +5,7 @@
                 <div class="p-popup-title">
                     {{ header }}
                 </div>
-                <ActionIcon faClassname="pi-sprite-times p-red-icon" :onclick="resolveOnClose" 
-                        :style="iconStyle" :iconStyle="iconStyle"/>
+                <ActionIcon fa="times" :iconStyle="{ color: 'var(--red-color)', fontSize: '24px'}" :onclick="resolveOnClose"/>
             </div>
 
             <div class="p-popup-content">
@@ -42,15 +41,10 @@ import CancelButton from '@/components/base/buttons/MCancelButton.vue';
 import ActionIcon from '@/components/base/icons/MActionIcon.vue';
 
 export default {
-    name: "MyPopup",
+    name: "MPopup",
     data() {
         return {
-            dIsShow: true,
-            iconStyle: {
-                width: "32px",
-                height: "32px",
-                'font-size': "24px"
-            }
+            dIsShow: true
         };
     },
     components: { NormalButton, CancelButton, ActionIcon },

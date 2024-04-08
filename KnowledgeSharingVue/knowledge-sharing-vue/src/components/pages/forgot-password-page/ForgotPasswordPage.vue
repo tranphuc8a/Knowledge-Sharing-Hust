@@ -49,7 +49,7 @@
 
 <script>
 import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-import AmisTextField from '@/components/base/authentication/MSlotedTextField.vue';
+import AmisTextField from '@/components/base/authentication/MSlotedTextfield.vue';
 import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
 import { EmailValidator } from '@/js/utils/validator';
 import { GetRequest, Request } from '@/js/services/request';
