@@ -24,4 +24,5 @@
 * {
 	box-sizing: border-box;
 	overflow: visible;
+	transition: background-color 0.5s ease;
 }
