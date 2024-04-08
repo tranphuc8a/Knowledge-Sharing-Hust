@@ -5,12 +5,12 @@
             <div class="p-table-toolbar" v-show="mode != 'view'">
                 <div class="p-table-left-toolbar" :style="{ visibility: listChosen.length > 0 ? 'visible' : 'hidden'}">
                     <div class="">
-                        {{ getLabel().toolbar.chosen }}
+                        {{ getLabel()?.toolbar.chosen }}
                         <span class="p-table-number-chosen"> {{ listChosen.length }}/{{ items.length }} </span>
                     </div>
-                    <LinkButton :onclick="resolveUncheckAll" :label="getLabel().toolbar.unChoose" />
+                    <LinkButton :onclick="resolveUncheckAll" :label="getLabel()?.toolbar.unChoose" />
                     <CancelIconButton :onclick="resolveDeleteMulti" faClassname="pi-icon-smaller pi-trash-can" 
-                                        color="red" :label="getLabel().toolbar.deleteChosen"/>
+                                        color="red" :label="getLabel()?.toolbar.deleteChosen"/>
                 </div>
 
                 <div class="p-table-right-toolbar">
@@ -44,11 +44,11 @@
                                         <span>  <div v-html="item[header.field]"></div> </span>
                                         
                                         <div class="p-table-actions" v-show="mode != 'view'">
-                                            <label for="" :title="getLabel().functionality.edit">
+                                            <label for="" :title="getLabel()?.functionality.edit">
                                                 <ActionIcon faClassname="pi-pencil-solid-green pi-icon-smaller"
                                                     :onclick="resolveEdit(item)"/>
                                             </label>
-                                            <label for="" :title="getLabel().functionality.option">
+                                            <label for="" :title="getLabel()?.functionality.option">
                                                 <ContextMenu 
                                                         :position="getItemMenuContextPosition(item, itemIndex)"
                                                         :items="getItemMenuContextItems(item, itemIndex)"
@@ -80,12 +80,12 @@
                 <div class="p-table-footer">
                     <div class="p-table-left-footer">
                         <div class="p-table-sumary">
-                            {{ getLabel().footer.sum }} {{ items.length }}
+                            {{ getLabel()?.footer.sum }} {{ items.length }}
                         </div>
                     </div>
                     <div class="p-table-right-footer">
                         <div class="p-table-numrecords">
-                            <p> {{ getLabel().footer.recordPerSheet }} </p>
+                            <p> {{ getLabel()?.footer.recordPerSheet }} </p>
                             <select v-model="pageSize" name="" id="" @:change="refillTableFromStartIndex">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -94,7 +94,7 @@
                             </select>
                         </div>
                         <div class="p-table-records-index">
-                            {{ startIndex + 1 }}-{{ endIndex + 1 }} {{ getLabel().footer.record }}
+                            {{ startIndex + 1 }}-{{ endIndex + 1 }} {{ getLabel()?.footer.record }}
                         </div>
                         <div class="p-table-navigate">
                             <ActionIcon :onclick="prevPage" faClassname="pi-chevron-left-solid-gray pi-icon" 
@@ -110,7 +110,7 @@
                 <Spinner color="green" size="large" />
             </div>
             <div class="p-table-empty">
-                {{ getLabel().empty }}
+                {{ getLabel()?.empty }}
             </div>
         </div>
 </template>
@@ -168,7 +168,7 @@ export default {
             }
             return this.label;
         },
-        /*
+        /**
         * Cập nhật các checkbox xem có phải checked tất cả row chưa
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -191,7 +191,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Bắn ra các event cho component cha xử lý
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -222,7 +222,7 @@ export default {
                 that.$emit('table-clone-item', item);
             }
         },
-        /*
+        /**
         * Chuyển đổi trạng thái table: normal, loading, empty
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -231,7 +231,7 @@ export default {
         async setState(state){
             this.tableState = state;
         },
-        /*
+        /**
         * Thực hiện check tất cả các row trong table
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -250,7 +250,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Thực hiện uncheck toàn bộ row trong table
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -269,7 +269,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Hai method kiểm tra xem có thể navigate tới trang sau/trang trước hay không
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -281,7 +281,7 @@ export default {
         isPrev(){
             return this.startIndex > 0;
         },
-        /*
+        /**
         * Hai hàm Xử lý sự kiện check/uncheck một checkbox của row
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -312,7 +312,7 @@ export default {
                 }
             }
         },
-        /*
+        /**
         * Cập nhật lại listFilledItems từ startIndex khi pageSize thay đổi
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -331,7 +331,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Cập nhật lại table bắt đầu từ props items
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -354,7 +354,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Hai methods thực hiện navigate tới page trước và page sau
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -389,7 +389,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Tính toán thuộc tính class cho mỗi thẻ th/td để trích xuất css class phù hợp
         * @param item, index: item và chỉ số header của nó
         * @Author TVPhuc (12/12/23)
@@ -406,7 +406,7 @@ export default {
                 return "";
             }
         },
-        /*
+        /**
         * Lấy về style cho ô hiện tại nếu có
         * @param item, index: item và chỉ số header của nó
         * @Author TVPhuc (16/1/24)
@@ -424,7 +424,7 @@ export default {
                 return null;
             }
         },
-        /*
+        /**
         * Lấy giá trị truyền vào props của menu context cho từng item
         * @param {*} item: customer được focus menu Context, index: chỉ số
         * @Author TVPhuc (20/12/23)

@@ -1,22 +1,23 @@
 <template>
-    <MTextField :placeholder="placeholder" :type="passwordType" :isShowTitle="false" ref="input"
+    <MTextField :placeholder="placeholder" :type="passwordType" ref="input"
         :autocomplete="autocomplete" :validator="validator" :errorMessage="errorMessage">
         <div class="p-password-icon" @:click="resolveClickPasswordIcon">
-            <img src="@/assets/login/icon-hide-pass.svg" v-show="passwordType !== 'password'"/>
-            <img src="@/assets/login/icon-show-pass.svg" v-show="passwordType === 'password'"/>
+            <MIcon fa="eye" :style="iconStyle" v-show="passwordType !== 'password'"/>
+            <MIcon fa="eye-slash" :style="iconStyle" v-show="passwordType === 'password'"/>
         </div>
     </MTextField>
 </template>
 
 <script>
 import { input } from '@/js/components/base/input';
-import MTextField from './MTextField.vue';
+import MTextField from './MSlotedTextfield.vue';
 
 export default{
-    name: 'MPasswordTextField',
+    name: 'MPasswordTextfield',
     components: { MTextField },
     data(){
         return {
+            iconStyle: { color: 'var(--primary-color)'},
             passwordType: 'password',
             input: null
         }
@@ -95,9 +96,8 @@ export default{
     justify-content: center;
     align-items: center;
 }
-.p-password-icon > img{
-    width: 16px;
-    height: 16px;
+.p-password-icon > *{
+    width: 24px;
     cursor: pointer;
 }
 </style>

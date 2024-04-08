@@ -14,10 +14,10 @@
             </div>
             <div class="p-combobox-textfield-right">
                 <div class="p-icon-container p-icon-down" @:click="resolveClickExpand">
-                    <i class="fa pi-sprite-chevron-down p-icon"></i>
+                    <MIcon fa="chevron-down" />
                 </div>
                 <div class="p-icon-container p-icon-up" @:click="resolveClickCollapse">
-                    <i class="fa pi-sprite-chevron-up p-icon"></i>
+                    <MIcon fa="chevron-up" />
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
         <div class="p-combobox-dropdown-frame" :state="data.dropdownState" ref="dropdownFrame">
             <div class="p-combobox-dropdown-content" ref="dropdownContent">
                 <div class="p-combobox-dropdown-loading">
-                    <Spinner color="green" size="normal" />
+                    <MSpinner :style="{ fontSize: '24px' }" />
                 </div>
                 <div class="p-combobox-dropdown-empty">
                     {{ label.noOptions }}
@@ -39,7 +39,7 @@
                             {{ item.label }}
                         </div>
                         <div class="p-combobox-item-checked">
-                            <i class="pi-icon pi-check-solid-green p-validating-icon"></i>
+                            <MIcon fa="check" />
                         </div>
                     </div>                            
                 </div>
@@ -54,11 +54,10 @@ import { Validator } from '@/js/utils/validator';
 import { input } from '@/js/components/base/input';
 import InputFrame from './MInputFrame.vue';
 import { myEnum } from '@/js/resources/enum';
-import Spinner from '@/components/base/icons/MSpinner.vue';
 
 let combobox = {
     name: "Combobox",
-    components: { InputFrame, Spinner },
+    components: { InputFrame },
     data() {
         return {
             inputFrame: {
@@ -107,7 +106,7 @@ let combobox = {
     },
     methods: {
         ...input.methods,
-        /*
+        /**
         * Override validate function
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -125,7 +124,7 @@ let combobox = {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Thực hiện xử lý logic sau khi thay đổi giá trị của input live
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -245,7 +244,7 @@ let combobox = {
 
 
         // OTHER METHODS:
-        /* 
+        /* *
         * Xử lý logic khi click chuột vào một item của combobox
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -263,7 +262,7 @@ let combobox = {
                 console.error(error);
             }
         },  
-        /* 
+        /* *
         * Hai hàm xử lý sự kiện click vào nút expand và collapse
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -275,7 +274,7 @@ let combobox = {
         async resolveClickCollapse(){
             await this.$refs.input.blur();
         },
-        /*
+        /**
         * Cập nhật chiều cao của dropdownFrame dựa trên dropdownContent
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -285,7 +284,7 @@ let combobox = {
             // let clH = 
             this.components.dropdownFrame.style.height = `${this.components.dropdownContent.clientHeight}px`;
         },
-        /* 
+        /* *
         * Xử lý sự kiện yêu cầu lọc item theo text
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -322,7 +321,7 @@ let combobox = {
                 console.error(error);
             }
         },
-        /* 
+        /* *
         * Xử lý yêu cầu làm mới danh sách items của combobox
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -445,7 +444,7 @@ export default combobox;
 </script>
 
 <style>
-    @import url(@/css/base/combobox.css);
+    @import url(@/css/base/input/combobox.css);
 </style>
 
 

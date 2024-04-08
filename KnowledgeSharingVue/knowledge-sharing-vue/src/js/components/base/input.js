@@ -1,21 +1,7 @@
 import { Validator } from "@/js/utils/validator";
 
 let input = {
-    data: {
-        // inputFrame: {
-        //     state: this.state,
-        //     label: this.label,
-        //     title: this.title,
-        //     errorMessage: this.errorMessage,
-        //     isObligate: this.isObligate,
-        //     isFull: this.isFull
-        // },
-        // data: {
-        //     value: this.value,
-        //     isDynamicValidate: this.isDynamicValidate,
-        //     validator: this.validator
-        // }
-    },
+   
     watch: {
         // input frame props
         state(newVal)           { this.inputFrame.state = newVal; },
@@ -70,7 +56,7 @@ let input = {
         }
     },
     methods: {
-        /*
+        /**
         * Validate dữ liệu của input
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -88,7 +74,7 @@ let input = {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Thực hiện Validate dữ liệu của input và cập nhật trạng thái
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -107,7 +93,7 @@ let input = {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Hai method thực hiện đăng ký và hủy đăng ký DynamicValidate
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -129,7 +115,7 @@ let input = {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Thực hiện binding chiều ngược lại value -> this.data.value
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -138,7 +124,7 @@ let input = {
         async bindModel(value){
             this.setValue(value);
         },
-        /*
+        /**
         * Các hàm xử lý sự kiện mặc định của input: resolveOn[Change, Focus, Blur]
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -185,7 +171,7 @@ let input = {
             }
         },
 
-        /*
+        /**
         * Hai hàm thực hiện focus và blur vào thẻ input
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -209,7 +195,7 @@ let input = {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Hai hàm thực hiện lấy giá trị và đặt giá trị vào input
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -232,7 +218,7 @@ let input = {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Hai hàm thực hiện thay đổi trạng thái của input
         * @param none
         * @Author TVPhuc (12/12/23)

@@ -1,6 +1,6 @@
 
-@import url(./icon/icon.css);
-@import url(../main.css);
+
+@import url(@/css/main.css);
 
 
 /* *:hover{

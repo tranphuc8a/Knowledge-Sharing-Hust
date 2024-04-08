@@ -17,6 +17,30 @@
     --primary-color-100: #EBD4EF;
     --primary-color-50 : #F5EAF7;
 
+    --green-color: rgb(8, 151, 64);
+    --green-color-900: rgb(2, 30, 13);
+    --green-color-800: rgb(3, 60, 26);
+    --green-color-700: rgb(5, 91, 39);
+    --green-color-600: rgb(6, 121, 51);
+    --green-color-500: rgb(8, 151, 64);
+    --green-color-400: rgb(57, 172, 102);
+    --green-color-300: rgb(107, 193, 141);
+    --green-color-200: rgb(156, 213, 179);
+    --green-color-100: rgb(206, 234, 217);
+    --green-color-50 : rgb(231, 245, 236);
+
+    --light-green-color: rgb(80, 184, 60);
+    --light-green-color-900: rgb(16, 37, 12);
+    --light-green-color-800: rgb(32, 73, 24);
+    --light-green-color-700: rgb(48, 111, 36);
+    --light-green-color-600: rgb(64, 147, 48);
+    --light-green-color-500: rgb(80, 184, 60);
+    --light-green-color-400: rgb(115, 198, 99);
+    --light-green-color-300: rgb(150, 213, 138);
+    --light-green-color-200: rgb(185, 226, 177);
+    --light-green-color-100: rgb(220, 241, 216);
+    --light-green-color-50 : rgb(238, 248, 236);
+
     --red-color: #E60000;
     --red-color-900: #2E0000;
     --red-color-800: #5C0000;
@@ -81,6 +105,30 @@
     --red-color-200-rgb: 245, 153, 153;
     --red-color-100-rgb: 250, 204, 204;
     --red-color-50-rgb: 252, 230, 230;
+
+    --green-color-rgb: 8, 151, 64;
+    --green-color-900-rgb: 2, 30, 13;
+    --green-color-800-rgb: 3, 60, 26;
+    --green-color-700-rgb: 5, 91, 39;
+    --green-color-600-rgb: 6, 121, 51;
+    --green-color-500-rgb: 8, 151, 64;
+    --green-color-400-rgb: 57, 172, 102;
+    --green-color-300-rgb: 107, 193, 141;
+    --green-color-200-rgb: 156, 213, 179;
+    --green-color-100-rgb: 206, 234, 217;
+    --green-color-50-rgb: 231, 245, 236;
+
+    --light-green-color-rgb: 80, 184, 60;
+    --light-green-color-900-rgb: 16, 37, 12;
+    --light-green-color-800-rgb: 32, 73, 24;
+    --light-green-color-700-rgb: 48, 111, 36;
+    --light-green-color-600-rgb: 64, 147, 48;
+    --light-green-color-500-rgb: 80, 184, 60;
+    --light-green-color-400-rgb: 115, 198, 99;
+    --light-green-color-300-rgb: 150, 213, 138;
+    --light-green-color-200-rgb: 185, 226, 177;
+    --light-green-color-100-rgb: 220, 241, 216;
+    --light-green-color-50-rgb: 238, 248, 236;
 
     --grey-color-rgb: 158, 158, 158;
     --grey-color-900-rgb: 31, 31, 31;

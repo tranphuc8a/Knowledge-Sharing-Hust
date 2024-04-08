@@ -56,7 +56,7 @@
 <script>
 import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
 // import AmisTextField from '@/components/base/authentication/MTextField.vue';
-import AmisPasswordTextField from '@/components/base/authentication/MPasswordTextField.vue'
+import AmisPasswordTextField from '@/components/base/authentication/MPasswordTextfield.vue'
 import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
 import { PostRequest, Request } from '@/js/services/request';
 import { PasswordValidator, RepasswordValidator } from '@/js/utils/validator';

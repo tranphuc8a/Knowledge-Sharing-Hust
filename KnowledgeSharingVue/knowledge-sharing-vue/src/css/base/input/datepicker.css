@@ -1,5 +1,4 @@
 
-@import url(./icon/icon.css);
 @import url(@/css/base/font.css);
 
 
@@ -11,7 +10,7 @@
     min-width: 60px;
     width: 100%;
     padding: 0px;
-    border: solid #E0E0E0 1px;
+    border: solid var(--primary-color-200) 1px;
     box-sizing: border-box;
 
     display: flex;
@@ -27,7 +26,7 @@
     line-height: 18px;
     height: 20px;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0);
+    background-color: var(--transparent-color);
     box-sizing: border-box;
 
     outline: unset;
@@ -48,7 +47,7 @@
     margin: 0; */
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0);
+    background-color: var(--transparent-color);
 }
 
 .p-date-picker::placeholder{
@@ -58,33 +57,35 @@
 
 /* NORMAL STATE */
 .p-input:not([state="read-only"]) .p-date-picker-bound:hover{
-    background-color: #F6F6F6;
-    border: solid #EBEBEB 1px;
+    background-color: var(--grey-color-200);
+    border: solid var(--primary-color-200) 1px;
 }
 .p-input:not([state="read-only"]):not([state="error"]) .p-date-picker-bound:focus-within{
     background-color: #FFFFFF;
-    border: solid #50B83C 1px;
+    border: solid var(--primary-color) 1px;
+    box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.56);
 }
 
 
 /* ERROR STATE */
 .p-input[state="error"] .p-date-picker-bound{
     background-color: white;
-    border: solid #E61D1D 1px;
+    border: solid var(--red-color) 1px;
 }
 .p-input[state="error"] .p-date-picker-bound:hover{
     background-color: #F6F6F6;
-    border: solid #E61D1D 1px;
+    border: solid var(--red-color) 1px;
 }
 .p-input[state="error"] .p-date-picker-bound:focus-within{
     background-color: white;
-    border: solid #E61D1D 1px;
+    border: solid var(--red-color) 1px;
+    box-shadow: 0 0 10px rgba(var(--red-color-rgb), 0.56);
 }
 
 
 /* READ-ONLY STATE */
 .p-input[state="read-only"] .p-date-picker-bound{
-    background-color: #EBEBEB;
+    background-color: var(--grey-color-200);
     border: none;
 }
 
@@ -93,33 +94,18 @@
 .p-input[state="validating"] .p-date-picker-bound,
 .p-input[state="validated"] .p-date-picker-bound{
     background-color: #E0E0E0;
-    border: solid #50B83C 1px;
+    border: solid var(--light-green-color) 1px;
 }
 .p-input[state="validating"] .p-date-picker-bound:hover,
 .p-input[state="validated"] .p-date-picker-bound:hover{
-    background-color: #F6F6F6;
-    border: solid #50B83C 1px;
+    background-color: var(--grey-color-200);
+    border: solid var(--light-green-color) 1px;
 }
 .p-input[state="validating"] .p-date-picker-bound:focus-within,
 .p-input[state="validated"] .p-date-picker-bound:focus-within{
     background-color: #FFFFFF;
-    border: solid #50B83C 1px;
+    border: solid var(--light-green-color) 1px;
+    box-shadow: 0 0 10px rgba(var(--light-green-color-rgb), 0.56);
 }
 
 
-/* CHOOSE ICON */
-.p-input .p-date-picker-bound i {
-    display: none;
-}
-.p-input[state="normal"] .p-date-picker-bound i.p-normal-icon,
-.p-input[state="error"] .p-date-picker-bound i.p-normal-icon,
-.p-input[state="read-only"] .p-date-picker-bound i.p-normal-icon{
-    display: block;
-}
-
-.p-input[state="validating"] .p-date-picker-bound i.p-validating-icon{
-    display: block;
-}
-.p-input[state="validated"] .p-date-picker-bound i.p-validated-icon{
-    display: block;
-}

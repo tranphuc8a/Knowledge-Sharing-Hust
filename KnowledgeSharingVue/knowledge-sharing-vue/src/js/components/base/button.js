@@ -11,12 +11,16 @@ let button = {
          * @Modified None
         */
         async resolveOnclick() {
-            if (this.data.state !== myEnum.buttonState.NORMAL){
-                return;
+            try {
+                if (this.data.state !== myEnum.buttonState.NORMAL){
+                    return;
+                }
+                this.data.state = myEnum.buttonState.LOADING;
+                await this.onclick();
+                this.data.state = myEnum.buttonState.NORMAL;
+            } catch (e) {
+                console.error(e);
             }
-            this.data.state = myEnum.buttonState.LOADING;
-            await this.onclick();
-            this.data.state = myEnum.buttonState.NORMAL;
         }
     },
 

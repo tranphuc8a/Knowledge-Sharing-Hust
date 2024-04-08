@@ -1,9 +1,9 @@
 
-@import url(./form.css);
-@import url(./button.css);
-@import url(./font.css);
-@import url(./icon/icon.css);
-@import url(../layouts/body.css);
+@import url(@/css/base/popup/form.css);
+@import url(@/css/main.css);
+@import url(@/css/base/input/radiobutton.css);
+@import url(@/css/base/button/button.css);
+@import url(@/css/layouts/body.css);
 
 .p-dialog-container{
     width: 100%;

@@ -5,12 +5,12 @@
 @import url(@/css/layouts/sidebar.css);
 
 /* IMPORT component css */
-@import url(@/css/base/button.css);
+@import url(@/css/base/button/button.css);
 @import url(@/css/base/textfield.css);
 @import url(@/css/base/table.css);
 @import url(@/css/base/font.css);
 @import url(@/css/base/dialog.css);
-@import url(@/css/base/toast.css);
+@import url(@/css/base/toast/toast.css);
 @import url(@/css/base/popup.css);
 @import url(@/css/base/dropdown-list.css);
 @import url(@/css/base/combobox.css);

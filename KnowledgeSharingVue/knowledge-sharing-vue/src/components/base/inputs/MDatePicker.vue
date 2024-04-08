@@ -13,9 +13,6 @@
                     :readonly="inputFrame.state==='read-only'"
                     @internal-model-change="resolveOnChange" @:focus="resolveOnFocus" @:blur="resolveOnBlur"
                     v-model="data.value" :format="formatDate" />
-            <!-- <Icon v-show="data.isShowIcon" faClassname="pi-sprite-search-dark p-normal-icon"/>
-            <Spinner v-show="data.isShowIcon" />
-            <Icon faClassname="pi-icon pi-circle-check-green p-validating-icon"/> -->
         </div>
     </InputFrame>
 </template>
@@ -24,10 +21,8 @@
 import InputFrame from './MInputFrame.vue';
 import { input } from '@/js/components/base/input';
 import { MyDate } from '@/js/utils/mydate';
-// import Icon from    '@/components/base/icons/MIcon.vue';
-// import Spinner from '@/components/base/icons/MSpinner.vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export default{
     name: 'DatePicker',
@@ -83,5 +78,5 @@ export default{
 </script>
 
 <style>
-@import url(@/css/base/datepicker.css);
+@import url(@/css/base/input/datepicker.css);
 </style>

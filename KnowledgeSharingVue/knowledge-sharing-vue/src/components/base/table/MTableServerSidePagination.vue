@@ -167,7 +167,7 @@ export default {
             }
             return this.label;
         },
-        /*
+        /**
         * Cập nhật các checkbox xem có phải checked tất cả row chưa
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -184,7 +184,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Bắn ra các event cho component cha xử lý
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -215,7 +215,7 @@ export default {
                 that.$emit('table-clone-item', item);
             }
         },
-        /*
+        /**
         * Chuyển đổi trạng thái table: normal, loading, empty
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -224,7 +224,7 @@ export default {
         async setState(state){
             this.tableState = state;
         },
-        /*
+        /**
         * Thực hiện check tất cả các row trong table
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -243,7 +243,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Thực hiện uncheck toàn bộ row trong table
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -262,7 +262,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Hai method kiểm tra xem có thể navigate tới trang sau/trang trước hay không
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -274,7 +274,7 @@ export default {
         isPrev(){
             return this.startIndex > 0;
         },
-        /*
+        /**
         * Hai hàm Xử lý sự kiện check/uncheck một checkbox của row
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -306,7 +306,7 @@ export default {
             }
         },
         
-        /*
+        /**
         * Hai methods thực hiện navigate tới page trước và page sau
         * Khác với table tự navigate, sẽ thay đổi thuộc tính phân tran và emit ra yêu cầu refresh page
         * @param none
@@ -346,7 +346,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Tính toán thuộc tính class cho mỗi thẻ th/td để trích xuất css class phù hợp
         * Danh sách các css class: p-table-[first|last]-column, p-table-column-function
         * p-table-column-justify-[left|right|center]
@@ -365,7 +365,7 @@ export default {
                 return "";
             }
         },
-        /*
+        /**
         * Lấy về style cho ô hiện tại nếu có
         * @param item, index: item và chỉ số header của nó
         * @Author TVPhuc (16/1/24)
@@ -385,7 +385,7 @@ export default {
                 return null;
             }
         },
-        /*
+        /**
         * Lấy giá trị truyền vào props của menu context cho từng item
         * @param {*} item: customer được focus menu Context, index: chỉ số
         * @Author TVPhuc (20/12/23)

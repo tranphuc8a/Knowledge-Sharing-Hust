@@ -1,0 +1,112 @@
+
+@import url(@/css/main.css);
+
+
+.p-textfield-bound{
+    height: var(--component-height);
+    border-radius: var(--border-radius);
+    opacity: 100%;
+    font-size: var(--font-size);
+    min-width: 60px;
+    width: 100%;
+    padding: 0px 8px 0px 12px;
+    border: solid var(--primary-color-200) 1px;
+    box-sizing: border-box;
+
+    color: var(--blue-grey-color-900);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border 0.5s ease, box-shadow 0.5s ease;
+}
+
+.p-textfield{
+    font-family: 'ks-font-regular';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    height: 20px;
+    width: 100%;
+    background-color: var(--transparent-color);
+
+    outline: unset;
+    border: unset;
+}
+
+.p-textfield::placeholder{
+    color: var(--grey-color-500);
+}
+
+
+/* NORMAL STATE */
+.p-input:not([state="read-only"]) .p-textfield-bound:hover{
+    background-color: var(--grey-color-200);
+}
+.p-input[state="normal"] .p-textfield-bound:focus-within{
+    background-color: #ffffff;
+    border: solid var(--primary-color) 1px;
+    box-shadow: var(--box-shadow-menucontext);
+}
+
+
+/* ERROR STATE */
+.p-input[state="error"] .p-textfield-bound{
+    background-color: white;
+    border: solid var(--red-color) 1px;
+}
+.p-input[state="error"] .p-textfield-bound:hover{
+    background-color: var(--grey-color-200);
+    border: solid var(--red-color) 1px;
+}
+.p-input[state="error"] .p-textfield-bound:focus-within{
+    background-color: white;
+    border: solid var(--red-color) 1px;
+    box-shadow: 0 0 10px rgba(var(--red-color-rgb), 0.56);
+}
+
+
+/* READ-ONLY STATE */
+.p-input[state="read-only"] .p-textfield-bound{
+    background-color: var(--primary-color-100);
+    border: none;
+}
+
+
+/* VALIDATING & VALIDATED STATE */
+.p-input[state="validating"] .p-textfield-bound,
+.p-input[state="validated"] .p-textfield-bound{
+    background-color: #FFFFFF;
+    border: solid var(--light-green-color) 1px;
+}
+.p-input[state="validating"] .p-textfield-bound:hover,
+.p-input[state="validated"] .p-textfield-bound:hover{
+    background-color: var(--grey-color-200);
+    border: solid var(--light-green-color) 1px;
+}
+.p-input[state="validating"] .p-textfield-bound:focus-within,
+.p-input[state="validated"] .p-textfield-bound:focus-within{
+    background-color: #FFFFFF;
+    border: solid var(--light-green-color) 1px;
+    box-shadow: 0 0 10px rgba(var(--light-green-color-rgb), 0.56);
+}
+
+
+/* CHOOSE ICON */
+.p-input .p-textfield-bound .p-normal-icon,
+.p-input .p-textfield-bound .p-validating-icon,
+.p-input .p-textfield-bound .p-validated-icon{
+    display: none;
+}
+
+.p-input[state="normal"] .p-textfield-bound .p-normal-icon,
+.p-input[state="error"] .p-textfield-bound .p-normal-icon,
+.p-input[state="read-only"] .p-textfield-bound .p-normal-icon{
+    display: block;
+}
+
+.p-input[state="validating"] .p-textfield-bound .p-validating-icon{
+    display: block;
+}
+.p-input[state="validated"] .p-textfield-bound .p-validated-icon{
+    display: block;
+}

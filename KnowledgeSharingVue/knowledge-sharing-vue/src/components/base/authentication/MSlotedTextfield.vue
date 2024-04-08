@@ -23,7 +23,7 @@ import { input } from '@/js/components/base/input';
 import { myEnum } from '@/js/resources/enum';
 import InputFrame from '@/components/base/inputs/MInputFrame.vue';
 export default {
-    name: 'MTextField',
+    name: 'MTextfield',
     data(){
         return {
             inputFrame: {
@@ -56,7 +56,7 @@ export default {
     },
     methods: {
         ...input.methods,
-        /*
+        /**
         * Ghi đè sự kiện resolveOnChange
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -69,7 +69,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Xử lý sự kiện resolveOnInput
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -121,5 +121,5 @@ export default {
 
 
 <style scoped>
-    @import url(@/css/base/authentication/text-field.css);
+@import url(@/css/base/input/textfield.css);
 </style>

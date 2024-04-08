@@ -1,14 +1,6 @@
 
-@import url(./icon/icon.css);
+@import url(@/css/main.css);
 
-.p-context-menu-container-parent{
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #EEEEEE;
-}
 
 .p-context-menu{
     position: relative;
@@ -18,13 +10,7 @@
 
 .p-context-menu .p-context-menu-mask {
     width: fit-content;
-}
-
-.p-context-menu > input{
-    opacity: 0; 
-    position: fixed;
-    z-index: -100;
-    cursor: unset;
+    cursor: pointer;
 }
 
 .p-context-menu-container{
@@ -37,7 +23,7 @@
     z-index: 100;
     position: absolute;
     font-family: 'ks-font-regular';
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.259);
+    box-shadow: var(--box-shadow-menucontext);
 }
 
 .p-context-menu-devide{
@@ -45,14 +31,13 @@
     padding: 8px 0px;
     height: 1px;
 }
-
 .p-context-menu-devide div{
     border-bottom: solid rgba(0, 0, 0, 0.05) 1px;
 }
 
 
 .p-context-menu-item{
-    height: 48px;
+    height: 36px;
     padding: 0px 16px;
     display: flex;
     justify-content: flex-start;
@@ -62,20 +47,16 @@
     cursor: pointer;
     font-family: 'ks-font-semibold';
 }
-
-.p-context-menu-item:hover{
-    background-color: rgba(80, 184, 60, 0.1)
-}
-
-.p-context-menu-item:active{
-    background-color: rgba(80, 184, 60, 0.3)
-}
-
-.p-context-menu-item-icon i::before{
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
+.p-context-menu-item .p-context-menu-item-icon{
+    width: 28px;
     display: flex;
+    flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
+}
+.p-context-menu-item:hover{
+    background-color: rgba(var(--primary-color-rgb), 0.1)
+}
+.p-context-menu-item:active{
+    background-color: rgba(var(--primary-color-rgb), 0.3)
 }

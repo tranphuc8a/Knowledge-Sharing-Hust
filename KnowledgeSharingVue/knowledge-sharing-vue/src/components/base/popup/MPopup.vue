@@ -58,7 +58,7 @@ export default {
 
     },
     methods: {
-        /*
+        /**
         * Hai phương thức ẩn/hiện popup
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -70,7 +70,7 @@ export default {
         async hide(){
             this.dIsShow = false;
         }, 
-        /*
+        /**
         * Xử lý logic khi close popup
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -86,7 +86,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Xử lý logic khi click previous popup
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -104,7 +104,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Xử lý logic khi click Okay
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -122,7 +122,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Xử lý logic khi click cancel button
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -178,7 +178,7 @@ export default {
 </script>
 
 <style scoped>
-    @import url(@/css/base/popup.css);
+    @import url(@/css/base/popup/popup.css);
 </style>
 
 

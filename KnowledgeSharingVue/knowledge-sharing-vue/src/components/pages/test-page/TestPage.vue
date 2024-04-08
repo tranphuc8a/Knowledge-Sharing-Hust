@@ -1,22 +1,20 @@
 <template>
+    <TestInputPage />
     <TestButtonsPage />
-
-    <ImageIcon :src="require('@/assets/logo.png')" />
-    <ImageIcon :src="require('@/assets/logo.png')" state="disabled"/>
-
-    <ActionIcon fa="close" />
-    <ActionIcon fa="close" state="disabled"/>
+    <TestContextMenuPage />
+    <TestToastPage />
 </template>
 
 
 <script>
+import TestInputPage from '@/components/base/inputs/TestInputPage.vue';
 import TestButtonsPage from '@/components/base/buttons/TestButtonsPage.vue';
-import ImageIcon from '@/components/base/icons/MImageIcon.vue';
-import ActionIcon from '@/components/base/icons/MActionIcon'
+import TestContextMenuPage from '@/components/base/context-menu/TestContextMenuPage.vue';
+import TestToastPage from '@/components/base/toast/TestToastPage.vue';
 
 export default {
     name: 'KSTestPage',
-    components: { TestButtonsPage, ImageIcon, ActionIcon },
+    components: { TestButtonsPage, TestContextMenuPage, TestToastPage, TestInputPage },
     data(){
         return {
         }

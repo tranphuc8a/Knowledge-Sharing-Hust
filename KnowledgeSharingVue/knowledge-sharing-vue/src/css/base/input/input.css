@@ -1,10 +1,10 @@
 
-@import url(./icon/icon.css);
+@import url(@/css/main.css);
 
 .p-input{
     display: flex;
     flex-flow: column nowrap;
-    gap: 8px;
+    gap: 0px;
     font-family: 'ks-font-regular';
 }
 
@@ -26,6 +26,11 @@
     font-family: 'ks-font-semibold';
 }
 
+.p-input .p-input-title .p-input-obligate{
+    color: red;
+}
+
+
 .p-input .p-input-note{
     font-family: 'ks-font-italic';
     color: #9E9E9E;
@@ -36,12 +41,15 @@
     color: #E61D1D;
     font-size: 14px;
     display: none;
+    line-height: 20px;
 }
 
 
 .p-input[state='error'] .p-input-error-message{
     display: block;
+    text-align: start;
 }
+
 
 .p-input-content{
     position: relative;

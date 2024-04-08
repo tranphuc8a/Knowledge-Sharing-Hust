@@ -48,7 +48,7 @@ export default {
 
     },
     methods: {
-        /*
+        /**
         * Hai phương thức giúp ẩn hiện dialog
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -60,7 +60,7 @@ export default {
         async hide(){
             this.dIsShow = false;
         }, 
-        /*
+        /**
         * Thực hiện xử lý đóng dialog
         * @param none
         * @Author TVPhuc (12/12/23)

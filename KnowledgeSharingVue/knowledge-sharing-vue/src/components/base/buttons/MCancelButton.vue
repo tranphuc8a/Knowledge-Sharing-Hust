@@ -35,7 +35,7 @@ export default button;
 </script>
 
 <style scoped>
-    @import url(@/css/base/button.css);
+    @import url(@/css/base/button/button.css);
 </style>
 
 
