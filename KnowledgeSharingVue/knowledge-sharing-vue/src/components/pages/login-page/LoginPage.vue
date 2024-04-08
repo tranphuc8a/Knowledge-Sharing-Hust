@@ -78,8 +78,8 @@
 
 <script>
 import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-import AmisTextField from '@/components/base/authentication/MTextField.vue';
-import AmisPasswordTextField from '@/components/base/authentication/MPasswordTextField.vue';
+import AmisTextField from '@/components/base/authentication/MSlotedTextField.vue';
+import AmisPasswordTextField from '@/components/base/authentication/MPasswordTextfield.vue';
 import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
 import { UsernameValidator, PasswordValidator, Validator, NotEmptyValidator } from '@/js/utils/validator';
 import { Request, PostRequest, GetRequest } from '@/js/services/request';

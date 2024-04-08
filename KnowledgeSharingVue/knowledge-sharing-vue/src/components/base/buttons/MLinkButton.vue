@@ -48,7 +48,7 @@ export default button;
 </script>
 
 <style>
-    @import url(@/css/base/button.css);
+    @import url(@/css/base/button/button.css);
 </style>
 
 

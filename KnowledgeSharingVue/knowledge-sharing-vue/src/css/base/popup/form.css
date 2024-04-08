@@ -1,6 +1,6 @@
 
 
-@import url(./textfield.css);
+@import url(@/css/base/input/textfield.css);
 
 .p-form-container{
     width: 100%;

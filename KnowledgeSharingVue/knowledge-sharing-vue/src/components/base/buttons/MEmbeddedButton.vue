@@ -1,5 +1,5 @@
 <template>
-    <div @:click="resolveOnclick" class="p-button p-cancel-button" :state="data.state">
+    <div @:click="resolveOnclick" class="p-button p-embedded-button" :state="data.state">
         <div class="p-button-content">
             <MIcon :fa="fa" v-if="fa != null" />
             <div v-if="label != null"> {{ label }} </div>
@@ -13,7 +13,7 @@
 <script>
 import buttonScript from '@/js/components/base/button';
 let button = {
-    name: "CancelButton",
+    name: "EmbeddedButton",
     data() {
         return {
             data: {

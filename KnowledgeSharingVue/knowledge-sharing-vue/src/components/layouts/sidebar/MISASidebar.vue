@@ -6,7 +6,7 @@
                     <i class="pi-icon pi-home-white"></i>
                 </div>
                 <div class="p-sidebar-item-title">
-                    {{ getLabel().homepage }}
+                    {{ getLabel()?.homepage }}
                 </div>
             </router-link>
             <router-link to="/customer" class="p-sidebar-item">
@@ -14,7 +14,7 @@
                     <i class="pi-icon pi-vcard-white"></i>
                 </div>
                 <div class="p-sidebar-item-title">
-                    {{ getLabel().customer }}
+                    {{ getLabel()?.customer }}
                 </div>
             </router-link>
             <router-link to="/employee" class="p-sidebar-item">
@@ -22,7 +22,7 @@
                     <i class="pi-icon pi-user-white"></i>
                 </div>
                 <div class="p-sidebar-item-title">
-                    {{ getLabel().employee }}
+                    {{ getLabel()?.employee }}
                 </div>
             </router-link>
             <router-link to="/import" class="p-sidebar-item">
@@ -30,7 +30,7 @@
                     <Icon faClassname="pi-icon pi-excel-white"/>
                 </div>
                 <div class="p-sidebar-item-title">
-                    {{ getLabel().import }}
+                    {{ getLabel()?.import }}
                 </div>
             </router-link>
             <router-link to="/setting" class="p-sidebar-item">
@@ -38,7 +38,7 @@
                     <i class="pi-icon pi-gear-white"></i>
                 </div>
                 <div class="p-sidebar-item-title">
-                    {{ getLabel().setting }}
+                    {{ getLabel()?.setting }}
                 </div>
             </router-link>
         </div>
@@ -48,7 +48,7 @@
                     <i class="pi-icon pi-collapse-white"></i>
                 </div>
                 <div class="p-sidebar-item-title">
-                    {{ getLabel().collapse }}
+                    {{ getLabel()?.collapse }}
                 </div>
                 <div class="p-sidebar-item-icon p-expand">
                     <i class="pi-icon pi-expand-white"></i>
@@ -90,7 +90,7 @@ export default {
             }
             return this.label;
         },
-        /* 
+        /* *
         * Thay đổi trạng thái expand của sidebar
         * @param none
         * @Author TVPhuc (19/12/23)
@@ -107,7 +107,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Thay đổi trạng thái sidebar
         * @param none
         * @Author TVPhuc (19/12/23)

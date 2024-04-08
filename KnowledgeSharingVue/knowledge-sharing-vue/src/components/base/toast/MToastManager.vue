@@ -54,6 +54,9 @@ export default {
         async success(description = "This is message", duration = 3000){
             await this.addToast("success", description, duration);
         },
+        async information(description = "This is message", duration = 3000){
+            await this.addToast("inform", description, duration);
+        },
         async inform(description = "This is message", duration = 3000){
             await this.addToast("inform", description, duration);
         },
@@ -76,40 +79,7 @@ export default {
 }
 </script>
 
-<style>
-.p-toast-manager{
-    position: fixed;
-    right: 50px;
-    bottom: 50px;
-    /* background-color: red; */
-    height: auto;
-    width: auto;
-    max-width: 80%;
-    /* padding: 16px; */
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: flex-end;
-    align-items: flex-end;
-    gap: 12px;
-    z-index: 20;
-}
-
-.toast-enter-active, .toast-leave-active {
-    transition: opacity 0.5s, transform 0.5s;
-}
-
-.toast-move{
-    transition: all 0.35s;
-}
-
-.toast-enter-from{
-    opacity: 0;
-    transform: translateX(200px);
-}
-.toast-leave-to {
-    opacity: 0;
-    transform: translateX(200px);
-}
-
+<style scoped>
+@import url(@/css/base/toast/toast-manager.css);
 </style>
 

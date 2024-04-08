@@ -63,7 +63,7 @@
     flex-shrink: 0;
     flex-grow: 0;
     box-sizing: border-box;
-    background-color: #50B83C;
+    background-color: var(--primary-color);
     border-radius: 100%;
     opacity: 0;
     display: flex;
@@ -72,12 +72,12 @@
 }
 
 .p-radio-button .p-radio-button-mask:hover{
-    border: solid #50B83C 1px;
-    box-shadow: 0 0 4px #50B83C;
+    border: solid var(--primary-color) 1px;
+    box-shadow: 0 0 4px var(--primary-color);
 }
 
 .p-radio-button:has(:checked) .p-radio-button-mask{
-    border-color: #50B83C;
+    border-color: var(--primary-color);
 }
 
 .p-radio-button:has(:checked) .p-radio-button-mask .p-radio-button-dot{

@@ -1,6 +1,6 @@
 
-@import url(./icon/icon.css);
-@import url(../main.css);
+
+@import url(@/css/main.css);
 
 
 /* *:hover{
@@ -25,6 +25,9 @@
     padding: var(--button-padding);
     border-radius: var(--border-radius);
     box-sizing: border-box;
+    overflow: hidden;
+    box-shadow: 0 0 4px rgba(var(--primary-color-rgb), 0.2);
+    white-space: nowrap;
     overflow: hidden;
 }
 
@@ -84,6 +87,7 @@
 .p-delete-button {
     padding: var(--button-padding);
     background-color: var(--red-color);
+    box-shadow: 0 0 4px rgba(var(--red-color-rgb), 0.56);
     color: white;
 }
 
@@ -105,7 +109,7 @@
     padding: var(--button-padding);
     background-color: white;
     color: var(--primary-color);
-    border: solid #E6E6E6 1px;
+    border: solid var(--primary-color-100) 1px;
 }
 
 .p-cancel-button:not([state='loading']):hover,
@@ -119,12 +123,34 @@
 }
 
 
+/* EMBEDDED BUTTON */
+
+.p-embedded-button {
+    padding: var(--button-padding);
+    background-color: var(--transparent-color);
+    color: var(--primary-color);
+    border: unset;
+    box-shadow: none;
+}
+
+.p-embedded-button:not([state='loading']):hover,
+.p-embedded-icon-button:not([state='loading']):hover{
+    background-color: var(--grey-color-200);
+}
+
+.p-embedded-button:not([state='loading']):active,
+.p-embedded-icon-button:not([state='loading']):active{
+    background-color: var(--grey-color-300);
+}
+
+
 
 /* LINK BUTTON */
 .p-link-button {
     background-color: var(--transparent-color);
     color: var(--primary-color);
     border: none;
+    box-shadow: none;
 }
 .p-link-button a{
     text-decoration: none;

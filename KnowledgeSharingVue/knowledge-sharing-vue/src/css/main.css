@@ -10,6 +10,8 @@
 	--button-padding: 0px 24px;
 
 	--font-size: 14px;
+	--box-shadow-card: 0px 0px 10px rgba(var(--primary-color-rgb), 0.2);
+	--box-shadow-menucontext: 0px 0px 10px rgba(var(--primary-color-rgb), 0.56);
 }
 
 #app {
@@ -19,9 +21,11 @@
 	text-align: center;
 	color: var(--blue-grey-color-900);
 	margin-top: 60px;
+	
 }
 
 * {
 	box-sizing: border-box;
 	overflow: visible;
+	transition: background-color 0.5s ease;
 }

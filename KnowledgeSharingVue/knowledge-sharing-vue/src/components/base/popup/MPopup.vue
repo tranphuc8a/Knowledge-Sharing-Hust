@@ -5,8 +5,7 @@
                 <div class="p-popup-title">
                     {{ header }}
                 </div>
-                <ActionIcon faClassname="pi-sprite-times p-red-icon" :onclick="resolveOnClose" 
-                        :style="iconStyle" :iconStyle="iconStyle"/>
+                <ActionIcon fa="times" :iconStyle="{ color: 'var(--red-color)', fontSize: '24px'}" :onclick="resolveOnClose"/>
             </div>
 
             <div class="p-popup-content">
@@ -42,15 +41,10 @@ import CancelButton from '@/components/base/buttons/MCancelButton.vue';
 import ActionIcon from '@/components/base/icons/MActionIcon.vue';
 
 export default {
-    name: "MyPopup",
+    name: "MPopup",
     data() {
         return {
-            dIsShow: true,
-            iconStyle: {
-                width: "32px",
-                height: "32px",
-                'font-size': "24px"
-            }
+            dIsShow: true
         };
     },
     components: { NormalButton, CancelButton, ActionIcon },
@@ -58,7 +52,7 @@ export default {
 
     },
     methods: {
-        /*
+        /**
         * Hai phương thức ẩn/hiện popup
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -70,7 +64,7 @@ export default {
         async hide(){
             this.dIsShow = false;
         }, 
-        /*
+        /**
         * Xử lý logic khi close popup
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -86,7 +80,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Xử lý logic khi click previous popup
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -104,7 +98,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Xử lý logic khi click Okay
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -122,7 +116,7 @@ export default {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Xử lý logic khi click cancel button
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -178,7 +172,7 @@ export default {
 </script>
 
 <style scoped>
-    @import url(@/css/base/popup.css);
+    @import url(@/css/base/popup/popup.css);
 </style>
 
 

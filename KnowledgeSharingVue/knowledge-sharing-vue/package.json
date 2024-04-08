@@ -11,6 +11,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/vue-fontawesome": "^3.0.6",
+    "@vuepic/vue-datepicker": "^8.4.0",
     "axios": "^1.6.8",
     "core-js": "^3.8.3",
     "jquery": "^3.7.1",
@@ -18,8 +19,7 @@
     "postcss": "^8.4.38",
     "primevue": "^3.50.0",
     "vue": "^3.2.13",
-    "vue-router": "^4.2.5",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

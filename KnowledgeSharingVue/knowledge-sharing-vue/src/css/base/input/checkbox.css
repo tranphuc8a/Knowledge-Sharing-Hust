@@ -1,5 +1,6 @@
 
-@import url(./font.css);
+@import url(@/css/main.css);
+
 /* CSS FOR CHECKBOX */
 
 
@@ -32,11 +33,11 @@
 
 @supports (-webkit-appearance: none) or (-moz-appearance: none) {
     .p-checkbox input[type=checkbox] {
-        --active: #50B83C;
+        --active: var(--primary-color);
         --active-inner: #fff;
-        --focus: 2px #50B83C;
+        --focus: 2px var(--primary-color);
         --border: #BBC1E1;
-        --border-hover: #50B83C;
+        --border-hover: var(--primary-color);
         --background: #fff;
         --disabled: #F6F8FF;
         --disabled-inner: #E1E6F9;

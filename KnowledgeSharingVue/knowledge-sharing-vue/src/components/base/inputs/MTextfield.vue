@@ -11,12 +11,11 @@
                     @:keyup.enter.prevent.stop="resolveOnPressEnter"
                     :readonly="inputFrame.state==='read-only'"/>
 
-            <ActionIcon v-if="isShowIcon && onclickIcon" 
-                faClassname="pi-sprite-search-dark p-normal-icon" :onclick="resolveOnclickIcon()" />
-            <Icon v-else-if="isShowIcon == 1" faClassname="pi-sprite-search-dark p-normal-icon"/>
+            <ActionIcon v-if="isShowIcon && onclickIcon" fa="search" :onclick="resolveOnclickIcon()" />
+            <MIcon v-else-if="isShowIcon == 1" fa="search"/>
             
-            <Spinner color="green" size="small" class="p-validating-icon"/>
-            <Icon faClassname="pi-icon-smaller pi-circle-check-green p-validated-icon"/>
+            <MSpinner class="p-validating-icon" :style="data.greenColor" />
+            <MIcon fa="circle-check" :style="data.greenColor" class="p-validated-icon"/>
         </div>
     </InputFrame>
 </template>
@@ -27,7 +26,7 @@ import ActionIcon from '@/components/base/icons/MActionIcon.vue';
 import Spinner from '@/components/base/icons/MSpinner.vue';
 import InputFrame from './MInputFrame.vue';
 import { input } from '@/js/components/base/input';
-import { myEnum } from '@/js/resources/enum';
+// import { myEnum } from '@/js/resources/enum';
 
 let textfield = {
     name: "Textfield",
@@ -44,6 +43,7 @@ let textfield = {
                 isShowError: this.isShowError
             },
             data: {
+                greenColor: { color: 'var(--light-green-color)'},
                 value: this.value,
                 isDynamicValidate: this.isDynamicValidate,
                 validator: this.validator,
@@ -57,7 +57,6 @@ let textfield = {
         };
     },
     mounted() {
-        this.inputFrame.state = myEnum.inputState.NORMAL;
         this.components.input = this.$refs.textfield;
     },
     components: {
@@ -66,7 +65,7 @@ let textfield = {
     methods: {
         ...input.methods,
         
-        /*
+        /**
         * Ghi đè sự kiện resolveOnChange
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -79,7 +78,7 @@ let textfield = {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Xử lý sự kiện resolveOnInput
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -135,5 +134,5 @@ export default textfield;
 </script>
 
 <style>
-@import url(@/css/base/textfield.css);
+@import url(@/css/base/input/textfield.css);
 </style>

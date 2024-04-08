@@ -17,6 +17,9 @@
 
         <ComboButton label="Facebook" fa="align-center"/>
         <ComboButton label="Youtube" fa="align-left" state="disabled" />
+
+        <EmbeddedButton label="Liked" fa="thumbs-up"/>
+        <EmbeddedButton label="Comment" fa="comment-alt" state="disabled" />
     </div>
 </template>
 
@@ -27,9 +30,10 @@ import CancelButton from '@/components/base/buttons/MCancelButton';
 import DeleteButton from '@/components/base/buttons/MDeleteButton';
 import LinkButton from '@/components/base/buttons/MLinkButton';
 import ComboButton from '@/components/base/buttons/MComboButton';
+import EmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
 
 export default {
     name: 'TestButtonsPage',
-    components: { Button, CancelButton, DeleteButton, LinkButton, ComboButton },
+    components: { Button, CancelButton, DeleteButton, LinkButton, ComboButton, EmbeddedButton },
 }
 </script>

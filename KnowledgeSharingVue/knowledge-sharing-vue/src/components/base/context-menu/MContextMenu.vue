@@ -1,34 +1,33 @@
 <template>
-    <div class="p-context-menu" tabindex="1" @focus="resolveOnFocus" @blur="resolveOnBlur">
-        <div class="p-context-menu-mask" @:click="showContextMenu"
-            ref="mask">
+    <div class="p-context-menu" tabindex="1" @blur="resolveOnBlur">
+        <div class="p-context-menu-mask" @:click="toggleShowContextMenu" ref="mask">
             <slot />
         </div>
 
-        <!-- <input type="text" ref="input"
-            /> -->
         <div class="p-context-menu-container" ref="menu" v-show="isShowMenu">
             <!-- Items on context menu top -->
             <div class="p-context-menu-top" v-show="dItems.top.length > 0">
-                <div class="p-context-menu-item" v-for="(item, index) in dItems.top" :key="index"
+                <div class="p-context-menu-item" 
+                    v-for="(item, index) in dItems.top" :key="index"
                     @:click="resolveClickItemFunction(item.onclick)">
                     <div class="p-context-menu-item-icon">
-                        <i :class="getItemIconClassname(item)"></i>
+                        <MIcon :fa="item.fa" :style="item.style" />
                     </div>
                     <div class="p-context-menu-item-title">
                         {{ item.label }}
                     </div>
                 </div>
             </div>
-            <div class="p-context-menu-devide" v-show="dItems.bottom.length > 0">
-                <div></div>
+            <div class="p-context-menu-devide" v-show="dItems.top.length > 0 && dItems.bottom.length > 0">
+                <div> </div>
             </div>
             <!-- Items on context menu bottom -->
             <div class="p-context-menu-bottom" v-show="dItems.bottom.length > 0">
-                <div class="p-context-menu-item" v-for="(item, index) in dItems.bottom" :key="index"
+                <div class="p-context-menu-item" 
+                    v-for="(item, index) in dItems.bottom" :key="index"
                     @:click="resolveClickItemFunction(item.onclick)">
                     <div class="p-context-menu-item-icon">
-                        <i :class="getItemIconClassname(item)"></i>
+                        <MIcon :fa="item.fa" :style="item.style" />
                     </div>
                     <div class="p-context-menu-item-title">
                         {{ item.label }}
@@ -65,63 +64,49 @@ export default {
         this.updateMenuContextPosition();
     },
     methods: {
-        /* 
-        * Hiển thị context menu
+        /**
+        * Hiển thị hoặc ẩn menu context
         * @param none
         * @Author TVPhuc (20/12/23)
         * @Edit None
         **/
-        async showContextMenu(){
+        async toggleShowContextMenu(){
             try {
-                // await this.input.focus();
+                this.isShowMenu = !this.isShowMenu;
             } catch (error){
                 console.error(error);
             }
         },
-        /* 
-        * Xử lý khi focus menu
-        * @param none
-        * @Author TVPhuc (20/12/23)
-        * @Edit None
-        **/
-        async resolveOnFocus(){
-            try {
-                this.isShowMenu = true;
-            } catch (error){
-                console.error(error);
-            }
-        },
-        /* 
-        * Xử lý khi unfocus menu
+        
+        /**
+        * Xử lý khi unfocus menu (ẩn menu)
         * @param none
         * @Author TVPhuc (20/12/23)
         * @Edit None
         **/
         async resolveOnBlur(){
             try {
-                // await new Promise(e => setTimeout(e, 200));
                 this.isShowMenu = false;
             } catch (error){
                 console.error(error);
             }
         },
-        /* 
-        * Xử lý khi click item
+        
+        /**
+        * Xử lý khi click item trong menu dropdown
         * @param none
         * @Author TVPhuc (20/12/23)
         * @Edit None
         **/
         async resolveClickItemFunction(itemCallback){
             try {
-                // console.log("do call back");
                 await itemCallback();
-                // console.log("do call back done");
-                // await this.input.blur();
+                await this.toggleShowContextMenu();
             } catch (error){
                 console.error(error);
             }
         },
-        /* 
+        /**
         * Lấy classname cho item icon
         * @param none
         * @return className của icon cần lấy
@@ -131,7 +116,7 @@ export default {
         getItemIconClassname(item){
             return `fa ${item.faClassname} p-icon p-${item.color}-icon`;
         },
-        /* 
+        /**
         * Định dạng lại danh sách các items
         * @param none
         * @Author TVPhuc (20/12/23)
@@ -139,11 +124,11 @@ export default {
         **/
         async formatItems(){
             try {
-                // Đặt các giá trị mặc định cho item nếu props truyền thiếu
+                // Đặt các giá trị mặc định cho item nếu props truyền thiếu dữ liệu
                 let temp = this.items;
                 let formatItem = function(item){
-                    let keys = ['faClassname', 'color', 'label', 'onclick'];
-                    let defaults = ['pi-icon pi-book', 'green', 'Đọc sách', async function(){}];
+                    let keys = ['fa', 'style', 'label', 'onclick'];
+                    let defaults = ['book', null, 'Đọc sách', async function(){}];
                     for (let i = 0; i < 4; i++){
                         if (Validator.isEmpty(item[keys[i]])){
                             item[keys[i]] = defaults[i];
@@ -161,7 +146,7 @@ export default {
                 console.error(error);
             }
         },
-        /* 
+        /**
         * Cập nhật vị trí menu context
         * @param none
         * @Author TVPhuc (20/12/23)
@@ -196,24 +181,23 @@ export default {
         position() { this.updateMenuContextPosition(); }
     },
     props: {
-        position: { default: "bottom right" },
+        position: { default: "bottom left" },
         items: {
             default: { // example about items form
                 top: [{
-                    faClassname: 'pi-icon pi-book',
-                    color: 'green',
-                    label: 'Đọc sách',
+                    fa: 'user-plus',
+                    style: null,
+                    label: 'Thêm người dùng',
                     onclick: async function(){}
                 }, {
-                    faClassname: 'pi-icon pi-book',
-                    color: 'green',
+                    fa: 'book',
                     label: 'Đọc sách',
                     onclick: async function(){}
                 }],
                 bottom: [{
-                    faClassname: 'pi-icon pi-book',
-                    color: 'red',
-                    label: 'Đọc sách',
+                    fa: 'trash-can',
+                    style: { color: 'var(--red-color)'},
+                    label: 'Xóa',
                     onclick: async function(){ console.log("xóa"); }
                 }]
             }
@@ -226,5 +210,5 @@ export default {
 
 
 <style>
-@import url(@/css/base/context-menu.css);
+@import url(@/css/base/others/context-menu.css);
 </style>

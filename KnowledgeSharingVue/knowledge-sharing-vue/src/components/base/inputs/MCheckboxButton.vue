@@ -72,7 +72,7 @@ let checkbox = {
                 console.error(error);
             }
         },
-        /*
+        /**
         * Tương tự setValue nhưng tên ý nghĩa hơn
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -109,7 +109,7 @@ export default checkbox;
 </script>
 
 <style>
-    @import url(@/css/base/checkbox.css);
+    @import url(@/css/base/input/checkbox.css);
 </style>
 
 

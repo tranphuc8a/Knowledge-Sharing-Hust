@@ -1,7 +1,8 @@
 
 @import url(./icon/icon.css);
 @import url(./checkbox.css);
-@import url(./font.css);
+@import url(@/css/main.css);
+
 @import url(./button.css);
 @import url(./textfield.css);
 

@@ -175,7 +175,7 @@ export default checkbox;
 </script>
 
 <style>
-    @import url(@/css/base/checkbox.css);
+    @import url(@/css/base/input/checkbox.css);
 </style>
 
 

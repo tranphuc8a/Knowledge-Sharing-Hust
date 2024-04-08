@@ -9,6 +9,7 @@ import setnewPasswordResource from "./authentication/setnew-password-resource";
 import registerPageResource from "./authentication/register-page-resource";
 import enterRegisterVerificationCodeResource from "./authentication/enter-register-verification-code-resource";
 import createNewUserPageResource from "./authentication/create-new-user-page-resource";
+import componentResource from "./component-resource";
 
 const language = {
     'vi': {
@@ -23,6 +24,7 @@ const language = {
                 other: 'Khác'
             }
         },
+        components: componentResource.vi,
         validator: validatorResource.vi,
         pages: {
             login: loginPageResource.vi,
@@ -47,6 +49,7 @@ const language = {
                 other: 'Others'
             }
         },
+        components: componentResource.en,
         validator: validatorResource.en,
         pages: {
             login: loginPageResource.en,

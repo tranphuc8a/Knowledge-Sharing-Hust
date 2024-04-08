@@ -5,8 +5,7 @@
                 <div class="p-dialog-title">
                     {{ header }}
                 </div>
-                <ActionIcon faClassname="pi-sprite-times p-red-icon" :onclick="resolveClickClose" 
-                            :style="iconStyle" :iconStyle="iconStyle"/>
+                <ActionIcon fa="times" :onclick="resolveClickClose"/>
             </div>
             <div class="p-dialog-content">
                 <div class="p-dialog-content-icon">
@@ -35,12 +34,7 @@ export default {
     name: "MyDialog",
     data() {
         return {
-            dIsShow: true,
-            iconStyle: {
-                width: "32px",
-                height: "32px",
-                'font-size': "24px"
-            }
+            dIsShow: true
         };
     },
     components: {NormalButton, CancelButton, ActionIcon},
@@ -48,7 +42,7 @@ export default {
 
     },
     methods: {
-        /*
+        /**
         * Hai phương thức giúp ẩn hiện dialog
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -60,7 +54,7 @@ export default {
         async hide(){
             this.dIsShow = false;
         }, 
-        /*
+        /**
         * Thực hiện xử lý đóng dialog
         * @param none
         * @Author TVPhuc (12/12/23)

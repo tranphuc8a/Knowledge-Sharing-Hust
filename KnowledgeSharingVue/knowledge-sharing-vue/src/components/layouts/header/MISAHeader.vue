@@ -16,7 +16,7 @@
             <div class="p-header-navbar">
                 <div class="p-button p-link-button" state="normal">
                     <div onclick="" class="p-button-content">
-                        <a href="./html"> {{ getLabel().summary }} </a>
+                        <a href="./html"> {{ getLabel()?.summary }} </a>
                     </div>
                     <div class="p-loading-container">
                         <Spinner />
@@ -24,7 +24,7 @@
                 </div>
                 <div class="p-button p-link-button" state="normal">
                     <div onclick="" class="p-button-content">
-                        <a href=""> {{ getLabel().salaryComponent }} </a>
+                        <a href=""> {{ getLabel()?.salaryComponent }} </a>
                     </div>
                     <div class="p-loading-container">
                         <Spinner />
@@ -32,7 +32,7 @@
                 </div>
                 <div class="p-button p-link-button" state="normal">
                     <div onclick="" class="p-button-content">
-                        <a href=""> {{ getLabel().salaryTablePattern }} </a>
+                        <a href=""> {{ getLabel()?.salaryTablePattern }} </a>
                     </div>
                     <div class="p-loading-container">
                         <Spinner />
@@ -40,7 +40,7 @@
                 </div>
                 <div class="p-button p-link-button" state="normal">
                     <div onclick="" class="p-button-content">
-                        <a href=""> {{ getLabel().salaryData }} </a>
+                        <a href=""> {{ getLabel()?.salaryData }} </a>
                     </div>
                     <div class="p-loading-container">
                         <Spinner />

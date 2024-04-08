@@ -36,7 +36,7 @@ export default {
         isShowError: {
             default: true
         },
-        title: {},
+        title: { default: null},
         label: {
             default: 'Label of input'
         },
@@ -51,8 +51,6 @@ export default {
 </script>
 
 <style scoped>
-@import url(@/css/base/input.css);
-.p-input .p-input-title .p-input-obligate{
-    color: red;
-}
+@import url(@/css/base/input/input.css);
+
 </style>

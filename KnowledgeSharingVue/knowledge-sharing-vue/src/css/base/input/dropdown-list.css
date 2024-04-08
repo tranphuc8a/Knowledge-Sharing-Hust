@@ -1,5 +1,5 @@
 
-@import url(./icon/icon.css);
+@import url(@/css/main.css);
 
 .p-dropdown-container{
     padding: 0 500px;

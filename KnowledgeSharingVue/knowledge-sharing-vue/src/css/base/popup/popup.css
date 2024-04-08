@@ -1,10 +1,9 @@
 
-@import url(./form.css);
-@import url(./icon/icon.css);
-@import url(./font.css);
-@import url(./radiobutton.css);
-@import url(./button.css);
-@import url(../layouts/body.css);
+@import url(@/css/base/popup/form.css);
+@import url(@/css/main.css);
+@import url(@/css/base/input/radiobutton.css);
+@import url(@/css/base/button/button.css);
+@import url(@/css/layouts/body.css);
 
 
 .p-popup-background{
@@ -20,11 +19,23 @@
     position: fixed;
 }
 
+@media screen and (max-width: 767px){
+    .p-popup{
+        min-width: 100px; 
+        width: 80vw;  
+    }
+}
+@media screen and (min-width: 768px){
+    .p-popup{
+        min-width: 500px;   
+        width: fit-content;
+    }
+}
+
 .p-popup{
     margin: 36px;
     background-color: white;
-    min-width: 500px;
-    width: fit-content;
+    max-width: 80vw;
     flex: 0 0 auto;
     /* max-width: 80%; */
     overflow: visible;
@@ -90,8 +101,4 @@
     justify-content: flex-end;
     align-items: center;
     gap: 8px;
-}
-
-.p-cancel-button {
-    border: solid #E0E0E0 1px;
 }
