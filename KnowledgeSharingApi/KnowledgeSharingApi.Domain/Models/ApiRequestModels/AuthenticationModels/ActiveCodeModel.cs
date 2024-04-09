@@ -12,9 +12,9 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationMode
     {
         [EmailValidator(ErrorMessage = ViConstantResource.EMAIL_FORMAT)]
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.EMAIL_EMPTY)]
-        public string Email { get; set; } = string.Empty;
+        public string? Email { get; set; } = string.Empty;
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ACCESS_CODE_EMPTY)]
-        public string ActiveCode { get; set; } = string.Empty;
+        public string? ActiveCode { get; set; } = string.Empty;
     }
 }

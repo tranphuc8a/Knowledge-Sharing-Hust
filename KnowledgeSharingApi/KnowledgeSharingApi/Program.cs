@@ -10,13 +10,17 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Captcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Emails;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
+using KnowledgeSharingApi.Infrastructures.Interfaces.OAuth2;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Request;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets;
+using KnowledgeSharingApi.Infrastructures.OAuth2;
 using KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories;
+using KnowledgeSharingApi.Infrastructures.Request;
 using KnowledgeSharingApi.Infrastructures.Storages;
 using KnowledgeSharingApi.Infrastructures.UnitOfWorks;
 using KnowledgeSharingApi.Infrastructures.WebSockets;
@@ -119,6 +123,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<INotificationSocketSessionManager, NotificationSocketSessionManager>();
 builder.Services.AddSingleton<ILiveChatSocketSessionManager, LiveChatSocketSessionManager>();
 builder.Services.AddSingleton<INewMessageNotificationSocketSessionManager, NewMessageNotificationSocketSessionManager>();
+builder.Services.AddSingleton<IGoogleOAuth2, GoogleOAuth2>();
 
 //
 //

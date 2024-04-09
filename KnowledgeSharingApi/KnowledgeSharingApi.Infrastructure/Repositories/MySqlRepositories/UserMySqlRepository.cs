@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Entities;
@@ -144,6 +145,29 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 res[item.UserId] = item;
             }
             return res;
+        }
+
+        public async Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName)
+        {
+            user.UserId = userId;
+            user.HashPassword = encrypt.Sha256HashPassword(user.Username, password);
+            user.Role = UserRoles.User;
+
+            DbContext.Users.Add(user);
+            Profile profile = new()
+            {
+                // Entity:
+                CreatedBy = fullName,
+                CreatedTime = DateTime.Now,
+                // Profile
+                ProfileId = Guid.NewGuid(),
+                UserId = userId,
+                FullName = fullName
+            };
+            DbContext.Profiles.Add(profile);
+
+            int rows = await DbContext.SaveChangesAsync();
+            return rows > 0 ? userId : null;
         }
     }
 }
