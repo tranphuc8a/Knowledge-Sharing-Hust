@@ -126,5 +126,17 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage);
+
+        /// <summary>
+        /// Dang ky moi mot user
+        /// </summary>
+        /// <param name="userId"> id của user cần them moi </param>
+        /// <param name="user"> thong tin user them moi </param>
+        /// <param name="password"> mat khau </param>
+        /// <param name="fullName"> Ten cua user dang ky </param>
+        /// <returns> Trả về id user tương ứng hoac null neu that bai </returns>
+        /// Created: PhucTV (10/4/24)
+        /// Modified: None
+        Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName);
     }
 }
