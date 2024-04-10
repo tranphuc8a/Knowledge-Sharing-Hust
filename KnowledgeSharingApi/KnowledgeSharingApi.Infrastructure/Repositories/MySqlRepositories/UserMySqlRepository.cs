@@ -149,25 +149,36 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName)
         {
-            user.UserId = userId;
-            user.HashPassword = encrypt.Sha256HashPassword(user.Username, password);
-            user.Role = UserRoles.User;
-
-            DbContext.Users.Add(user);
-            Profile profile = new()
+            var transaction = await DbContext.BeginTransaction();
+            try
             {
-                // Entity:
-                CreatedBy = fullName,
-                CreatedTime = DateTime.Now,
-                // Profile
-                ProfileId = Guid.NewGuid(),
-                UserId = userId,
-                FullName = fullName
-            };
-            DbContext.Profiles.Add(profile);
+                user.HashPassword = encrypt.Sha256HashPassword(user.Username, password);
+                user.Role = UserRoles.User;
+                user.UserId = userId;
 
-            int rows = await DbContext.SaveChangesAsync();
-            return rows > 0 ? userId : null;
+                Profile profile = new()
+                {
+                    CreatedBy = fullName,
+                    CreatedTime = DateTime.Now,
+                    ProfileId = Guid.NewGuid(),
+                    UserId = userId,
+                    FullName = fullName
+                };
+
+                dbContext.Users.Add(user);
+                await dbContext.SaveChangesAsync();
+                dbContext.Profiles.Add(profile);
+                await dbContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return userId;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return null;
+            }
         }
     }
 }
