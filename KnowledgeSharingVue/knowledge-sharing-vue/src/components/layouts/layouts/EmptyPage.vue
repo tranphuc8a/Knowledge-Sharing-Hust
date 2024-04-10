@@ -56,11 +56,11 @@ export default {
         */
         changeLanguage(lang){
             try {
-                if (lang === this.languageEnum.VIETNAMESE){
-                    this.inject?.language = language['vi'];
+                if (lang === this.languageEnum.VIETNAMESE && this.inject?.language !== language['vi']){
+                    this.inject.language = language['vi'];
                     console.log("Change language to " + 'vi');
                 } else if (lang === this.languageEnum.ENGLISH){
-                    this.inject?.language = language['en'];
+                    this.inject.language = language['en'];
                     console.log("Change language to " + 'en');
                 }
             } catch (error){
