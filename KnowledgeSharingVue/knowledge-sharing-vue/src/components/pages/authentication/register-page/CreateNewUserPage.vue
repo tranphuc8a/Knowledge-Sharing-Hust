@@ -1,90 +1,78 @@
 
 
 <template>
-    <div class="pr-background">
-        <div class="pr-form-container">
-            <div class="pr-form">
-                <div class="pr-logo-frame">
-                    <div class="pr-logo"></div>
-                </div>
-                <div class="pr-header-and-description">
-                    <div class="pr-header"> 
-                        {{ getLabel()?.header }}
-                    </div>
-                    <div class="pr-description">
-                        {{ getLabel()?.description }}
-                    </div>
-                </div>
-                <form class="pr-input" v-on:keypress.enter.prevent="resolveEnterForm">
-                    <AmisTextField :autocomplete="'username'" type="text" :placeholder=" getLabel()?.username " :isShowTitle="false" 
-                        ref="username" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.username"
-                        :errorMessage="getLabel()?.invalidUsername"
-                        />
-
-                    <AmisPasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.password"
-                        ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" 
-                        :onchange="resolveOnChangePassword"
-                        :validator="validator.password"
-                        :errorMessage="getLabel()?.invalidPassword"
-                        />
-
-                    <AmisPasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.repassword"
-                        ref="repassword" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.repassword"
-                        :errorMessage="getLabel()?.invalidRepassword"
-                        />
-                </form>
-                <div class="pr-error-message" v-show="isShowError">
-                    {{ errorMessage }}
-                </div>
-                
-                <div class="pr-button">
-                    <!-- Thẻ button login -->
-                    <AmisSubmitButton :label=" getLabel()?.button" :onclick="resolveSubmit" ref="button" />
-                </div>
-                <div class="pr-links pa-link">
-                    <router-link to="/login" >
-                        {{ getLabel()?.login }}
-                    </router-link>
-                </div>
-                <div class="pr-divide">
-                    <div class="pr-segment-frame">
-                        <div class="pr-segment"></div>
-                    </div>
-                    <div class="pr-text-divide">
-                        {{ getLabel()?.others }}
-                    </div>
-                </div>
-                <div class="pr-login-options">
-                    <div class="pr-option pr-login-google">
-                    </div>
-                    <div class="pr-option pr-login-apple">
-                    </div>
-                    <div class="pr-option pr-login-microsoft">
-                    </div>
-                </div>
+    <BaseAuthenticationPage>
+        <div class="pr-header-and-description">
+            <div class="pr-header"> 
+                {{ getLabel()?.header }}
             </div>
-            <div class="pr-copyright">
-                Copyright © 2012 - 2024 KS JSC
+            <div class="pr-description">
+                {{ getLabel()?.description }}
             </div>
         </div>
-        <div class="pr-change-language-button">
-            <ChangeLanguageButton />
+        <form class="pr-input" v-on:keypress.enter.prevent="resolveEnterForm">
+            <MSlotedTextfield :autocomplete="'username'" type="text" :placeholder=" getLabel()?.username " :isShowTitle="false" 
+                ref="username" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.username"
+                :errorMessage="getLabel()?.invalidUsername"
+                />
+
+            <MPasswordTextfield :autocomplete="'current-password'" :placeholder="getLabel()?.password"
+                ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :is-show-title="false"
+                :onchange="resolveOnChangePassword"
+                :validator="validator.password"
+                :errorMessage="getLabel()?.invalidPassword"
+                />
+
+            <MPasswordTextfield :autocomplete="'current-password'" :placeholder="getLabel()?.repassword"
+                ref="repassword" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.repassword"
+                :errorMessage="getLabel()?.invalidRepassword" :is-show-title="false"
+                />
+        </form>
+        <div class="pa-error-message" v-show="isShowError">
+            {{ errorMessage }}
         </div>
-    </div>
+        <div class="pa-success-message" v-show="isShowSuccess">
+            {{ successMessage }}
+        </div>
+        
+        <div class="pr-button">
+            <!-- Thẻ button login -->
+            <MButton :label=" getLabel()?.button" :onclick="resolveSubmit" ref="button" />
+        </div>
+        <div class="pr-links">
+            <router-link class="pa-link" to="/login" >
+                {{ getLabel()?.login }}
+            </router-link>
+        </div>
+        <div class="pr-divide">
+            <div class="pr-segment-frame">
+                <div class="pr-segment"></div>
+            </div>
+            <div class="pr-text-divide">
+                {{ getLabel()?.others }}
+            </div>
+        </div>
+        <div class="pr-login-options">
+            <div class="pr-option pr-login-google">
+            </div>
+            <div class="pr-option pr-login-apple">
+            </div>
+            <div class="pr-option pr-login-microsoft">
+            </div>
+        </div>
+    </BaseAuthenticationPage>
 </template>
 
 
 <script>
-import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-import AmisTextField from '@/components/base/authentication/MSlotedTextField.vue';
-import AmisPasswordTextField from '@/components/base/authentication/MPasswordTextfield.vue';
-import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
+import BaseAuthenticationPage from '@/components/pages/authentication/base-page/BaseAuthenticationPage.vue';
+import MSlotedTextfield from '@/components/base/inputs/MSlotedTextfield.vue';
+import MPasswordTextfield from '@/components/base/inputs/MPasswordTextfield.vue';
+import MButton from '@/components/base/buttons/MButton.vue';
 import { UsernameValidator, PasswordValidator, RepasswordValidator, Validator } from '@/js/utils/validator';
 import { PostRequest, Request } from '@/js/services/request';
 import { useRoute } from 'vue-router';
 import statusCodeEnum from '@/js/resources/status-code-enum';
-// import { Request, PostRequest, GetRequest } from '@/js/services/request';
-// import statusCodeEnum from '@/js/resources/status-code-enum';
 
 export default {
     name: 'KSForgotPasswordPage',
@@ -94,6 +82,8 @@ export default {
             global: this.globalData,
             isShowError: false,
             errorMessage: 'Verification code is invalid',
+            isShowSuccess: false,
+            successMessage: 'Successful create new user',
             input: {
                 username: null,
                 password: null,
@@ -117,11 +107,10 @@ export default {
         this.button = this.$refs.button;
         this.route = useRoute();
         this.email = this.route.query.email;
-        this.accessCode = this.route.query.accessCode;
-        this.code = this.route.query.code;
+        this.activeCode = this.route.query.activeCode;
     },
     components: {
-        ChangeLanguageButton, AmisTextField, AmisSubmitButton, AmisPasswordTextField
+        BaseAuthenticationPage, MSlotedTextfield, MButton, MPasswordTextfield
     },
     methods: {
         /**
@@ -132,8 +121,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject.language != null){
-                this.label = this.inject.language.pages.createnewuser;
+            if (this.inject?.language != null){
+                this.label = this.inject?.language?.pages?.createnewuser;
             }
             return this.label;
         },
@@ -178,10 +167,9 @@ export default {
 
                 // Validate success, call API:
                 let account = await this.getAccount();
-                let result = await new PostRequest('Authenticate/AddNewUser/')
+                let result = await new PostRequest('Authentications/register-account/')
                         .setBody({
-                            AccessCode: this.accessCode,
-                            Code: this.code,
+                            ActiveCode: this.activeCode,
                             Email: this.email,
                             Username: account.username,
                             Password: account.password
@@ -269,7 +257,7 @@ export default {
         async resolveSubmitSuccess(result){
             try {
                 let userMessage = Request.tryGetUserMessage(result);
-                await this.showErrorMsg(userMessage);
+                await this.showSuccessMsg(userMessage);
             } catch (error){
                 console.error(error);
             }
@@ -312,11 +300,39 @@ export default {
          * @Modified None
         */
         async showErrorMsg(errorMessage){
+            await this.hideSuccessMsg();
             if (Validator.isEmpty(errorMessage))
                 return;
             this.errorMessage = errorMessage;
             this.isShowError = true;
+        },
+
+        /**
+         * Xử lý yêu cầu ẩn thông báo thành công
+         * @param none
+         * @returns none
+         * @Created PhucTV (11/04/24)
+         * @Modified None
+        */
+        async hideSuccessMsg(){
+            this.isShowSuccess = false;
+        },
+
+        /**
+         * Xử lý yêu cầu hiển thị thông báo thành công
+         * @param successMessage - thông báo thành công cần hiển thị
+         * @returns none
+         * @Created PhucTV (11/04/24)
+         * @Modified None
+        */
+        async showSuccessMsg(successMessage){
+            await this.hideErrorMsg();
+            if (Validator.isEmpty(successMessage))
+                return;
+            this.successMessage = successMessage;
+            this.isShowSuccess = true;
         }
+
     },
     inject: {
         inject: {},
@@ -328,7 +344,7 @@ export default {
 
 
 <style scoped>
-@import url(@/css/pages/register-page/register-page.css);
+@import url(@/css/pages/authentication/register-page/register-page.css);
 </style>
 
 

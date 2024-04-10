@@ -1,85 +1,73 @@
 
-
 <template>
-    <div class="pl-background">
-        <div class="pl-form-container">
-            <div class="pl-form">
-                <div class="pl-logo-frame">
-                    <div class="pl-logo"></div>
+    <BaseAuthenticationPage>
+        <form class="pl-input" v-on:keypress.enter="resolveEnterForm">
+            <!-- 2 thẻ input -->
+            <SlotedTextfield :autocomplete="'username'" type="text" :placeholder=" getLabel()?.username " :isShowTitle="false" 
+                ref="username" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.username"
+                :errorMessage="getLabel()?.invalidUsername"
+                />
+            <PasswordTextfield :autocomplete="'current-password'" :placeholder="getLabel()?.password" :is-show-title="false"
+                ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.password"
+                :errorMessage="getLabel()?.invalidPassword"
+                />
+            <div class="pl-input-captcha" v-show="isLoginWithCaptcha">
+                <div class="pl-input-captcha-textfield">
+                    <SlotedTextfield type="text" :placeholder=" getLabel()?.captcha " :isShowTitle="false" 
+                        ref="captcha" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.captcha"
+                        :errorMessage="getLabel()?.invalidCaptcha">
+                        <MActionIcon fa="rotate-right" :onclick="refreshCaptcha" 
+                            :iconStyle="{width: '18px', height: '18px'}"
+                            :containerStyle="{width: '24px', height: '24px'}"/>
+                    </SlotedTextfield>
                 </div>
-                <form class="pl-input" v-on:keypress.enter="resolveEnterForm">
-                    <!-- 2 thẻ input -->
-                    <SlotedTextfield :autocomplete="'username'" type="text" :placeholder=" getLabel()?.username " :isShowTitle="false" 
-                        ref="username" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.username"
-                        :errorMessage="getLabel()?.invalidUsername"
-                        />
-                    <PasswordTextfield :autocomplete="'current-password'" :placeholder="getLabel()?.password" :is-show-title="false"
-                        ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.password"
-                        :errorMessage="getLabel()?.invalidPassword"
-                        />
-                    <div class="pl-input-captcha" v-show="isLoginWithCaptcha">
-                        <div class="pl-input-captcha-textfield">
-                            <SlotedTextfield type="text" :placeholder=" getLabel()?.captcha " :isShowTitle="false" 
-                                ref="captcha" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.captcha"
-                                :errorMessage="getLabel()?.invalidCaptcha">
-                                <MActionIcon fa="rotate-right" :onclick="refreshCaptcha" 
-                                    :iconStyle="{width: '18px', height: '18px'}"
-                                    :containerStyle="{width: '24px', height: '24px'}"/>
-                            </SlotedTextfield>
-                        </div>
-                        <div class="pl-captcha-image-frame">
-                            <img v-show="captchaImageData != null" class="pl-captcha-image" :src="`data:image/png;base64,${captchaImageData}`" alt="Captcha">
-                        </div>
-                    </div>
-                </form>
-                <div class="pl-error-message" v-show="isShowError">
-                    {{ errorMessage }}
+                <div class="pl-captcha-image-frame">
+                    <img v-show="captchaImageData != null" class="pl-captcha-image" :src="`data:image/png;base64,${captchaImageData}`" alt="Captcha">
                 </div>
-                <div class="pl-links">
-                    <router-link class="pa-link" to="/forgotpassword" >
-                        {{ getLabel()?.forgotpassword }}
-                    </router-link>
+            </div>
+        </form>
+        <div class="pl-error-message" v-show="isShowError">
+            {{ errorMessage }}
+        </div>
+        <div class="pl-links">
+            <router-link class="pa-link" to="/forgotpassword" >
+                {{ getLabel()?.forgotpassword }}
+            </router-link>
 
-                    <router-link class="pa-link" to="/register" >
-                        {{ getLabel()?.register }}
-                    </router-link>
-                </div>
-                <div class="pl-button">
-                    <!-- Thẻ button login -->
-                    <MButton :label=" getLabel()?.login" :onclick="resolveSubmitLogin" ref="button" />
-                </div>
-                <div class="pl-divide">
-                    <div class="pl-segment-frame">
-                        <div class="pl-segment"></div>
-                    </div>
-                    <div class="pl-text-divide">
-                        {{ getLabel()?.others }}
-                    </div>
-                </div>
-                <div class="pl-login-options">
-                    <div class="pl-option pl-login-google">
-                    </div>
-                    <div class="pl-option pl-login-apple">
-                    </div>
-                    <div class="pl-option pl-login-microsoft">
-                    </div>
-                </div>
+            <router-link class="pa-link" to="/register" >
+                {{ getLabel()?.register }}
+            </router-link>
+        </div>
+        <div class="pl-button">
+            <!-- Thẻ button login -->
+            <MButton :label=" getLabel()?.login" :onclick="resolveSubmitLogin" ref="button" />
+        </div>
+        <div class="pl-divide">
+            <div class="pl-segment-frame">
+                <div class="pl-segment"></div>
             </div>
-            <div class="pl-copyright">
-                Copyright © 2024 by tranphuc8a
+            <div class="pl-text-divide">
+                {{ getLabel()?.others }}
             </div>
         </div>
-        <div class="pl-change-language-button">
-            <ChangeLanguageButton />
+        <div class="pl-login-options">
+            <!-- <div class="pl-option pl-login-google">
+            </div> -->
+            <LoginWithGoogleIcon />
+            <div class="pl-option pl-login-apple">
+            </div>
+            <div class="pl-option pl-login-microsoft">
+            </div>
         </div>
-    </div>
+    </BaseAuthenticationPage>
 </template>
 
 
 <script>
-import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-import SlotedTextfield from '@/components/base/authentication/MSlotedTextfield.vue';
-import PasswordTextfield from '@/components/base/authentication/MPasswordTextfield.vue';
+import LoginWithGoogleIcon from './LoginWithGoogleIcon.vue';
+import BaseAuthenticationPage from '@/components/pages/authentication/base-page/BaseAuthenticationPage.vue';
+import SlotedTextfield from '@/components/base/inputs/MSlotedTextfield.vue';
+import PasswordTextfield from '@/components/base/inputs/MPasswordTextfield.vue';
 import MButton from '@/components/base/buttons/MButton.vue';
 import { UsernameValidator, PasswordValidator, Validator, NotEmptyValidator } from '@/js/utils/validator';
 import { Request, PostRequest, GetRequest } from '@/js/services/request';
@@ -135,8 +123,8 @@ export default {
         }
     },
     components: {
-        ChangeLanguageButton, SlotedTextfield, PasswordTextfield,
-        MButton
+        BaseAuthenticationPage, SlotedTextfield, PasswordTextfield,
+        MButton, LoginWithGoogleIcon
     },
     methods: {
         /**
@@ -147,8 +135,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject.language != null){
-                this.label = this.inject.language.pages.login;
+            if (this.inject?.language != null){
+                this.label = this.inject?.language?.pages?.login;
             }
             return this.label;
         },
@@ -350,7 +338,7 @@ export default {
             }
         },
         
-        /***
+        /**
          * Xử lý đăng nhập thành công
          * @param {*} tokenModel - chứa token lấy về từ api login
          * @returns none
@@ -369,7 +357,7 @@ export default {
                 let redirectTo = localStorage.getItem("redirect-to");
                 localStorage.setItem("redirect-to", "");
                 if (Validator.isEmpty(redirectTo)){
-                    redirectTo = appConfig.homepage;
+                    redirectTo = appConfig.getHomePageUrl();
                 }
                 window.location.href = redirectTo;
             } catch (error){

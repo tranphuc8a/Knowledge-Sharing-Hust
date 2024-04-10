@@ -5,6 +5,7 @@
 
 
 :root{
+	--component-height-taller: 48px;
 	--component-height: 36px;
 	--border-radius: 4px;
 	--button-padding: 0px 24px;

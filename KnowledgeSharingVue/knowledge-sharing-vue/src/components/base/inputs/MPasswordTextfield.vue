@@ -2,8 +2,8 @@
     <MTextField :placeholder="placeholder" :type="passwordType" ref="input"
         :autocomplete="autocomplete" :validator="validator" :errorMessage="errorMessage">
         <div class="p-password-icon" @:click="resolveClickPasswordIcon">
-            <MIcon fa="eye" :style="iconStyle" v-show="passwordType !== 'password'"/>
-            <MIcon fa="eye-slash" :style="iconStyle" v-show="passwordType === 'password'"/>
+            <MIcon fa="eye-slash" :style="iconStyle" v-show="passwordType !== 'password'"/>
+            <MIcon fa="eye" :style="iconStyle" v-show="passwordType === 'password'"/>
         </div>
     </MTextField>
 </template>

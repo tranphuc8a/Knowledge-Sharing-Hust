@@ -1,72 +1,59 @@
 
 
 <template>
-    <div class="pr-background">
-        <div class="pr-form-container">
-            <div class="pr-form">
-                <div class="pr-logo-frame">
-                    <div class="pr-logo"></div>
-                </div>
-                <div class="pr-header-and-description">
-                    <div class="pr-header"> 
-                        {{ getLabel()?.header }}
-                    </div>
-                    <div class="pr-description">
-                        {{ getLabel()?.description }}
-                    </div>
-                </div>
-                <form class="pr-input" v-on:keypress.enter.prevent="resolveEnterForm">
-                    <!-- input email -->
-                    <AmisTextField :autocomplete="'email'" type="email" :placeholder=" getLabel()?.email " :isShowTitle="false" 
-                        ref="email" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.email"
-                        :errorMessage="getLabel()?.invalidEmail"
-                        />
-                </form>
-                <div class="pr-error-message" v-show="isShowError">
-                    {{ errorMessage }}
-                </div>
-                
-                <div class="pr-button">
-                    <!-- Thẻ button login -->
-                    <AmisSubmitButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
-                </div>
-                <div class="pr-links pa-link">
-                    <router-link to="/login" >
-                        {{ getLabel()?.login }}
-                    </router-link>
-                </div>
-                <div class="pr-divide">
-                    <div class="pr-segment-frame">
-                        <div class="pr-segment"></div>
-                    </div>
-                    <div class="pr-text-divide">
-                        {{ getLabel()?.others }}
-                    </div>
-                </div>
-                <div class="pr-login-options">
-                    <div class="pr-option pr-login-google">
-                    </div>
-                    <div class="pr-option pr-login-apple">
-                    </div>
-                    <div class="pr-option pr-login-microsoft">
-                    </div>
-                </div>
+    <BaseAuthenticationPage>
+        <div class="pr-header-and-description">
+            <div class="pr-header"> 
+                {{ getLabel()?.header }}
             </div>
-            <div class="pr-copyright">
-                Copyright © 2012 - 2024 KS JSC
+            <div class="pr-description">
+                {{ getLabel()?.description }}
             </div>
         </div>
-        <div class="pr-change-language-button">
-            <ChangeLanguageButton />
+        <form class="pr-input" v-on:keypress.enter.prevent="resolveEnterForm">
+            <!-- input email -->
+            <MSlotedTextfield :autocomplete="'email'" type="email" :placeholder=" getLabel()?.email " :isShowTitle="false" 
+                ref="email" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.email"
+                :errorMessage="getLabel()?.invalidEmail"
+                />
+        </form>
+        <div class="pa-error-message" v-show="isShowError">
+            {{ errorMessage }}
         </div>
-    </div>
+        
+        <div class="pr-button">
+            <!-- Thẻ button login -->
+            <MButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
+        </div>
+        <div class="pr-links">
+            <router-link class="pa-link" to="/login" >
+                {{ getLabel()?.login }}
+            </router-link>
+        </div>
+        <div class="pr-divide">
+            <div class="pr-segment-frame">
+                <div class="pr-segment"></div>
+            </div>
+            <div class="pr-text-divide">
+                {{ getLabel()?.others }}
+            </div>
+        </div>
+        <div class="pr-login-options">
+            <div class="pr-option pr-login-google">
+            </div>
+            <div class="pr-option pr-login-apple">
+            </div>
+            <div class="pr-option pr-login-microsoft">
+            </div>
+        </div>
+    </BaseAuthenticationPage>
 </template>
 
 
 <script>
-import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-import AmisTextField from '@/components/base/authentication/MSlotedTextField.vue';
-import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
+import BaseAuthenticationPage from '@/components/pages/authentication/base-page/BaseAuthenticationPage.vue';
+import MSlotedTextfield from '@/components/base/inputs/MSlotedTextfield.vue';
+import MButton from '@/components/base/buttons/MButton.vue';
 import { EmailValidator, Validator } from '@/js/utils/validator';
 import { GetRequest, Request } from '@/js/services/request';
 import statusCodeEnum from '@/js/resources/status-code-enum';
@@ -97,7 +84,7 @@ export default {
         this.button = this.$refs.button;
     },
     components: {
-        ChangeLanguageButton, AmisTextField, AmisSubmitButton
+        BaseAuthenticationPage, MSlotedTextfield, MButton
     },
     methods: {
         /**
@@ -108,8 +95,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject.language != null){
-                this.label = this.inject.language.pages.register;
+            if (this.inject?.language != null){
+                this.label = this.inject?.language?.pages?.register;
             }
             return this.label;
         },
@@ -134,7 +121,7 @@ export default {
 
                 // Validate success, call API:
                 let emailValue = await email.getValue();
-                let result = await new GetRequest('Authenticate/SendRegisterVerificationCode/')
+                let result = await new GetRequest('Authentications/send-register-account-verify-code/')
                         .setParams({ email: emailValue}).execute();
                 
                 // Call API success:
@@ -229,7 +216,7 @@ export default {
 
 
 <style scoped>
-@import url(@/css/pages/register-page/register-page.css);
+@import url(@/css/pages/authentication/register-page/register-page.css);
 </style>
 
 

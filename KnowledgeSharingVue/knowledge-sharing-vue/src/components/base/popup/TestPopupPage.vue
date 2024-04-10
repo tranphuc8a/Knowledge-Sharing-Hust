@@ -10,7 +10,7 @@
 
 
 <script>
-import MTextField from '@/components/base/authentication/MSlotedTextfield.vue';
+import MTextField from '@/components/base/inputs/MSlotedTextfield.vue';
 import MButton from '@/components/base/buttons/MButton'
 
 export default {

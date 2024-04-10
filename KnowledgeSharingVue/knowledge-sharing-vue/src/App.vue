@@ -56,7 +56,7 @@ export default {
         */
         changeLanguage(lang){
             try {
-                if (lang === this.languageEnum.VIETNAMESE){
+                if (lang === this.languageEnum.VIETNAMESE && this.inject?.language){
                     this.inject.language = language['vi'];
                     console.log("Change language to " + 'vi');
                 } else if (lang === this.languageEnum.ENGLISH){

@@ -1,61 +1,46 @@
 
 
 <template>
-    <div class="pfp-background">
-        <div class="pfp-form-container">
-            <div class="pfp-form">
-                <div class="pfp-logo-frame">
-                    <div class="pfp-logo"></div>
-                </div>
-                <div class="pfp-header-and-description">
-                    <div class="pfp-header"> 
-                        {{ getLabel()?.header }}
-                    </div>
-                    <div class="pfp-description">
-                        {{ getLabel()?.description }}
-                    </div>
-                </div>
-                <form class="pfp-input" v-on:keypress.enter.prevent="resolveEnterForm">
-                    <!-- input verificationCode -->
-                    <AmisTextField :autocomplete="'text'" type="text" :placeholder=" getLabel()?.verificationCode " :isShowTitle="false" 
-                        ref="verificationCode" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.verificationCode"
-                        :errorMessage="getLabel()?.invalidVerificationCode"
-                        />
-                </form>
-                <div class="pfp-error-message" v-show="isShowError">
-                    {{ errorMessage }}
-                </div>
-                
-                <div class="pfp-button">
-                    <!-- Thẻ button login -->
-                    <AmisSubmitButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
-                </div>
-                <div class="pfp-links pa-link">
-                    <router-link to="/login" >
-                        {{ getLabel()?.login }}
-                    </router-link>
-                </div>
+    <BaseAuthenticationPage>
+        <div class="pfp-header-and-description">
+            <div class="pfp-header"> 
+                {{ getLabel()?.header }}
             </div>
-            <div class="pfp-copyright">
-                Copyright © 2012 - 2024 KS JSC
+            <div class="pfp-description">
+                {{ getLabel()?.description }}
             </div>
         </div>
-        <div class="pfp-change-language-button">
-            <ChangeLanguageButton />
+        <form class="pfp-input" v-on:keypress.enter.prevent="resolveEnterForm">
+            <!-- input verificationCode -->
+            <MSlotedTextfield :autocomplete="'text'" type="text" :placeholder=" getLabel()?.verificationCode " :isShowTitle="false" 
+                ref="verificationCode" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.verificationCode"
+                :errorMessage="getLabel()?.invalidVerificationCode"
+                />
+        </form>
+        <div class="pa-error-message" v-show="isShowError">
+            {{ errorMessage }}
         </div>
-    </div>
+        
+        <div class="pfp-button">
+            <!-- Thẻ button login -->
+            <MButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
+        </div>
+        <div class="pfp-links">
+            <router-link class="pa-link" to="/login" >
+                {{ getLabel()?.login }}
+            </router-link>
+        </div>
+    </BaseAuthenticationPage>
 </template>
 
 
 <script>
-import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-import AmisTextField from '@/components/base/authentication/MSlotedTextfield.vue';
-import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
+import BaseAuthenticationPage from '../base-page/BaseAuthenticationPage.vue';
+import MSlotedTextfield from '@/components/base/inputs/MSlotedTextfield.vue';
+import MButton from '@/components/base/buttons/MButton.vue';
 import { NotEmptyValidator } from '@/js/utils/validator';
 import { PostRequest, Request } from '@/js/services/request';
 import { Validator } from '@/js/utils/validator';
-// import { Request, PostRequest, GetRequest } from '@/js/services/request';
-// import statusCodeEnum from '@/js/resources/status-code-enum';
 import { useRoute } from 'vue-router';
 import statusCodeEnum from '@/js/resources/status-code-enum';
 
@@ -92,7 +77,7 @@ export default {
         console.log(this.accessCode);
     },
     components: {
-        ChangeLanguageButton, AmisTextField, AmisSubmitButton
+        BaseAuthenticationPage, MSlotedTextfield, MButton
     },
     methods: {
         /**
@@ -103,8 +88,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject.language != null){
-                this.label = this.inject.language.pages.enterforgotpasswordverificationcode;
+            if (this.inject?.language != null){
+                this.label = this.inject?.language?.pages?.enterforgotpasswordverificationcode;
             }
             return this.label;
         },
@@ -129,7 +114,7 @@ export default {
 
                 // validate success, call API:
                 let code = await textField.getValue();
-                await new PostRequest('Authenticate/VerifyForgotPasswordCode')
+                let response = await new PostRequest('/Authentications/check-reset-password-verify-code')
                     .setBody({
                         Email: this.email,
                         Code: code,
@@ -137,7 +122,9 @@ export default {
                     }).execute();
 
                 // call API success
-                await this.resolveSubmitSuccess(this.email, this.accessCode, code);
+                let body = await Request.tryGetBody(response);
+                let activeCode = body?.ActiveCode;
+                await this.resolveSubmitSuccess(this.email, activeCode);
 
             } catch (error){
                 console.error(error);
@@ -162,17 +149,17 @@ export default {
         /**
          * Xử lý sự kiện submit code thành công
          * @param email - email nhận mã xác minh
-         * @param accessCode - mã token truy nhập từ api trả về
+         * @param activeCode - mã token truy nhập từ api trả về
          * @param code - mã xác minh nhận được từ email
          * @returns none
          * @Created PhucTV (04/03/24)
          * @Modified None
         */
-        async resolveSubmitSuccess(email, accessCode, code){
+        async resolveSubmitSuccess(email, activeCode){
             try {
                 // navigate to submit code page
                 this.$router.push({ path: '/set-new-password', 
-                    query: { email: email, accessCode: accessCode, code: code} });
+                    query: { email: email, activeCode: activeCode} });
             } catch (error){
                 console.error(error);
             }
@@ -233,7 +220,7 @@ export default {
 
 
 <style scoped>
-@import url(@/css/pages/forgot-password-page/forgot-password-page.css);
+@import url(@/css/pages/authentication/forgot-password-page/forgot-password-page.css);
 </style>
 
 

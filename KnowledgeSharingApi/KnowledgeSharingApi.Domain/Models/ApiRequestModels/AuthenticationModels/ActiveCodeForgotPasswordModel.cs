@@ -12,7 +12,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationMode
     {
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.PASSWORD_EMPTY)]
         [PasswordValidator(ErrorMessage = ViConstantResource.PASSWORD_FORMAT)]
-        public string? NewPassword { get; set; }
+        public string? Password { get; set; }
 
     }
 }

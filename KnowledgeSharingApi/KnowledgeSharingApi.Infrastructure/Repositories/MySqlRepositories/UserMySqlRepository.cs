@@ -20,8 +20,8 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
-    public class UserMySqlRepository(IDbContext dbContext, IEncrypt encrypt)
-        : BaseMySqlRepository<User>(dbContext), IUserRepository
+    public class UserMySqlRepository(IDbContext _dbContext, IEncrypt encrypt)
+        : BaseMySqlRepository<User>(_dbContext), IUserRepository
     {
         protected readonly IEncrypt encrypt = encrypt;
 
@@ -165,10 +165,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     FullName = fullName
                 };
 
-                dbContext.Users.Add(user);
-                await dbContext.SaveChangesAsync();
-                dbContext.Profiles.Add(profile);
-                await dbContext.SaveChangesAsync();
+                DbContext.Users.Add(user);
+                await DbContext.SaveChangesAsync();
+                DbContext.Profiles.Add(profile);
+                await DbContext.SaveChangesAsync();
 
                 await transaction.CommitAsync();
                 return userId;

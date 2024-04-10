@@ -36,6 +36,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected override EVerifyCodeType VerifyCodeType { get; set; } = EVerifyCodeType.Register;
         protected override string EmailSubject { get; set; } = resourceFactory.GetResponseResource().RegistrationEmailSubject();
 
+
         public override async Task CheckEmailIsValid(string? email)
         {
             // Check email is valid
@@ -67,7 +68,7 @@ namespace KnowledgeSharingApi.Services.Services
                     Role = UserRoles.User
                 };
 
-                ServiceResult res = await AddNewUser(user, model.Password!, model.FullName!);
+                ServiceResult res = await AddNewUser(user, model.Password!, model.Username!);
 
                 return res;
             }

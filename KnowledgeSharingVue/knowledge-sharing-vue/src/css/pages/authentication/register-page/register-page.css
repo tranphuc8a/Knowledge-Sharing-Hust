@@ -1,80 +1,16 @@
 
-@import url(@/css/base/font.css);
+@import url(@/css/main.css);
 
-.pr-background{
-    width: 100%;
-    height: 100%;
-    background-image: url(@/assets/login/bg1.jpg);
-    background-size: cover;
-    background-position: center;
-    font-family: 'ks-font-regular';
-    font-size: 14px;
-    /* color: white; */
-}
 
-.pr-change-language-button{
-    position: fixed;
-    width: fit-content;
-    height: fit-content;
-    right: 24px;
-    top: 24px;
-}
-
-.pr-background .pr-form-container{
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(rgba(0,30,61,.6) 0,rgba(0,0,0,.1) 41.42%,rgba(0,0,0,.3) 100%);
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 14px;
-}
-
-.pr-form-container .pr-copyright{
-    color: rgba(255,255,255,.6);
-    font-size: 12px;
-}
-
-.pr-form-container .pr-form{
-    width: 400px;
-    height: fit-content;
-    /* height: 473px; */
-    padding: 24px 48px 40px 48px;
-    box-sizing: border-box;
-    background-color: #fff;
-
-    border-radius: 8px;
-    min-height: 340px;
-    box-shadow: 0 12px 20px rgba(0,0,0,.12)
-}
-
-.pr-form .pr-logo-frame{
-    width: 100%;
-    height: fit-content;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 16px 0px;
-}
-.pr-form .pr-logo-frame .pr-logo{
-    width: 196px;
-    height: 36px;
-    background-image: url(@/assets/login/icon-platform2.svg);
-    background-size: 100% 100%;
-    background-position: center;
-}
-
-.pr-form .pr-header-and-description{
-    padding: 16px 0px 24px 0px;
+.pa-form .pr-header-and-description{
+    padding: 0px 0px 24px 0px;
     display: flex;
     flex-flow: column nowrap;
     gap: 8px;
     align-items: center;
 }
 
-.pr-form .pr-header{
+.pa-form .pr-header{
     font-size: 24px;
     font-weight: bold;
     font-style: normal;
@@ -84,14 +20,14 @@
     text-align: center;
 }
 
-.pr-form .pr-description{
+.pa-form .pr-description{
     color: #4d5156;
     font-size: 14px;
     text-align: center;
     width: 90%;
 }
 
-.pr-form .pr-input{
+.pa-form .pr-input{
     width: 100%;
     height: fit-content;
     display: flex;
@@ -107,26 +43,27 @@
     height: fit-content;
 }
 
-.pr-form .pr-error-message{
+.pa-form .pa-error-message{
     min-height: 24px;
     line-height: 17px;
     color: #ff1d1d;
     padding-bottom: 16px;
+    text-align: start;
 }
 
-.pr-form .pr-links{
+.pa-form .pr-links{
     padding-bottom: 24px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
 }
-.pr-form .pr-button {
+.pa-form .pr-button {
     padding-bottom: 24px;
 }
 
 
-.pr-form .pr-divide{
+.pa-form .pr-divide{
     width: 100%;
     position: relative;
     display: flex;
@@ -158,7 +95,7 @@
     z-index: 1;
 }
 
-.pr-form .pr-login-options{
+.pa-form .pr-login-options{
     width: 100%;
     height: fit-content;
     display: flex;
@@ -184,11 +121,11 @@
 }
 
 .pr-login-google{
-    background-image: url(@/assets/login/icon-google.svg);
+    background-image: url(@/assets/image-icons/icon-google.svg);
 }
 .pr-login-apple{
-    background-image: url(@/assets/login/icon-apple.svg);
+    background-image: url(@/assets/image-icons/icon-apple.svg);
 }
 .pr-login-microsoft{
-    background-image: url(@/assets/login/icon-microsoft.svg);
+    background-image: url(@/assets/image-icons/icon-microsoft.svg);
 }
