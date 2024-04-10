@@ -12,15 +12,18 @@
 	--font-size: 14px;
 	--box-shadow-card: 0px 0px 10px rgba(var(--primary-color-rgb), 0.2);
 	--box-shadow-menucontext: 0px 0px 10px rgba(var(--primary-color-rgb), 0.56);
+
+	--authentication-background-img: url(@/assets/background/bg1.jpg) center/cover;
+	--logo-img: url(@/assets/brand/logo.png) center/100% 100%;
 }
 
 #app {
 	font-family: 'ks-font-regular';
+	font-size: 14px;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-align: center;
 	color: var(--blue-grey-color-900);
-	margin-top: 60px;
 	
 }
 

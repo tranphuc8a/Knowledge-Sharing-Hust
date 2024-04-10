@@ -9,23 +9,23 @@
                 </div>
                 <form class="pl-input" v-on:keypress.enter="resolveEnterForm">
                     <!-- 2 thẻ input -->
-                    <AmisTextField :autocomplete="'username'" type="text" :placeholder=" getLabel()?.username " :isShowTitle="false" 
+                    <SlotedTextfield :autocomplete="'username'" type="text" :placeholder=" getLabel()?.username " :isShowTitle="false" 
                         ref="username" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.username"
                         :errorMessage="getLabel()?.invalidUsername"
                         />
-                    <AmisPasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.password"
+                    <PasswordTextfield :autocomplete="'current-password'" :placeholder="getLabel()?.password" :is-show-title="false"
                         ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.password"
                         :errorMessage="getLabel()?.invalidPassword"
                         />
                     <div class="pl-input-captcha" v-show="isLoginWithCaptcha">
                         <div class="pl-input-captcha-textfield">
-                            <AmisTextField type="text" :placeholder=" getLabel()?.captcha " :isShowTitle="false" 
+                            <SlotedTextfield type="text" :placeholder=" getLabel()?.captcha " :isShowTitle="false" 
                                 ref="captcha" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.captcha"
                                 :errorMessage="getLabel()?.invalidCaptcha">
-                                <div class="p-refresh-captcha-icon" @:click="refreshCaptcha">
-                                    <img src="@/assets/login/icon-reload.svg"/>
-                                </div>
-                            </AmisTextField>
+                                <MActionIcon fa="rotate-right" :onclick="refreshCaptcha" 
+                                    :iconStyle="{width: '18px', height: '18px'}"
+                                    :containerStyle="{width: '24px', height: '24px'}"/>
+                            </SlotedTextfield>
                         </div>
                         <div class="pl-captcha-image-frame">
                             <img v-show="captchaImageData != null" class="pl-captcha-image" :src="`data:image/png;base64,${captchaImageData}`" alt="Captcha">
@@ -35,18 +35,18 @@
                 <div class="pl-error-message" v-show="isShowError">
                     {{ errorMessage }}
                 </div>
-                <div class="pl-forgotpass-link pa-link">
-                    <router-link to="/forgotpassword" >
+                <div class="pl-links">
+                    <router-link class="pa-link" to="/forgotpassword" >
                         {{ getLabel()?.forgotpassword }}
                     </router-link>
 
-                    <router-link to="/register" >
+                    <router-link class="pa-link" to="/register" >
                         {{ getLabel()?.register }}
                     </router-link>
                 </div>
                 <div class="pl-button">
                     <!-- Thẻ button login -->
-                    <AmisSubmitButton :label=" getLabel()?.login" :onclick="resolveSubmitLogin" ref="button" />
+                    <MButton :label=" getLabel()?.login" :onclick="resolveSubmitLogin" ref="button" />
                 </div>
                 <div class="pl-divide">
                     <div class="pl-segment-frame">
@@ -66,7 +66,7 @@
                 </div>
             </div>
             <div class="pl-copyright">
-                Copyright © 2012 - 2024 KS JSC
+                Copyright © 2024 by tranphuc8a
             </div>
         </div>
         <div class="pl-change-language-button">
@@ -78,9 +78,9 @@
 
 <script>
 import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-import AmisTextField from '@/components/base/authentication/MSlotedTextField.vue';
-import AmisPasswordTextField from '@/components/base/authentication/MPasswordTextfield.vue';
-import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
+import SlotedTextfield from '@/components/base/authentication/MSlotedTextfield.vue';
+import PasswordTextfield from '@/components/base/authentication/MPasswordTextfield.vue';
+import MButton from '@/components/base/buttons/MButton.vue';
 import { UsernameValidator, PasswordValidator, Validator, NotEmptyValidator } from '@/js/utils/validator';
 import { Request, PostRequest, GetRequest } from '@/js/services/request';
 import statusCodeEnum from '@/js/resources/status-code-enum';
@@ -94,7 +94,7 @@ export default {
             isLoginWithCaptcha: false,
             captchaImageData: null,
             captchaToken: null,
-            global: this.globalData,
+
             isShowError: false,
             errorMessage: 'Tên đăng nhập hoặc mật khẩu không đúng',
             input: {},
@@ -112,6 +112,7 @@ export default {
         }
     },
     async mounted(){
+        // Check if loged in
         let userLogin = await new GetRequest().checkLogedIn();
         if (userLogin != null){
             let lastUrl = localStorage.getItem("redirect-to");
@@ -120,6 +121,8 @@ export default {
             }
             this.$router.push(lastUrl);
         }
+
+        // prepare data
         this.getLabel();
         this.input = {
             username: this.$refs.username,
@@ -132,8 +135,8 @@ export default {
         }
     },
     components: {
-        ChangeLanguageButton, AmisTextField, AmisPasswordTextField,
-        AmisSubmitButton
+        ChangeLanguageButton, SlotedTextfield, PasswordTextfield,
+        MButton
     },
     methods: {
         /**
@@ -169,6 +172,7 @@ export default {
         async hideErrorMsg(){
             this.isShowError = false;
         },
+
         /**
          * Hàm lấy dữ liệu từ form username, password đổ vào biến account
          * @param none
@@ -216,7 +220,7 @@ export default {
         */
         async refreshCaptcha(){
             try {
-                let result = await new GetRequest('/Authenticate/refresh-captcha').execute();
+                let result = await new GetRequest('/Authentications/refresh-captcha').execute();
                 // success:
                 let body = Request.tryGetBody(result);
                 this.captchaImageData = body.ImageData;
@@ -262,7 +266,7 @@ export default {
         async resolveLoginNormal(){
             let account = await this.getAccount();
             try {
-                let result = await new PostRequest('/Authenticate/login').setBody({
+                let result = await new PostRequest('/Authentications/login').setBody({
                     Username: account.username,
                     Password: account.password
                 }).setIsCallOnce(true).execute();
@@ -283,7 +287,7 @@ export default {
         async resolveLoginCaptcha(){
             let account = await this.getAccount();
             try {
-                let result = await new PostRequest('/Authenticate/login-with-captcha').setBody({
+                let result = await new PostRequest('/Authentications/login-with-captcha').setBody({
                     Username: account.username,
                     Password: account.password,
                     Captcha: account.captcha,
@@ -328,7 +332,7 @@ export default {
                     this.showErrorMsg(userMessage);
                 }                
                 // Nếu lỗi là BAD_REQUEST thì yêu cầu đăng nhập lại với Captcha
-                if (statusCode == statusCodeEnum.BAD_REQUEST){
+                if (this.isLoginWithCaptcha || statusCode == statusCodeEnum.BAD_REQUEST){
                     let body = Request.tryGetBody(error);
                     if (body != null && body != undefined){
                         this.isLoginWithCaptcha = true;
@@ -423,18 +427,6 @@ export default {
 
 
 <style scoped>
-@import url(@/css/pages/login-page/login-page.css);
+@import url(@/css/pages/authentication/login-page/login-page.css);
 </style>
 
-<style>
-.pa-link, .pa-link *{
-    text-decoration: none;
-    cursor: pointer;
-    color: #0073e6;
-}
-</style>
-
-
-<style scoped>
-
-</style>

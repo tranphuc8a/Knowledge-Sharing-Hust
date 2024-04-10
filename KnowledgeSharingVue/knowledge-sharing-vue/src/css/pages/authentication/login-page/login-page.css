@@ -1,15 +1,28 @@
 
-@import url(@/css/base/font.css);
+@import url(@/css/main.css);
+
+
+@media screen and (max-width: 767px){
+    .pl-form-container .pl-form{
+        width: 80%;
+        max-width: min(400px, 90vw);
+        min-width: 200px;
+        padding: 40px 28px;
+    }
+}
+
+@media screen and (min-width: 768px){
+    .pl-form-container .pl-form{
+        width: 400px;
+        padding: 40px 48px;
+    }
+}
+
 
 .pl-background{
     width: 100%;
     height: 100%;
-    background-image: url(@/assets/login/bg1.jpg);
-    background-size: cover;
-    background-position: center;
-    font-family: 'ks-font-regular';
-    font-size: 14px;
-    /* color: white; */
+    background: var(--authentication-background-img);
 }
 
 .pl-change-language-button{
@@ -37,10 +50,10 @@
 }
 
 .pl-form-container .pl-form{
-    width: 400px;
     height: fit-content;
-    /* height: 473px; */
-    padding: 40px 48px;
+    max-height: 100vh;
+    overflow: auto;
+
     box-sizing: border-box;
     background-color: #fff;
 
@@ -59,11 +72,9 @@
     padding-bottom: 40px;
 }
 .pl-form .pl-logo-frame .pl-logo{
-    width: 196px;
-    height: 36px;
-    background-image: url(@/assets/login/icon-platform2.svg);
-    background-size: 100% 100%;
-    background-position: center;
+    width: 200px;
+    height: 86px;
+    background: var(--logo-img);
 }
 
 .pl-form .pl-input{
@@ -87,11 +98,22 @@
     line-height: 17px;
     color: #ff1d1d;
     padding-bottom: 16px;
+    text-align: start;
 }
 
-.pl-form .pl-forgotpass-link{
+.pl-form .pl-links{
     padding-bottom: 24px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
 }
+.pl-form .pl-links .pa-link {
+    text-decoration: none;
+    cursor: pointer;
+    color: #0073e6;
+}
+
 .pl-form .pl-button {
     padding-bottom: 24px;
 }
@@ -154,13 +176,13 @@
 }
 
 .pl-login-google{
-    background-image: url(@/assets/login/icon-google.svg);
+    background-image: url(@/assets/image-icons/icon-google.svg);
 }
 .pl-login-apple{
-    background-image: url(@/assets/login/icon-apple.svg);
+    background-image: url(@/assets/image-icons/icon-apple.svg);
 }
 .pl-login-microsoft{
-    background-image: url(@/assets/login/icon-microsoft.svg);
+    background-image: url(@/assets/image-icons/icon-microsoft.svg);
 }
 
 
@@ -181,7 +203,6 @@
 }
 
 .pl-input-captcha > *{
-    height: 100%;
     width: 50%;
 }
 
@@ -191,6 +212,7 @@
 
 .pl-captcha-image-frame{
     border-radius: 4px;
+    height: 36px;
     box-sizing: border-box;
     display: flex;
     flex-flow: row nowrap;
@@ -204,7 +226,7 @@
 }
 
 
-.p-refresh-captcha-icon{
+/* .p-refresh-captcha-icon{
     height: 100%;
     display: flex;
     flex-flow: column nowrap;
@@ -215,5 +237,5 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
-}
+} */
 

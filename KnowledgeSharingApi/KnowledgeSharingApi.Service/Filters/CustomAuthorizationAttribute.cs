@@ -53,14 +53,16 @@ namespace KnowledgeSharingApi.Services.Filters
                         return;
                     }
                 }
+
+                context.Result = new ApiResponse
+                {
+                    StatusCode = EStatusCode.Forbidden,
+                    UserMessage = ViConstantResource.FORBIDDEN,
+                    DevMessage = ViConstantResource.FORBIDDEN
+                };
             }
 
-            context.Result = new ApiResponse
-            {
-                StatusCode = EStatusCode.Forbidden,
-                UserMessage = ViConstantResource.FORBIDDEN,
-                DevMessage = ViConstantResource.FORBIDDEN
-            };
+            // passed
         }
 
         private static bool IsAllowAnonymousUsed(AuthorizationFilterContext context)

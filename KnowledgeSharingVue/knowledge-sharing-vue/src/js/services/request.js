@@ -140,7 +140,7 @@ class Request {
      */
     async tryRefreshToken(){
         let that = this;
-        let response = await globalInstance.post('Authenticate/refresh-token', {
+        let response = await globalInstance.post('Authentications/refresh-token', {
             AccessToken: that.token,
             RefreshToken: that.refreshToken
         });
@@ -230,7 +230,7 @@ class Request {
      */
     async checkLogedIn(){
         try {
-            let response = await new GetRequest('Users/get-by-token').execute();
+            let response = await new GetRequest('Users/me').execute();
             return this.tryGetBody(response);
         } catch (error){
             console.error(error);

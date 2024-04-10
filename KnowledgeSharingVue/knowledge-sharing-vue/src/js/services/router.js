@@ -1,14 +1,14 @@
 
 import { createRouter, createWebHistory } from 'vue-router';
 
-// import LoginPage from '@/components/pages/login-page/KSLoginPage.vue';
-// import ForgotPasswordPage from '@/components/pages/forgot-password-page/KSForgotPasswordPage.vue';
-// import EnterForgotPasswordVerificationCodePage from '@/components/pages/forgot-password-page/KSEnterForgotPasswordVerificationCodePage.vue';
-// import SetNewPasswordPage from '@/components/pages/forgot-password-page/KSSetNewPasswordPage.vue';
+import LoginPage from '@/components/pages/authentication/login-page/LoginPage.vue';
+// import ForgotPasswordPage from '@/components/pages/authentication/forgot-password-page/ForgotPasswordPage.vue';
+// import EnterForgotPasswordVerificationCodePage from '@/components/pages/authentication/forgot-password-page/EnterForgotPasswordVerificationCodePage.vue';
+// import SetNewPasswordPage from '@/components/pages/authentication/forgot-password-page/SetNewPasswordPage.vue';
 
-// import RegisterPage from '@/components/pages/register-page/KSRegisterPage.vue';
-// import EnterRegisterVerificationPage from '@/components/pages/register-page/KSEnterRegisterVerificationCodePage.vue';
-// import CreateNewUserPage from '@/components/pages/register-page/KSCreateNewUserPage.vue';
+// import RegisterPage from '@/components/pages/authentication/register-page/RegisterPage.vue';
+// import EnterRegisterVerificationPage from '@/components/pages/authentication/register-page/EnterRegisterVerificationCodePage.vue';
+// import CreateNewUserPage from '@/components/pages/authentication/register-page/CreateNewUserPage.vue';
 
 import TestPage from '@/components/pages/test-page/TestPage.vue';
 import { GetRequest } from './request';
@@ -38,7 +38,7 @@ const routers = [{
 }, {
     path: '/login',
     name: 'login',
-    component: null,
+    component: LoginPage,
     meta: {
         autoRedirect: true
     }
