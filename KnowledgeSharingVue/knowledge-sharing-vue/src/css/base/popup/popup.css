@@ -19,13 +19,13 @@
     position: fixed;
 }
 
-@media screen and (max-width: 767px){
+@media screen and (max-width: 600px){
     .p-popup{
         min-width: 100px; 
         width: 80vw;  
     }
 }
-@media screen and (min-width: 768px){
+@media screen and (min-width: 600px){
     .p-popup{
         min-width: 500px;   
         width: fit-content;

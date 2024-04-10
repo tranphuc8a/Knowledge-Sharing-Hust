@@ -178,14 +178,14 @@ namespace KnowledgeSharingApi.Services.Services
             // Tao moi user, profile, role
             User user = new()
             {
-                CreatedBy = model.FullName,
+                CreatedBy = model.Username!,
                 CreatedTime = DateTime.Now,
                 UserId = Guid.NewGuid(),
                 Email = model.Email!,
                 Username = model.Username!,
                 Role = UserRoles.User
             };
-            Guid? id = await UserRepository.RegisterUser(user.UserId, user, model.Password!, model.FullName!);
+            Guid? id = await UserRepository.RegisterUser(user.UserId, user, model.Password!, model.Username!);
             if (id == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Tra ve thanh cong

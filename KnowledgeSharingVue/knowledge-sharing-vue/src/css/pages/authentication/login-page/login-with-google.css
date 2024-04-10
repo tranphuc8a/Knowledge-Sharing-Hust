@@ -1,7 +1,8 @@
 
+
 @import url(@/css/main.css);
 
-.pa-form .pfp-header-and-description{
+.pa-form .plg-header-and-description{
     padding: 0px 0px 24px 0px;
     display: flex;
     flex-flow: column nowrap;
@@ -9,7 +10,7 @@
     align-items: center;
 }
 
-.pa-form .pfp-header{
+.pa-form .plg-header{
     font-size: 24px;
     font-weight: bold;
     font-style: normal;
@@ -19,39 +20,25 @@
     text-align: center;
 }
 
-.pa-form .pfp-description{
+.pa-form .plg-description{
     color: #4d5156;
     font-size: 14px;
     text-align: center;
     width: 90%;
 }
 
-.pa-form .pfp-input{
-    width: 100%;
-    height: fit-content;
-    display: flex;
-    flex-flow: column nowrap;
-    gap: 12px;
-    padding-bottom: 16px;
-    justify-content: center;
-    align-items: center;
+.pa-form .plg-loading{
+    padding-bottom: 36px;
 }
 
-.pfp-input > * {
-    width: 100%;
-    height: fit-content;
+.pa-form .pa-error-message{
+    padding-bottom: 36px;
 }
 
-.pa-form .pfp-links{
+.pa-form .plg-links{
     padding-bottom: 24px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
 }
-
-.pa-form .pfp-button {
-    padding-bottom: 24px;
-}
-
-

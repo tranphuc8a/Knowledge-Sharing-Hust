@@ -10,7 +10,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.AuthenticationMode
 {
     public class TokenModel
     {
-        [CustomRequiredValidator(ErrorMessage = ViConstantResource.ACCESS_CODE_EMPTY)]
+        [CustomRequiredValidator(ErrorMessage = ViConstantResource.ACCESS_TOKEN_EMPTY)]
         public string? AccessToken { get; set; }
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.REFRESH_TOKEN_EMPTY)]

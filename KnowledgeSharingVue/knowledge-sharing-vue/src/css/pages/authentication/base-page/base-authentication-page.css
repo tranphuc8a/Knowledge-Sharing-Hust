@@ -1,0 +1,112 @@
+
+@import url(@/css/main.css);
+
+
+@media screen and (max-width: 600px){
+    .pa-form-container .pa-form{
+        width: 80%;
+        max-width: min(400px, 90vw);
+        min-width: 200px;
+        padding: 20px 28px;
+    }
+    .pa-form .pa-logo-frame{
+        padding-bottom: 20px;
+    }
+}
+
+@media screen and (min-width: 600px){
+    .pa-form-container .pa-form{
+        width: 400px;
+        padding: 40px 48px;
+    }
+    .pa-form .pa-logo-frame{
+        padding-bottom: 40px;
+    }
+    .pa-form .p-button{
+        height: 40px;
+    }
+    .pa-form .p-textfield-bound{
+        height: var(--component-height-taller);
+    }
+    
+}
+
+
+.pa-background{
+    width: 100%;
+    height: 100%;
+    background: var(--authentication-background-img);
+}
+
+.pa-change-language-button{
+    position: fixed;
+    width: fit-content;
+    height: fit-content;
+    right: 24px;
+    top: 24px;
+}
+
+.pa-background .pa-form-container{
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0,30,61,.6) 0,rgba(0,0,0,.1) 41.42%,rgba(0,0,0,.3) 100%);
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+}
+
+.pa-form-container .pa-copyright{
+    color: rgba(255,255,255,.6);
+    font-size: 12px;
+}
+
+.pa-form-container .pa-form{
+    height: fit-content;
+    max-height: 100vh;
+    overflow: auto;
+
+    box-sizing: border-box;
+    background-color: #fff;
+
+    border-radius: 8px;
+    min-height: 340px;
+    box-shadow: 0 12px 20px rgba(0,0,0,.12)
+}
+
+.pa-form .pa-logo-frame{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+.pa-form .pa-logo-frame .pa-logo{
+    width: 200px;
+    height: 86px;
+    background: var(--logo-img);
+}
+
+.pa-form .pa-link {
+    text-decoration: none;
+    cursor: pointer;
+    color: #0073e6;
+}
+
+.pa-form .pa-error-message{
+    min-height: 24px;
+    line-height: 17px;
+    color: #ff1d1d;
+    padding-bottom: 16px;
+    text-align: start;
+}
+
+.pa-form .pa-success-message{
+    min-height: 24px;
+    line-height: 17px;
+    color: var(--light-green-color);
+    padding-bottom: 16px;
+    text-align: start;
+}

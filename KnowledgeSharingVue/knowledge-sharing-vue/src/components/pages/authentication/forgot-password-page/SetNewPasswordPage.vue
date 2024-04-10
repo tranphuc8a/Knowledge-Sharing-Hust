@@ -1,70 +1,56 @@
 
-
 <template>
-    <div class="pfp-background">
-        <div class="pfp-form-container">
-            <div class="pfp-form">
-                <div class="pfp-logo-frame">
-                    <div class="pfp-logo"></div>
-                </div>
-                <div class="pfp-header-and-description">
-                    <div class="pfp-header"> 
-                        {{ getLabel()?.header }}
-                    </div>
-                    <div class="pfp-description">
-                        {{ getLabel()?.description }}
-                    </div>
-                </div>
-                <form class="pfp-input" v-on:keypress.enter="resolveEnterForm">
-                    <AmisPasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.password"
-                        ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" 
-                        :onchange="resolveOnChangePassword"
-                        :validator="validator.password"
-                        :errorMessage="getLabel()?.invalidPassword"
-                        />
+    <BaseAuthenticationPage>
+        <div class="pfp-header-and-description">
+            <div class="pfp-header"> 
+                {{ getLabel()?.header }}
+            </div>
+            <div class="pfp-description">
+                {{ getLabel()?.description }}
+            </div>
+        </div>
+        <form class="pfp-input" v-on:keypress.enter="resolveEnterForm">
+            <PasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.password"
+                ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :is-show-title="false"
+                :onchange="resolveOnChangePassword"
+                :validator="validator.password"
+                :errorMessage="getLabel()?.invalidPassword"
+                />
 
-                    <AmisPasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.repassword"
-                        ref="repassword" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.repassword"
-                        :errorMessage="getLabel()?.invalidRepassword"
-                        />
-                </form>
-                <div class="pfp-error-message" v-show="isShowError">
-                    {{ errorMessage }}
-                </div>
-                
-                <div class="pfp-button">
-                    <!-- Thẻ button login -->
-                    <AmisSubmitButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
-                </div>
-                <div class="pfp-links pa-link">
-                    <router-link to="/login" >
-                        {{ getLabel()?.login }}
-                    </router-link>
-                </div>
-            </div>
-            <div class="pfp-copyright">
-                Copyright © 2012 - 2024 KS JSC
-            </div>
+            <PasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.repassword" :is-show-title="false"
+                ref="repassword" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.repassword"
+                :errorMessage="getLabel()?.invalidRepassword"
+                />
+        </form>
+        <div class="pa-error-message" v-show="isShowError">
+            {{ errorMessage }}
         </div>
-        <div class="pfp-change-language-button">
-            <ChangeLanguageButton />
+        <div class="pa-success-message" v-show="isShowSuccess">
+            {{ successMessage }}
         </div>
-    </div>
+        
+        <div class="pfp-button">
+            <!-- Thẻ button login -->
+            <MButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
+        </div>
+        <div class="pfp-links">
+            <router-link class="pa-link" to="/login" >
+                {{ getLabel()?.login }}
+            </router-link>
+        </div>
+    </BaseAuthenticationPage>
 </template>
 
 
 <script>
-import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-// import AmisTextField from '@/components/base/authentication/MTextField.vue';
-import AmisPasswordTextField from '@/components/base/authentication/MPasswordTextfield.vue'
-import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
+import BaseAuthenticationPage from '../base-page/BaseAuthenticationPage.vue';
+import PasswordTextField from '@/components/base/inputs/MPasswordTextfield.vue'
+import MButton from '@/components/base/buttons/MButton.vue';
 import { PostRequest, Request } from '@/js/services/request';
 import { PasswordValidator, RepasswordValidator } from '@/js/utils/validator';
 import { useRoute } from 'vue-router';
 import { Validator } from '@/js/utils/validator';
 import statusCodeEnum from '@/js/resources/status-code-enum';
-// import { Request, PostRequest, GetRequest } from '@/js/services/request';
-// import statusCodeEnum from '@/js/resources/status-code-enum';
 
 export default {
     name: 'KSForgotPasswordPage',
@@ -73,7 +59,9 @@ export default {
             label: null,
             global: this.globalData,
             isShowError: false,
+            isShowSuccess: false,
             errorMessage: 'Lỗi xảy ra',
+            successMessage: 'Đổi mật khẩu thành công',
             input: {
                 password: null,
                 repassword: null
@@ -84,7 +72,7 @@ export default {
             },
             button: null,
             email: null,
-            accessCode: null,
+            activeCode: null,
             code: null,
         }
     },
@@ -97,11 +85,10 @@ export default {
         this.button = this.$refs.button;
         this.route = useRoute();
         this.email = this.route.query.email;
-        this.accessCode = this.route.query.accessCode;
-        this.code = this.route.query.code;
+        this.activeCode = this.route.query.activeCode;
     },
     components: {
-        ChangeLanguageButton, AmisPasswordTextField, AmisSubmitButton
+        BaseAuthenticationPage, PasswordTextField, MButton
     },
     methods: {
         /**
@@ -112,8 +99,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject.language != null){
-                this.label = this.inject.language.pages.setnewpassword;
+            if (this.inject?.language != null){
+                this.label = this.inject?.language?.pages?.setnewpassword;
             }
             return this.label;
         },
@@ -142,11 +129,10 @@ export default {
 
                 // validate success, call API:
                 let passwordValue = await password.getValue();
-                let result = await new PostRequest('Authenticate/ResetPassword')
+                let result = await new PostRequest('Authentications/reset-password')
                     .setBody({
                         Email: this.email,
-                        AccessCode: this.accessCode,
-                        Code: this.code,
+                        ActiveCode: this.activeCode,
                         Password: passwordValue
                     }).execute();
                 
@@ -183,7 +169,7 @@ export default {
             try {
                 // navigate to success page
                 let userMessage = Request.tryGetUserMessage(response);
-                this.showErrorMsg(userMessage);
+                this.showSuccessMsg(userMessage);
             } catch (error){
                 console.error(error);
             }
@@ -251,10 +237,38 @@ export default {
          * @Modified None
         */
         async showErrorMsg(errorMessage){
+            await this.hideSuccessMsg();
             if (Validator.isEmpty(errorMessage))
                 return;
             this.errorMessage = errorMessage;
             this.isShowError = true;
+        },
+
+
+        /**
+         * Xử lý yêu cầu ẩn thông báo thành công
+         * @param none
+         * @returns none
+         * @Created PhucTV (11/04/24)
+         * @Modified None
+        */
+        async hideSuccessMsg(){
+            this.isShowSuccess = false;
+        },
+
+        /**
+         * Xử lý yêu cầu hiển thị thông báo thành công
+         * @param successMessage - thông báo thành công cần hiển thị
+         * @returns none
+         * @Created PhucTV (11/04/24)
+         * @Modified None
+        */
+        async showSuccessMsg(successMessage){
+            await this.hideErrorMsg();
+            if (Validator.isEmpty(successMessage))
+                return;
+            this.successMessage = successMessage;
+            this.isShowSuccess = true;
         }
 
     },
@@ -268,7 +282,7 @@ export default {
 
 
 <style scoped>
-@import url(@/css/pages/forgot-password-page/forgot-password-page.css);
+@import url(@/css/pages/authentication/forgot-password-page/forgot-password-page.css);
 </style>
 
 

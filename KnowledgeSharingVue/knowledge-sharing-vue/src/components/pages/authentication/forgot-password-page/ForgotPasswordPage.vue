@@ -1,62 +1,48 @@
 
 
 <template>
-    <div class="pfp-background">
-        <div class="pfp-form-container">
-            <div class="pfp-form">
-                <div class="pfp-logo-frame">
-                    <div class="pfp-logo"></div>
-                </div>
-                <div class="pfp-header-and-description">
-                    <div class="pfp-header"> 
-                        {{ getLabel()?.header }}
-                    </div>
-                    <div class="pfp-description">
-                        {{ getLabel()?.description }}
-                    </div>
-                </div>
-                <form class="pfp-input" v-on:keypress.enter.prevent="resolveEnterForm">
-                    <!-- input email -->
-                    <AmisTextField :autocomplete="'email'" type="email" :placeholder=" getLabel()?.email " :isShowTitle="false" 
-                        ref="email" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.email"
-                        :errorMessage="getLabel()?.invalidEmail"
-                        />
-                </form>
-                <div class="pfp-error-message" v-show="isShowError">
-                    {{ errorMessage }}
-                </div>
-                
-                <div class="pfp-button">
-                    <!-- Thẻ button login -->
-                    <AmisSubmitButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
-                </div>
-                <div class="pfp-links pa-link">
-                    <router-link to="/login" >
-                        {{ getLabel()?.login }}
-                    </router-link>
-                </div>
+    <BaseAuthenticationPage>
+        <div class="pfp-header-and-description">
+            <div class="pfp-header"> 
+                {{ getLabel()?.header }}
             </div>
-            <div class="pfp-copyright">
-                Copyright © 2012 - 2024 KS JSC
+            <div class="pfp-description">
+                {{ getLabel()?.description }}
             </div>
         </div>
-        <div class="pfp-change-language-button">
-            <ChangeLanguageButton />
+        <form class="pfp-input" v-on:keypress.enter.prevent="resolveEnterForm">
+            <!-- input email -->
+            <MSlotedTextfield :autocomplete="'email'" type="email" :placeholder=" getLabel()?.email " :isShowTitle="false" 
+                ref="email" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.email"
+                :errorMessage="getLabel()?.invalidEmail"
+                />
+        </form>
+        <div class="pa-error-message" v-show="isShowError">
+            {{ errorMessage }}
         </div>
-    </div>
+        
+        <div class="pfp-button">
+            <!-- Thẻ button login -->
+            <MButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
+        </div>
+        <div class="pfp-links">
+            <router-link class="pa-link" to="/login" >
+                {{ getLabel()?.login }}
+            </router-link>
+        </div>
+    </BaseAuthenticationPage>
 </template>
 
 
 <script>
-import ChangeLanguageButton from '@/components/base/authentication/MChangeLanguageButton.vue';
-import AmisTextField from '@/components/base/authentication/MSlotedTextfield.vue';
-import AmisSubmitButton from '@/components/base/authentication/MSubmitButton.vue';
+import BaseAuthenticationPage from '@/components/pages/authentication/base-page/BaseAuthenticationPage.vue';
+import MSlotedTextfield from '@/components/base/inputs/MSlotedTextfield.vue';
+import MButton from '@/components/base/buttons/MButton.vue';
 import { EmailValidator } from '@/js/utils/validator';
 import { GetRequest, Request } from '@/js/services/request';
 import { Validator } from '@/js/utils/validator';
 import statusCodeEnum from '@/js/resources/status-code-enum';
-// import { Request, PostRequest, GetRequest } from '@/js/services/request';
-// import statusCodeEnum from '@/js/resources/status-code-enum';
+
 
 export default {
     name: 'KSForgotPasswordPage',
@@ -81,7 +67,7 @@ export default {
         this.button = this.$refs.button;
     },
     components: {
-        ChangeLanguageButton, AmisTextField, AmisSubmitButton
+        BaseAuthenticationPage, MSlotedTextfield, MButton
     },
     methods: {
         /**
@@ -92,8 +78,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject.language != null){
-                this.label = this.inject.language.pages.forgotpassword;
+            if (this.inject?.language != null){
+                this.label = this.inject?.language?.pages?.forgotpassword;
             }
             return this.label;
         },
@@ -118,7 +104,7 @@ export default {
 
                 // Validate success, call API:
                 let emailValue = await email.getValue();
-                let result = await new GetRequest('Authenticate/SendForgotPasswordVerificationCode/')
+                let result = await new GetRequest('Authentications/send-reset-password-verify-code')
                         .setParams({ email: emailValue}).execute();
                 
                 // Call API success:
@@ -215,7 +201,7 @@ export default {
 
 
 <style scoped>
-@import url(@/css/pages/forgot-password-page/forgot-password-page.css);
+@import url(@/css/pages/authentication/forgot-password-page/forgot-password-page.css);
 </style>
 
 

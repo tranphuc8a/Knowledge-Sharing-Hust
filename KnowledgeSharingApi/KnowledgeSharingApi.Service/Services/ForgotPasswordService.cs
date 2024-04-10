@@ -51,7 +51,7 @@ namespace KnowledgeSharingApi.Services.Services
                 }
 
                 // OK, thực hiện reset password
-                return await ResetPassword(user.Username, model.NewPassword!);
+                return await ResetPassword(user.Username, model.Password!);
             }
 
             throw new NotMatchTypeException();

@@ -55,8 +55,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject.language != null){
-                this.label = this.inject.language.pages.login;
+            if (this.inject?.language != null){
+                this.label = this.inject?.language?.pages?.login;
             }
             return this.label;
         },
@@ -94,6 +94,6 @@ export default {
 
 <style scoped>
 
-@import url(@/css/base/authentication/change-language-button.css);
+@import url(@/css/base/button/change-language-button.css);
 
 </style>

@@ -78,7 +78,7 @@ import MCombobox from '@/components/base/inputs/MCombobox';
 import MDatePicker from '@/components/base/inputs/MDatePicker';
 import MRadio from '@/components/base/inputs/MRadio';
 import MTextfield from '@/components/base/inputs/MTextfield';
-import MPasswordTextfield from '@/components/base/authentication/MPasswordTextfield.vue';
+import MPasswordTextfield from '@/components/base/inputs/MPasswordTextfield.vue';
 
 export default {
     name: 'TestInputsPage',
