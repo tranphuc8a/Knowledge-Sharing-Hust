@@ -31,12 +31,6 @@ namespace KnowledgeSharingApi.Infrastructures.Request
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _authenticationToken);
                 }
 
-                // Set content type
-                if (!string.IsNullOrEmpty(_contentType))
-                {
-                    httpClient.DefaultRequestHeaders.Add("Content-Type", _contentType);
-                }
-
                 // Set body
                 string requestBody = _body != null ? JsonConvert.SerializeObject(_body) : "";
                 StringContent content = new(requestBody, System.Text.Encoding.UTF8, _contentType);

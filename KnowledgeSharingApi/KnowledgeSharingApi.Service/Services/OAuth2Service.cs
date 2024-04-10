@@ -62,21 +62,6 @@ namespace KnowledgeSharingApi.Services.Services
             UserResource = EntityResource.User();
         }
 
-        #region Redefine Access Cache Avoid Duplicate key
-        protected virtual string BoundKey(string key)
-        {
-            return $"Set Check Login Attack {key}";
-        }
-        protected virtual void CacheSet(CheckLoginAttackCacheDto value)
-        {
-            Cache.Set<CheckLoginAttackCacheDto>(BoundKey(value.Username), value);
-        }
-        protected virtual CheckLoginAttackCacheDto? CacheGet(string username)
-        {
-            return Cache.Get<CheckLoginAttackCacheDto>(BoundKey(username));
-        }
-        #endregion
-
         #region Functional methods
 
         /// <summary>
@@ -102,11 +87,6 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<ServiceResult> LoginSuccess(User user)
         {
-            // Cập nhật lại số lần đăng nhập lỗi = 0
-            CheckLoginAttackCacheDto loginModel = CacheGet(user.Username)!;
-            loginModel.NumberFailedAttempt = 0;
-            CacheSet(loginModel);
-
             // Sinh token
             Guid sessionId = Guid.NewGuid();
             string? token = Encrypt.JwtEncrypt(new JwtTokenDto()
@@ -181,9 +161,13 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> RegsiterUserByActiveCode(ActiveCodeRegisterModel model)
         {
             // Check token
-            bool isValidateToken = CheckActiveCode(model.ActiveCode!, model.Email!);
-            if (!isValidateToken)
+            string? emailDecoded = CheckActiveCode(model.ActiveCode!);
+            if (emailDecoded == null)
                 return ServiceResult.UnAuthorized(ResponseResource.InvalidToken());
+
+            // check email is match:
+            if (emailDecoded != model.Email!)
+                return ServiceResult.BadRequest("Email khong khop voi token");
 
             // Check email va username chua ton tai
             User? userByEmail = await UserRepository.GetByEmail(model.Email!);
@@ -208,18 +192,24 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, user);
         }
 
-        protected virtual bool CheckActiveCode(string activeCode, string email)
+        /// <summary>
+        /// Decode active code va tra ve email duoc ma hoa
+        /// </summary>
+        /// <param name="activeCode"> token can check </param>
+        /// <returns> email hoac null </returns>
+        /// Created: PhucTV (10/4/24)
+        /// Modified: None
+        protected virtual string? CheckActiveCode(string activeCode)
         {
             List<Claim>? claims = Encrypt.JwtDecryptToListClaims(activeCode, isValidateLifeTime: true)?.ToList();
-            if (claims == null) return false;
+            if (claims == null) return null;
             string? roleType = claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault()?.Value;
-            if (roleType != RoleType) return false;
+            if (roleType != RoleType) return null;
             string? emailToCheck = claims.Where(c => c.Type == ClaimTypes.Email).FirstOrDefault()?.Value;
-            if (emailToCheck != email) return false;
-            return true;
+            return emailToCheck;
         }
 
-        public async Task<ServiceResult> RequestSigninByGoogle(string googleToken)
+        public async Task<ServiceResult> RequestSignupByGoogle(string googleToken)
         {
             // Check token hop le
             GoogleOAuth2User? userInfor = await GoogleOAuth2.GetuserByToken(googleToken);
@@ -232,7 +222,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Sinh Active code va tra ve
             List<Claim> claims = [
                 new(ClaimTypes.Role, RoleType),
-                new(ClaimTypes.Email, user!.Email)
+                new(ClaimTypes.Email, userInfor.email)
             ];
             string? token = Encrypt.JwtEncrypt(claims);
             if (token == null) return ServiceResult.ServerError(ResponseResource.ServerError());

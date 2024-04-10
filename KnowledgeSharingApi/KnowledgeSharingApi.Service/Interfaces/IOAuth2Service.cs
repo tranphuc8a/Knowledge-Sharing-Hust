@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns> Active Code </returns>
         /// Created: PhucTV (10/4/24)
         /// Modified: None
-        Task<ServiceResult> RequestSigninByGoogle(string googleToken);
+        Task<ServiceResult> RequestSignupByGoogle(string googleToken);
 
         /// <summary>
         /// Thuc hien tao moi tai khoan dua tren active code
