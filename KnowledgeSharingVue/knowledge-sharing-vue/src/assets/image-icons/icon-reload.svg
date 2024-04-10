@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16">
+  <path d="M1.5,8A6.5,6.5,0,0,1,13.478,4.5" fill="none" stroke="#444" stroke-linecap="round" stroke-linejoin="round"></path>
+  <polyline points="13.5 0.5 13.5 4.5 9.5 4.5" fill="none" stroke="#444" stroke-linecap="round" stroke-linejoin="round"></polyline>
+  <path d="M14.5,8A6.5,6.5,0,0,1,2.522,11.5" fill="none" stroke="#444444" stroke-linecap="round" stroke-linejoin="round" data-color="color-2"></path>
+  <polyline points="2.5 15.5 2.5 11.5 6.5 11.5" fill="none" stroke="#444444" stroke-linecap="round" stroke-linejoin="round" data-color="color-2"></polyline>
+</svg>

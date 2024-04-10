@@ -131,7 +131,8 @@ class ResolveAxiosResponse {
         [statusCodeEnum.BAD_REQUEST]:   this.resolveBadRequest,
         [statusCodeEnum.UNAUTHORIZED]:  this.resolveUnAuthorized,
         [statusCodeEnum.FORBIDDEN]:     this.resolveForbidden,
-        [statusCodeEnum.SERVER_ERROR]:  this.resolveServerError
+        [statusCodeEnum.SERVER_ERROR]:  this.resolveServerError,
+        [statusCodeEnum.NOT_FOUND]:     this.resolveConnectError
     };
 
 

@@ -12,7 +12,7 @@ export default {
         others: 'Hoặc đăng nhập với',
         invalidUsername: 'Tên tài khoản không hợp lệ',
         invalidPassword: 'Mật khẩu không hợp lệ',
-        invalidCaptcha: 'Mã captcha không hợp lệ',
+        invalidCaptcha: 'Captcha trống',
     }, 
     en: {
         vietnamese: 'Vietnamese',

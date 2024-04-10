@@ -43,7 +43,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpGet("me")]
-        [CustomAuthorization(Roles: "User, Admin")]
+        [CustomAuthorization("User, Admin")]
         public virtual async Task<IActionResult> GetMeProfile()
         {
             string? uId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);

@@ -3,8 +3,8 @@
 import { myEnum } from "@/js/resources/enum";
 import Common from "./js/utils/common";
 
-// const defaultBackendUrl = 'http://tranphuc8a.somee.com/api/v1';
-const defaultBackendUrl = 'http://localhost:5000/api/v1';
+//const defaultBackendUrl = 'http://tranphuc8a.somee.com/api/v1';
+const defaultBackendUrl = 'http://localhost:5133/api/v1';
 const defaultHomepageUrl = 'http://localhost:8080';
 
 
