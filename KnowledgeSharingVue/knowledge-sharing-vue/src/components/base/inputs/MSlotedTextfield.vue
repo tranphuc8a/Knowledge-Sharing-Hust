@@ -6,7 +6,7 @@
                 :state="inputFrame.state" :errorMessage="inputFrame.errorMessage"
                 :is-obligate="inputFrame.isObligate"
                 :isShowTitle="inputFrame.isShowTitle" :isShowError="inputFrame.isShowError">
-        <div class="p-textfield-bound">
+        <div class="p-textfield-bound" :title="title ?? null">
             <input ref="textfield" class="p-textfield" v-model="data.value"
                     :type="data.type" :placeholder="data.placeholder" :autocomplete="autocomplete"
                     @:input="resolveOnInput" @:change="resolveOnChange" 

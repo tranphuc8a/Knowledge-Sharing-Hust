@@ -13,52 +13,35 @@
         <form class="pr-input" v-on:keypress.enter.prevent="resolveEnterForm">
             <!-- input email -->
             <MSlotedTextfield :autocomplete="'email'" type="email" :placeholder=" getLabel()?.email " :isShowTitle="false" 
-                ref="email" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.email"
+                ref="email" :validator="validator.email"
                 :errorMessage="getLabel()?.invalidEmail"
                 />
         </form>
-        <div class="pa-error-message" v-show="isShowError">
-            {{ errorMessage }}
+
+        <div class="pr-links">
+            <router-link class="pa-link" to="/login" >
+                {{ getLabel()?.login }}
+            </router-link>
         </div>
         
         <div class="pr-button">
             <!-- Thẻ button login -->
             <MButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
         </div>
-        <div class="pr-links">
-            <router-link class="pa-link" to="/login" >
-                {{ getLabel()?.login }}
-            </router-link>
-        </div>
-        <div class="pr-divide">
-            <div class="pr-segment-frame">
-                <div class="pr-segment"></div>
-            </div>
-            <div class="pr-text-divide">
-                {{ getLabel()?.others }}
-            </div>
-        </div>
-        <div class="pr-login-options">
-            <div class="pr-option pr-login-google">
-            </div>
-            <div class="pr-option pr-login-apple">
-            </div>
-            <div class="pr-option pr-login-microsoft">
-            </div>
-        </div>
+    
+        <OtherRegisterOptions :label="getLabel()?.others" />
     </BaseAuthenticationPage>
 </template>
 
 
 <script>
+import OtherRegisterOptions from './OtherRegisterOptions.vue';
 import BaseAuthenticationPage from '@/components/pages/authentication/base-page/BaseAuthenticationPage.vue';
 import MSlotedTextfield from '@/components/base/inputs/MSlotedTextfield.vue';
 import MButton from '@/components/base/buttons/MButton.vue';
 import { EmailValidator, Validator } from '@/js/utils/validator';
 import { GetRequest, Request } from '@/js/services/request';
 import statusCodeEnum from '@/js/resources/status-code-enum';
-// import { Request, PostRequest, GetRequest } from '@/js/services/request';
-// import statusCodeEnum from '@/js/resources/status-code-enum';
 
 export default {
     name: 'KSForgotPasswordPage',
@@ -66,8 +49,7 @@ export default {
         return {
             label: null,
             global: this.globalData,
-            isShowError: false,
-            errorMessage: 'Email không tồn tại',
+            
             input: {},
             validator: {
                 email: new EmailValidator(this.getLabel()?.invalidEmail)
@@ -84,7 +66,7 @@ export default {
         this.button = this.$refs.button;
     },
     components: {
-        BaseAuthenticationPage, MSlotedTextfield, MButton
+        BaseAuthenticationPage, MSlotedTextfield, MButton, OtherRegisterOptions
     },
     methods: {
         /**
@@ -182,17 +164,6 @@ export default {
         },
 
         /**
-         * Xử lý yêu cầu ẩn lỗi
-         * @param none
-         * @returns none
-         * @Created PhucTV (04/03/24)
-         * @Modified None
-        */
-        async hideErrorMsg(){
-            this.isShowError = false;
-        },
-
-        /**
          * Xử lý yêu cầu hiển thị lỗi
          * @param errorMessage - lỗi cần hiển thị
          * @returns none
@@ -202,8 +173,7 @@ export default {
         async showErrorMsg(errorMessage){
             if (Validator.isEmpty(errorMessage))
                 return;
-            this.errorMessage = errorMessage;
-            this.isShowError = true;
+            await this.getToastManager()?.error(errorMessage);
         }
     },
     inject: {

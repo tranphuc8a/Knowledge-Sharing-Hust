@@ -8,12 +8,15 @@
                 {{ getLabel()?.description }}
             </div>
         </div>
-        <div class="plg-loading" v-show="isLoading">
-            <MSpinner :style="{fontSize: '24px'}" />
+        <div class="plg-content">
+            <div class="plg-loading" v-show="isLoading">
+                <MSpinner :style="{fontSize: '24px'}" />
+            </div>
+            <div class="pa-error-message" v-show="isShowError">
+                {{ errorMessage }}
+            </div>
         </div>
-        <div class="pa-error-message" v-show="isShowError">
-            {{ errorMessage }}
-        </div>
+        
         <div class="plg-links">
             <router-link class="pa-link" to="/login" >
                 {{ getLabel()?.login }}
@@ -199,12 +202,10 @@ export default {
                 if (Validator.isEmpty(msg)) return;
                 this.isShowError = true;
                 this.errorMessage = msg;
+                await this.getToastManager().error(msg);
             } catch (error){
                 console.error(error);
             }
-        },
-        async hideErrorMsg(){
-            this.isShowError = false;
         },
     },
     inject: {

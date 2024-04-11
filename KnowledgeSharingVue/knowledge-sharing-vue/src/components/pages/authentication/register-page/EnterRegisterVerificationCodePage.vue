@@ -13,39 +13,22 @@
         <form class="pr-input" v-on:keypress.enter.prevent="resolveEnterForm">
             <!-- input verificationCode -->
             <MSlotedTextfield :autocomplete="'text'" type="text" :placeholder=" getLabel()?.verificationCode " :isShowTitle="false" 
-                ref="verificationCode" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.verificationCode"
+                ref="verificationCode" :validator="validator.verificationCode"
                 :errorMessage="getLabel()?.invalidVerificationCode"
                 />
         </form>
-        <div class="pa-error-message" v-show="isShowError">
-            {{ errorMessage }}
-        </div>
-        
-        <div class="pr-button">
-            <!-- Thẻ button login -->
-            <MButton :label=" getLabel()?.button" :onclick="resolveSubmit" ref="button" />
-        </div>
+       
         <div class="pr-links">
             <router-link class="pa-link" to="/login" >
                 {{ getLabel()?.login }}
             </router-link>
         </div>
-        <div class="pr-divide">
-            <div class="pr-segment-frame">
-                <div class="pr-segment"></div>
-            </div>
-            <div class="pr-text-divide">
-                {{ getLabel()?.others }}
-            </div>
+
+        <div class="pr-button">
+            <!-- Thẻ button login -->
+            <MButton :label=" getLabel()?.button" :onclick="resolveSubmit" ref="button" />
         </div>
-        <div class="pr-login-options">
-            <div class="pr-option pr-login-google">
-            </div>
-            <div class="pr-option pr-login-apple">
-            </div>
-            <div class="pr-option pr-login-microsoft">
-            </div>
-        </div>
+        
     </BaseAuthenticationPage>
 </template>
 
@@ -66,8 +49,7 @@ export default {
         return {
             label: null,
             global: this.globalData,
-            isShowError: false,
-            errorMessage: 'Verification code is invalid',
+            
             input: {},
             validator: {
                 verificationCode: new NotEmptyValidator(this.getLabel()?.invalidVerificationCode)
@@ -190,17 +172,6 @@ export default {
         },
 
         /**
-         * Xử lý yêu cầu ẩn lỗi
-         * @param none
-         * @returns none
-         * @Created PhucTV (04/03/24)
-         * @Modified None
-        */
-        async hideErrorMsg(){
-            this.isShowError = false;
-        },
-
-        /**
          * Xử lý yêu cầu hiển thị lỗi
          * @param errorMessage - lỗi cần hiển thị
          * @returns none
@@ -210,8 +181,7 @@ export default {
         async showErrorMsg(errorMessage){
             if (Validator.isEmpty(errorMessage))
                 return;
-            this.errorMessage = errorMessage;
-            this.isShowError = true;
+            await this.getToastManager()?.error(errorMessage);
         }
     },
     inject: {

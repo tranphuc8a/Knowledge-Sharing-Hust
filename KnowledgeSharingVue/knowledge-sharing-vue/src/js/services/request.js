@@ -79,6 +79,7 @@ class Request {
      * @Modified None
      */
     setToken(token){
+        this.token = token;
         this.instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         return this;
     }

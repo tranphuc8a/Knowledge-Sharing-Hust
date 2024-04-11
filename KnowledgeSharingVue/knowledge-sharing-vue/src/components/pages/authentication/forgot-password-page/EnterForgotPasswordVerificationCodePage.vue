@@ -13,23 +13,21 @@
         <form class="pfp-input" v-on:keypress.enter.prevent="resolveEnterForm">
             <!-- input verificationCode -->
             <MSlotedTextfield :autocomplete="'text'" type="text" :placeholder=" getLabel()?.verificationCode " :isShowTitle="false" 
-                ref="verificationCode" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.verificationCode"
+                ref="verificationCode" :validator="validator.verificationCode"
                 :errorMessage="getLabel()?.invalidVerificationCode"
                 />
         </form>
-        <div class="pa-error-message" v-show="isShowError">
-            {{ errorMessage }}
+        <div class="pfp-links">
+            <router-link class="pa-link" to="/login" >
+                {{ getLabel()?.login }}
+            </router-link>
         </div>
         
         <div class="pfp-button">
             <!-- Thẻ button login -->
             <MButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
         </div>
-        <div class="pfp-links">
-            <router-link class="pa-link" to="/login" >
-                {{ getLabel()?.login }}
-            </router-link>
-        </div>
+        
     </BaseAuthenticationPage>
 </template>
 
@@ -50,8 +48,7 @@ export default {
         return {
             label: null,
             global: this.globalData,
-            isShowError: false,
-            errorMessage: 'Mã xác minh không hợp lệ',
+            
             input: {},
             validator: {
                 verificationCode: new NotEmptyValidator(this.getLabel()?.invalidVerificationCode)
@@ -183,18 +180,6 @@ export default {
             }
         },
 
-
-        /**
-         * Xử lý yêu cầu ẩn lỗi
-         * @param none
-         * @returns none
-         * @Created PhucTV (04/03/24)
-         * @Modified None
-        */
-        async hideErrorMsg(){
-            this.isShowError = false;
-        },
-
         /**
          * Xử lý yêu cầu hiển thị lỗi
          * @param errorMessage - lỗi cần hiển thị
@@ -205,8 +190,7 @@ export default {
         async showErrorMsg(errorMessage){
             if (Validator.isEmpty(errorMessage))
                 return;
-            this.errorMessage = errorMessage;
-            this.isShowError = true;
+            await this.getToastManager()?.error(errorMessage);
         }
 
     },

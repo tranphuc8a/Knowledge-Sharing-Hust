@@ -1,8 +1,8 @@
 
 export default {
     vi: {
-        vietnamese: 'Tiếng Việt',
-        english: 'Tiếng Anh',
+        header: 'Đăng nhập',
+        description: 'Đăng nhập bằng tài khoản của bạn',
         username: 'Nhập tên tài khoản',
         captcha: 'Nhập captcha',
         password: 'Nhập mật khẩu',
@@ -15,8 +15,8 @@ export default {
         invalidCaptcha: 'Captcha trống',
     }, 
     en: {
-        vietnamese: 'Vietnamese',
-        english: 'English',
+        header: 'Login',
+        description: 'Login with your account',
         username: 'Enter your username',
         captcha: 'Enter captcha',
         password: 'Enter password',
