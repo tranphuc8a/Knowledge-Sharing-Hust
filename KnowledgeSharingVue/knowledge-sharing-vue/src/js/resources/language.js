@@ -11,6 +11,7 @@ import enterRegisterVerificationCodeResource from "./authentication/enter-regist
 import createNewUserPageResource from "./authentication/create-new-user-page-resource";
 import componentResource from "./component-resource";
 import loginWithGooglePageResource from "./authentication/login-with-google-page-resource";
+import registerWithGoogleResource from "./authentication/register-with-google-resource";
 
 const language = {
     'vi': {
@@ -35,7 +36,8 @@ const language = {
             register: registerPageResource.vi,
             enterregisterverificationcode: enterRegisterVerificationCodeResource.vi,
             createnewuser: createNewUserPageResource.vi,
-            loginWithGoogle: loginWithGooglePageResource.vi
+            loginWithGoogle: loginWithGooglePageResource.vi,
+            registerWithGoogle: registerWithGoogleResource.vi
         }
     },
     'en': {
@@ -60,7 +62,8 @@ const language = {
             register: registerPageResource.en,
             enterregisterverificationcode: enterRegisterVerificationCodeResource.en,
             createnewuser: createNewUserPageResource.en,
-            loginWithGoogle: loginWithGooglePageResource.en
+            loginWithGoogle: loginWithGooglePageResource.en,
+            registerWithGoogle: registerWithGoogleResource.en,
             
         }
     }

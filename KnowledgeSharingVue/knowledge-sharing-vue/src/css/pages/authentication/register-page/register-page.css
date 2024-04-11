@@ -43,14 +43,6 @@
     height: fit-content;
 }
 
-.pa-form .pa-error-message{
-    min-height: 24px;
-    line-height: 17px;
-    color: #ff1d1d;
-    padding-bottom: 16px;
-    text-align: start;
-}
-
 .pa-form .pr-links{
     padding-bottom: 24px;
     display: flex;
@@ -60,72 +52,4 @@
 }
 .pa-form .pr-button {
     padding-bottom: 24px;
-}
-
-
-.pa-form .pr-divide{
-    width: 100%;
-    position: relative;
-    display: flex;
-    flex-flow: row nowrap;
-    padding-bottom: 16px;
-    justify-content: center;
-    align-items: center;
-}
-
-.pr-divide .pr-segment-frame{
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.pr-divide .pr-segment-frame .pr-segment{
-    width: 100%;
-    height: 1px;
-    background-color: #9ea1a5;
-}
-
-.pr-divide .pr-text-divide{
-    width: fit-content;
-    color: #9ea1a5;
-    background-color: #fff;
-    padding: 5px 10px;
-    z-index: 1;
-}
-
-.pa-form .pr-login-options{
-    width: 100%;
-    height: fit-content;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-}
-
-.pr-login-options .pr-option{
-    width: 40px;
-    height: 40px;
-    background-size: 100% 100%;
-    background-position: center;
-    
-    border-radius: 100%;
-    cursor: pointer;
-    box-sizing: border-box;
-}
-
-.pr-login-options .pr-option:hover{
-    box-shadow: 0 1px 4px rgba(0,0,0,.16);
-}
-
-.pr-login-google{
-    background-image: url(@/assets/image-icons/icon-google.svg);
-}
-.pr-login-apple{
-    background-image: url(@/assets/image-icons/icon-apple.svg);
-}
-.pr-login-microsoft{
-    background-image: url(@/assets/image-icons/icon-microsoft.svg);
 }

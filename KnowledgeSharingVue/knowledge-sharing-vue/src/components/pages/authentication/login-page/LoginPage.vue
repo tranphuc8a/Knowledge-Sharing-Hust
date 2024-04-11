@@ -1,20 +1,29 @@
 
 <template>
     <BaseAuthenticationPage>
+        <div class="pl-header-and-description">
+            <div class="pl-header"> 
+                {{ getLabel()?.header }}
+            </div>
+            <!-- <div class="pl-description">
+                {{ getLabel()?.description }}
+            </div> -->
+        </div>
+
         <form class="pl-input" v-on:keypress.enter="resolveEnterForm">
             <!-- 2 thẻ input -->
             <SlotedTextfield :autocomplete="'username'" type="text" :placeholder=" getLabel()?.username " :isShowTitle="false" 
-                ref="username" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.username"
+                ref="username" :validator="validator.username"
                 :errorMessage="getLabel()?.invalidUsername"
                 />
             <PasswordTextfield :autocomplete="'current-password'" :placeholder="getLabel()?.password" :is-show-title="false"
-                ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.password"
+                ref="password" :validator="validator.password"
                 :errorMessage="getLabel()?.invalidPassword"
                 />
             <div class="pl-input-captcha" v-show="isLoginWithCaptcha">
                 <div class="pl-input-captcha-textfield">
                     <SlotedTextfield type="text" :placeholder=" getLabel()?.captcha " :isShowTitle="false" 
-                        ref="captcha" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.captcha"
+                        ref="captcha" :validator="validator.captcha"
                         :errorMessage="getLabel()?.invalidCaptcha">
                         <MActionIcon fa="rotate-right" :onclick="refreshCaptcha" 
                             :iconStyle="{width: '18px', height: '18px'}"
@@ -26,9 +35,7 @@
                 </div>
             </div>
         </form>
-        <div class="pl-error-message" v-show="isShowError">
-            {{ errorMessage }}
-        </div>
+
         <div class="pl-links">
             <router-link class="pa-link" to="/forgotpassword" >
                 {{ getLabel()?.forgotpassword }}
@@ -38,33 +45,20 @@
                 {{ getLabel()?.register }}
             </router-link>
         </div>
+
         <div class="pl-button">
             <!-- Thẻ button login -->
             <MButton :label=" getLabel()?.login" :onclick="resolveSubmitLogin" ref="button" />
         </div>
-        <div class="pl-divide">
-            <div class="pl-segment-frame">
-                <div class="pl-segment"></div>
-            </div>
-            <div class="pl-text-divide">
-                {{ getLabel()?.others }}
-            </div>
-        </div>
-        <div class="pl-login-options">
-            <!-- <div class="pl-option pl-login-google">
-            </div> -->
-            <LoginWithGoogleIcon />
-            <div class="pl-option pl-login-apple">
-            </div>
-            <div class="pl-option pl-login-microsoft">
-            </div>
-        </div>
+        
+        <OtherLoginOptions :label="getLabel()?.others" />
+        
     </BaseAuthenticationPage>
 </template>
 
 
 <script>
-import LoginWithGoogleIcon from './LoginWithGoogleIcon.vue';
+import OtherLoginOptions from '@/components/pages/authentication/login-page/OtherLoginOptions';
 import BaseAuthenticationPage from '@/components/pages/authentication/base-page/BaseAuthenticationPage.vue';
 import SlotedTextfield from '@/components/base/inputs/MSlotedTextfield.vue';
 import PasswordTextfield from '@/components/base/inputs/MPasswordTextfield.vue';
@@ -83,8 +77,6 @@ export default {
             captchaImageData: null,
             captchaToken: null,
 
-            isShowError: false,
-            errorMessage: 'Tên đăng nhập hoặc mật khẩu không đúng',
             input: {},
             account: {
                 username: null,
@@ -124,7 +116,7 @@ export default {
     },
     components: {
         BaseAuthenticationPage, SlotedTextfield, PasswordTextfield,
-        MButton, LoginWithGoogleIcon
+        MButton, OtherLoginOptions
     },
     methods: {
         /**
@@ -142,7 +134,7 @@ export default {
         },
 
         /**
-         * Hai hàm thực hiện ẩn hiện lỗi đăng nhập từ api
+         * Hai hàm thực hiện show lỗi đăng nhập từ api
          * @param {*} msg - lỗi hiển thị
          * @returns none
          * @Created PhucTV (20/2/24)
@@ -151,14 +143,10 @@ export default {
         async showErrorMsg(msg){
             try {
                 if (Validator.isEmpty(msg)) return;
-                this.isShowError = true;
-                this.errorMessage = msg;
+                this.getToastManager().error(msg);
             } catch (error){
                 console.error(error);
             }
-        },
-        async hideErrorMsg(){
-            this.isShowError = false;
         },
 
         /**
@@ -227,8 +215,7 @@ export default {
         */
         async resolveSubmitLogin(){
             try {
-                await this.hideErrorMsg();
-
+                
                 let isOkay = await this.validateForm();
                 if (!isOkay) {
                     return;

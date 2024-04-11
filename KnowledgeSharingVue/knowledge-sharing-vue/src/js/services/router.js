@@ -11,6 +11,7 @@ import SetNewPasswordPage from '@/components/pages/authentication/forgot-passwor
 import RegisterPage from '@/components/pages/authentication/register-page/RegisterPage.vue';
 import EnterRegisterVerificationPage from '@/components/pages/authentication/register-page/EnterRegisterVerificationCodePage.vue';
 import CreateNewUserPage from '@/components/pages/authentication/register-page/CreateNewUserPage.vue';
+import RegisterWithGooglePage from '@/components/pages/authentication/register-page/RegisterWithGooglePage.vue';
 
 import TestPage from '@/components/pages/test-page/TestPage.vue';
 import { GetRequest } from './request';
@@ -64,7 +65,11 @@ const routers = [{
     path: '/register',
     name: 'register',
     component: RegisterPage
-},  {
+}, {
+    path: '/register/google',
+    name: 'register-with-google',
+    component: RegisterWithGooglePage
+}, {
     path: '/enter-register-verification-code',
     name: 'enter-register-verification-code',
     component: EnterRegisterVerificationPage

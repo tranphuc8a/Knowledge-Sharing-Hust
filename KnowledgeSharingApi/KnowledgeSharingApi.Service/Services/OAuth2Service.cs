@@ -152,7 +152,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiem tra email ton tai trong db
             User? user = await UserRepository.GetByEmail(userInfor.email);
-            if (user == null) return ServiceResult.BadRequest("Ban chua dang ky tai khoan, hay dang ky truoc");
+            if (user == null) return ServiceResult.BadRequest("Bạn chưa đăng ký tài khoản bằng email này, hãy thực hiện đăng ký tài khoản trước");
 
             // return Dang nhap thanh cong
             return await LoginSuccess(user!);
@@ -167,13 +167,13 @@ namespace KnowledgeSharingApi.Services.Services
 
             // check email is match:
             if (emailDecoded != model.Email!)
-                return ServiceResult.BadRequest("Email khong khop voi token");
+                return ServiceResult.BadRequest("Email không khớp với ActiveCode");
 
             // Check email va username chua ton tai
             User? userByEmail = await UserRepository.GetByEmail(model.Email!);
             if (userByEmail != null) return ServiceResult.BadRequest(ResponseResource.ExistedUser());
             User? userByUsername = await UserRepository.GetByUsername(model.Username!);
-            if (userByUsername != null) return ServiceResult.BadRequest("Username da ton tai");
+            if (userByUsername != null) return ServiceResult.BadRequest("Username đã tồn tại");
 
             // Tao moi user, profile, role
             User user = new()
@@ -217,7 +217,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiem tra chua ton tai trong db
             User? user = await UserRepository.GetByEmail(userInfor.email);
-            if (user != null) return ServiceResult.BadRequest("Ban da dang ky tai khoan roi, hay dang nhap");
+            if (user != null) return ServiceResult.BadRequest("Bạn đã đăng ký tài khoản bằng email này rồi, hãy chọn đăng nhập");
 
             // Sinh Active code va tra ve
             List<Claim> claims = [
@@ -226,7 +226,9 @@ namespace KnowledgeSharingApi.Services.Services
             ];
             string? token = Encrypt.JwtEncrypt(claims);
             if (token == null) return ServiceResult.ServerError(ResponseResource.ServerError());
-            return ServiceResult.Success(ResponseResource.Success(), string.Empty, token);
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, new {
+                ActiveCode = token
+            });
         }
     }
 }

@@ -56,7 +56,7 @@ export default {
         */
         getLabel(){
             if (this.inject?.language != null){
-                this.label = this.inject?.language?.pages?.login;
+                this.label = this.inject?.language?.components?.changeLanguageButton;
             }
             return this.label;
         },

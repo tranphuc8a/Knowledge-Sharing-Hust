@@ -11,33 +11,29 @@
         </div>
         <form class="pfp-input" v-on:keypress.enter="resolveEnterForm">
             <PasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.password"
-                ref="password" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :is-show-title="false"
+                ref="password" :is-show-title="false"
                 :onchange="resolveOnChangePassword"
                 :validator="validator.password"
                 :errorMessage="getLabel()?.invalidPassword"
                 />
 
             <PasswordTextField :autocomplete="'current-password'" :placeholder="getLabel()?.repassword" :is-show-title="false"
-                ref="repassword" :onfocus="hideErrorMsg" :oninput="hideErrorMsg" :validator="validator.repassword"
+                ref="repassword" :validator="validator.repassword"
                 :errorMessage="getLabel()?.invalidRepassword"
                 />
         </form>
-        <div class="pa-error-message" v-show="isShowError">
-            {{ errorMessage }}
-        </div>
-        <div class="pa-success-message" v-show="isShowSuccess">
-            {{ successMessage }}
+
+        <div class="pfp-links">
+            <router-link class="pa-link" to="/login" >
+                {{ getLabel()?.login }}
+            </router-link>
         </div>
         
         <div class="pfp-button">
             <!-- Thẻ button login -->
             <MButton :label=" getLabel()?.header" :onclick="resolveSubmit" ref="button" />
         </div>
-        <div class="pfp-links">
-            <router-link class="pa-link" to="/login" >
-                {{ getLabel()?.login }}
-            </router-link>
-        </div>
+        
     </BaseAuthenticationPage>
 </template>
 
@@ -58,10 +54,7 @@ export default {
         return {
             label: null,
             global: this.globalData,
-            isShowError: false,
-            isShowSuccess: false,
-            errorMessage: 'Lỗi xảy ra',
-            successMessage: 'Đổi mật khẩu thành công',
+            
             input: {
                 password: null,
                 repassword: null
@@ -217,18 +210,6 @@ export default {
             }
         },
 
-
-        /**
-         * Xử lý yêu cầu ẩn lỗi
-         * @param none
-         * @returns none
-         * @Created PhucTV (04/03/24)
-         * @Modified None
-        */
-        async hideErrorMsg(){
-            this.isShowError = false;
-        },
-
         /**
          * Xử lý yêu cầu hiển thị lỗi
          * @param errorMessage - lỗi cần hiển thị
@@ -237,23 +218,9 @@ export default {
          * @Modified None
         */
         async showErrorMsg(errorMessage){
-            await this.hideSuccessMsg();
             if (Validator.isEmpty(errorMessage))
                 return;
-            this.errorMessage = errorMessage;
-            this.isShowError = true;
-        },
-
-
-        /**
-         * Xử lý yêu cầu ẩn thông báo thành công
-         * @param none
-         * @returns none
-         * @Created PhucTV (11/04/24)
-         * @Modified None
-        */
-        async hideSuccessMsg(){
-            this.isShowSuccess = false;
+            await this.getToastManager()?.error(errorMessage);
         },
 
         /**
@@ -264,11 +231,9 @@ export default {
          * @Modified None
         */
         async showSuccessMsg(successMessage){
-            await this.hideErrorMsg();
             if (Validator.isEmpty(successMessage))
                 return;
-            this.successMessage = successMessage;
-            this.isShowSuccess = true;
+            await this.getToastManager()?.success(successMessage);
         }
 
     },

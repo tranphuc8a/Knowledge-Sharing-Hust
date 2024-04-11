@@ -2,7 +2,7 @@
 
 @import url(@/css/main.css);
 
-.pa-form .plg-header-and-description{
+.pa-form .prg-header-and-description{
     padding: 0px 0px 24px 0px;
     display: flex;
     flex-flow: column nowrap;
@@ -10,7 +10,7 @@
     align-items: center;
 }
 
-.pa-form .plg-header{
+.pa-form .prg-header{
     font-size: 24px;
     font-weight: bold;
     font-style: normal;
@@ -20,19 +20,18 @@
     text-align: center;
 }
 
-.pa-form .plg-description{
+.pa-form .prg-description{
     color: #4d5156;
     font-size: 14px;
     text-align: center;
     width: 90%;
 }
 
-.pa-form .plg-content{
+.pa-form .prg-content{
     padding-bottom: 36px;
 }
 
-
-.pa-form .plg-links{
+.pa-form .prg-links{
     padding-bottom: 24px;
     display: flex;
     flex-flow: row nowrap;

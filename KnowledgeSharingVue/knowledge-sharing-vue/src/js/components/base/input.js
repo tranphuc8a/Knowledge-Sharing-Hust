@@ -20,6 +20,7 @@ let input = {
         state: { default: 'normal' },
         // label: { default: "Họ tên" },
         title: { default: null },
+        label: { default: null },
         isObligate: { default: true },
         isDynamicValidate: { default: false },
         // isFull: { default: true },

@@ -20,7 +20,7 @@
         padding: 40px 48px;
     }
     .pa-form .pa-logo-frame{
-        padding-bottom: 40px;
+        padding-bottom: 20px;
     }
     .pa-form .p-button{
         height: 40px;
@@ -71,7 +71,6 @@
     background-color: #fff;
 
     border-radius: 8px;
-    min-height: 340px;
     box-shadow: 0 12px 20px rgba(0,0,0,.12)
 }
 
@@ -99,7 +98,6 @@
     min-height: 24px;
     line-height: 17px;
     color: #ff1d1d;
-    padding-bottom: 16px;
     text-align: start;
 }
 
@@ -107,6 +105,5 @@
     min-height: 24px;
     line-height: 17px;
     color: var(--light-green-color);
-    padding-bottom: 16px;
     text-align: start;
 }

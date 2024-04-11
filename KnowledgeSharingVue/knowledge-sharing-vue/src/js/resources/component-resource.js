@@ -1,31 +1,8 @@
 
+import changeLanguageButtonResource from "./authentication/change-language-button-resource";
 
 export default {
     vi: {
-        table: {
-            toolbar: {
-                chosen: 'Đã chọn',
-                unChoose: 'Bỏ chọn',
-                deleteChosen: 'Xóa đã chọn',
-                find: 'Tìm kiếm',
-            },
-            functionality: {
-                edit: 'Chỉnh sửa',
-                option: 'Tùy chọn',
-                delete: 'Xóa',
-            },
-            footer: {
-                sum: 'Tổng:',
-                recordPerSheet: 'Số bản ghi/trang:',
-                record: 'bản ghi'
-            },
-            contextMenu: {
-                edit: 'Chỉnh sửa',
-                clone: 'Nhân bản',
-                delete: 'Xóa'
-            },
-            empty: 'Hiện chưa có dữ liệu'
-        },
         input: {
             notObligate: 'Không bắt buộc',
             combobox: {
@@ -51,33 +28,10 @@ export default {
             previousButtonLabel: 'Trở lại',
             cancelButtonLabel: 'Hủy bỏ',
             okayButtonLabel: 'Đồng ý'
-        }
+        },
+        changeLanguageButton: changeLanguageButtonResource.vi,
     },
     en: {
-        table: {
-            toolbar: {
-                chosen: 'Chosen',
-                unChoose: 'Un choose',
-                deleteChosen: 'Delete chosen',
-                find: 'Search',
-            },
-            functionality: {
-                edit: 'Edit',
-                option: 'Options',
-                delete: 'Delete',
-            },
-            footer: {
-                sum: 'Sum:',
-                recordPerSheet: 'Number records/sheet:',
-                record: 'records'
-            },
-            contextMenu: {
-                edit: 'Edit',
-                clone: 'Clone',
-                delete: 'Delete'
-            },
-            empty: 'There is no data'
-        },
         input: {
             notObligate: 'Not obligate',
             combobox: {
@@ -103,7 +57,8 @@ export default {
             previousButtonLabel: 'Back',
             cancelButtonLabel: 'Cancel',
             okayButtonLabel: 'Okay'
-        }
+        },
+        changeLanguageButton: changeLanguageButtonResource.en,
     }
 };
 
