@@ -1,0 +1,57 @@
+
+@import url(@/css/main.css);
+@import url(@/css/pages/desktop/home/desktop-home.css);
+
+
+.d-content{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: var(--body-min-width);
+
+    position: fixed;
+    top: var(--bar-height);
+}
+
+.d-content-subpage__left,
+.d-content-subpage__right
+{
+    width: var(--subpage-max-width);
+    height: 100%;
+    padding: 0 16px;
+}
+.d-content-subpage__center{
+    height: 100%;
+    flex: 1;
+    min-width: calc(var(--feed-page-min-width) + 2*var(--feed-page-padding));
+    max-width: calc(var(--feed-page-max-width) + 2*var(--feed-page-padding));
+    width: 100%;
+    padding: 0 32px;
+}
+
+
+@media screen and (min-width: 1464px){
+    .d-content-subpage__left,
+    .d-content-subpage__right
+    {
+        width: var(--subpage-max-width);
+    }
+}
+
+@media screen and (min-width: 1104px) and (max-width: 1464px){
+    .d-content-subpage__left,
+    .d-content-subpage__right
+    {
+        width: var(--subpage-min-width);
+    }
+}
+
+@media screen and (max-width: 1104px){
+    .d-content-subpage__left,
+    .d-content-subpage__right
+    {
+        width: var(--subpage-min-width);
+    }
+}

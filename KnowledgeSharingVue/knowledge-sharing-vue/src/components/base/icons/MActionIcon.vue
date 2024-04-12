@@ -1,5 +1,5 @@
 <template>
-    <div ref="iconContainer" class="p-icon-container" :style="containerStyle"
+    <div ref="iconContainer" class="p-icon-container p-action-icon" :style="containerStyle"
         @:click="resolveOnclick" :state="state">
         <MIcon  :fa="fa" 
                 :style="iconStyle" />

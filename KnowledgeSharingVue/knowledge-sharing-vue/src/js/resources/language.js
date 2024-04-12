@@ -12,6 +12,7 @@ import createNewUserPageResource from "./authentication/create-new-user-page-res
 import componentResource from "./component-resource";
 import loginWithGooglePageResource from "./authentication/login-with-google-page-resource";
 import registerWithGoogleResource from "./authentication/register-with-google-resource";
+import homepageResource from "./homepage/homepage-resource";
 
 const language = {
     'vi': {
@@ -37,7 +38,8 @@ const language = {
             enterregisterverificationcode: enterRegisterVerificationCodeResource.vi,
             createnewuser: createNewUserPageResource.vi,
             loginWithGoogle: loginWithGooglePageResource.vi,
-            registerWithGoogle: registerWithGoogleResource.vi
+            registerWithGoogle: registerWithGoogleResource.vi,
+            homepage: homepageResource.vi,
         }
     },
     'en': {
@@ -64,6 +66,7 @@ const language = {
             createnewuser: createNewUserPageResource.en,
             loginWithGoogle: loginWithGooglePageResource.en,
             registerWithGoogle: registerWithGoogleResource.en,
+            homepage: homepageResource.en
             
         }
     }
