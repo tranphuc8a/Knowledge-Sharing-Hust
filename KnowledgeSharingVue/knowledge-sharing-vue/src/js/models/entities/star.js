@@ -4,10 +4,10 @@ import Entity from './entity';
 class Star extends Entity{
     constructor() {
         super();
-        this.starId = null;
-        this.userId = null;
-        this.userItemId = null;
-        this.stars = null;
+        this.StarId = null;
+        this.UserId = null;
+        this.UserItemId = null;
+        this.Stars = null;
     }
 
     init() {

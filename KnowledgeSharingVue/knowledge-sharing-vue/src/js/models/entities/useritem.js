@@ -4,9 +4,9 @@ import Entity from './entity';
 class UserItem extends Entity {
     constructor() {
         super();
-        this.userItemId = null;
-        this.userId = null;
-        this.userItemType = null;
+        this.UserItemId = null;
+        this.UserId = null;
+        this.UserItemType = null;
     }
 
     init() {

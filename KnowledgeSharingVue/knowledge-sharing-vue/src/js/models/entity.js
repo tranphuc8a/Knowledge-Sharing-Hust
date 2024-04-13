@@ -9,14 +9,36 @@ class Entity {
     }
 
 
+    /**
+     * Lấy ra các thuộc tính của Entity
+     * @param none
+     * @returns {Array} - mảng chứa các tên thuộc tính của Entity
+     * @Author TVPhuc (13/04/24)
+     * @Edit None
+     **/
     getProperties() {
         return Object.getOwnPropertyNames(this);
     }
 
+
+    /**
+     * Khởi tạo một entity mặc định
+     * @param none
+     * @returns {Entity} - entity mặc định
+     * @Author TVPhuc (13/04/24)
+     * @Edit None
+     */
     init() {
         return new Entity();
     }
 
+    /**
+     * Clone một entity
+     * @param none
+     * @returns {Entity} - entity được clone
+     * @Author TVPhuc (13/04/24)
+     * @Edit None
+     */
     clone() {
         const entity = this.init();
         const properties = this.getProperties();
@@ -26,6 +48,13 @@ class Entity {
         return entity;
     }
 
+    /**
+     * Copy dữ liệu từ entity khác
+     * @param {*} entity - entity cần copy dữ liệu
+     * @returns {Entity} - entity được copy dữ liệu
+     * @Author TVPhuc (13/04/24)
+     * @Edit None
+     */
     copy(entity) {
         if (Validator.isEmpty(entity)) {
             return;

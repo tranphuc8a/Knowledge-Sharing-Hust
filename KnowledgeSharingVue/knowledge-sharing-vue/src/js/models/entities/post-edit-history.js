@@ -3,12 +3,12 @@ import Entity from './entity';
 class PostEditHistory extends Entity{
     constructor() {
         super();
-        this.postEditHistoryId = null;
-        this.postId = null;
-        this.title = null;
-        this.abstract = null;
-        this.thumbnail = null;
-        this.content = null;
+        this.PostEditHistoryId = null;
+        this.PostId = null;
+        this.Title = null;
+        this.Abstract = null;
+        this.Thumbnail = null;
+        this.Content = null;
     }
 
     init() {

@@ -4,9 +4,9 @@ import Entity from './entity';
 class KnowledgeCategory extends Entity {
     constructor() {
         super();
-        this.knowledgeCategoryId = null;
-        this.knowledgeId = null;
-        this.categoryId = null;
+        this.KnowledgeCategoryId = null;
+        this.KnowledgeId = null;
+        this.CategoryId = null;
     }
 
     init() {

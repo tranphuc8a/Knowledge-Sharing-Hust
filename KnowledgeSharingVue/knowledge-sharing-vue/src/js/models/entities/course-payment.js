@@ -4,11 +4,11 @@ import Entity from './entity';
 class CoursePayment extends Entity {
     constructor() {
         super();
-        this.coursePaymentId = null;
-        this.userId = null;
-        this.courseId = null;
-        this.fee = 0;
-        this.paymentMethod = null;
+        this.CoursePaymentId = null;
+        this.UserId = null;
+        this.CourseId = null;
+        this.Fee = 0;
+        this.PaymentMethod = null;
     }
 
     init() {

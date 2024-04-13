@@ -5,11 +5,11 @@ import Entity from './entity.js';
 class UserRelation extends Entity {
     constructor() {
         super(); 
-        this.userRelationId = null; 
-        this.senderId = null;
-        this.receiverId = null;
-        this.userRelationType = null;
-        this.time = null;
+        this.UserRelationId = null; 
+        this.SenderId = null;
+        this.ReceiverId = null;
+        this.UserRelationType = null;
+        this.Time = null;
     }
 
     init() {
