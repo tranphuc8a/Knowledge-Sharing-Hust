@@ -95,7 +95,7 @@
     flex-flow: row nowrap;
     justify-content: flex-end;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
     height: 100%;
 }
 .d-bar__right{

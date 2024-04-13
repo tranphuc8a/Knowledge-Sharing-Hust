@@ -2,28 +2,28 @@
 <template>
     <div class="d-centerbar">
         <div class="d-centerbar__icon">
-            <div class="d-centerbar__icon-bg">
+            <div class="d-centerbar__icon-bg" :title="getLabel()?.home">
                 <router-link class="p-router-link" to="home">
                     <MIcon :style="iconStyle" fa="home" />
                 </router-link >
             </div>
         </div>
         <div class="d-centerbar__icon">
-            <div class="d-centerbar__icon-bg">
+            <div class="d-centerbar__icon-bg" :title="getLabel()?.lesson">
                 <router-link class="p-router-link" to="lessons">
                     <MIcon :style="iconStyle" fa="book-open" />
                 </router-link >
             </div>
         </div>
         <div class="d-centerbar__icon">
-            <div class="d-centerbar__icon-bg">
+            <div class="d-centerbar__icon-bg" :title="getLabel()?.course">
                 <router-link class="p-router-link" to="courses">
                     <MIcon :style="iconStyle" fa="layer-group" />
                 </router-link >
             </div>
         </div>
         <div class="d-centerbar__icon">
-            <div class="d-centerbar__icon-bg">
+            <div class="d-centerbar__icon-bg" :title="getLabel()?.question">
                 <router-link class="p-router-link" to="questions">
                     <MIcon :style="iconStyle" fa="comments" />
                 </router-link >
@@ -93,6 +93,7 @@ export default {
     align-items: center;
 }
 .d-centerbar__icon{
+    border-top: solid var(--transparent-color) 3px;
     border-bottom: solid var(--transparent-color) 3px;
 }
 .d-centerbar__icon,
@@ -110,7 +111,7 @@ export default {
 }
 .d-centerbar__icon-bg{
     width: 80%;
-    height: 90%;
+    height: 95%;
     border-radius: 8px;
 }
 .d-centerbar__icon-bg:hover{

@@ -1,6 +1,6 @@
 <template>
     <div class="p-avatar-menu-context" tabindex="1">
-        <Avatar :src="src" size="36" />
+        <Avatar :src="src" :title="name" size="36" />
     </div>
 </template>
 
@@ -13,7 +13,8 @@ export default {
     },
     data(){
         return {
-            src: null
+            src: null,
+            name: null
         }
     },
     mounted() {
@@ -21,6 +22,7 @@ export default {
         let userContext = localStorage.getItem("user");
         userContext = JSON.parse(userContext);
         this.src = userContext?.avatar;
+        this.name = userContext?.fullName;
     },
     methods: {
         

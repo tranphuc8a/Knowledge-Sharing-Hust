@@ -1,12 +1,12 @@
 
 <template>
     <div class="d-rightbar">
-        <div class="d-rightbar__message">
+        <div class="d-rightbar__message" :title="getLabel()?.message">
             <MActionIcon fa="envelope" :onclick="resolveClickMessageIcon" 
                 :iconStyle="iconStyle" :containerStyle="containerStyle"
             />
         </div>
-        <div class="d-rightbar__notification">
+        <div class="d-rightbar__notification" :title="getLabel()?.notification">
             <MActionIcon fa="bell" :onclick="resolveClickNotificationIcon" 
                 :iconStyle="iconStyle" :containerStyle="containerStyle"/>
         </div>
