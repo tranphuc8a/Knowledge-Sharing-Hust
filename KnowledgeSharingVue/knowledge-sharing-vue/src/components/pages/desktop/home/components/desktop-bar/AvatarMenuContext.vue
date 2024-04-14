@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import CurrentUser from '@/js/models/entities/current-user';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 export default {
     name: "AvatarMenuContext",
@@ -15,8 +16,7 @@ export default {
         }
     },
     mounted() {
-        // Get user data in local storage
-        this.user = JSON.parse(localStorage.getItem('user'));
+        this.user = CurrentUser.getInstance();
     },
     methods: {
         

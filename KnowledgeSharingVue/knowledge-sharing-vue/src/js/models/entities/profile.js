@@ -1,5 +1,5 @@
 
-import Entity from './entity';
+import Entity from "../entity";
 
 class Profile extends Entity{
     constructor() {

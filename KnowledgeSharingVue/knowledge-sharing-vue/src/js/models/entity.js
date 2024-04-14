@@ -1,4 +1,4 @@
-import Validator from "@/js/utils/validator";
+import { Validator } from "@/js/utils/validator";
 
 class Entity {
     constructor() {

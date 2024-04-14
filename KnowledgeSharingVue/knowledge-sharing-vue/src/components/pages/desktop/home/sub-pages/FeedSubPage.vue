@@ -1,24 +1,39 @@
 <template>
     <div class="p-feedsubpage">
         <AddPostFeedCard />
+        <component v-for="item in listPosts" 
+            :key="item?.UserItemId"
+            :is="getComponent(item)"
+            v-bind="{post: item}">
+            Hello
+        </component>
     </div>
 </template>
 
 <script>
 import AddPostFeedCard from '../components/feed-subpage/AddPostFeedCard.vue';
+import LessonFeedCard from '../components/feed-subpage/LessonFeedCard.vue';
+import QuestionFeedCard from '../components/feed-subpage/QuestionFeedCard.vue';
+import { myEnum } from '@/js/resources/enum';
 
 export default {
 
     components: {
-        AddPostFeedCard
+        AddPostFeedCard, LessonFeedCard, QuestionFeedCard
     },
     data(){
         return {
-            title: "Desktop Home Page"
+            title: "Desktop Home Page",
+            listPosts: [ null, null ]
         }
     },
     methods: {
-
+        getComponent(item){
+            if (item?.PostType ==  myEnum.EPostType.Question){
+                return QuestionFeedCard;
+            }
+            return LessonFeedCard;
+        }
     },
     inject: {
         inject: {},
@@ -34,7 +49,7 @@ export default {
 
 .p-feedsubpage{
     display: flex;
-    flex: column nowrap;
+    flex-flow: column nowrap;
     gap: 16px;
 }
 

@@ -53,7 +53,6 @@ export default {
         getLabel(){
             if (this.inject?.language != null){
                 this.label = this.inject?.language?.pages?.homepage?.homeDbarResource;
-                console.log(this.inject?.language);
             }
             return this.label;
         },

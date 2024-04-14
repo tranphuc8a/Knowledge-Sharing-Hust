@@ -2,7 +2,7 @@
     <FeedCardFrame>
         <div class="p-feedcard-addpost">
             <div class="p-feedcard-addpost__header">
-                <TooltipUserAvatar />
+                <TooltipUserAvatar :user="currentUser" :size="36" />
                 <div class="p-feedcard-addpost__reminder">
                     {{ getLabel()?.remind(user?.FullName) }}
                 </div>
@@ -32,6 +32,8 @@
 import FeedCardFrame from './FeedCardFrame.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
+import CurrentUser from '@/js/models/entities/current-user';
+
 export default {
     name: "AddPostFeedCard",
     data() {
@@ -43,10 +45,12 @@ export default {
             iconStyle: {
                 color: 'var(--grey-color)',
             },
+            currentUser: null
         }
     },
-    mounted() {
+    async mounted() {
         this.getLabel();
+        this.currentUser = CurrentUser.getInstance();
     },
     components: {
         FeedCardFrame, TooltipUserAvatar, MEmbeddedButton
@@ -62,14 +66,13 @@ export default {
         getLabel(){
             if (this.inject?.language != null){
                 this.label = this.inject?.language?.subpages?.feedpage?.addpostcard;
-                console.log(this.inject?.language);
             }
             return this.label;
         },
 
         async resolveClickAddLesson(){
             try {
-                let router = this.inject?.router;
+                let router = this.globalData.router;
                 router.push({name: 'add-lesson'});
             } catch (error) {
                 console.log(error);
@@ -78,7 +81,7 @@ export default {
 
         async resolveClickAddQuestion(){
             try {
-                let router = this.inject?.router;
+                let router = this.globalData.router;
                 router.push({name: 'add-question'});
             } catch (error) {
                 console.log(error);

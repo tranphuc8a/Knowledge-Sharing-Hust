@@ -1,6 +1,6 @@
 // Framework and Technology Stack: C#
 
-import Profile from './profile';
+import Profile from "../entities/profile";
 
 class ViewUser extends Profile {
     constructor() {

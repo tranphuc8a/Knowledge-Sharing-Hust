@@ -11,78 +11,124 @@
 </template>
 
 <script>
-    export default {
-        data() {
-            return {
-                isTooltipVisible: false,
-                tooltipStyle: {},
-                hoverCount: 0,
-                tooltipContent: null,
-                tooktipMask: null,
-            };
+export default {
+    data() {
+        return {
+            isTooltipVisible: false,
+            isWaitingToShow: false,
+            tooltipStyle: {},
+            hoverCount: 0,
+            tooltipContent: null,
+            tooltipMask: null,
+            tooltipPosition: {
+                top: "top",
+                bottom: "bottom",
+            },
+            barHeight: 56,
+            padding_horizontal: 0,
+            padding_vertical: 0,
+        };
+    },
+    mounted() {
+        this.tooltipContent = this.$refs["tooltip-content"];
+        this.tooltipMask = this.$refs["tooltip-mask"];
+    },
+    watch: {
+        async hoverCount(value) {
+            this.isTooltipVisible = value > 0;
+            if (value > 0){
+                await this.showTooltip();
+            }
         },
-        mounted() {
-            this.tooltipContent = this.$refs["tooltip-content"];
-            this.tooktipMask = this.$refs["tooltip-mask"];
+    },
+    methods: {
+        async hideTooltip() {
+            this.isTooltipVisible = false;
+            this.isWaitingToShow = false;
         },
-        watch: {
-            async hoverCount(value) {
-                this.isTooltipVisible = value > 0;
-                if (value > 0){
-                    await this.showTooltip();
+        async showTooltip() {
+            this.isWaitingToShow = true;
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, 500);
+            });
+            if (!this.isWaitingToShow) return;
+            
+            this.isTooltipVisible = true;
+            let that = this;
+            this.$nextTick(async () => {
+                try {
+                    const tempStyle = {};
+                    await that.horizontalAlign(that, tempStyle);
+                    await that.verticalAlign(that, tempStyle);
+                    that.tooltipStyle = tempStyle;
+                } catch (e) {
+                    console.error(e);
+                }     
+            });
+        },
+
+        /**
+         * Hàm xử lý can chinh tooltip theo chieu doc
+         * @param {*} that this pointer
+         * @param {*} style style cua tooltip
+         * @returns none
+         * @Created PhucTV (15/04/24)
+         * @Modified None
+        */
+        async verticalAlign(that, style){
+            const toolTipRect = that.tooltipContent.getBoundingClientRect();
+            const maskRect = that.tooltipMask.getBoundingClientRect();
+            
+            if (that.position == that.tooltipPosition.top) {
+                style.bottom = `${that.padding_vertical + maskRect.height}px`;
+            } else if (that.position == that.tooltipPosition.bottom) {
+                style.top = `${that.padding_vertical + maskRect.height}px`;
+            } else {
+                const minTopContent = maskRect.top - that.padding_vertical - toolTipRect.height - that.barHeight;
+                const maxBottomContent = maskRect.bottom + that.padding_vertical + toolTipRect.height;
+                if (minTopContent < 0 && maxBottomContent <= window.innerHeight) {
+                    style.top = `${that.padding_vertical + maskRect.height}px`;
+                } else {
+                    style.bottom = `${that.padding_vertical + maskRect.height}px`;
+                    // alert(style.bottom);
                 }
-            },
+            }
         },
-        methods: {
-            async hideTooltip() {
-                this.isTooltipVisible = false;
-            },
-            async showTooltip() {
-                this.isTooltipVisible = true;
-                let that = this;
-                this.$nextTick(() => {
-                    try {
-                        console.log("window viewport: " + window.innerWidth + "x" + window.innerHeight);
-                        const tooltipEl = that.tooltipContent;
-                        const tooltipMaskEl = that.tooktipMask;
-                        const barHeight = 56; // Chiều cao của thanh tiêu đề
-                        const padding_vertical = 0; // Khoảng cách giữa tooltip và mask
-                        const padding_horizontal = 0; // Khoảng cách giữa tooltip và mask
-                        
-                        const toolTipRect = tooltipEl.getBoundingClientRect();
-                        const maskRect = tooltipMaskEl.getBoundingClientRect();
-                        const tempStyle = {};
 
-                        // align tooltip follow vertically
-                        const minTopContent = maskRect.top - padding_vertical - toolTipRect.height - barHeight;
-                        const maxBottomContent = maskRect.bottom + padding_vertical + toolTipRect.height;
-                        if (minTopContent < 0 && maxBottomContent <= window.innerHeight) {
-                            tempStyle.top = `${padding_vertical + maskRect.height}px`;
-                        } else {
-                            tempStyle.bottom = `${padding_vertical + maskRect.height}px`;
-                        }
-
-                        // align tooltip follow horizontally
-                        const minLeftContent = maskRect.left + maskRect.width/2 - toolTipRect.width/2;
-                        const maxRightContent = maskRect.left + maskRect.width/2 + toolTipRect.width/2;
-                        if (minLeftContent < 0) {
-                            tempStyle.left = `${-maskRect.left + padding_horizontal}px`;
-                        } else {
-                            if (maxRightContent <= window.innerWidth){
-                                tempStyle.left = `${maskRect.width/2 - toolTipRect.width/2}px`;
-                            } else {
-                                tempStyle.right = `${-window.innerWidth + maskRect.right + padding_horizontal}px`;
-                            }
-                        }
-
-                        that.tooltipStyle = tempStyle;
-                    } catch (e) {
-                        console.error(e);
-                    }     
-                });
-            },
-        },
-    };
+        /**
+         * Hàm xử lý can chinh tooltip theo chieu ngang
+         * @param {*} that this pointer
+         * @param {*} style style cua tooltip
+         * @returns none
+         * @Created PhucTV (15/04/24)
+         * @Modified None
+         */
+        async horizontalAlign(that, style){
+            const toolTipRect = that.tooltipContent.getBoundingClientRect();
+            const maskRect = that.tooltipMask.getBoundingClientRect();
+            
+            // align tooltip follow horizontally
+            const minLeftContent = maskRect.left + maskRect.width/2 - toolTipRect.width/2;
+            const maxRightContent = maskRect.left + maskRect.width/2 + toolTipRect.width/2;
+            if (minLeftContent < 0) {
+                style.left = `${-maskRect.left + that.padding_horizontal}px`;
+            } else {
+                if (maxRightContent <= window.innerWidth){
+                    style.left = `${maskRect.width/2 - toolTipRect.width/2}px`;
+                } else {
+                    style.right = `${-window.innerWidth + maskRect.right + that.padding_horizontal}px`;
+                }
+            }
+        }
+    },
+    props: {
+        position: {
+            default: null
+        }
+    }
+};
 </script>
 
 
@@ -102,7 +148,7 @@
     position: absolute;
     background-color: #fff;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0px 2px rgba(0, 0, 0, 0.56);
     padding: 10px;
     z-index: 9999;
     white-space: nowrap; /* Đảm bảo nội dung không bị wrap nếu dài */
