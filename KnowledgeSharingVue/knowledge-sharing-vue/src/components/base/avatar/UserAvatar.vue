@@ -8,7 +8,7 @@ export default {
     name: 'UserAvatar',
     data() {
     },
-    compoennts: {
+    components: {
         Avatar
     },
     methods: {

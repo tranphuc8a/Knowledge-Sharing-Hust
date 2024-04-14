@@ -1,28 +1,22 @@
 <template>
-    <div class="p-avatar-menu-context" tabindex="1">
-        <Avatar :src="src" :title="name" size="36" />
-    </div>
+    <TooltipUserAvatar :user="user" size="36" />
 </template>
 
 <script>
-import Avatar from '@/components/base/avatar/Avatar.vue';
+import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 export default {
     name: "AvatarMenuContext",
     components: {
-        Avatar
+        TooltipUserAvatar
     },
     data(){
         return {
-            src: null,
-            name: null
+            user: null
         }
     },
     mounted() {
-        // Get avatar url from user data in local storage
-        let userContext = localStorage.getItem("user");
-        userContext = JSON.parse(userContext);
-        this.src = userContext?.avatar;
-        this.name = userContext?.fullName;
+        // Get user data in local storage
+        this.user = JSON.parse(localStorage.getItem('user'));
     },
     methods: {
         

@@ -8,7 +8,7 @@ export default {
     name: 'HoverableUserAvatar',
     data() {
     },
-    compoennts: {
+    components: {
         UserAvatar
     },
     methods: {
