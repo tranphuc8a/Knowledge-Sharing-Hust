@@ -5,7 +5,7 @@
             <div class="p-button-content p-content-combo-button">
                 <div class="p-combo-button-left">
                     <MIcon :fa="fa" :style="data.style" />
-                    <div> {{ label }} </div>
+                    <div > {{ label }} </div>
                 </div>
                 <div class="p-combo-button-right">
                     <MIcon fa="chevron-down" :style="data.style" />
@@ -27,7 +27,6 @@ let button = {
         return {
             data: {
                 state: this.state,
-                style: { color: 'white'}
             }
         };
     },

@@ -13,6 +13,7 @@ import componentResource from "./component-resource";
 import loginWithGooglePageResource from "./authentication/login-with-google-page-resource";
 import registerWithGoogleResource from "./authentication/register-with-google-resource";
 import homepageResource from "./homepage/homepage-resource";
+import feedpage from "./subpage/feedpage";
 
 const language = {
     'vi': {
@@ -40,6 +41,9 @@ const language = {
             loginWithGoogle: loginWithGooglePageResource.vi,
             registerWithGoogle: registerWithGoogleResource.vi,
             homepage: homepageResource.vi,
+        },
+        subpages: {
+            feedpage: feedpage.vi
         }
     },
     'en': {
@@ -68,6 +72,9 @@ const language = {
             registerWithGoogle: registerWithGoogleResource.en,
             homepage: homepageResource.en
             
+        },
+        subpages: {
+            feedpage: feedpage.en
         }
     }
 };

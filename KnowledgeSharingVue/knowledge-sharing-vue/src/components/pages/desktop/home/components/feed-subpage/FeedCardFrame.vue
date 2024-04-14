@@ -1,6 +1,6 @@
 <template>
     <div class="p-feedcard">
-        <sloted></sloted>
+        <slot></slot>
     </div>
 </template>
 
@@ -25,10 +25,12 @@ export default {
 </script>
 
 <style scoped>
-.feedcard{
+.p-feedcard{
     background-color: white;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1),
-              0 6px 20px 0 rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1),
+                0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    width: 100%;
+    color: var(--blue-grey-color-900);
 }
 </style>

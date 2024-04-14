@@ -41,7 +41,9 @@ let button = {
         },
         fa: {
             default: null
-        }
+        },
+        buttonStyle: {},
+        iconStyle: {},
     },
 
     watch: {

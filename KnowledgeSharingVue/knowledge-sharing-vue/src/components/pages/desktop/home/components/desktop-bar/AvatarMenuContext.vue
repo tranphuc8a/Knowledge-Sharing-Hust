@@ -1,5 +1,5 @@
 <template>
-    <TooltipUserAvatar :user="user" size="36" />
+    <TooltipUserAvatar :user="user" :size="36" />
 </template>
 
 <script>

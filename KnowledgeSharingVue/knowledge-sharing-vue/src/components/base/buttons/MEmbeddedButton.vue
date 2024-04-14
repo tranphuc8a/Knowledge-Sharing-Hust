@@ -1,7 +1,7 @@
 <template>
-    <div @:click="resolveOnclick" class="p-button p-embedded-button" :state="data.state">
+    <div @:click="resolveOnclick" :style="buttonStyle" class="p-button p-embedded-button" :state="data.state">
         <div class="p-button-content">
-            <MIcon :fa="fa" v-if="fa != null" />
+            <MIcon :fa="fa" :style="iconStyle" v-if="fa != null" />
             <div v-if="label != null"> {{ label }} </div>
         </div>
         <div class="p-loading-container">
@@ -17,7 +17,7 @@ let button = {
     data() {
         return {
             data: {
-                state: this.state,
+                state: this.state
             }
         };
     },

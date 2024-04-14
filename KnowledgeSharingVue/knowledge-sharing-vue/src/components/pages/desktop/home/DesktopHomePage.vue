@@ -18,21 +18,10 @@
             </div>
 
             <div class="d-content-subpage__center">
-                center d-content
                 <!-- Set a router view for this subpage -->
                 <!-- Cannot communicate by props, so -->
                 <!-- When navigate on bar, how to know if subpage should refresh ??? -->
-                <TooltipFrame>
-                    <template #tooltipMask>
-                        <MIcon fa="book" />
-                    </template>
-                    <template #tooltipContent>
-                        <div class="p-tooltip-content">
-                            <h3 class="p-tooltip-title">Tooltip Title</h3>
-                            <p class="p-tooltip-description">Tooltip Description</p>
-                        </div>
-                    </template> 
-                </TooltipFrame>
+                <router-view></router-view>
             </div>
 
             <div class="d-content-subpage__right">

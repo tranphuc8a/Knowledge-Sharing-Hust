@@ -7,6 +7,7 @@ import Avatar from '@/components/base/avatar/Avatar.vue';
 export default {
     name: 'UserAvatar',
     data() {
+        return {}
     },
     components: {
         Avatar

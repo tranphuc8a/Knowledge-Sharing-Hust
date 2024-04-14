@@ -14,6 +14,7 @@ import CreateNewUserPage from '@/components/pages/authentication/register-page/C
 import RegisterWithGooglePage from '@/components/pages/authentication/register-page/RegisterWithGooglePage.vue';
 
 import DesktopHomePage from '@/components/pages/desktop/home/DesktopHomePage.vue';
+import FeedSubPage from '@/components/pages/desktop/home/sub-pages/FeedSubPage.vue';
 
 import TestPage from '@/components/pages/test-page/TestPage.vue';
 import { GetRequest } from './request';
@@ -28,7 +29,7 @@ const routers = [{
     children: [ { // when /
         path: 'home',
         name: 'feed-page',
-        component: null
+        component: FeedSubPage
     }, { // when /lessons
         path: 'lessons',
         name: 'lessons-page',

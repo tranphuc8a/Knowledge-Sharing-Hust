@@ -31,7 +31,9 @@ import UserAvatar from './UserAvatar.vue';
 import TooltipFrame from '../tooltip/TooltipFrame.vue';
 export default {
     name: "TooltipUserAvatar",
-    data() {},
+    data() {
+        return {}
+    },
     components: {
         UserAvatar, TooltipFrame
     },
