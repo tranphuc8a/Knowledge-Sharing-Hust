@@ -1,0 +1,21 @@
+
+@import url(@/css/main.css);
+
+.d-home {
+    --subpage-max-width: 360px;
+    --subpage-min-width: 280px;
+
+    --feed-page-max-width: 680px;
+    --feed-page-min-width: 450px;
+    --feed-page-padding: 32px;
+
+    --bar-height: 56px;
+
+    --body-min-width: 1074px;
+}
+
+.d-home {
+    background-color: var(--primary-color-50);
+    min-height: 100vh;
+}
+

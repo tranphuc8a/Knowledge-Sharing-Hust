@@ -93,6 +93,45 @@ class MyDate extends Date{
         }
         return format;
     }
+
+    toTimeSince() {
+        const now = new Date();
+        const secondsPast = (now - this) / 1000;
+        
+        if (secondsPast < 60) {
+            return `${Math.round(secondsPast)} giây trước`;
+        }
+        if (secondsPast < 3600) {
+            return `${Math.round(secondsPast / 60)} phút trước`;
+        }
+        if (secondsPast < 86400) {
+            return `${Math.round(secondsPast / 3600)} giờ trước`;
+        }
+        if (secondsPast < 604800) {
+            return `${Math.round(secondsPast / 86400)} ngày trước`;
+        }
+        if (secondsPast < 2419200) {
+            return `${Math.round(secondsPast / 604800)} tuần trước`;
+        }
+        if (secondsPast < 29030400) {
+            return `${Math.round(secondsPast / 2419200)} tháng trước`;
+        }
+        return `${Math.round(secondsPast / 29030400)} năm trước`;
+    }
+
+    toFullyText() {
+        const daysOfWeek = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+        
+        const dayName = daysOfWeek[this.getDay()];
+        const day = this.getDate();
+        const month = this.getMonth() + 1; // getMonth() trả về từ 0-11
+        const year = this.getFullYear();
+        const hour = this.getHours().toString().padStart(2, '0');
+        const minutes = this.getMinutes().toString().padStart(2, '0');
+        
+        return `${dayName}, ngày ${day} tháng ${month} năm ${year}, lúc ${hour}:${minutes}`;
+    }
+    
 }
 
 export { MyDate };

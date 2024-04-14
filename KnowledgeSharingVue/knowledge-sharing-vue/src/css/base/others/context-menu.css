@@ -51,8 +51,11 @@
     width: 28px;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+}
+.p-context-menu-item .p-context-menu-item-icon svg path{
+    width: 24px;
 }
 .p-context-menu-item:hover{
     background-color: rgba(var(--primary-color-rgb), 0.1)

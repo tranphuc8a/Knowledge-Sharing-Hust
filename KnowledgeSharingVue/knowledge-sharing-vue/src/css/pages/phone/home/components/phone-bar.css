@@ -1,0 +1,31 @@
+
+@import url(@/css/main.css);
+@import url(@/css/pages/home/home.css);
+
+
+.phone-bar__top{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--bar-height);
+    padding: 0 16px;
+}
+
+.phone-bar__bottom{
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--bar-height);
+    padding: 0 16px;
+}
+
+
+@media screen and (min-width: 794px) {
+    .phone-bar__top,
+    .phone-bar__bottom{
+        display: none;
+    }
+}
+/* 
+@media screen and (max-width: 794px){
+    
+} */
+

@@ -13,16 +13,36 @@ import EnterRegisterVerificationPage from '@/components/pages/authentication/reg
 import CreateNewUserPage from '@/components/pages/authentication/register-page/CreateNewUserPage.vue';
 import RegisterWithGooglePage from '@/components/pages/authentication/register-page/RegisterWithGooglePage.vue';
 
+import DesktopHomePage from '@/components/pages/desktop/home/DesktopHomePage.vue';
+import FeedSubPage from '@/components/pages/desktop/home/sub-pages/FeedSubPage.vue';
+
 import TestPage from '@/components/pages/test-page/TestPage.vue';
 import { GetRequest } from './request';
 
 const routers = [{
     path: '/',
     name: 'home',
-    component: null,
+    component: DesktopHomePage,
     meta: {
-        requiredAuth: true
-    }
+        requiredAuth: false
+    },
+    children: [ { // when /
+        path: 'home',
+        name: 'feed-page',
+        component: FeedSubPage
+    }, { // when /lessons
+        path: 'lessons',
+        name: 'lessons-page',
+        component: null
+    }, { // when /courses
+        path: 'courses',
+        name: 'courses-page',
+        component: null
+    }, { // when /questions
+        path: 'questions',
+        name: 'questions-page',
+        component: null
+    }],
 }, {
     path: '/employee',
     name: 'employee',

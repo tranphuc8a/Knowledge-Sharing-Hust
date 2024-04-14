@@ -1,0 +1,129 @@
+@import url(@/css/pages/desktop/home/desktop-home.css);
+@import url(@/css/main.css);
+
+
+.d-bar{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: var(--body-min-width);
+    height: var(--bar-height);
+
+    background-color: white;
+    box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.56);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.d-bar__left,
+.d-bar__right
+{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    width: var(--subpage-max-width);
+    height: 100%;
+    padding: 0 16px;
+}
+.d-bar__center{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    flex: 1;
+    min-width: calc(var(--feed-page-min-width) + 2*var(--feed-page-padding));
+    max-width: calc(var(--feed-page-max-width) + 2*var(--feed-page-padding));
+    width: 100%;
+    padding: 0 32px;
+}
+
+
+@media screen and (min-width: 1464px){
+    .d-bar__left,
+    .d-bar__right
+    {
+        width: var(--subpage-max-width);
+    }
+}
+
+@media screen and (min-width: 1104px) and (max-width: 1464px){
+    .d-bar__left,
+    .d-bar__right
+    {
+        width: var(--subpage-min-width);
+    }
+}
+
+@media screen and (max-width: 1104px){
+    .d-bar__left,
+    .d-bar__right
+    {
+        width: var(--subpage-min-width);
+    }
+}
+
+
+
+/* CSS for dbarleft */
+.d-leftbar{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+}
+.d-leftbar__logo{
+    background: var(--logo-img);
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+
+/* CSS for dbarright */
+.d-rightbar{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+}
+.d-bar__right{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+}
+
+
+/* CSS for center bar */
+.d-centerbar{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+.d-bar__center{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    margin: 0 32px;
+    height: 100%;
+}

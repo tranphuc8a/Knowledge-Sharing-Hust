@@ -3,6 +3,9 @@ import axios from "axios";
 import { language } from "../resources/language";
 import { myEnum } from "../resources/enum";
 import appConfig from "@/app-config";
+import { useRoute } from "vue-router";
+import { useRouter } from "vue-router";
+
 const api = axios.create({
     baseURL: appConfig.getBackendUrl(),
 });
@@ -15,7 +18,7 @@ class GlobalProperties{
         this.lang = language['vi'];
 
         this.buildGlobalData();
-        this.buildGlobalMethod();
+        this.buildGlobalMethods();
     }
 
     /**
@@ -31,19 +34,21 @@ class GlobalProperties{
             api: that.api,
             enum: that.enum,
             lang: that.lang,
+            route: useRoute(),
+            router: useRouter(),
         }
     }
 
     /**
      * Tạo ra các phương thức toàn cục cho ứng dụng
      *
-     * @memberof GlobalProperties
+     * @memberof GlobalMethods
      * @Created PhucTV (22/2/24)
      * @Modified None
      */
-    buildGlobalMethod(){
+    buildGlobalMethods(){
         let that = this;
-        that.globalMethod = {
+        that.globalMethods = {
             changeLanguage: that.changeLanguage.bind(that)
         }
     }

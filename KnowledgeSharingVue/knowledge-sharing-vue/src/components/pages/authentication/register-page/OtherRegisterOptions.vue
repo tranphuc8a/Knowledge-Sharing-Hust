@@ -22,6 +22,7 @@
 
 <script>
 import appConfig from '@/app-config';
+import Common from '@/js/utils/common';
 
 export default {
     name: 'OtherRegisterOptions',
@@ -38,7 +39,7 @@ export default {
             try {
                 const googleOAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
                 const client_id = '17403549430-no5m3svllo81fcnj5suedcg42meb204u.apps.googleusercontent.com';
-                const baseUrl = appConfig.getHomePageUrl();
+                const baseUrl = Common.removeTrailingSlash(appConfig.getHomePageUrl());
                 const redirect_uri = encodeURIComponent(`${baseUrl}/register/google`);
                 const scope = 'openid+profile+email';
                 const response_type = 'token';
@@ -63,7 +64,7 @@ export default {
             try {
                 const googleOAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
                 const client_id = '17403549430-no5m3svllo81fcnj5suedcg42meb204u.apps.googleusercontent.com';
-                const baseUrl = appConfig.getHomePageUrl();
+                const baseUrl = Common.removeTrailingSlash(appConfig.getHomePageUrl());
                 const redirect_uri = encodeURIComponent(`${baseUrl}/register/google`);
                 const scope = 'openid+profile+email';
                 const response_type = 'token';
@@ -87,7 +88,7 @@ export default {
             try {
                 const googleOAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
                 const client_id = '17403549430-no5m3svllo81fcnj5suedcg42meb204u.apps.googleusercontent.com';
-                const baseUrl = appConfig.getHomePageUrl();
+                const baseUrl = Common.removeTrailingSlash(appConfig.getHomePageUrl());
                 const redirect_uri = encodeURIComponent(`${baseUrl}/register/google`);
                 const scope = 'openid+profile+email';
                 const response_type = 'token';
