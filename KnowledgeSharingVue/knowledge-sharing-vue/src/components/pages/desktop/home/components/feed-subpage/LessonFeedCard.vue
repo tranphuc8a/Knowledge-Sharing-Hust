@@ -97,7 +97,7 @@ export default {
 
 <style scoped>
 .p-feedcard-lesson{
-    padding: 16px 16px;
+    padding: 16px 0px;
     box-sizing: border-box;
     display: flex;
     flex-flow: column nowrap;

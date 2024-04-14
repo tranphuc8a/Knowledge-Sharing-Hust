@@ -52,6 +52,7 @@ export default {
 
 <style scoped>
 .p-postcard-header{
+    padding: 0 16px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
