@@ -92,7 +92,7 @@ export default {
     font-size: 16px;
     font-weight: 600;
     color: var(--primary-color-600);
-    background-color: var(--primary-color-100);
+    background-color: white;
 }
 
 </style>

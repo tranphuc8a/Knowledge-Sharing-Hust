@@ -16,6 +16,8 @@ export default {
         return {
             isTooltipVisible: false,
             isWaitingToShow: false,
+            isWaitingToHide: false,
+
             tooltipStyle: {},
             hoverCount: 0,
             tooltipContent: null,
@@ -42,16 +44,24 @@ export default {
         },
     },
     methods: {
-        async hideTooltip() {
-            this.isTooltipVisible = false;
+        async hideTooltip(delay) {
+            this.isWaitingToHide = true;
             this.isWaitingToShow = false;
-        },
-        async showTooltip() {
-            this.isWaitingToShow = true;
             await new Promise((resolve) => {
                 setTimeout(() => {
                     resolve();
-                }, 500);
+                }, delay ?? this.delayHiding);
+            });
+            if (!this.isWaitingToHide) return;
+            this.isTooltipVisible = false;
+        },
+        async showTooltip(delay) {
+            this.isWaitingToShow = true;
+            this.isWaitingToHide = false;
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, delay ?? this.delayShowing);
             });
             if (!this.isWaitingToShow) return;
             
@@ -126,7 +136,13 @@ export default {
     props: {
         position: {
             default: null
-        }
+        },
+        delayShowing: {
+            default: 500
+        },
+        delayHiding: {
+            default: 100
+        },
     }
 };
 </script>
@@ -140,7 +156,7 @@ export default {
 
 .p-tooltip-mask {
     cursor: pointer;
-    width: fit-content;
+    width: 100%;
 }
 
 .p-tooltip-content {

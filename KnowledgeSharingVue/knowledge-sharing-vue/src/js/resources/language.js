@@ -13,7 +13,7 @@ import componentResource from "./component-resource";
 import loginWithGooglePageResource from "./authentication/login-with-google-page-resource";
 import registerWithGoogleResource from "./authentication/register-with-google-resource";
 import homepageResource from "./homepage/homepage-resource";
-import feedpage from "./subpage/feedpage";
+import feedpage from "./subpage/feedpage-resource.js";
 
 const language = {
     'vi': {

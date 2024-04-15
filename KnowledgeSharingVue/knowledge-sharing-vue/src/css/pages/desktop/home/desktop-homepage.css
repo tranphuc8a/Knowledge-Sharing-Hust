@@ -13,7 +13,7 @@
     min-width: var(--body-min-width);
     height: calc(100vh - var(--bar-height));
 
-    position: fixed;
+    position: relative; 
     top: var(--bar-height);
     overflow-y: auto;
 }

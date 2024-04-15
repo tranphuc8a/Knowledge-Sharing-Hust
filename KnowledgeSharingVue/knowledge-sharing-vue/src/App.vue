@@ -1,6 +1,6 @@
 <template>
     <div class="p-body">
-        <RouterView />
+        <router-view />
     </div>
 
     <PopupManager ref="popupManager"/>

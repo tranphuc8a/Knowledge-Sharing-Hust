@@ -27,7 +27,11 @@ const routers = [{
         requiredAuth: false
     },
     children: [ { // when /
-        path: 'home',
+        path: '/',
+        name: 'feed',
+        component: FeedSubPage
+    }, { // when /feed
+        path: '/feed',
         name: 'feed-page',
         component: FeedSubPage
     }, { // when /lessons
@@ -114,7 +118,7 @@ const createMyRouter = (app) => {
 
     router.beforeEach(async (to, from, next) => {
         if (to.matched.some(record => record.meta.requiredAuth)) {
-            app.store
+            app.store = 0;
             let isLogedIn = await new GetRequest().checkLogedIn();
             if (!isLogedIn) {
                 localStorage.setItem('redirect-to', to.fullPath);

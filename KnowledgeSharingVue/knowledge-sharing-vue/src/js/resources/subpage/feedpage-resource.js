@@ -1,3 +1,4 @@
+import { Validator } from "@/js/utils/validator";
 
 export default {
     vi: {
@@ -12,6 +13,12 @@ export default {
             star: 'Đánh giá',
             comment: 'Bình luận',
             viewDetail: 'Xem chi tiết',
+            valueStar(number){
+                if (Validator.isEmpty(number)) {
+                    return 'Đánh giá';
+                }
+                return `${number} sao`;
+            },
             numberStar(number){
                 return `${number} đánh giá`;
             },
@@ -34,6 +41,12 @@ export default {
             star: 'Rating',
             comment: 'Comment',
             viewDetail: 'View detail',
+            valueStar(number){
+                if (Validator.isEmpty(number)) {
+                    return 'Rating';
+                }
+                return `${number} stars`;
+            },
             numberStar(number){
                 return `${number} ratings`;
             },

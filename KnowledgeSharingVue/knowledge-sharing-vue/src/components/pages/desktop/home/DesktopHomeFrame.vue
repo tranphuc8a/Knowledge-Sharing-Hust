@@ -1,7 +1,7 @@
 <template>
     <div class="d-home">
         <slot />
-    
+
         <DesktopBar />
     </div>
 </template>

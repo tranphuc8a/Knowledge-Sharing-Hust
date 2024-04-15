@@ -24,7 +24,7 @@
         </div>
         <div class="p-postcard-toolbar__actions">
             <div class="p-pct-star">
-                
+                <PostCardStarButton />
             </div>
             <div class="p-pct-comment">
                 <MEmbeddedButton fa="comment" :label="getLabel()?.comment" 
@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import PostCardStarButton from './PostCardStarButton.vue';
 import VisualizedStar from '@/components/base/visualized-components/VisualizedStar.vue';
 import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton'
 import Common from '@/js/utils/common';
@@ -59,7 +60,7 @@ export default {
         }
     },
     components: {
-        MEmbeddedButton, VisualizedStar
+        MEmbeddedButton, VisualizedStar, PostCardStarButton
     },
     mounted(){
         this.getLabel();
@@ -142,6 +143,7 @@ export default {
     width: 100%;
     height: fit-content;
     padding: 0px 16px;
+    box-sizing: border-box;
 }
 
 .p-postcard-toolbar > * {
@@ -181,10 +183,19 @@ export default {
     flex-flow: row nowrap;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
     gap: 4px;
+    width: 100%;
+    flex-grow: 0;
 }
 
-.p-postcard-toolbar__actions > * {
-    flex: 1;
+.p-postcard-toolbar__actions > div {
+    width: 0;
+    flex: 1 0;
+}
+
+.p-pct-star .p-tooltip-container,
+.p-pct-star .p-tooltip-container .p-tooltip-mask{
+    width: 100%;
 }
 </style>
