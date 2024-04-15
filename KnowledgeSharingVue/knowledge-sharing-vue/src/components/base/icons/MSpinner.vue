@@ -1,5 +1,5 @@
 <template>
-    <FontAwesomeIcon ref="icon" :icon="['fas', fa]" :style="style" class="p-icon" spin/>
+    <FontAwesomeIcon ref="icon" :icon="[family, fa]" :style="style" class="p-icon" spin/>
 </template>
 
 <script>
@@ -11,6 +11,10 @@ let icon = {
     },
     props: {
         fa: { default: "spinner" },
+        family: {
+            type: String,
+            default: 'fas'
+        },
         style: {
             type: Object,
             default: {}

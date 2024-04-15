@@ -2,6 +2,7 @@
     <div ref="iconContainer" class="p-icon-container p-action-icon" :style="containerStyle"
         @:click="resolveOnclick" :state="state">
         <MIcon  :fa="fa" 
+                :family="family"
                 :style="iconStyle" />
     </div>
     
@@ -25,6 +26,10 @@ let icon = {
     },
     props: {
         fa: {},
+        family: {
+            type: String,
+            default: 'fas'
+        },
         containerStyle: {
             type: Object,
             default: {}

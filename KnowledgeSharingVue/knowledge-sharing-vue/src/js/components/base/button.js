@@ -42,6 +42,10 @@ let button = {
         fa: {
             default: null
         },
+        iconFamily: {
+            type: String,
+            default: 'fas'
+        },
         buttonStyle: {},
         iconStyle: {},
     },

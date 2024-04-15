@@ -146,10 +146,11 @@ export default {
 .p-tooltip-content {
     box-sizing: border-box;
     position: absolute;
+    overflow: hidden;
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0px 2px rgba(0, 0, 0, 0.56);
-    padding: 10px;
+    /* padding: 10px; */
     z-index: 9999;
     white-space: nowrap; /* Đảm bảo nội dung không bị wrap nếu dài */
 }

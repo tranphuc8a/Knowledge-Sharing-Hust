@@ -7,13 +7,15 @@
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     padding-top: 20px;
     min-width: var(--body-min-width);
+    height: calc(100vh - var(--bar-height));
 
     position: fixed;
     top: var(--bar-height);
+    overflow-y: auto;
 }
 
 .d-content-subpage__left,
@@ -24,7 +26,7 @@
     padding: 0 16px;
 }
 .d-content-subpage__center{
-    height: 100%;
+    height: fit-content;
     flex: 1;
     min-width: calc(var(--feed-page-min-width) + 2*var(--feed-page-padding));
     max-width: calc(var(--feed-page-max-width) + 2*var(--feed-page-padding));

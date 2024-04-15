@@ -7,6 +7,20 @@ export default {
             },
             addLesson: 'Tạo bài học',
             addQuestion: 'Tạo cuộc thảo luận'
+        },
+        postcard: {
+            star: 'Đánh giá',
+            comment: 'Bình luận',
+            viewDetail: 'Xem chi tiết',
+            numberStar(number){
+                return `${number} đánh giá`;
+            },
+            numberComment(number){
+                return `${number} bình luận`;
+            },
+            numberView(number){
+                return `${number} lượt xem`;
+            }
         }
     }, en: {
         addpostcard: {
@@ -15,6 +29,20 @@ export default {
             },
             addLesson: 'Create a lesson',
             addQuestion: 'Create a discussion'
+        },
+        postcard: {
+            star: 'Rating',
+            comment: 'Comment',
+            viewDetail: 'View detail',
+            numberStar(number){
+                return `${number} ratings`;
+            },
+            numberComment(number){
+                return `${number} comments`;
+            },
+            numberView(number){
+                return `${number} views`;
+            }
         }
     }
 

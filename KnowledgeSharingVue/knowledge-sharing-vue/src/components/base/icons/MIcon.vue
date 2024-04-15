@@ -1,5 +1,5 @@
 <template>
-    <FontAwesomeIcon ref="icon" :icon="['fas', fa]" :style="style" class="p-icon"/>
+    <FontAwesomeIcon ref="icon" :icon="[family, fa]" :style="style" class="p-icon"/>
 </template>
 
 <script>
@@ -14,6 +14,10 @@ let icon = {
         style: {
             type: Object,
             default: {}
+        },
+        family: {
+            type: String,
+            default: 'fas'
         }
     },
 };

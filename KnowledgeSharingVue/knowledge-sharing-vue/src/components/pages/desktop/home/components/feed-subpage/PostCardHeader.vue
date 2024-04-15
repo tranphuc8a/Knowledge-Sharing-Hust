@@ -41,11 +41,8 @@ export default {
     methods: {
 
     },
-    props: {
-        post: {
-            type: Object,
-            required: true
-        }
+    injects: {
+        post: {}
     }
 }
 </script>

@@ -2,40 +2,37 @@
     <FeedCardFrame>
         <div class="p-feedcard-lesson">
             <div class="p-feedcard-lesson__header">
-                <PostCardHeader :post="lesson" />
+                <PostCardHeader />
             </div>
-            <div class="p-feedcard-devide"></div>
-            <div class="p-feedcard-buttons">
-                <MEmbeddedButton 
-                    fa="book-open"
-                    :label="getLabel()?.addLesson"
-                    :onclick="resolveClickAddLesson"
-                    :buttonStyle="buttonStyle"
-                    :iconStyle="iconStyle"
-                />
-                <MEmbeddedButton 
-                    fa="comments"
-                    :label="getLabel()?.addQuestion"
-                    :onclick="resolveClickAddQuestion"
-                    :buttonStyle="buttonStyle"
-                    :iconStyle="iconStyle"
-                />
+            <div class="p-feedcard-lesson__title">
+                {{lesson?.Title ?? "Title of lesson"}}
+            </div>
+            <div class="p-feedcard-lesson__categories">
+                <CategoriesList :categories="lesson?.Categories ?? defaultCategoriesList" />
+            </div>
+            <div class="p-feedcard-lesson__thumbnail">
+                <PostCardThumbnail />
+            </div>
+            <div class="p-feedcard-lesson__toolbar">
+                <PostCardToolBar />
             </div>
         </div>
     </FeedCardFrame>
 </template>
 
 <script>
-// import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
-// import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
+import PostCardToolBar from './PostCardToolBar.vue';
+import PostCardThumbnail from './PostCardThumbnail.vue';
+import CategoriesList from '@/components/base/category/CategoriesList.vue';
 import PostCardHeader from './PostCardHeader.vue';
 import FeedCardFrame from './FeedCardFrame.vue';
-import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
+
 export default {
     name: "lessonFeedCard",
     data() {
         return {
             label: null,
+            defaultCategoriesList: ["Hello", "Goodbye asjdg q22222222222222222222222222222222222222222"],
             buttonStyle: {
                 color: 'var(--blue-grey-color-800)',
             },
@@ -48,7 +45,8 @@ export default {
         this.getLabel();
     },
     components: {
-        FeedCardFrame, MEmbeddedButton, PostCardHeader
+        PostCardThumbnail, PostCardToolBar,
+        FeedCardFrame, PostCardHeader, CategoriesList
     },
     methods: {
         /**
@@ -89,6 +87,11 @@ export default {
         getToastManager: {},
         getPopupManager: {}
     },
+    provide(){
+        return {
+            post: this.lesson
+        }
+    },
     props: {
         lesson: {}
     }
@@ -96,14 +99,21 @@ export default {
 </script>
 
 <style scoped>
+.p-feedcard-lesson * {
+    text-align: start;
+}
+
+.p-feedcard-lesson > div {
+    width: 100%;
+}
+
 .p-feedcard-lesson{
-    padding: 16px 0px;
+    padding: 16px 0px 8px 0px;
     box-sizing: border-box;
     display: flex;
     flex-flow: column nowrap;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
 }
 
 .p-feedcard-lesson__header{
@@ -137,21 +147,22 @@ export default {
     color: var(--blue-grey-color-800);
 }
 
-.p-feedcard-devide{
-    width: 100%;
-    height: 1px;
-    background-color: var(--grey-color-300);
-}
 
-.p-feedcard-buttons{
+.p-feedcard-lesson__title{
+    padding: 4px 16px;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    font-weight: 600;
+    font-size: 18px;
     width: 100%;
 }
 
-.p-feedcard-buttons .p-button{
-    border-radius: 8px;
+.p-feedcard-lesson__categories{
+    width: 100%;
+    padding: 0px 16px;
 }
+
+
 </style>
