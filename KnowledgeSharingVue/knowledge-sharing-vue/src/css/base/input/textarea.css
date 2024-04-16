@@ -1,0 +1,115 @@
+
+@import url(@/css/main.css);
+
+
+.p-textarea-bound{
+    height: fit-content;
+    border-radius: var(--border-radius);
+    opacity: 100%;
+    font-size: var(--font-size);
+    min-width: 60px;
+    width: 100%;
+    padding: 4px 8px 4px 8px;
+    border: solid var(--primary-color-200) 1px;
+    box-sizing: border-box;
+
+    color: var(--blue-grey-color-900);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border 0.5s ease, box-shadow 0.5s ease;
+}
+
+.p-textarea{
+    font-family: 'ks-font-regular';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    height: fit-content;
+    width: 100%;
+    background-color: var(--transparent-color);
+    overflow-x: hidden;
+    overflow-y: auto;
+    resize: none;
+
+    outline: unset;
+    border: unset;
+}
+
+.p-textarea::placeholder{
+    color: var(--grey-color-500);
+}
+
+
+/* NORMAL STATE */
+.p-input:not([state="read-only"]) .p-textarea-bound:hover{
+    background-color: var(--grey-color-200);
+}
+.p-input[state="normal"] .p-textarea-bound:focus-within{
+    background-color: #ffffff;
+    border: solid var(--primary-color) 1px;
+    box-shadow: var(--box-shadow-menucontext);
+}
+
+
+/* ERROR STATE */
+.p-input[state="error"] .p-textarea-bound{
+    background-color: white;
+    border: solid var(--red-color) 1px;
+}
+.p-input[state="error"] .p-textarea-bound:hover{
+    background-color: var(--grey-color-200);
+    border: solid var(--red-color) 1px;
+}
+.p-input[state="error"] .p-textarea-bound:focus-within{
+    background-color: white;
+    border: solid var(--red-color) 1px;
+    box-shadow: 0 0 10px rgba(var(--red-color-rgb), 0.56);
+}
+
+
+/* READ-ONLY STATE */
+.p-input[state="read-only"] .p-textarea-bound{
+    background-color: var(--primary-color-100);
+    border: none;
+}
+
+
+/* VALIDATING & VALIDATED STATE */
+.p-input[state="validating"] .p-textarea-bound,
+.p-input[state="validated"] .p-textarea-bound{
+    background-color: #FFFFFF;
+    border: solid var(--light-green-color) 1px;
+}
+.p-input[state="validating"] .p-textarea-bound:hover,
+.p-input[state="validated"] .p-textarea-bound:hover{
+    background-color: var(--grey-color-200);
+    border: solid var(--light-green-color) 1px;
+}
+.p-input[state="validating"] .p-textarea-bound:focus-within,
+.p-input[state="validated"] .p-textarea-bound:focus-within{
+    background-color: #FFFFFF;
+    border: solid var(--light-green-color) 1px;
+    box-shadow: 0 0 10px rgba(var(--light-green-color-rgb), 0.56);
+}
+
+
+/* CHOOSE ICON */
+.p-input .p-textarea-bound .p-normal-icon,
+.p-input .p-textarea-bound .p-validating-icon,
+.p-input .p-textarea-bound .p-validated-icon{
+    display: none;
+}
+
+.p-input[state="normal"] .p-textarea-bound .p-normal-icon,
+.p-input[state="error"] .p-textarea-bound .p-normal-icon,
+.p-input[state="read-only"] .p-textarea-bound .p-normal-icon{
+    display: block;
+}
+
+.p-input[state="validating"] .p-textarea-bound .p-validating-icon{
+    display: block;
+}
+.p-input[state="validated"] .p-textarea-bound .p-validated-icon{
+    display: block;
+}

@@ -7,7 +7,7 @@
                     :onclick="resolveUnStar"/>
                 <MEmbeddedButton v-else :iconStyle="notStaredIconStyle" :buttonStyle="buttonStyle"
                     fa="star" iconFamily="far" :label="getStaredLabel()"
-                    :onclick="()=>{}"/>
+                    :onclick="resolveCommitFiveStar"/>
             </div>
         </template>
         <template #tooltipContent>
@@ -139,6 +139,16 @@ export default {
                 this.tooltip.hideTooltip(0);
             } catch (e){
                 console.error(e);
+            }
+        },
+
+        async resolveCommitFiveStar(){
+            try {
+                this.myStar = 5;
+                this.currentStar = 5;
+                this.tooltip.hideTooltip(0);
+            } catch (error) {
+                console.error(error);
             }
         }
     },

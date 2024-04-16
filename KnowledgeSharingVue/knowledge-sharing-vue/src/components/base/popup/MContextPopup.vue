@@ -109,10 +109,10 @@
 .p-popup-context-content {
     box-sizing: border-box;
     position: absolute;
+    overflow: hidden;
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
     z-index: 9999;
     white-space: nowrap; /* Đảm bảo nội dung không bị wrap nếu dài */
 }

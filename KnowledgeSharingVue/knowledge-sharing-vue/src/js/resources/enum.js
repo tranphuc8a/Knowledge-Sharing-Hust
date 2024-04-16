@@ -83,6 +83,12 @@ let myEnum = {
         URL_ENCODED : 'application/x-www-form-urlencoded'
     },
 
+    commentFilterType: {
+        Best: 0,
+        All: 1,
+        Recent: 2
+    },
+
     /**
      * Danh sách giới tính
      */
@@ -207,6 +213,9 @@ let myEnum = {
         Member: 2,
         Owner: 3
     },
+
+
+
 
 };
 

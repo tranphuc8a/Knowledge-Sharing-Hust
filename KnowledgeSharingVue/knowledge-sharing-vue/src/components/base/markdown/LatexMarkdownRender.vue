@@ -1,5 +1,8 @@
 <template>
-    <div v-html="renderedContent" :style="style" class="markdown-body"></div>
+    <div>
+        <div class="toc" ref="toc"></div>
+        <div v-html="renderedContent" :style="style" class="markdown-body"></div>
+    </div>
 </template>
 
 <script>
@@ -8,6 +11,9 @@ import 'github-markdown-css/github-markdown-light.css';
 
 import ml from 'markdown-it-latex';
 import 'markdown-it-latex/dist/index.css';
+
+import anchor from 'markdown-it-anchor';
+import TOC from 'markdown-it-toc-done-right';
 
 export default {
     name: "LatexMardownRender",
@@ -18,30 +24,59 @@ export default {
         },
         style: {}
     },
+    mounted() {
+        this.toc = this.$refs?.toc;
+    },
     data() {
         return {
             md: new MarkdownIt({
                 html: true
-            }).use(ml),
+            })
+                .use(anchor)
+                .use(TOC, { containerClass: 'toc' })
+                .use(ml),
+            tableOfContents: "",
+            toc: null,
+            renderedContent: ""
         };
     },
-    computed: {
-        renderedContent() {
-            try {
-                return this.md.render(this.markdownContent);
+    watch: {
+        markdownContent: {
+            immediate: true,
+            handler(newValue) {
+                if (newValue) {
+                    this.updateContent();
+                }
             }
-            catch (error){
+        }
+    },
+    methods: {
+        updateContent() {
+            try {
+                this.renderedContent = this.md.render(this.markdownContent);
+                this.$nextTick(() => {
+                    this.tableOfContents = this.extractTableOfContents();
+                });
+            } catch (error) {
                 console.error(error);
-                return "";
+                this.renderedContent = "";
             }
         },
-    },
+        extractTableOfContents() {
+            return this.toc?.innerHTML || "";
+        }
+    }
 };
 </script>
 
 <style>
-/* @import url(@/css/base/latex/latex.css); */
-.katex svg{
+.katex svg {
     overflow: hidden;
+}
+.toc {
+    margin-bottom: 20px;
+}
+.markdown-body{
+    overflow-x: hidden;
 }
 </style>

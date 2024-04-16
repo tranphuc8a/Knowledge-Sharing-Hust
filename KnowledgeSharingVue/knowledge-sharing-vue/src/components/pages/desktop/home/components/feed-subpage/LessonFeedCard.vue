@@ -12,7 +12,6 @@
                 <CategoriesList :categories="lesson?.Categories ?? defaultCategoriesList" />
             </div>
             <div class="p-feedcard-lesson__content">
-                <MTextfield />
                 <textarea type="text" v-model="content"/>
                 <LatexMarkdownRender :markdown-content="content" />
             </div>
@@ -22,12 +21,18 @@
             <div class="p-feedcard-lesson__toolbar">
                 <PostCardToolBar />
             </div>
+            <div class="p-feedcard-lesson__devide">
+                <div></div>
+            </div>
+            <div class="p-feedcard-lesson__comments">
+                <PostCardCommentList />
+            </div>
         </div>
     </FeedCardFrame>
 </template>
 
 <script>
-import MTextfield from '@/components/base/inputs/MTextfield';
+import PostCardCommentList from './PostCardCommentList.vue';
 import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
 import PostCardToolBar from './PostCardToolBar.vue';
 import PostCardThumbnail from './PostCardThumbnail.vue';
@@ -47,7 +52,6 @@ export default {
             iconStyle: {
                 color: 'var(--grey-color)',
             },
-// eslint-disable-next-line no-useless-escape
             content: ''
         }
     },
@@ -55,7 +59,7 @@ export default {
         this.getLabel();
     },
     components: {
-        LatexMarkdownRender, MTextfield,
+        LatexMarkdownRender, PostCardCommentList,
         PostCardThumbnail, PostCardToolBar,
         FeedCardFrame, PostCardHeader, CategoriesList
     },
@@ -171,9 +175,18 @@ export default {
 }
 
 .p-feedcard-lesson__categories,
-.p-feedcard-lesson__content{
+.p-feedcard-lesson__content,
+.p-feedcard-lesson__devide,
+.p-feedcard-lesson__comments{
     width: 100%;
     padding: 0px 16px;
+}
+
+.p-feedcard-lesson__devide > div{
+    height: 1px;
+    margin: 4px 0px;
+    width: 100%;
+    background-color: var(--grey-color-300);
 }
 
 </style>

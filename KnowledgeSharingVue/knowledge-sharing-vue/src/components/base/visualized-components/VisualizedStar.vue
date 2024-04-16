@@ -14,6 +14,7 @@
         <template #tooltipContent>
             <div class="p-visualized-star-numbers">
                 {{ dStar }}
+                <MIcon :style="iconStyle" fa="star" />
             </div>
         </template>
     </TooltipFrame>
