@@ -4,16 +4,17 @@
         <div class="p-enter-comment-avatar">
             <UserAvatar :user="curentUser" :size="36" />
         </div>
-        <div class="p-enter-comment-textarea">
+        <div class="p-enter-comment-textarea" ref="textarea">
             <MTextArea
                 ref="textarea"
                 placeholder="Thêm bình luận"
                 :is-show-title="false" :is-show-error="true" 
                 :validator="commentValidator"
-                :oninput="()=>{}"
+                :oninput="adjustHeight"
+                max-height="150px" rows="1"
                 />
         </div>
-        <div class="p-enter-comment-submit">
+        <div class="p-enter-comment-submit" ref="submit">
             <MActionIcon fa="paper-plane" 
                 :containerStyle="{width: '36px', height: '36px'}"
                 :onclick="resolveSubmitComment" />
@@ -36,19 +37,39 @@ export default {
             label: null,
             listComments: [null, null],
             curentUser: null,
-            textarea: null,
             commentValidator: new NotEmptyValidator().setErrorMsg("Bình luận không được trống"),
+
+            components: {
+                textarea: null,
+                submit: null
+            }
         }
     },
-    mounted(){
-        this.curentUser = CurrentUser.getInstance();
-        this.textarea = this.$refs?.textarea;
+    async mounted(){
+        this.curentUser = await CurrentUser.getInstance();
+        this.components = {
+            textarea: this.$refs.textarea,
+            submit: this.$refs.submit
+        }
+        this.adjustHeight();
     },
     components: {
         MTextArea,
         UserAvatar,
     },
     methods: {
+        async adjustHeight(){
+            try {
+                let textarea = this.components.textarea;
+                let submit = this.components.submit;
+
+                submit.style.height = textarea.clientHeight + "px";
+            } catch (e){
+                console.error(e);
+            }
+        },
+
+
         async resolveSubmitComment(){
             try {
                 // validate form

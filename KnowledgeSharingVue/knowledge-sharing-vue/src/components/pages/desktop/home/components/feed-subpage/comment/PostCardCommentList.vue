@@ -4,7 +4,7 @@
             <CommentFilterButton :on-change="resolveOnchangeFilter" />
         </div>
         <div class="p-pcl-comment-list">
-
+            <PostCardComment v-for="comment in listComments" :key="comment?.UserItemId" :comment="comment"/>
         </div>
         <div class="p-pcl-enter-comment">
             <PostCardEnterComment :useritem="post"/>
@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import PostCardComment from './PostCardComment.vue';
 import PostCardEnterComment from './PostCardEnterComment.vue';
 import CommentFilterButton from './CommentFilterButton.vue';
 import { myEnum } from '@/js/resources/enum';
@@ -27,7 +28,7 @@ export default {
         }
     },
     components: {
-        CommentFilterButton, PostCardEnterComment
+        CommentFilterButton, PostCardEnterComment, PostCardComment
     },
     mounted(){
         this.getLabel();
@@ -81,5 +82,14 @@ export default {
 </script>
 
 <style scoped>
+
+.p-pcl-comment-list{
+    padding: 18px 0px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 18px;
+}
 
 </style>

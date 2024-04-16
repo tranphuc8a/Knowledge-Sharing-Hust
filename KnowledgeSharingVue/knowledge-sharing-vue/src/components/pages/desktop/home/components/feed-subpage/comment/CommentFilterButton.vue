@@ -37,7 +37,7 @@ export default{
             selected: 0,
             iconStyle: {
                 fontSize: '18px',
-                color: 'var(--grey-color)'
+                color: 'var(--primary-color)'
             },
             listOptions: [
                 myEnum.commentFilterType.Best,
@@ -56,7 +56,7 @@ export default{
                     onClick: this.resolveClickOption(myEnum.commentFilterType.Recent),
                 },
                 [myEnum.commentFilterType.All]: {
-                    label: 'Tât cả bình luận',
+                    label: 'Tất cả bình luận',
                     fa: 'list-ol',
                     onClick: this.resolveClickOption(myEnum.commentFilterType.All),
                 }

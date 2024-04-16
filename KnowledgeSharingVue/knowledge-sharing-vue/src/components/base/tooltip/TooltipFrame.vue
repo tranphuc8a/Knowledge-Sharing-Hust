@@ -35,14 +35,6 @@ export default {
         this.tooltipContent = this.$refs["tooltip-content"];
         this.tooltipMask = this.$refs["tooltip-mask"];
     },
-    watch: {
-        async hoverCount(value) {
-            this.isTooltipVisible = value > 0;
-            if (value > 0){
-                await this.showTooltip();
-            }
-        },
-    },
     methods: {
         async hideTooltip(delay) {
             this.isWaitingToHide = true;
@@ -50,7 +42,7 @@ export default {
             await new Promise((resolve) => {
                 setTimeout(() => {
                     resolve();
-                }, delay ?? this.delayHiding);
+                }, isNaN(delay) ? this.delayHiding : delay);
             });
             if (!this.isWaitingToHide) return;
             this.isTooltipVisible = false;
@@ -61,7 +53,7 @@ export default {
             await new Promise((resolve) => {
                 setTimeout(() => {
                     resolve();
-                }, delay ?? this.delayShowing);
+                }, isNaN(delay) ? this.delayShowing : delay);
             });
             if (!this.isWaitingToShow) return;
             

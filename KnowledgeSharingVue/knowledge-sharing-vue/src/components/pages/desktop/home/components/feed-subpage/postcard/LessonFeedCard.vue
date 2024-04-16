@@ -32,9 +32,9 @@
 </template>
 
 <script>
-import PostCardCommentList from './PostCardCommentList.vue';
+import PostCardCommentList from '../comment/PostCardCommentList.vue';
 import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
-import PostCardToolBar from './PostCardToolBar.vue';
+import PostCardToolBar from '../PostCardToolBar.vue';
 import PostCardThumbnail from './PostCardThumbnail.vue';
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
 import PostCardHeader from './PostCardHeader.vue';

@@ -1,4 +1,5 @@
 
+import { Validator } from "@/js/utils/validator";
 import ViewUser from "../views/view-user";
 class CurrentUser extends ViewUser {
     static _instance = null;
@@ -15,12 +16,20 @@ class CurrentUser extends ViewUser {
      * @Modified None
      */
     static async getInstance(){
-        if(!this._instance){
-            let storageUser = await localStorage.getItem('currentUser');
-            this._instance = new CurrentUser();
-            this._instance.copy(JSON.parse(storageUser));
+        try {
+            if(!this._instance){
+                let storageUser = await localStorage.getItem('currentUser');
+                storageUser = JSON.parse(storageUser)
+                if (Validator.isEmpty(storageUser)) return null;
+                this._instance = new CurrentUser();
+                this._instance.copy(storageUser);
+            }
+            return this._instance;
+        } catch (error){
+            console.error(error);
+            return null;
         }
-        return this._instance;
+        
     }
 
     /**

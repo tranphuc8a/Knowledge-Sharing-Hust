@@ -8,7 +8,9 @@
                     :placeholder="data.placeholder"  
                     @:input="resolveOnInput" @:change="resolveOnChange" 
                     @:focus="resolveOnFocus" @:blur="resolveOnBlur" 
-                    :readonly="inputFrame.state==='read-only'"/>
+                    :readonly="inputFrame.state==='read-only'"
+                    :style="{maxHeight: maxHeight}"
+                    :rows="rows"/>
         </div>
     </InputFrame>
 </template>
@@ -131,7 +133,11 @@ let textarea = {
         onclickIcon: {
             type: Function,
             default: null
-        }
+        },
+        maxHeight: {
+            default: null
+        },
+        rows: {}
     },
     watch: {
         ...input.watch,

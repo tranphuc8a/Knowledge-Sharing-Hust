@@ -50,7 +50,7 @@ export default {
     },
     async mounted() {
         this.getLabel();
-        this.currentUser = CurrentUser.getInstance();
+        this.currentUser = await CurrentUser.getInstance();
     },
     components: {
         FeedCardFrame, TooltipUserAvatar, MEmbeddedButton
