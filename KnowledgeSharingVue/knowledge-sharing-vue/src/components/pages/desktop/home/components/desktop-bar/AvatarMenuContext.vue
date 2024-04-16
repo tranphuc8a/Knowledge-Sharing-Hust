@@ -15,8 +15,8 @@ export default {
             user: null
         }
     },
-    mounted() {
-        this.user = CurrentUser.getInstance();
+    async mounted() {
+        this.user = await CurrentUser.getInstance();
     },
     methods: {
         

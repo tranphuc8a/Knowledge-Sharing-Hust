@@ -3,28 +3,28 @@
     <div class="d-centerbar">
         <div class="d-centerbar__icon">
             <div class="d-centerbar__icon-bg" :title="getLabel()?.home">
-                <router-link class="p-router-link" to="home">
-                    <MIcon :style="iconStyle" fa="home" />
+                <router-link class="p-router-link" to="/feed" exact-path>
+                    <MIcon :style="iconStyle" fa="house" />
                 </router-link >
             </div>
         </div>
         <div class="d-centerbar__icon">
             <div class="d-centerbar__icon-bg" :title="getLabel()?.lesson">
-                <router-link class="p-router-link" to="lessons">
+                <router-link class="p-router-link" :to="{name: 'lessons-page'}">
                     <MIcon :style="iconStyle" fa="book-open" />
                 </router-link >
             </div>
         </div>
         <div class="d-centerbar__icon">
             <div class="d-centerbar__icon-bg" :title="getLabel()?.course">
-                <router-link class="p-router-link" to="courses">
+                <router-link class="p-router-link" :to="{name: 'courses-page'}">
                     <MIcon :style="iconStyle" fa="layer-group" />
                 </router-link >
             </div>
         </div>
         <div class="d-centerbar__icon">
             <div class="d-centerbar__icon-bg" :title="getLabel()?.question">
-                <router-link class="p-router-link" to="questions">
+                <router-link class="p-router-link" :to="{name: 'questions-page'}">
                     <MIcon :style="iconStyle" fa="comments" />
                 </router-link >
             </div>

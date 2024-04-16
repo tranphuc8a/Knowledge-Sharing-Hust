@@ -4,7 +4,7 @@
         <div @:click="resolveOnclick" class="p-button p-combo-button" :state="data.state">
             <div class="p-button-content p-content-combo-button">
                 <div class="p-combo-button-left">
-                    <MIcon :fa="fa" :style="data.style" />
+                    <MIcon :fa="fa" :family="iconFamily" :style="data.style" />
                     <div > {{ label }} </div>
                 </div>
                 <div class="p-combo-button-right">
@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="p-loading-container">
-                <MSpinner :style="data.style"/>
+                <MSpinner :style="iconStyle"/>
             </div>
         </div>
     </div>

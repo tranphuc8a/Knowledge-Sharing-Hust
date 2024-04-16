@@ -1,17 +1,29 @@
 
 
+
 ::-webkit-scrollbar{
+    position: fixed;
     background: transparent;
-    width: 10px;
+    width: 8px;
+    height: 0;
 }
+
 ::-webkit-scrollbar-thumb{
-    position: absolute;
-    right: 15px;
+    position: fixed;
     background: rgba(0,0,0,0.4); 
     border-radius: 4px;
+    width: 10px;
 }
+
+::-webkit-scrollbar-track{
+    position: fixed;
+    background: transparent;
+    width: 50px;
+    border-radius: 4px;
+}
+
 ::-webkit-resizer,
 ::-webkit-scrollbar-button,
-::-webkit-scrollbar-corner { display: none; }
+::-webkit-scrollbar-corner { display: none }
 
 

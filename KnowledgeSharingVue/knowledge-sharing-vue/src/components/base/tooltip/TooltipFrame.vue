@@ -16,6 +16,8 @@ export default {
         return {
             isTooltipVisible: false,
             isWaitingToShow: false,
+            isWaitingToHide: false,
+
             tooltipStyle: {},
             hoverCount: 0,
             tooltipContent: null,
@@ -33,25 +35,25 @@ export default {
         this.tooltipContent = this.$refs["tooltip-content"];
         this.tooltipMask = this.$refs["tooltip-mask"];
     },
-    watch: {
-        async hoverCount(value) {
-            this.isTooltipVisible = value > 0;
-            if (value > 0){
-                await this.showTooltip();
-            }
-        },
-    },
     methods: {
-        async hideTooltip() {
-            this.isTooltipVisible = false;
+        async hideTooltip(delay) {
+            this.isWaitingToHide = true;
             this.isWaitingToShow = false;
-        },
-        async showTooltip() {
-            this.isWaitingToShow = true;
             await new Promise((resolve) => {
                 setTimeout(() => {
                     resolve();
-                }, 500);
+                }, isNaN(delay) ? this.delayHiding : delay);
+            });
+            if (!this.isWaitingToHide) return;
+            this.isTooltipVisible = false;
+        },
+        async showTooltip(delay) {
+            this.isWaitingToShow = true;
+            this.isWaitingToHide = false;
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, isNaN(delay) ? this.delayShowing : delay);
             });
             if (!this.isWaitingToShow) return;
             
@@ -126,7 +128,13 @@ export default {
     props: {
         position: {
             default: null
-        }
+        },
+        delayShowing: {
+            default: 500
+        },
+        delayHiding: {
+            default: 100
+        },
     }
 };
 </script>
@@ -140,16 +148,17 @@ export default {
 
 .p-tooltip-mask {
     cursor: pointer;
-    width: fit-content;
+    width: 100%;
 }
 
 .p-tooltip-content {
     box-sizing: border-box;
     position: absolute;
+    overflow: hidden;
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0px 2px rgba(0, 0, 0, 0.56);
-    padding: 10px;
+    /* padding: 10px; */
     z-index: 9999;
     white-space: nowrap; /* Đảm bảo nội dung không bị wrap nếu dài */
 }

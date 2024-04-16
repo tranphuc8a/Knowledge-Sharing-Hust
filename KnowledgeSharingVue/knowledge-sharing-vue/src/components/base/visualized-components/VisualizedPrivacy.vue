@@ -67,9 +67,10 @@ export default {
 
 .p-visual-privacy-content{
     width: fit-content;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--grey-color-900);
     font-size: 13px;
+    padding: 5px 10px;
 }
 </style>
 

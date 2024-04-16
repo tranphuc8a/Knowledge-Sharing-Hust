@@ -1,5 +1,5 @@
 <template>
-    <div class="p-avatar">
+    <div class="p-avatar" :style="iconStyle">
         <img :src="validatedSrc" :style="iconStyle" :alt="title" class="p-avatar__img" />
         <!-- <MIcon v-else fa="user" :style="iconStyle" class="p-avatar__icon" /> -->
     </div>

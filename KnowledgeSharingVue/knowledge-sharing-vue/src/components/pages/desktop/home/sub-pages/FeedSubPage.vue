@@ -11,9 +11,9 @@
 </template>
 
 <script>
-import AddPostFeedCard from '../components/feed-subpage/AddPostFeedCard.vue';
-import LessonFeedCard from '../components/feed-subpage/LessonFeedCard.vue';
-import QuestionFeedCard from '../components/feed-subpage/QuestionFeedCard.vue';
+import AddPostFeedCard from '../components/feed-subpage/postcard/AddPostFeedCard.vue';
+import LessonFeedCard from '../components/feed-subpage/postcard/LessonFeedCard.vue';
+import QuestionFeedCard from '../components/feed-subpage/postcard/QuestionFeedCard.vue';
 import { myEnum } from '@/js/resources/enum';
 
 export default {

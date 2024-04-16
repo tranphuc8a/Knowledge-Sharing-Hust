@@ -29,20 +29,38 @@
 </script>
 
 <style scoped>
-    .category-list {
-        display: flex;
-        flex-wrap: wrap;
-    }
+.category-list {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    height: fit-content;
+}
 
-    .category {
-        background-color: #f0f0f0;
-        padding: 5px 10px;
-        margin: 5px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+.category {
+    background-color: var(--grey-color-200);
+    padding: 4px 8px;
+    border-radius: 12px;
+    height: fit-content;
+    font-size: 12px;
+    color: var(--grey-color-700);
+    cursor: pointer;
+    max-width: 100px;
 
-    .category:hover {
-        background-color: #e0e0e0;
-    }
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    /* text-overrlow only active with these four attributes */
+}
+
+.category:hover {
+    background-color: var(--grey-color-300)
+}
+
+.category:active {
+    background-color: var(--grey-color-400)
+}
 </style>

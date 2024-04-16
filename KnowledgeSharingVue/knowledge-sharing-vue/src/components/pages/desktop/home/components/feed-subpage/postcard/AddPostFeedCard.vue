@@ -1,8 +1,11 @@
 <template>
     <FeedCardFrame>
-        <div class="p-feedcard-lesson">
-            <div class="p-feedcard-lesson__header">
-                <PostCardHeader :post="lesson" />
+        <div class="p-feedcard-addpost">
+            <div class="p-feedcard-addpost__header">
+                <TooltipUserAvatar :user="currentUser" :size="36" />
+                <div class="p-feedcard-addpost__reminder">
+                    {{ getLabel()?.remind(user?.FullName) }}
+                </div>
             </div>
             <div class="p-feedcard-devide"></div>
             <div class="p-feedcard-buttons">
@@ -26,13 +29,13 @@
 </template>
 
 <script>
-// import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
-// import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
-import PostCardHeader from './PostCardHeader.vue';
 import FeedCardFrame from './FeedCardFrame.vue';
+import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
+import CurrentUser from '@/js/models/entities/current-user';
+
 export default {
-    name: "lessonFeedCard",
+    name: "AddPostFeedCard",
     data() {
         return {
             label: null,
@@ -42,13 +45,15 @@ export default {
             iconStyle: {
                 color: 'var(--grey-color)',
             },
+            currentUser: null
         }
     },
-    mounted() {
+    async mounted() {
         this.getLabel();
+        this.currentUser = await CurrentUser.getInstance();
     },
     components: {
-        FeedCardFrame, MEmbeddedButton, PostCardHeader
+        FeedCardFrame, TooltipUserAvatar, MEmbeddedButton
     },
     methods: {
         /**
@@ -60,7 +65,7 @@ export default {
         */
         getLabel(){
             if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.lessoncard;
+                this.label = this.inject?.language?.subpages?.feedpage?.addpostcard;
             }
             return this.label;
         },
@@ -88,16 +93,13 @@ export default {
         inject: {},
         getToastManager: {},
         getPopupManager: {}
-    },
-    props: {
-        lesson: {}
     }
 }
 </script>
 
 <style scoped>
-.p-feedcard-lesson{
-    padding: 16px 0px;
+.p-feedcard-addpost{
+    padding: 16px 16px;
     box-sizing: border-box;
     display: flex;
     flex-flow: column nowrap;
@@ -106,7 +108,7 @@ export default {
     gap: 12px;
 }
 
-.p-feedcard-lesson__header{
+.p-feedcard-addpost__header{
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
@@ -115,7 +117,7 @@ export default {
     gap: 8px;
 }
 
-.p-feedcard-lesson__reminder{
+.p-feedcard-addpost__reminder{
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
@@ -132,7 +134,7 @@ export default {
     cursor: pointer;
     color: var(--grey-color-600);
 }
-.p-feedcard-lesson__reminder:hover{
+.p-feedcard-addpost__reminder:hover{
     background-color: var(--grey-color-300);
     color: var(--blue-grey-color-800);
 }

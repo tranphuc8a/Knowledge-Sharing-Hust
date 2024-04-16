@@ -1,8 +1,11 @@
 <template>
     <div ref="iconContainer" class="p-icon-container p-action-icon" :style="containerStyle"
-        @:click="resolveOnclick" :state="state">
+        @:click="resolveOnclick" :state="dstate">
         <MIcon  :fa="fa" 
-                :style="iconStyle" />
+                :family="family"
+                :style="iconStyle" 
+                v-if="dstate != 'loading'"/>
+        <MSpinner v-else :style="iconStyle" />
     </div>
     
 </template>
@@ -11,6 +14,11 @@
 
 let icon = {
     name: "ActionIcon",
+    data(){
+        return {
+            dstate: this.state
+        }
+    },
     methods: {
         /**
          * Xử lý sự kiện click chuột vào icon
@@ -20,11 +28,18 @@ let icon = {
          * @Modified None
         */
         async resolveOnclick(){
+            if (this.dstate != 'normal') return;
+            this.dstate = 'loading';
             await this.onclick();
+            this.dstate = 'normal';
         }
     },
     props: {
         fa: {},
+        family: {
+            type: String,
+            default: 'fas'
+        },
         containerStyle: {
             type: Object,
             default: {}
@@ -35,9 +50,13 @@ let icon = {
         },
         onclick: {
             type: Function,
-            default: async function(){}
+            default: async function(){
+                await new Promise(t => setTimeout(t, 1000));
+            }
         }, 
-        state: {}
+        state: {
+            default: 'normal'
+        }
     },
 };
 export default icon;

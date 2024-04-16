@@ -47,7 +47,7 @@ export default {
 .p-tooltip-user-info {
     display: flex;
     align-items: center;
-    padding: 8px;
+    padding: 16px;
 }
 
 .p-tooltip-user-info-avatar {

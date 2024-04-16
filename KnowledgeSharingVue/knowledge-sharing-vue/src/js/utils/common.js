@@ -1,3 +1,4 @@
+import { Validator } from "./validator";
 
 class Common {  
     /**
@@ -19,6 +20,7 @@ class Common {
      * @Modified None
      */
     static isValidImage(url) {
+        if (Validator.isEmpty(url)) return false;
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => resolve(true);
@@ -41,6 +43,46 @@ class Common {
             img.onerror = () => resolve(null);
             img.src = url;
         });
+    }
+
+    /**
+     * Format the number to beautiful format
+     * 
+     * @param {*} num the number need to be formatted
+     * @returns {string} the formatted number
+     * @Created PhucTV (15/04/24)
+     * @Modified None
+     */
+    static formatNumber(num) {
+        if (Validator.isEmpty(num)) return 0;
+
+        if (num < 1000) {
+            return num.toString();
+            // or simply return num; for number format
+        }
+        
+        // Defines units
+        const units = ["K", "M", "B", "T", "KT", "MT", "BT", "TT",
+            "KTT", "MTT", "BTT", "TTT"
+        ];
+        
+        // Divide log by 3 because 10^3 = 1000
+        const order = Math.floor(Math.log10(num) / 3);
+        
+        // Get unitName
+        const unitName = units[order - 1];
+        
+        // Scale number
+        const scale = Math.pow(10, order * 3);
+        const scaled = num / scale;
+        
+        // keep up to three significant digits
+        let formatted = scaled.toFixed(2 - Math.floor(Math.log10(scaled)));
+        
+        // Remove trailing zeroes
+        formatted = parseFloat(formatted).toString();
+        
+        return formatted + (unitName ?? "H");
     }
 }
 

@@ -1,7 +1,7 @@
 <template>
     <div @:click="resolveOnclick" :style="buttonStyle" class="p-button p-cancel-button" :state="data.state">
         <div class="p-button-content">
-            <MIcon :fa="fa" :style="iconStyle" v-if="fa != null" />
+            <MIcon :fa="fa" :family="iconFamily" :style="iconStyle" v-if="fa != null" />
             <div v-if="label != null" > {{ label }} </div>
         </div>
         <div class="p-loading-container">

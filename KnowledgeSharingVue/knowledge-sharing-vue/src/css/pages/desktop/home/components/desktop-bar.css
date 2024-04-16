@@ -11,6 +11,9 @@
     min-width: var(--body-min-width);
     height: var(--bar-height);
 
+    /* of scrollbar */
+    padding-right: 8px;
+
     background-color: white;
     box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.56);
 
