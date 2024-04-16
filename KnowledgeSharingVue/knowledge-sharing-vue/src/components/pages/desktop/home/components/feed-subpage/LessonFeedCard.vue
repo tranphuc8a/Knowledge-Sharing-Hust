@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
     <FeedCardFrame>
         <div class="p-feedcard-lesson">
@@ -10,6 +11,11 @@
             <div class="p-feedcard-lesson__categories">
                 <CategoriesList :categories="lesson?.Categories ?? defaultCategoriesList" />
             </div>
+            <div class="p-feedcard-lesson__content">
+                <MTextfield />
+                <textarea type="text" v-model="content"/>
+                <LatexMarkdownRender :markdown-content="content" />
+            </div>
             <div class="p-feedcard-lesson__thumbnail">
                 <PostCardThumbnail />
             </div>
@@ -21,6 +27,8 @@
 </template>
 
 <script>
+import MTextfield from '@/components/base/inputs/MTextfield';
+import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
 import PostCardToolBar from './PostCardToolBar.vue';
 import PostCardThumbnail from './PostCardThumbnail.vue';
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
@@ -39,12 +47,15 @@ export default {
             iconStyle: {
                 color: 'var(--grey-color)',
             },
+// eslint-disable-next-line no-useless-escape
+            content: ''
         }
     },
     mounted() {
         this.getLabel();
     },
     components: {
+        LatexMarkdownRender, MTextfield,
         PostCardThumbnail, PostCardToolBar,
         FeedCardFrame, PostCardHeader, CategoriesList
     },
@@ -159,10 +170,10 @@ export default {
     width: 100%;
 }
 
-.p-feedcard-lesson__categories{
+.p-feedcard-lesson__categories,
+.p-feedcard-lesson__content{
     width: 100%;
     padding: 0px 16px;
 }
-
 
 </style>
