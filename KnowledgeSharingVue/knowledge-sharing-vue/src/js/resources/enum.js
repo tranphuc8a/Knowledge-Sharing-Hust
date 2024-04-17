@@ -80,7 +80,8 @@ let myEnum = {
     contentType: {
         JSON        : 'application/json',
         FORM_DATA   : 'multipart/form-data',
-        URL_ENCODED : 'application/x-www-form-urlencoded'
+        URL_ENCODED : 'application/x-www-form-urlencoded',
+        GWT         : 'text/x-gwt-rpc; charset=UTF-8'
     },
 
     commentFilterType: {

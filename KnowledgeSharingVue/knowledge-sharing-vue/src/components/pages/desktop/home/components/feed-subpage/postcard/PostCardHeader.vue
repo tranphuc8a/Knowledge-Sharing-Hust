@@ -1,14 +1,14 @@
 <template>
     <div class="p-postcard-header">
         <div class="p-header-left">
-            <TooltipUserAvatar :user="lesson?.User" :size="36" />
-            <div class="p-lesson-infor">
-                <div class="p-lesson-owner-name">
-                    <TooltipUsername :user="lesson?.User" />
+            <TooltipUserAvatar :user="post?.User" :size="36" />
+            <div class="p-post-infor">
+                <div class="p-post-owner-name">
+                    <TooltipUsername :user="post?.User" />
                 </div>
-                <div class="p-lesson-detail-infor">
-                    <VisualizedDatetime :datetime="lesson?.CreatedTime" />
-                    <VisualizedPrivacy :privacy="lesson?.Privacy" />
+                <div class="p-post-detail-infor">
+                    <VisualizedDatetime :datetime="post?.CreatedTime" />
+                    <VisualizedPrivacy :privacy="post?.Privacy" />
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@ export default {
     methods: {
 
     },
-    injects: {
+    inject: {
         post: {}
     }
 }
@@ -65,14 +65,14 @@ export default {
     gap: 8px;
 }
 
-.p-lesson-infor{
+.p-post-infor{
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
     align-items: flex-start;
 }
 
-.p-lesson-detail-infor{
+.p-post-detail-infor{
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;

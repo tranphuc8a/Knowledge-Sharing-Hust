@@ -45,7 +45,6 @@ export default {
             if (this.inject?.language != null){
                 this.label = this.inject?.language?.subpages?.feedpage?.postcard;
             }
-            console.log(this.inject);
             return this.label;
         },
 

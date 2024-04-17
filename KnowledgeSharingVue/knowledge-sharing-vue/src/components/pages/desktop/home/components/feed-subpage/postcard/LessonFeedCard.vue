@@ -52,7 +52,8 @@ export default {
             iconStyle: {
                 color: 'var(--grey-color)',
             },
-            content: ''
+            content: '',
+            lesson: this.post
         }
     },
     mounted() {
@@ -108,7 +109,9 @@ export default {
         }
     },
     props: {
-        lesson: {}
+        post: {
+            required: true
+        }
     }
 }
 </script>

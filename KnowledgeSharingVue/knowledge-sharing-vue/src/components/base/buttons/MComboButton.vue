@@ -1,18 +1,18 @@
 <template>
     
     <div class="p-fitcontent-button-container">
-        <div @:click="resolveOnclick" class="p-button p-combo-button" :state="data.state">
+        <div @:click="resolveOnclick" :style="data.buttonStyle" class="p-button p-combo-button" :state="data.state">
             <div class="p-button-content p-content-combo-button">
                 <div class="p-combo-button-left">
-                    <MIcon :fa="fa" :family="iconFamily" :style="data.style" />
+                    <MIcon :fa="fa" :family="iconFamily" :style="data.iconStyle" />
                     <div > {{ label }} </div>
                 </div>
                 <div class="p-combo-button-right">
-                    <MIcon fa="chevron-down" :style="data.style" />
+                    <MIcon fa="chevron-down" :style="data.iconStyle" />
                 </div>
             </div>
             <div class="p-loading-container">
-                <MSpinner :style="iconStyle"/>
+                <MSpinner :style="data.iconStyle"/>
             </div>
         </div>
     </div>
@@ -27,6 +27,14 @@ let button = {
         return {
             data: {
                 state: this.state,
+                buttonStyle: {
+                    color: 'white',
+                    ...this.buttonStyle
+                },
+                iconStyle: {
+                    color: 'white',
+                    ...this.iconStyle
+                },
             }
         };
     },

@@ -2,7 +2,10 @@
     <TooltipFrame ref="tooltip" :delay-hiding="500" :delay-showing="500">
         <template #tooltipMask>
             <div class="p-star-button-frame">
-                <div v-if="myStar != null" @:click="resolveUnStar" class="p-stared-button"> {{ getStaredLabel() }} </div>
+                <div v-if="myStar != null" @:click="resolveUnStar" class="p-stared-button"> 
+                    <MIcon fa="star" :style="{fontSize: '12px'}" />
+                    {{ getStaredLabel() }} 
+                </div>
                 <div v-else @:click="resolveCommitFiveStar" class="p-not-stared-button"> {{ getStaredLabel() }} </div>
             </div>
         </template>
@@ -43,7 +46,7 @@ export default {
     name: 'VisualizedStar',
     data() {
         return {
-            myStar: this.comment?.MyStar,
+            myStar: this.commentProvider?.MyStar,
             currentUser: null,
             selectStarIconStyle:{
                 fontSize: '28px'
@@ -142,7 +145,7 @@ export default {
     
     inject: {
         inject: {},
-        comment: {}
+        commentProvider: {}
     }
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="markdown-container">
         <div class="toc" ref="toc"></div>
         <div v-html="renderedContent" :style="style" class="markdown-body"></div>
     </div>
@@ -70,6 +70,9 @@ export default {
 </script>
 
 <style>
+.markdown-container{
+    margin-top: -20px;
+}
 .katex svg {
     overflow: hidden;
 }
@@ -78,5 +81,7 @@ export default {
 }
 .markdown-body{
     overflow-x: hidden;
+    background-color: transparent;
+    font-size: 14px;
 }
 </style>

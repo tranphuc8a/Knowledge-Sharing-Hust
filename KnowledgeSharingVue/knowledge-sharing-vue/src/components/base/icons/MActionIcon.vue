@@ -35,7 +35,9 @@ let icon = {
         }
     },
     props: {
-        fa: {},
+        fa: {
+            required: true,
+        },
         family: {
             type: String,
             default: 'fas'
@@ -51,7 +53,7 @@ let icon = {
         onclick: {
             type: Function,
             default: async function(){
-                await new Promise(t => setTimeout(t, 1000));
+                // await new Promise(t => setTimeout(t, 1000));
             }
         }, 
         state: {

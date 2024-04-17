@@ -19,6 +19,8 @@ import FeedSubPage from '@/components/pages/desktop/home/sub-pages/FeedSubPage.v
 import TestPage from '@/components/pages/test-page/TestPage.vue';
 import { GetRequest } from './request';
 
+import HustPage from '@/components/pages/hust-page/HustPage.vue';
+
 const routers = [{
     path: '/',
     name: 'home',
@@ -105,6 +107,10 @@ const routers = [{
     path: '/test',
     name: 'test',
     component: TestPage
+}, {
+    path: '/hust',
+    name: 'hust',
+    component: HustPage
 }];
 
 

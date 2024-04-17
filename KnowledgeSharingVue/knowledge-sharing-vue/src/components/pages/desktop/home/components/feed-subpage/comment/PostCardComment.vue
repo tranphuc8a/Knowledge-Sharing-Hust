@@ -9,30 +9,17 @@
 
         <div class="p-comment-content">
             <div class="p-my-comment">
-                <div class="p-comment-card">
+                <div class="p-comment-card" ref="comment-card">
                     <div class="p-comment-frame">
                         <div class="p-comment-username">
                             <TooltipUsername :user="comment?.User"/>
                         </div>
                         <div class="p-comment-text">
-                            <span v-show="!isCollapsing">
-                                {{comment?.Content ?? "Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luậnĐây là bình luậnĐây là bình luận Đây là bình luận"}}
-                            </span> 
-                            <span v-show="isCollapsing">
-                                {{ collapseText(
-                                    comment?.Content ?? "Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luậnĐây là bình luậnĐây là bình luận Đây là bình luận"
-                                ) }}
-                            </span>
-                            <span> &nbsp; </span>
-                            <span class="p-more-button" 
-                                v-show="!isCollapsing && true"
-                                @:click="toggleCollapse">Ẩn bớt</span>
-                            <span class="p-more-button" 
-                                v-show="isCollapsing"
-                                @:click="toggleCollapse">Xem thêm</span>
+                            <LimitLengthText :text="comment?.Content" 
+                                :lenth="50" :on-collapse="adjustMenuContextHeight"/>
                         </div>
                     </div>
-                    <div class="p-comment-menu-context">
+                    <div class="p-comment-menu-context" ref="comment-menu-context">
                         <CommentMenuContext 
                             :on-edit="resolveEditComment"
                             :on-delete="resolveDeleteComment"
@@ -48,7 +35,7 @@
                 <PostCardComment v-for="(comment) in comment?.Replies ?? []" :key="comment?.UserItemId" :comment="comment"/>
             </div>
             <div class="p-reply-enter" v-if="isShowEnterComment && comment?.ReplyId == null">
-                <PostCardEnterComment :useritem="comment"/>
+                <PostCardEnterComment :useritem="comment" placeholder="Phản hồi bình luận"/>
             </div>
         </div>
     </div>
@@ -56,6 +43,7 @@
 </template>
 
 <script>
+import LimitLengthText from '@/components/base/text/LimitLengthText.vue';
 import CommentInformationBar from './CommentInformationBar.vue';
 import CommentMenuContext from './CommentMenuContext.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
@@ -69,15 +57,28 @@ export default {
             isShowEnterComment: false,
             isShowReplies: false,
             isCollapsing: true,
-            maxCommentLength: 50,
+            components: {
+                commentCard: null,
+                commentMenuContext: null
+            }
         }
     },
     components: {
+        LimitLengthText,
         CommentInformationBar,
         CommentMenuContext,
         TooltipUserAvatar,
         PostCardEnterComment,
         TooltipUsername
+    },
+    mounted(){
+        this.components = {
+            commentCard: this.$refs['comment-card'],
+            commentMenuContext: this.$refs['comment-menu-context']
+        };
+        this.listComments = this.comments;
+        this.getLabel();
+        this.adjustMenuContextHeight();
     },
     methods: {
         isOwner(){
@@ -97,45 +98,47 @@ export default {
             if (this.inject?.language != null){
                 this.label = this.inject?.language?.subpages?.feedpage?.postcard;
             }
-            console.log(this.inject);
             return this.label;
         },
 
 
-        collapseText(text){
-            try {
-                text = String(text);
-                if (text.length <= this.maxCommentLength) {
-                    return text;
+        async adjustMenuContextHeight(){
+            let that = this;
+            this.$nextTick(async function(){
+                try {
+                    that.components.commentMenuContext.style.height = 'auto';
+                    that.components.commentMenuContext.style.height 
+                        = that.components.commentCard.clientHeight + 'px';
+                } catch (error) {
+                    console.error(error);
                 }
-                return text.slice(0, this.maxCommentLength) + '...';
-            } catch (error){
-                console.error(error);
-                return "Error";
-            }
-        },
-
-        toggleCollapse(){
-            this.isCollapsing = !this.isCollapsing;
+            })
         },
 
         async resolveReplyComment(){
-            this.isShowEnterComment = true;
+            this.isShowEnterComment = !this.isShowEnterComment;
+        },
+
+        async resolveEditComment(){
+            this.$emit('on-edit', this.comment);
+        },
+
+        async resolveDeleteComment(){
+            this.$emit('on-delete', this.comment);
         }
     },
     props: {
-        comment: {}
-    },
-    mounted() {
-        this.listComments = this.comments;
+        comment: {
+            required: true
+        }
     },
     inject: {
         inject: {},
         post: {}
     },
-    provider(){
+    provide(){
         return {
-            comment: this.comment
+            commentProvider: this.comment
         }
     }
 }
@@ -151,6 +154,10 @@ export default {
     justify-content: flex-start;
     align-items: flex-start;
     gap: 4px;
+}
+
+.p-comment{
+    width: 100%;
 }
 
 .p-comment-left{
@@ -191,6 +198,10 @@ export default {
     gap: 4px;
 }
 
+.p-comment-info{
+    width: calc(100% - 40px);
+}
+
 .p-comment-frame{
     width: fit-content;
     display: flex;
@@ -203,18 +214,22 @@ export default {
     padding: 8px 12px;;
 }
 
+.p-comment-menu-context{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
 .p-comment-text{
-    text-align: justify;
+    height: fit-content;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 
-.p-more-button{
-    font-family: 'ks-font-semibold';
-    cursor: pointer;
-}
-
-.p-more-button:hover{
-    text-decoration: underline;
-}
 
 .p-my-comment{
     display: flex;

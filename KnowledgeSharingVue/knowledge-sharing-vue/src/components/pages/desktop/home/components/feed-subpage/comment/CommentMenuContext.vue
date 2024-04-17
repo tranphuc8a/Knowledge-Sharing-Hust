@@ -40,14 +40,14 @@ export default {
             if (this.currentUser == null){
                 this.listOptions = [this.actions.Reply];
             }
-            if (this.currentUser.UserId == this.comment?.UserId && this.comment?.UserId != null){
+            else if (this.currentUser.UserId == this.commentProvider?.UserId && this.commentProvider?.UserId != null){
                 this.listOptions = [
                     this.actions.Reply,
                     this.actions.Edit,
                     this.actions.Delete
                 ];
             }
-            if (this.currentUser.UserId == this.post?.UserId && this.comment?.UserId != null){
+            else if (this.currentUser.UserId == this.post?.UserId && this.commentProvider?.UserId != null){
                 this.listOptions = [
                     this.actions.Reply,
                     this.actions.Delete
@@ -114,7 +114,7 @@ export default {
     },
     inject: {
         inject: {},
-        comment: {},
+        commentProvider: {},
         post: {}
     }
 }
@@ -124,7 +124,7 @@ export default {
 <style scoped>
 
 .p-cmc-content{
-    padding: 18px 0px;
+    padding: 12px 0px;
     display: flex;
     flex-flow: column nowrap;
     justify-content: space-between;

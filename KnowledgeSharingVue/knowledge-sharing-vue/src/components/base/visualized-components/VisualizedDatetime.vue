@@ -45,7 +45,7 @@ export default {
         */
         getTimeSince() {
             try {
-                return this.myDateTime.toTimeSince();
+                return this.myDateTime?.toTimeSince();
             } catch (e) {
                 console.error(e);
             }
@@ -60,7 +60,7 @@ export default {
          */
         getFullDateTime() {
             try {
-                return this.myDateTime.toFullyText();
+                return this.myDateTime?.toFullyText();
             } catch (e) {
                 console.error(e);
             }

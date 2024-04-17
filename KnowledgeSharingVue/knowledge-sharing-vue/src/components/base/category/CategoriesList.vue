@@ -40,12 +40,12 @@
 }
 
 .category {
-    background-color: var(--grey-color-200);
+    background-color: var(--primary-color-100);
     padding: 4px 8px;
     border-radius: 12px;
     height: fit-content;
     font-size: 12px;
-    color: var(--grey-color-700);
+    color: var(--primary-color);
     cursor: pointer;
     max-width: 100px;
 
@@ -57,10 +57,11 @@
 }
 
 .category:hover {
-    background-color: var(--grey-color-300)
+    background-color: var(--primary-color-200);
 }
 
 .category:active {
-    background-color: var(--grey-color-400)
+    background-color: var(--primary-color-300);
+    color: var(--primary-color-600);
 }
 </style>

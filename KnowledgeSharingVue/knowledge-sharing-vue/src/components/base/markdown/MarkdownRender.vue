@@ -9,16 +9,16 @@ import marked from 'marked'
 export default {
     name: "MarkdownRender",
     props: {
-        markdownText: {
+        markdownContent: {
             type: String,
-            default: ''
+            required: true
         },
         style: {}
     },
     computed: {
 
         renderedMarkdown() {
-            return marked(this.markdownText, { sanitize: true })
+            return marked(this.markdownContent, { sanitize: true })
         }
     }
 }

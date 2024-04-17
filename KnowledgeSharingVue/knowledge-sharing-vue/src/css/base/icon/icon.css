@@ -32,10 +32,10 @@
     opacity: 56%;
 }
 .p-icon-container:hover{
-    background-color: var(--grey-color-300);
+    background-color: var(--primary-color-100);
 }
 .p-icon-container:active{
-    background-color: var(--grey-color-400);
+    background-color: var(--primary-color-200);
 }
 
 .p-image-icon{

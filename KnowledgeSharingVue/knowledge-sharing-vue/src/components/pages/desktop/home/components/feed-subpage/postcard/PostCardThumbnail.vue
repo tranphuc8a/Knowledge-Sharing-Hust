@@ -61,7 +61,7 @@ export default {
             }
         }
     },
-    injects: {
+    inject: {
         post: {
             default: null
         }

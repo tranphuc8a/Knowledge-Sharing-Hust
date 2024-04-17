@@ -7,7 +7,7 @@
         <div class="p-enter-comment-textarea" ref="textarea">
             <MTextArea
                 ref="textarea"
-                placeholder="Thêm bình luận"
+                :placeholder="placeholder"
                 :is-show-title="false" :is-show-error="true" 
                 :validator="commentValidator"
                 :oninput="adjustHeight"
@@ -90,7 +90,10 @@ export default {
     },
     props: {
         useritem: {},
-        onCommentSubmitted: {}
+        onCommentSubmitted: {},
+        placeholder: {
+            default: "Thêm bình luận"
+        }
     }
 }
 
