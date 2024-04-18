@@ -2,10 +2,10 @@
     <div class="p-comment-information-bar">
         <div class="p-comment-infor">
             <div class="p-comment-time">
-                <VisualizedDatetime :datetime="commentProvider?.CreatedTime" />
+                <VisualizedDatetime :datetime="getComment()?.CreatedTime" />
             </div>
             <div class="p-comment-star">
-                <VisualizedStar :star="commentProvider?.Star ?? 3.68" />
+                <VisualizedStar :star="getComment()?.Star ?? tempStar" />
             </div>
             <MIcon fa="circle" :style="dotIconStyle" />
             <div class="p-comment-numstar">
@@ -42,11 +42,15 @@ export default {
     },
     data() {
         return {
+            tempStar: 3.89,
             label: null,
             dotIconStyle: {fontSize: '3px', color: 'var(--grey-color-600)'},
             iconStyle: {color: 'var(--grey-color)'},
             buttonStyle: {color: 'var(--grey-color-800)'}
         }
+    },
+    mounted() {
+        this.getLabel();
     },
     methods: {
 
@@ -58,8 +62,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },
@@ -67,7 +71,7 @@ export default {
 
         getNumStar(){
             try {
-                let numstar = Number(this.commentProvider?.NumberStar ?? 0);
+                let numstar = Number(this.getComment()?.NumberStar ?? 0);
                 let beautyNumber = Common.formatNumber(numstar);
                 return this.getLabel()?.numberStar(beautyNumber);
             } catch (e) {
@@ -83,8 +87,8 @@ export default {
         }
     },
     inject: {
-        inject: {},
-        commentProvider: {}
+        getLanguage: {},
+        getComment: {}
     }
 }
 

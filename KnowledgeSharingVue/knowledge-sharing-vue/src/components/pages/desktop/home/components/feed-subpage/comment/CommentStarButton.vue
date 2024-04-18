@@ -46,7 +46,7 @@ export default {
     name: 'VisualizedStar',
     data() {
         return {
-            myStar: this.commentProvider?.MyStar,
+            myStar: this.getComment()?.Star,
             currentUser: null,
             selectStarIconStyle:{
                 fontSize: '28px'
@@ -81,8 +81,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },
@@ -144,8 +144,8 @@ export default {
     },
     
     inject: {
-        inject: {},
-        commentProvider: {}
+        getLanguage: {},
+        getComment: {}
     }
 }
 

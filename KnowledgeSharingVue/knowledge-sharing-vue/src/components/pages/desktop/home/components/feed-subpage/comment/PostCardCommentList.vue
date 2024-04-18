@@ -42,8 +42,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },
@@ -71,7 +71,7 @@ export default {
         
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         post: {
             default: null
         }

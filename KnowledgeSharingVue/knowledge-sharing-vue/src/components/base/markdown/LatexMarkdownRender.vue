@@ -19,7 +19,6 @@ export default {
     name: "LatexMardownRender",
     props: {
         markdownContent: {
-            type: String,
             required: true,
         },
         style: {}

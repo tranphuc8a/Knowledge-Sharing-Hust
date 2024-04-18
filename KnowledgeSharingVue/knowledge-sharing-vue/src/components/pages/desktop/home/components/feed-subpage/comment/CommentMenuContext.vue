@@ -9,7 +9,7 @@
 
         <template #popupContextContent>
             <div class="p-cmc-content">
-                <template v-for="(option, index) in listOptions" :key="index">
+                <template v-for="(option) in listOptions" :key="option?.id">
                     <div class="p-cmc-option" @:click="options[option].onClick">
                         <MIcon :style="iconStyle" :fa="options[option].fa"> </MIcon>
                         <span> {{ options[option].label }} </span>
@@ -24,40 +24,25 @@
 <script>
 import MContextPopup from '@/components/base/popup/MContextPopup.vue';
 import CurrentUser from '@/js/models/entities/current-user';
+// import { MyRandom } from '@/js/utils/myrandom';
 export default {
     name: "CommentMenuContext",
     props: {
         onEdit: {},
         onDelete: {},
-        onReply: {}
+        onReply: {},
+        onToggleInformation: {}
     },
     components: {
         MContextPopup
     },
     async mounted(){
         try {
-            this.currentUser = await CurrentUser.getInstance();
-            if (this.currentUser == null){
-                this.listOptions = [this.actions.Reply];
-            }
-            else if (this.currentUser.UserId == this.commentProvider?.UserId && this.commentProvider?.UserId != null){
-                this.listOptions = [
-                    this.actions.Reply,
-                    this.actions.Edit,
-                    this.actions.Delete
-                ];
-            }
-            else if (this.currentUser.UserId == this.post?.UserId && this.commentProvider?.UserId != null){
-                this.listOptions = [
-                    this.actions.Reply,
-                    this.actions.Delete
-                ];
-            }
-        }
-        catch (error){
+            this.comment = this.getComment();
+            await this.updateOptions();
+        } catch (error){
             console.error(error);
         }
-        
     },
     methods: {
         async resolveEditComment(){
@@ -74,10 +59,50 @@ export default {
             if (this.onReply){
                 this.onReply();
             }
+        },
+        async resolveToggleInformation(){
+            if (this.onToggleInformation){
+                await this.onToggleInformation();
+                await this.updateOptions();
+            }
+        },
+
+        async updateOptions(){
+            try {
+                this.currentUser = await CurrentUser.getInstance();
+                if (this.currentUser == null){
+                    this.listOptions = [this.actions.Reply];
+                }
+                else if (this.currentUser.UserId == this.getComment()?.UserId && this.getComment()?.UserId != null){
+                    this.listOptions = [
+                        this.actions.Reply,
+                        this.actions.Edit,
+                        this.actions.Delete
+                    ];
+                }
+                else if (this.currentUser.UserId == this.getPost()?.UserId && this.getComment()?.UserId != null){
+                    this.listOptions = [
+                        this.actions.Reply,
+                        this.actions.Delete
+                    ];
+                }
+                if (this.getComment()?.isHideCommentInformation == true){
+                    this.listOptions.push(this.actions.ShowInformation);
+                } else {
+                    this.listOptions.push(this.actions.HideInformation);
+                }
+            }
+            catch (error){
+                console.error(error);
+            }
         }
     },
     data() {
         return {
+            // for listen the change of inject:
+            dCommentProvider: this.commentProvider,
+            isHideCommentInformation: null,
+            comment: null,
             currentUser: null,
             iconStyle: {
                 fontSize: '18px',
@@ -90,32 +115,49 @@ export default {
             actions: {
                 Edit: 1,
                 Delete: 2,
-                Reply: 3
+                Reply: 3,
+                HideInformation: 4,
+                ShowInformation: 5
             },
             listOptions: [],
             options: {
                 [1]: {
+                    id: 1,
                     label: 'Chỉnh sửa',
                     fa: 'pencil',
-                    onClick: this.resolveEditComment,
+                    onClick: this.resolveEditComment
                 }, 
                 [2]: {
+                    id: 2,
                     label: 'Xóa',
                     fa: 'trash-can',
                     onClick: this.resolveDeleteComment,
                 },
                 [3]: {
+                    id: 3,
                     label: 'Phản hồi',
                     fa: 'share',
                     onClick: this.resolveReplyComment,
+                },
+                [4]: {
+                    id: 4,
+                    label: 'Ẩn thông tin',
+                    fa: 'eye-slash',
+                    onClick: this.resolveToggleInformation,
+                },
+                [5]: {
+                    id: 5,
+                    label: 'Hiển thị thông tin',
+                    fa: 'eye',
+                    onClick: this.resolveToggleInformation,
                 }
             }
         }
     },
     inject: {
-        inject: {},
-        commentProvider: {},
-        post: {}
+        getLanguage: {},
+        getComment: {},
+        getPost: {}
     }
 }
 

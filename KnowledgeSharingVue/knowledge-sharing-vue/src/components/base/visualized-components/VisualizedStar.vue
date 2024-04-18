@@ -44,7 +44,6 @@ export default {
     },
     props: {
         star: {
-            type: Number,
             required: true,
         },
     },
@@ -58,7 +57,7 @@ export default {
         */
         async updateStar(){
             try {
-                let round = Math.round(this.star ?? 0 * 10) / 10;
+                let round = Math.round((this.star ?? 0) * 10) / 10;
                 this.dStar = round;
             } catch (e){
                 console.error(e);

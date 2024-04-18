@@ -73,8 +73,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.lessoncard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.lessoncard;
             }
             return this.label;
         },
@@ -99,13 +99,13 @@ export default {
         
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         getToastManager: {},
         getPopupManager: {}
     },
     provide(){
         return {
-            post: this.lesson
+            getPost: () => this.lesson
         }
     },
     props: {

@@ -86,6 +86,21 @@ export default {
             } catch (e){
                 console.error(e);
             }
+        },
+
+        /**
+         * Focus on textarea
+         * @param none
+         * @returns none
+         * @Created PhucTV (18/04/24)
+         * @Modified None
+         */
+        async focus(){
+            try {
+                this.components.textarea.focus();
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     props: {

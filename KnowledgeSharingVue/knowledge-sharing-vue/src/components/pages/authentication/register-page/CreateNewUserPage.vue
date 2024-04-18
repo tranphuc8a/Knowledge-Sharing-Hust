@@ -55,8 +55,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.pages?.createnewuser;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.pages?.createnewuser;
             }
             return this.label;
         },
@@ -82,7 +82,7 @@ export default {
 
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         getPopupManager: {}, 
         getToastManager: {}
     }

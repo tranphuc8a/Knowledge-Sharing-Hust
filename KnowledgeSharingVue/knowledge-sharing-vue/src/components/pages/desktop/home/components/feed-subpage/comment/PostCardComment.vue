@@ -24,10 +24,11 @@
                             :on-edit="resolveEditComment"
                             :on-delete="resolveDeleteComment"
                             :on-reply="resolveReplyComment"
+                            :on-toggle-information="resolveToggleInformation"
                         />
                     </div>
                 </div>
-                <div class="p-comment-info">
+                <div class="p-comment-info" v-if="dComment?.isHideCommentInformation === false">
                     <CommentInformationBar :on-reply="resolveReplyComment" />
                 </div>
             </div>
@@ -35,7 +36,7 @@
                 <PostCardComment v-for="(comment) in comment?.Replies ?? []" :key="comment?.UserItemId" :comment="comment"/>
             </div>
             <div class="p-reply-enter" v-if="isShowEnterComment && comment?.ReplyId == null">
-                <PostCardEnterComment :useritem="comment" placeholder="Phản hồi bình luận"/>
+                <PostCardEnterComment ref="reply-enter" :useritem="comment" placeholder="Phản hồi bình luận"/>
             </div>
         </div>
     </div>
@@ -54,12 +55,14 @@ export default {
     name: "p-comment",
     data() {
         return {
+            dComment: this.comment,
             isShowEnterComment: false,
             isShowReplies: false,
             isCollapsing: true,
             components: {
                 commentCard: null,
-                commentMenuContext: null
+                commentMenuContext: null,
+                replyEnter: null
             }
         }
     },
@@ -72,18 +75,25 @@ export default {
         TooltipUsername
     },
     mounted(){
-        this.components = {
-            commentCard: this.$refs['comment-card'],
-            commentMenuContext: this.$refs['comment-menu-context']
-        };
-        this.listComments = this.comments;
-        this.getLabel();
-        this.adjustMenuContextHeight();
+        try {
+            if (this.dComment == null) this.dComment = {};
+            this.dComment.isHideCommentInformation = false;
+            this.components = {
+                commentCard: this.$refs['comment-card'],
+                commentMenuContext: this.$refs['comment-menu-context'],
+                replyEnter: this.$refs['reply-enter']
+            };
+            this.listComments = this.dComments;
+            this.getLabel();
+            this.adjustMenuContextHeight();
+        } catch (error) {
+            console.error(error);
+        }
     },
     methods: {
         isOwner(){
-            let postOwner = this.post?.UserId;
-            let commentOwner = this.comment?.UserId;
+            let postOwner = this.getPost()?.UserId;
+            let commentOwner = this.dComment?.UserId;
             return Validator.isNotEmpty(commentOwner) && postOwner === commentOwner;
         },
 
@@ -95,8 +105,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },
@@ -116,15 +126,28 @@ export default {
         },
 
         async resolveReplyComment(){
-            this.isShowEnterComment = !this.isShowEnterComment;
+            try {
+                this.isShowEnterComment = !this.isShowEnterComment;
+                this.components.replyEnter.focus();
+            } catch (error) {
+                console.error(error);
+            }
         },
 
         async resolveEditComment(){
-            this.$emit('on-edit', this.comment);
+            this.$emit('on-edit', this.dComment);
         },
 
         async resolveDeleteComment(){
-            this.$emit('on-delete', this.comment);
+            this.$emit('on-delete', this.dComment);
+        },
+
+        async resolveToggleInformation(){
+            try {
+                this.dComment.isHideCommentInformation = !this.dComment.isHideCommentInformation;
+            } catch (error){
+                console.error(error);
+            }
         }
     },
     props: {
@@ -133,12 +156,12 @@ export default {
         }
     },
     inject: {
-        inject: {},
-        post: {}
+        getLanguage: {},
+        getPost: {}
     },
     provide(){
         return {
-            commentProvider: this.comment
+            getComment: () => this.dComment,
         }
     }
 }
@@ -219,6 +242,7 @@ export default {
     flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
+    visibility: hidden;
 }
 
 .p-comment-text{
@@ -237,6 +261,10 @@ export default {
     justify-content: flex-start;
     align-items: flex-start;
     gap: 4px;
+}
+
+.p-my-comment:hover .p-comment-menu-context{
+    visibility: visible;
 }
 
 .p-reply-enter{

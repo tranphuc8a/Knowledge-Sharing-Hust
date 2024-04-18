@@ -18,10 +18,6 @@ export default {
     name: 'KSEmptyPage',
     data(){
         return {
-            inject: {
-                language: this.globalData.lang,
-                changeLanguage: this.changeLanguage
-            },
             languageEnum: this.globalData.enum.language
         }
     },
@@ -56,11 +52,11 @@ export default {
         */
         changeLanguage(lang){
             try {
-                if (lang === this.languageEnum.VIETNAMESE && this.inject?.language){
-                    this.inject.language = language['vi'];
+                if (lang === this.languageEnum.VIETNAMESE){
+                    this.globalData.lang = language['vi'];
                     console.log("Change language to " + 'vi');
                 } else if (lang === this.languageEnum.ENGLISH){
-                    this.inject.language = language['en'];
+                    this.globalData.lang = language['en'];
                     console.log("Change language to " + 'en');
                 }
             } catch (error){
@@ -73,8 +69,8 @@ export default {
             parent: this,
             getToastManager: this.getToastManager,
             getPopupManager: this.getPopupManager,
-
-            inject: this.inject
+            getLanguage: () => this.globalData.lang,
+            changeLanguage: this.changeLanguage
         }
     }
 }

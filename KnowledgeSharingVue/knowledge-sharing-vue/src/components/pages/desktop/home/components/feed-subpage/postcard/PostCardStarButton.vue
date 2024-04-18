@@ -48,7 +48,7 @@ export default {
     name: 'VisualizedStar',
     data() {
         return {
-            myStar: this.post?.MyStar,
+            myStar: this.getPost()?.MyStar,
             currentUser: null,
             notStaredIconStyle: {
                 color: 'var(--grey-color)',
@@ -91,8 +91,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },
@@ -154,8 +154,8 @@ export default {
     },
     
     inject: {
-        inject: {},
-        post: {}
+        getLanguage: {},
+        getPost: {}
     }
 }
 

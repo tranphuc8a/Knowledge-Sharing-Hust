@@ -1,14 +1,14 @@
 <template>
     <div class="p-postcard-header">
         <div class="p-header-left">
-            <TooltipUserAvatar :user="post?.User" :size="36" />
+            <TooltipUserAvatar :user="getPost()?.User" :size="36" />
             <div class="p-post-infor">
                 <div class="p-post-owner-name">
-                    <TooltipUsername :user="post?.User" />
+                    <TooltipUsername :user="getPost()?.User" />
                 </div>
                 <div class="p-post-detail-infor">
-                    <VisualizedDatetime :datetime="post?.CreatedTime" />
-                    <VisualizedPrivacy :privacy="post?.Privacy" />
+                    <VisualizedDatetime :datetime="getPost()?.CreatedTime" />
+                    <VisualizedPrivacy :privacy="getPost()?.Privacy" />
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@ export default {
 
     },
     inject: {
-        post: {}
+        getPost: {}
     }
 }
 </script>
