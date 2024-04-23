@@ -71,7 +71,7 @@ export default {
             try {
                 this.currentUser = await CurrentUser.getInstance();
                 if (this.currentUser == null){
-                    this.listOptions = [this.actions.Reply];
+                    this.listOptions = [this.actions.Reply, this.actions.Edit];
                 }
                 else if (this.currentUser.UserId == this.getComment()?.UserId && this.getComment()?.UserId != null){
                     this.listOptions = [

@@ -197,7 +197,7 @@ export default {
 .p-pct-numstar:hover svg,
 .p-pct-numcomment:hover svg,
 .p-pct-numview:hover svg{
-    color: var(--primary-color-300);
+    color: var(--primary-color-700);
 }
 
 .p-postcard-toolbar__devide{

@@ -120,6 +120,10 @@ export default {
     width: 100%;
 }
 
+.p-comment-infor > * {
+    flex-shrink: 0;
+}
+
 .p-comment-reply-button{
     cursor: pointer;
     color: var(--grey-color);

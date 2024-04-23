@@ -14,9 +14,8 @@
             </span>
         </span>
 
-        <span> &nbsp; </span>
-
         <span class="p-collapse-button" v-show="isEnableCollapse">
+            <span> &nbsp; </span>
             <span v-show="!isCollapsed"
                 @:click="toggleCollapse">Ẩn bớt</span>
             <span v-show="isCollapsed"
@@ -26,6 +25,7 @@
 </template>
 
 <script>
+import { Validator } from '@/js/utils/validator';
 import LatexMarkdownRender from '../markdown/LatexMarkdownRender.vue';
 
 export default {
@@ -43,16 +43,7 @@ export default {
         LatexMarkdownRender
     },
     mounted() {
-        try {
-            this.dText = this.text ?? this.draftData;
-            if (this.dText?.length > this.length) {
-                this.isCollapsed = true;
-                this.isEnableCollapse = true;
-            }
-            this.collapsedText = this.collapseText(this.dText, this.length);
-        } catch (error){
-            console.error(error);
-        }
+        
     },
     methods: {
 
@@ -88,6 +79,22 @@ export default {
                 this.onCollapse();
             }
         },
+    },
+    watch: {
+        text(){
+            try {
+                this.dText = this.text;
+                if (Validator.isEmpty(this.dText))
+                    this.dText = this.draftData;
+                if (this.dText?.length > this.length) {
+                    this.isCollapsed = true;
+                    this.isEnableCollapse = true;
+                }
+                this.collapsedText = this.collapseText(this.dText, this.length);
+            } catch (error){
+                console.error(error);
+            }
+        }
     },
     props: {
         text: {

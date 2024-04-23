@@ -4,13 +4,12 @@
         <div class="p-enter-comment-avatar">
             <UserAvatar :user="curentUser" :size="36" />
         </div>
-        <div class="p-enter-comment-textarea" ref="textarea">
+        <div class="p-enter-comment-textarea">
             <MTextArea
                 ref="textarea"
                 :placeholder="placeholder"
                 :is-show-title="false" :is-show-error="true" 
                 :validator="commentValidator"
-                :oninput="adjustHeight"
                 max-height="150px" rows="1"
                 />
         </div>
@@ -46,42 +45,36 @@ export default {
         }
     },
     async mounted(){
-        this.curentUser = await CurrentUser.getInstance();
-        this.components = {
-            textarea: this.$refs.textarea,
-            submit: this.$refs.submit
+        try {
+            this.curentUser = await CurrentUser.getInstance();
+            this.components = {
+                textarea: this.$refs.textarea,
+                submit: this.$refs.submit
+            }
+            this.components.textarea.setValue(this.value);
         }
-        this.adjustHeight();
+        catch (error) {
+            console.error(error);
+        }
     },
     components: {
         MTextArea,
         UserAvatar,
     },
     methods: {
-        async adjustHeight(){
-            try {
-                let textarea = this.components.textarea;
-                let submit = this.components.submit;
-
-                submit.style.height = textarea.clientHeight + "px";
-            } catch (e){
-                console.error(e);
-            }
-        },
-
 
         async resolveSubmitComment(){
             try {
                 // validate form
 
                 // get text
+                let text = await this.components.textarea.getValue();
 
                 // submit comment
 
-                // update
-                let comment = {};
+                // update ui
                 if (this.onCommentSubmitted) {
-                    await this.onCommentSubmitted(comment);
+                    await this.onCommentSubmitted(text);
                 }
             } catch (e){
                 console.error(e);
@@ -106,6 +99,12 @@ export default {
     props: {
         useritem: {},
         onCommentSubmitted: {},
+        isEditing: {
+            default: false
+        },
+        value: {
+            default: ''
+        },
         placeholder: {
             default: "Thêm bình luận"
         }
@@ -127,7 +126,7 @@ export default {
 
 .p-enter-comment > :first-child,
 .p-enter-comment > :last-child{
-    height: calc(100%);
+    align-self: stretch;
 }
 
 .p-enter-comment > :last-child{
@@ -141,5 +140,6 @@ export default {
     width: 0;
     flex: 1;
 }
+
 
 </style>
