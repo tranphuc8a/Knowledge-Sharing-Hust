@@ -84,7 +84,7 @@ export default {
             isShowEnterComment: false,
             isShowReplies: false,
             isCollapsing: true,
-            isEditing: true,
+            isEditing: false,
             components: {
                 commentCard: null,
                 commentMenuContext: null,
