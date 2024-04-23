@@ -43,7 +43,7 @@ export default {
         LatexMarkdownRender
     },
     mounted() {
-        
+        this.updateText();
     },
     methods: {
 
@@ -79,21 +79,29 @@ export default {
                 this.onCollapse();
             }
         },
-    },
-    watch: {
-        text(){
+
+        async updateText(){
             try {
+                this.isCollapsed = false;
+                this.isEnableCollapse = false;
+
                 this.dText = this.text;
                 if (Validator.isEmpty(this.dText))
                     this.dText = this.draftData;
+                console.log(this.dText);
                 if (this.dText?.length > this.length) {
                     this.isCollapsed = true;
                     this.isEnableCollapse = true;
-                }
+                } 
                 this.collapsedText = this.collapseText(this.dText, this.length);
             } catch (error){
                 console.error(error);
             }
+        }
+    },
+    watch: {
+        text(){
+            this.updateText();
         }
     },
     props: {
