@@ -140,7 +140,14 @@ export default {
         async resolveReplyComment(){
             try {
                 this.isShowEnterComment = !this.isShowEnterComment;
-                this.components.replyEnter.focus();
+                let that = this;
+                this.$nextTick(() => {
+                    try {
+                        that.$refs['reply-enter']?.focus?.();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
             } catch (error) {
                 console.error(error);
             }
@@ -310,6 +317,7 @@ export default {
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
+    font-size: 14px;
 }
 
 

@@ -70,6 +70,7 @@ export default {
 
 <style>
 .markdown-container{
+    font-size: inherit;
     margin-top: -20px;
 }
 .katex svg {
@@ -81,6 +82,6 @@ export default {
 .markdown-body{
     overflow-x: hidden;
     background-color: transparent;
-    font-size: 14px;
+    font-size: inherit;
 }
 </style>

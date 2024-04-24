@@ -1,6 +1,7 @@
 <template>
     <div class="category-list">
-        <div v-for="(category, index) in categories" :key="index" class="category" @mouseover="highlightCategory(index)" @click="handleCategoryClick(category)">
+        <div v-for="(category, index) in categories" :key="index" 
+            class="category" @:click="resolveClickCategory(category)">
             {{ category }}
         </div>
     </div>
@@ -16,14 +17,10 @@
             },
         },
         methods: {
-            highlightCategory(index) {
-                // Add your highlight logic here
-                console.log("Hovered over category:", this.categories[index]);
-            },
-            handleCategoryClick(category) {
-                // Add your click event handling logic here
-                console.log("Clicked on category:", category);
-            },
+
+            async resolveClickCategory(category){
+                console.log("Clicked category: " + category);
+            }
         },
     };
 </script>

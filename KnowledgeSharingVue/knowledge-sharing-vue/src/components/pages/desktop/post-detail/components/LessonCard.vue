@@ -12,8 +12,7 @@
                 <CategoriesList :categories="lesson?.Categories ?? defaultCategoriesList" />
             </div>
             <div class="p-feedcard-lesson__content">
-                <textarea type="text" v-model="content"/>
-                <LatexMarkdownRender :markdown-content="content" />
+                <LatexMarkdownRender :markdown-content="lesson?.Content" />
             </div>
             <div class="p-feedcard-lesson__thumbnail">
                 <PostCardThumbnail />
@@ -32,16 +31,16 @@
 </template>
 
 <script>
-import PostCardCommentList from '../comment/PostCardCommentList.vue';
+import PostCardCommentList from '../../home/components/feed-subpage/comment/PostCardCommentList.vue';
 import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
-import PostCardToolBar from './PostCardToolBar.vue';
-import PostCardThumbnail from './PostCardThumbnail.vue';
+import PostCardToolBar from '../../home/components/feed-subpage/postcard/PostCardToolBar.vue';
+import PostCardThumbnail from '../../home/components/feed-subpage/postcard/PostCardThumbnail.vue';
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
-import PostCardHeader from './PostCardHeader.vue';
-import FeedCardFrame from './FeedCardFrame.vue';
+import PostCardHeader from '../../home/components/feed-subpage/postcard/PostCardHeader.vue';
+import FeedCardFrame from '../../home/components/feed-subpage/postcard/FeedCardFrame.vue';
 
 export default {
-    name: "lessonFeedCard",
+    name: "lessonCard",
     data() {
         return {
             label: null,
@@ -124,5 +123,9 @@ export default {
 <style scoped>
 
 @import url(@/css/pages/desktop/components/lesson.css);
+
+.p-feedcard-lesson__content{
+    font-size: 16px;
+}
 
 </style>

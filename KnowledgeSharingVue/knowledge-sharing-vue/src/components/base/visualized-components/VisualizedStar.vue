@@ -44,7 +44,7 @@ export default {
     },
     props: {
         star: {
-            required: true,
+            required: false,
         },
     },
     methods: {

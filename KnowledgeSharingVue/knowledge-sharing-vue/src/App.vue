@@ -5,10 +5,12 @@
 
     <PopupManager ref="popupManager"/>
     <ToastManager ref="toastManager"/>
+    <LoadingPanel ref="loadingPanel"/>
+    
 </template>
 
 <script>
-
+import LoadingPanel from './components/base/popup/LoadingPanel.vue';
 import PopupManager from '@/components/base/popup/MPopupManager.vue';
 import ToastManager from '@/components/base/toast/MToastManager.vue';
 import { language } from '@/js/resources/language';
@@ -22,12 +24,15 @@ export default {
         }
     },
     components: {
-        PopupManager, ToastManager
+        PopupManager, ToastManager, LoadingPanel
     },
     mounted(){
         this.toastManager = this.$refs.toastManager;
         this.popupManager = this.$refs.popupManager;
+        this.loadingPanel = this.$refs.loadingPanel;
         resolveAxiosResponse.updateManager(this.toastManager, this.popupManager);
+
+        this.registerLoadingPanel();
     },
     methods: {
         /**
@@ -42,6 +47,9 @@ export default {
         },
         getPopupManager(){
             return this.$refs.popupManager;
+        },
+        getLoadingPanel(){
+            return this.$refs.loadingPanel;
         },
         /**
          * Hàm thực hiện thay đổi ngôn ngữ cho các component nhận inject language của trang này
@@ -62,6 +70,24 @@ export default {
             } catch (error){
                 console.error(error);
             }
+        },
+
+        /**
+         * Hàm thực hiện dang ky ham hien thi loading panel cho globalMethod
+         * @param none
+         * @returns none
+         * @Created PhucTV (25/4/24)
+         * @Modified None
+         */ 
+        registerLoadingPanel(){
+            try {
+                let that = this;
+                this.globalMethods.getLoadingPanel = function(){
+                    return that.loadingPanel;
+                }
+            } catch (e) {
+                console.error(e);
+            }
         }
     },
     provide(){
@@ -69,6 +95,7 @@ export default {
             parent: this,
             getToastManager: this.getToastManager,
             getPopupManager: this.getPopupManager,
+            getLoadingPanel: this.getLoadingPanel,
             getLanguage: () => this.globalData.lang,
             changeLanguage: this.changeLanguage
         }

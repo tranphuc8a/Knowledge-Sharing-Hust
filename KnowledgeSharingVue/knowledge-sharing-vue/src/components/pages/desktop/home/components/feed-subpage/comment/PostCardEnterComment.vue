@@ -90,7 +90,7 @@ export default {
          */
         async focus(){
             try {
-                this.components.textarea.focus();
+                this.$refs.textarea?.focus?.();
             } catch (e){
                 console.error(e);
             }

@@ -35,6 +35,11 @@ export default {
             required: true,
         },
     },
+    watch: {
+        datetime(newValue){
+            this.myDateTime = new MyDate(newValue);
+        }
+    },
     methods: {
         /**
          * Hàm lấy thời gian đã trôi qua

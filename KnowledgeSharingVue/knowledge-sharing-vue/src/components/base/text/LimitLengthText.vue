@@ -88,7 +88,6 @@ export default {
                 this.dText = this.text;
                 if (Validator.isEmpty(this.dText))
                     this.dText = this.draftData;
-                console.log(this.dText);
                 if (this.dText?.length > this.length) {
                     this.isCollapsed = true;
                     this.isEnableCollapse = true;

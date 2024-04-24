@@ -19,6 +19,8 @@ import FeedSubPage from '@/components/pages/desktop/home/sub-pages/FeedSubPage.v
 import TestPage from '@/components/pages/test-page/TestPage.vue';
 import { GetRequest } from './request';
 
+import LessonDetailPage from '@/components/pages/desktop/post-detail/LessonDetailPage.vue';
+
 import HustPage from '@/components/pages/hust-page/HustPage.vue';
 
 const routers = [{
@@ -26,7 +28,7 @@ const routers = [{
     name: 'home',
     component: DesktopHomePage,
     meta: {
-        requiredAuth: false
+        requiredAuth: true
     },
     children: [ { // when /
         path: '/',
@@ -111,6 +113,10 @@ const routers = [{
     path: '/hust',
     name: 'hust',
     component: HustPage
+}, {
+    path: '/lesson/:lessonId',
+    name: 'lesson-detail',
+    component: LessonDetailPage
 }];
 
 
@@ -124,7 +130,11 @@ const createMyRouter = (app) => {
 
     router.beforeEach(async (to, from, next) => {
         if (to.matched.some(record => record.meta.requiredAuth)) {
-            app.store = 0;
+            // show loading panel:
+            // console.log(app);
+            let loadingPanel = app?.config?.globalProperties?.globalMethods?.getLoadingPanel();
+            loadingPanel?.show?.();
+
             let isLogedIn = await new GetRequest().checkLogedIn();
             if (!isLogedIn) {
                 localStorage.setItem('redirect-to', to.fullPath);
@@ -132,6 +142,8 @@ const createMyRouter = (app) => {
             } else {
                 next();
             }
+
+            loadingPanel?.hide?.();
         } else {
             next();
         }

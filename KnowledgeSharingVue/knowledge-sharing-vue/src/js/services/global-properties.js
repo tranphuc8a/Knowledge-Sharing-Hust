@@ -3,8 +3,8 @@ import axios from "axios";
 import { language } from "../resources/language";
 import { myEnum } from "../resources/enum";
 import appConfig from "@/app-config";
-import { useRoute } from "vue-router";
-import { useRouter } from "vue-router";
+// import { useRoute } from "vue-router";
+// import { useRouter } from "vue-router";
 
 const api = axios.create({
     baseURL: appConfig.getBackendUrl(),
@@ -34,8 +34,8 @@ class GlobalProperties{
             api: that.api,
             enum: that.enum,
             lang: that.lang,
-            route: useRoute(),
-            router: useRouter(),
+            // route: useRoute(),
+            // router: useRouter(),
         }
     }
 
@@ -73,5 +73,12 @@ class GlobalProperties{
     }
 }
 
-export default new GlobalProperties();
+let props = new GlobalProperties();
+
+export default function registerGlobalProperties(app){
+    app.config.globalProperties = {
+        ...app.config.globalProperties, 
+        ...props
+    }
+}
 

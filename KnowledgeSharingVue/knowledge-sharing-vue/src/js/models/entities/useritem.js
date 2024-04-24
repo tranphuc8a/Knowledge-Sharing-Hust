@@ -1,5 +1,5 @@
 // Technology stack: C# Entity Framework
-import Entity from './entity';
+import Entity from "../entity";
 
 class UserItem extends Entity {
     constructor() {
