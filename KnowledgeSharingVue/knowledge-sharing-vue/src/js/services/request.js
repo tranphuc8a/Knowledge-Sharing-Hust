@@ -5,6 +5,7 @@ import { Validator } from "../utils/validator";
 import { myEnum } from "../resources/enum";
 import appConfig from "@/app-config";
 import resolveAxiosResponse from "./resolve-axios-response";
+import CurrentUser from "../models/entities/current-user";
 
 const statusCodeEnum    = myEnum.statusCode;
 const methodEnum        = myEnum.requestMethod;
@@ -232,10 +233,14 @@ class Request {
     async checkLogedIn(){
         try {
             let response = await new GetRequest('Users/me').execute();
-            return this.tryGetBody(response);
+            let body = this.tryGetBody(response);
+            let user = new CurrentUser();
+            user.copy(body);
+            CurrentUser.setInstance(user);
+            return true;
         } catch (error){
             console.error(error);
-            return null;
+            return false;
         }
     }
 

@@ -145,6 +145,7 @@ const createMyRouter = (app) => {
 
             loadingPanel?.hide?.();
         } else {
+            new GetRequest().checkLogedIn();
             next();
         }
     });

@@ -43,10 +43,10 @@
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 
 export default {
-    name: 'VisualizedStar',
+    name: 'CommentStarButton',
     data() {
         return {
-            myStar: this.getComment()?.Star,
+            myStar: this.getComment()?.MyStars,
             currentUser: null,
             selectStarIconStyle:{
                 fontSize: '28px'
@@ -63,14 +63,10 @@ export default {
     },
     mounted() {
         this.tooltip = this.$refs?.tooltip;
+        this.myStar = this.getComment().MyStars;
     },
     components: {
         TooltipFrame
-    },
-    props: {
-        star: {
-            required: true,
-        },
     },
     methods: {
         /**

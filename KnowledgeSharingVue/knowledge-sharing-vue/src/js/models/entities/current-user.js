@@ -40,8 +40,14 @@ class CurrentUser extends ViewUser {
      * @Modified None
      */
     static async setInstance(user){
-        this._instance.copy(user);
-        await localStorage.setItem('currentUser', user);
+        try {
+            if (user != null && this._instance != null){
+                this._instance.copy(user);
+            }
+            await localStorage.setItem('currentUser', JSON.stringify(user));
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     init() {

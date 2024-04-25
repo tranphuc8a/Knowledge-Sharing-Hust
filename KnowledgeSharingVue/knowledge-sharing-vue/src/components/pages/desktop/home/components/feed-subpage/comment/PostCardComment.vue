@@ -188,6 +188,10 @@ export default {
     props: {
         comment: {
             required: true
+        },
+
+        onPostedComment: {
+            default: null
         }
     },
     inject: {

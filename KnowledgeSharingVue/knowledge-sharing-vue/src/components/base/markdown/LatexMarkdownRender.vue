@@ -1,6 +1,5 @@
 <template>
     <div class="markdown-container">
-        <div class="toc" ref="toc"></div>
         <div v-html="renderedContent" :style="style" class="markdown-body"></div>
     </div>
 </template>
@@ -28,10 +27,28 @@ export default {
     },
     data() {
         return {
+            anchorOptions: { permalink: true, permalinkBefore: true, permalinkSymbol: '§' },
+            tocOptions: {
+                level: [2],
+                containerClass: "toc",
+                listClass: "tdesign-toc_list",
+                itemClass: "tdesign-toc_list_item",
+                linkClass: "tdesign-toc_list_item_a",
+                listType: "ul"
+                // format: (x, htmlencode) => {
+                //   console.log(x, htmlencode);
+                //   return `<span>${htmlencode(x)}</span>`;
+                // },
+                // callback: (res) => {
+                //   console.log(res);
+                // }
+            },
             md: new MarkdownIt({
-                html: true
+                html: true,
+                xhtmlOut: true,
+                typographer: true
             })
-                .use(anchor)
+                .use(anchor, this.anchorOptions)
                 .use(TOC, { containerClass: 'toc' })
                 .use(ml),
             tableOfContents: "",
@@ -53,9 +70,6 @@ export default {
         updateContent() {
             try {
                 this.renderedContent = this.md.render(this.markdownContent);
-                this.$nextTick(() => {
-                    this.tableOfContents = this.extractTableOfContents();
-                });
             } catch (error) {
                 console.error(error);
                 this.renderedContent = "";
@@ -63,7 +77,8 @@ export default {
         },
         extractTableOfContents() {
             return this.toc?.innerHTML || "";
-        }
+        },
+
     }
 };
 </script>
@@ -71,7 +86,6 @@ export default {
 <style>
 .markdown-container{
     font-size: inherit;
-    margin-top: -20px;
 }
 .katex svg {
     overflow: hidden;

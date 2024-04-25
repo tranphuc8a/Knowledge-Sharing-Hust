@@ -43,6 +43,8 @@
 import { Validator } from '@/js/utils/validator';
 import { MyRandom } from '@/js/utils/myrandom';
 import Popup from './MPopup.vue';
+import appConfig from '@/app-config';
+import Common from '@/js/utils/common';
 
 export default {
     data(){
@@ -152,6 +154,20 @@ export default {
         async warning(content, onOkay = null){
             await this.show("warning", content, onOkay);
         },
+
+        async requiredLogin(){
+            try {
+                let homepage = appConfig.getHomePageUrl();
+                homepage = Common.removeTrailingSlash(homepage);
+                this.inform("Bạn cần đăng nhập để thực hiện chức năng này!",
+                    async function(){
+                        this.location.href = homepage + "/login";
+                    }
+                )
+            } catch (error){
+                console.error(error);
+            }
+        }
     }
 }
 

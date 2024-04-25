@@ -27,7 +27,10 @@
 import UserAvatar from '@/components/base/avatar/UserAvatar.vue';
 import MTextArea from '@/components/base/inputs/MTextArea';
 import CurrentUser from '@/js/models/entities/current-user';
+import { PatchRequest, PostRequest, Request } from '@/js/services/request';
 import { NotEmptyValidator } from '@/js/utils/validator';
+import { myEnum } from '@/js/resources/enum';
+import ResponseCommentModel from '@/js/models/api-response-models/response-comment-model';
 
 export default {
     name: "p-enter-comment",
@@ -66,18 +69,90 @@ export default {
         async resolveSubmitComment(){
             try {
                 // validate form
+                if(!this.$refs.textarea.validate()){
+                    this.$refs['textarea'].startDynamicValidate();
+                    this.$refs['textarea'].focus();
+                    return;
+                }
 
                 // get text
                 let text = await this.components.textarea.getValue();
 
                 // submit comment
+                if (this.curentUser == null)
+                    this.getPopupManager().requiredLogin();
+                
+                if (this.isEditing){
+                    await this.editComment(text);
+                }
+                if (this.useritem.UserItemType == myEnum.EUserItemType.Comment){
+                    await this.replyComment(text);
+                }
+                await this.addComment(text);
 
+                this.components.textarea.setValue("");
+            } catch (e){
+                console.error(e);
+            }
+        },
+
+        async editComment(text){
+            try {
+                await new PatchRequest('Comments/' + this.editFor)
+                    .setBody({ Content: text })
+                    .execute();
                 // update ui
                 if (this.onCommentSubmitted) {
                     await this.onCommentSubmitted(text);
                 }
             } catch (e){
-                console.error(e);
+                Request.resolveAxiosError(e);
+                // update ui
+                if (this.onCommentSubmitted) {
+                    await this.onCommentSubmitted(null);
+                }
+            }
+        },
+        
+        async replyComment(text){
+            try {
+                let res = await new PostRequest('Comments/reply')
+                    .setBody({
+                        ReplyId: this.useritem.UserItemId,
+                        Content: text
+                    }).execute();
+                let body = await Request.tryGetBody(res);
+                let comment = new ResponseCommentModel();
+                comment.copy(body);
+                comment.User = this.curentUser;
+
+                // update ui
+                if (this.onCommentSubmitted) {
+                    await this.onCommentSubmitted(comment);
+                }
+            } catch (e){
+                Request.resolveAxiosError(e);
+            }
+        },
+
+        async addComment(text){
+            try {
+                let res = await new PostRequest('Comments')
+                    .setBody({
+                        KnowledgeId: this.useritem.UserItemId,
+                        Content: text
+                    }).execute();
+                let body = await Request.tryGetBody(res);
+                let comment = new ResponseCommentModel();
+                comment.copy(body);
+                comment.User = this.curentUser;
+
+                // update ui
+                if (this.onCommentSubmitted) {
+                    await this.onCommentSubmitted(comment);
+                }
+            } catch (e){
+                Request.resolveAxiosError(e);
             }
         },
 
@@ -102,12 +177,16 @@ export default {
         isEditing: {
             default: false
         },
+        editFor: {},
         value: {
             default: ''
         },
         placeholder: {
             default: "Thêm bình luận"
         }
+    },
+    inject: {
+        getPopupManager: {}
     }
 }
 

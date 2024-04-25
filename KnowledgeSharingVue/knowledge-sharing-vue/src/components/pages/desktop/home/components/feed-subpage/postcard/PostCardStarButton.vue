@@ -43,12 +43,14 @@
 <script>
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
+import CurrentUser from '@/js/models/entities/current-user';
+import { PutRequest } from '@/js/services/request';
 
 export default {
-    name: 'VisualizedStar',
+    name: 'PostCardStarButton',
     data() {
         return {
-            myStar: this.getPost()?.MyStar,
+            myStar: this.getPost()?.MyStars,
             currentUser: null,
             notStaredIconStyle: {
                 color: 'var(--grey-color)',
@@ -72,15 +74,18 @@ export default {
         }
     },
     mounted() {
-        this.tooltip = this.$refs?.tooltip;
+        try {
+            this.tooltip = this.$refs?.tooltip;
+            this.currentUser = CurrentUser.getInstance();
+            this.myStar = this.getPost().MyStars;
+        } catch (e) {
+            console.error(e);
+        }
     },
     components: {
         TooltipFrame, MEmbeddedButton
     },
     props: {
-        star: {
-            required: true,
-        },
     },
     methods: {
         /**
@@ -127,8 +132,20 @@ export default {
             try {
                 this.myStar = index;
                 this.tooltip.hideTooltip(0);
+                this.submitStar(index);
             } catch (e){
                 console.error(e);
+            }
+        },
+
+        async resolveCommitFiveStar(){
+            try {
+                this.myStar = 5;
+                this.currentStar = 5;
+                this.tooltip.hideTooltip(0);
+                this.submitStar(5);
+            } catch (error) {
+                console.error(error);
             }
         },
 
@@ -142,20 +159,29 @@ export default {
             }
         },
 
-        async resolveCommitFiveStar(){
+        async submitStar(star){
             try {
-                this.myStar = 5;
-                this.currentStar = 5;
-                this.tooltip.hideTooltip(0);
-            } catch (error) {
-                console.error(error);
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                }
+                let postId = this.getPost().UserItemId;
+                new PutRequest('Stars').setBody({
+                    UserItemId: postId,
+                    Score: star
+                }).execute();
+                this.getPost().MyStars = star;
+            } catch (e){
+                this.myStar = this.getPost()?.MyStars;
+                this.currentStar = this.myStar;
+                console.error(e);
             }
         }
     },
     
     inject: {
         getLanguage: {},
-        getPost: {}
+        getPost: {},
+        getPopupManager: {}
     }
 }
 

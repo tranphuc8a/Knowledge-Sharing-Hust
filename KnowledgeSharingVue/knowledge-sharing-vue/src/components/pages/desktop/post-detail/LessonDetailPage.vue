@@ -7,11 +7,11 @@
             </div>
 
             <div class="d-content-subpage__menu" v-show="isLessonExisted === true">
-                DDaay laf menu
+                <MarkdownToc :markdownContent="lesson?.Content" />
             </div>
 
-            <div class="d-content-subpage__content" v-show="isLessonExisted === true">
-                <LessonCard :post="this.lesson" />
+            <div class="d-content-subpage__content" v-if="isLessonExisted === true">
+                <LessonCard :post="lesson" />
             </div>
         </div>
         
@@ -21,6 +21,7 @@
 
 <script>
 
+import MarkdownToc from '@/components/base/markdown/MarkdownToc.vue';
 import LessonCard from './components/LessonCard.vue';
 import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 import DesktopHomeFrame from '../home/DesktopHomeFrame.vue';
@@ -41,11 +42,10 @@ export default {
         }
     },
     components: {
-        NotFoundPanel, DesktopHomeFrame, LessonCard
+        NotFoundPanel, DesktopHomeFrame, LessonCard, MarkdownToc
     },
     async created() {
         try {
-            console.log("Created");
             this.getLoadingPanel().show();
             this.currentUser = CurrentUser.getInstance();
             this.lessonId = this.route.params.lessonId;
