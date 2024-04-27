@@ -37,6 +37,8 @@
 
         <div class="p-comment-line p-edit-comment" v-if="isEditing">
             <PostCardEnterComment ref="edit-comment" 
+                :is-editing="true"
+                :edit-for="this.comment.UserItemId"
                 :useritem="comment" 
                 :value="dComment?.Content ?? 'Chinh sua binh luan'"
                 :on-comment-submitted="resolveSubmittedComment"

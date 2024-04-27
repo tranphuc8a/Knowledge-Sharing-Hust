@@ -33,14 +33,16 @@ import { GetRequest, Request } from '@/js/services/request';
 import ResponseLessonModel from '@/js/models/api-response-models/response-lesson-model';
 
 export default {
-    name: "LessonDetailPage",
+    name: "CourseLessonDetailPage",
     data() {
         return {
-            title: "Lesson Detail Page",
+            title: "CourseLesson Detail Page",
             lesson: null,
             isLessonExisted: null,
             route: useRoute(),
-            currentUser: null
+            currentUser: null,
+            courseId: null,
+            offset: null
         }
     },
     components: {
@@ -50,16 +52,13 @@ export default {
         try {
             this.getLoadingPanel().show();
             this.currentUser = await CurrentUser.getInstance();
-            this.lessonId = this.route.params.lessonId;
-            let url = null;
-
-            if (this.currentUser == null) {
-                url = `Lessons/anonymous/${this.lessonId}`;
-            } else {
-                url = `Lessons/${this.lessonId}`;
+            if (this.currentUser == null){
+                return this.getPopupManager().requiredLogin();
             }
+            this.lessonId = this.route.params.courseId;
+            this.offset = this.route.params.offset;
 
-            let res = await new GetRequest(url).execute();
+            let res = await new GetRequest('').execute();
             let body = await Request.tryGetBody(res);
             this.lesson = new ResponseLessonModel();
             this.lesson.copy(body);

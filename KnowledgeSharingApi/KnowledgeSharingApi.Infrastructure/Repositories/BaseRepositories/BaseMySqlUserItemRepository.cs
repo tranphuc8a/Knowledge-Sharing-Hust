@@ -35,7 +35,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         #region Get 
         public override async Task<T?> Get(Guid id)
         {
-            return await GetDbSet().FindAsync(id);
+            return (T?) (await GetDbSet().FindAsync(id))?.Clone();
         }
 
         public override async Task<IEnumerable<T>> Get()

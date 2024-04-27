@@ -42,8 +42,8 @@ export default {
     components: {
         CommentFilterButton, PostCardEnterComment, PostCardComment
     },
-    mounted(){
-        this.currentUser = CurrentUser.getInstance();
+    async mounted(){
+        this.currentUser = await CurrentUser.getInstance();
         this.getLabel();
         this.getMoreComments();
     },
@@ -88,7 +88,10 @@ export default {
             try {
                 let numComs = this.listComments.length;
                 let url = null;
-                let postId = this.getPost().UserItemId;
+                let postId = this.getPost()?.UserItemId;
+                if (postId == null){
+                    return;
+                }
                 if (this.currentUser == null){
                     url = 'Comments/anonymous/' + postId;
                 } else {

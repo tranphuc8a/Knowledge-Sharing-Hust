@@ -20,6 +20,7 @@ import TestPage from '@/components/pages/test-page/TestPage.vue';
 import { GetRequest } from './request';
 
 import LessonDetailPage from '@/components/pages/desktop/post-detail/LessonDetailPage.vue';
+import CreateLessonPage from '@/components/pages/desktop/post-detail/CreateLessonPage.vue';
 
 import HustPage from '@/components/pages/hust-page/HustPage.vue';
 
@@ -117,7 +118,11 @@ const routers = [{
     path: '/lesson/:lessonId',
     name: 'lesson-detail',
     component: LessonDetailPage
-}];
+}, {
+    path: '/lesson-create',
+    name: 'lesson-create',
+    component: CreateLessonPage
+}, ];
 
 
 

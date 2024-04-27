@@ -73,11 +73,11 @@ export default {
             tooltip: null,
         }
     },
-    mounted() {
+    async mounted() {
         try {
             this.tooltip = this.$refs?.tooltip;
-            this.currentUser = CurrentUser.getInstance();
-            this.myStar = this.getPost().MyStars;
+            this.currentUser = await CurrentUser.getInstance();
+            this.myStar = this.getPost()?.MyStars;
         } catch (e) {
             console.error(e);
         }

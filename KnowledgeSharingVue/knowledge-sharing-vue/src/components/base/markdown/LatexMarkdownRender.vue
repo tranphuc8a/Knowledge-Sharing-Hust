@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import Common from "@/js/utils/common";
+
 import MarkdownIt from "markdown-it";
 import 'github-markdown-css/github-markdown-light.css';
 
@@ -13,6 +15,7 @@ import 'markdown-it-latex/dist/index.css';
 
 import anchor from 'markdown-it-anchor';
 import TOC from 'markdown-it-toc-done-right';
+import { Validator } from "@/js/utils/validator";
 
 export default {
     name: "LatexMardownRender",
@@ -53,7 +56,8 @@ export default {
                 .use(ml),
             tableOfContents: "",
             toc: null,
-            renderedContent: ""
+            renderedContent: "",
+            mdContent: this.markdownContent,
         };
     },
     watch: {
@@ -69,7 +73,13 @@ export default {
     methods: {
         updateContent() {
             try {
-                this.renderedContent = this.md.render(this.markdownContent);
+                if (Validator.isEmpty(this.markdownContent)){
+                    this.renderedContent = "";
+                    return;
+                }
+                this.mdContent = Common.unescapeSpecialCharacters(this.markdownContent);
+                // console.log(this.mdContent);
+                this.renderedContent = this.md.render(this.mdContent) ?? "";
             } catch (error) {
                 console.error(error);
                 this.renderedContent = "";
@@ -79,11 +89,13 @@ export default {
             return this.toc?.innerHTML || "";
         },
 
+        
+
     }
 };
 </script>
 
-<style>
+<style scoped>
 .markdown-container{
     font-size: inherit;
 }

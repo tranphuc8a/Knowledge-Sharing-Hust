@@ -36,6 +36,7 @@ export default {
     name: "p-enter-comment",
     data() {
         return {
+            isSubmiting: true,
             label: null,
             listComments: [null, null],
             curentUser: null,
@@ -68,6 +69,9 @@ export default {
 
         async resolveSubmitComment(){
             try {
+                if (this.isSubmiting) return;
+                this.isSubmiting = true;
+
                 // validate form
                 if(!this.$refs.textarea.validate()){
                     this.$refs['textarea'].startDynamicValidate();
@@ -84,15 +88,17 @@ export default {
                 
                 if (this.isEditing){
                     await this.editComment(text);
-                }
-                if (this.useritem.UserItemType == myEnum.EUserItemType.Comment){
+                } else if (this.useritem.UserItemType == myEnum.EUserItemType.Comment){
                     await this.replyComment(text);
+                } else {
+                    await this.addComment(text);
                 }
-                await this.addComment(text);
 
                 this.components.textarea.setValue("");
             } catch (e){
                 console.error(e);
+            } finally {
+                this.isSubmiting = false;
             }
         },
 

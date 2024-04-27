@@ -1,18 +1,21 @@
 <template>
     <div class="toc-container">
-        <div class="toc" ref="toc" v-show="tocTree.length > 0">
-            <ul>
-                <li v-for="entry in tocTree" :key="entry.id">
+
+        <div class="toc" ref="toc" v-show="tocTree?.length > 0">
+            <div class="toc-title">
+                MỤC LỤC
+            </div>
+            <div class="toc-items">
+                <div v-for="entry in tocTree" :key="entry.id" class="p-item p-item-level-1">
                     <a :href="'#' + entry.id">{{ entry.title }}</a>
-                    <ul v-if="entry.children.length > 0">
-                        <li v-for="child in entry.children" :key="child.id">
-                            <a :href="'#' + child.id">{{ child.title }}</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                    <div v-for="child in entry.children ?? []" :key="child.id" class="p-item p-item-level-2">
+                        <a :href="'#' + child.id">{{ child.title }}</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="not-toc" v-show="tocTree.length <= 0">
+
+        <div class="not-toc" v-show="tocTree?.length <= 0">
             Không có mục lục
         </div>
     </div>
@@ -20,6 +23,7 @@
 
 <script>
 
+import Common from '@/js/utils/common';
 
 export default {
     name: "MarkdownToc",
@@ -29,18 +33,26 @@ export default {
         }
     },
     mounted() {
-        this.tocTree = this.createTOCTree(this.markdownContent);
+        this.updateTocTree();
     },
     data() {
         return {
-            tocTree: []
+            tocTree: [],
+            mdContent: this.markdownContent,
         };
     },
     methods: {
+        async updateTocTree(){
+            this.mdContent = Common.unescapeSpecialCharacters(this.markdownContent);
+            this.mdContent = Common.normalizeMarkdownText(this.mdContent);
+            this.tocTree = this.createTOCTree(this.mdContent);
+            console.log(this.tocTree);
+        },
+
         createTOCTree(markdownText) {
             try {
                 if (markdownText == null) {
-                    throw new Error("Markdown content is null");
+                    return null;
                 }
                 const lines = markdownText.split('\n');
                 const tocTree = [];
@@ -85,16 +97,75 @@ export default {
     },
     watch: {
         markdownContent(){
-            this.tocTree = this.createTOCTree(this.markdownContent);
+            this.updateTocTree();
         }
     }
 }
 </script>
 
-<style>
+<style scoped>
 
 .toc-container{
     width: 100%;
+}
+
+
+.toc, .toc .toc-items *{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-family: 'ks-font-semibold';
+    width: 100%;
+}
+
+.toc-container .toc .toc-title{
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 0 0 12px 0;
+}
+
+.toc-items{
+    width: 100%;
+}
+
+.p-item-level-1{
+    font-size: 15px;
+}
+.p-item-level-2{
+    font-size: 14px;
+}
+
+.p-item{
+    padding-left: 18px;
+}
+
+.p-item a {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 4px;
+}
+
+.p-item a.active {
+    background-color: var(--primary-color-100);
+    color: var(--primary-color-600);
+
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.p-item-level-1 > a{
+    padding: 10px 10px;
+}
+
+.p-item a:hover{
+    background-color: var(--primary-color-100);
 }
 
 .not-toc{

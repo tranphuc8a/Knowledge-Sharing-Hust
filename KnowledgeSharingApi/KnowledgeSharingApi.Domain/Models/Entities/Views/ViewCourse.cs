@@ -16,5 +16,10 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
         public string? Avatar { get; set; }
 
         public string? Cover { get; set; }
+
+        protected override ViewCourse Init()
+        {
+            return new ViewCourse();
+        }
     }
 }

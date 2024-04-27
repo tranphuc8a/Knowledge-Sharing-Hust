@@ -6,7 +6,7 @@
             </div> -->
             <div class="d-content-subpage__left_content">
                 <div class="p-left-page">
-                    left-d-content
+                    <HomeNavigationSubpage />
                 </div>
             </div>
 
@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import HomeNavigationSubpage from './sub-pages/HomeNavigationSubpage.vue';
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 import DesktopHomeFrame from './DesktopHomeFrame.vue';
 export default {
@@ -50,7 +51,7 @@ export default {
         }
     },
     components: {
-        DesktopHomeFrame, TooltipFrame
+        DesktopHomeFrame, TooltipFrame, HomeNavigationSubpage
     },
     methods: {
 
@@ -69,9 +70,16 @@ export default {
 <style scoped>
 @import url(@/css/pages/desktop/home/desktop-homepage.css);
 
+.d-content-subpage__left_content{
+    padding-left: 16px;
+}
 .p-left-page{
     width: 100%;
-    height: 3000px;
-    background-color: orange;
+    padding: 12px 8px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1),
+                0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    width: 100%;
 }
 </style>

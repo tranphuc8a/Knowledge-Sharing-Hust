@@ -22,5 +22,10 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
 
         public string? Cover { get; set; }
 
+
+        protected override ViewPost Init()
+        {
+            return new ViewPost();
+        }
     }
 }

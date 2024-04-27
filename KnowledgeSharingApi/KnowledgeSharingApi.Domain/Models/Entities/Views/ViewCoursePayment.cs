@@ -20,5 +20,10 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
         public string Title { get; set; } = string.Empty;
 
         public string? Thumbnail { get; set; }
+
+        protected override ViewCoursePayment Init()
+        {
+            return new ViewCoursePayment();
+        }
     }
 }
