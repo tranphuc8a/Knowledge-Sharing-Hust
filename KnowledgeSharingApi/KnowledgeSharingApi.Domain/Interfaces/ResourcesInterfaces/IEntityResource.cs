@@ -45,6 +45,7 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces
         String UserConversation();
         String UserItem();
         String UserRelation();
+        String Image();
 
         #endregion
 

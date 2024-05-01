@@ -95,5 +95,6 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<ViewCourseRegister> ViewCourseRegisters { get; set; }
         public DbSet<ViewKnowledgeCategory> ViewKnowledgeCategories { get; set; }
         public DbSet<ViewCoursePayment> ViewCoursePayments { get; set; }
+        public DbSet<Image> Images { get; set; }
     }
 }

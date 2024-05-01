@@ -152,7 +152,7 @@ builder.Services.AddScoped<ICourseRelationRepository, CourseRelationMySqlReposit
 builder.Services.AddScoped<ICoursePaymentRepository, CoursePaymentMySqlRepository>();
 builder.Services.AddScoped<IDecorationRepository, DecorationRepository>();
 builder.Services.AddScoped<ICourseLessonRepository, CourseLessonMySqlRepository>();
-
+builder.Services.AddScoped<IImageRepository, ImageMySqlRepository>();
 
 
 //
