@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
@@ -60,12 +61,12 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(ImageResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UploadImage(Guid myUid, IFormFile image)
+        public async Task<ServiceResult> UploadImage(Guid myUid, UploadImageModel model)
         {
             // check giới hạn upload // lam sau
 
             // upload
-            string? url = await Storage.SaveImage(image);
+            string? url = await Storage.SaveImage(model.Image!);
             if (String.IsNullOrEmpty(url))
             {
                 return ServiceResult.ServerError("Upload image failed!");
@@ -80,7 +81,7 @@ namespace KnowledgeSharingApi.Services.Services
                 // Image:
                 ImageId = Guid.NewGuid(),
                 UserId = myUid,
-                Url = url
+                ImageUrl = url
             };
             Guid? id = await ImageRepository.Insert(imageToAdd.ImageId, imageToAdd);
             if (id == null)

@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
@@ -42,9 +43,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (1/5/24)
         /// Modified: None
         [HttpPost]
-        public async Task<IActionResult> UploadImage([FromForm] IFormFile image)
+        public async Task<IActionResult> UploadImage([FromForm] UploadImageModel model)
         {
-            ServiceResult res = await ImageService.UploadImage(GetCurrentUserId(), image);
+            ServiceResult res = await ImageService.UploadImage(GetCurrentUserId(), model);
             return StatusCode((int)res.StatusCode, new ApiResponse(res));
         }
 

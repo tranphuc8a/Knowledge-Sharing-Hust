@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (1/5/24)
         /// Modified: None
-        Task<ServiceResult> UploadImage(Guid myUid, IFormFile image);
+        Task<ServiceResult> UploadImage(Guid myUid, UploadImageModel image);
 
 
         /// <summary>

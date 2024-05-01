@@ -14,7 +14,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
 
         public Guid UserId { get; set; } = Guid.Empty;
 
-        public string Url { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
 
 
         protected override Image Init()
