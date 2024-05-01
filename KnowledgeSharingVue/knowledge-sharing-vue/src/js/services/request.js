@@ -320,7 +320,7 @@ class DeleteRequest extends Request {
     }
 }
 
-class PutRequest extends Request {
+class PutRequest extends PostRequest {
     constructor(url) {
         super();
         this.config = {
@@ -330,7 +330,7 @@ class PutRequest extends Request {
     }
 }
 
-class PatchRequest extends Request {
+class PatchRequest extends PostRequest {
     constructor(url) {
         super();
         this.config = {

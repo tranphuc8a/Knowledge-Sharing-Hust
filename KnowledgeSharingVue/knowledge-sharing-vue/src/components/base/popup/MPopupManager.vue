@@ -161,7 +161,7 @@ export default {
                 homepage = Common.removeTrailingSlash(homepage);
                 this.inform("Bạn cần đăng nhập để thực hiện chức năng này!",
                     async function(){
-                        this.location.href = homepage + "/login";
+                        window.location.href = homepage + "/login";
                     }
                 )
             } catch (error){

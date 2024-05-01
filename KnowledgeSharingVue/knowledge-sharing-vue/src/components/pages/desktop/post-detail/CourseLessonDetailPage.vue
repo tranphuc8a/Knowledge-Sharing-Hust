@@ -3,7 +3,7 @@
         
         <div class="d-content">
             <div class="d-empty-panel" v-show="isLessonExisted === false">
-                <not-found-panel text="Bài giảng hiện không tồn tại hoặc đã bị xóa" />
+                <not-found-panel :text="errorMessage" />
             </div>
 
             <div class="d-content-subpage__menu" v-show="isLessonExisted === true">
@@ -33,16 +33,17 @@ import { GetRequest, Request } from '@/js/services/request';
 import ResponseLessonModel from '@/js/models/api-response-models/response-lesson-model';
 
 export default {
-    name: "CourseLessonDetailPage",
+    name: "LessonDetailPage",
     data() {
         return {
-            title: "CourseLesson Detail Page",
+            title: "Lesson Detail Page",
             lesson: null,
             isLessonExisted: null,
             route: useRoute(),
             currentUser: null,
+            errorMessage: 'Bài giảng hiện không tồn tại hoặc đã bị xóa',
             courseId: null,
-            offset: null
+            lessonOffset: null,
         }
     },
     components: {
@@ -53,21 +54,34 @@ export default {
             this.getLoadingPanel().show();
             this.currentUser = await CurrentUser.getInstance();
             if (this.currentUser == null){
-                return this.getPopupManager().requiredLogin();
+                this.getPopupManager().requiredLogin();
+                return;
             }
-            this.lessonId = this.route.params.courseId;
-            this.offset = this.route.params.offset;
+            this.courseId = this.route.params.courseId;
+            this.lessonOffset = this.route.params.offset;
+            // get all lessons of courses
+            let url = '';
 
-            let res = await new GetRequest('').execute();
+            // get lesson of position offset
+            let res = await new GetRequest(url).execute();
             let body = await Request.tryGetBody(res);
             this.lesson = new ResponseLessonModel();
             this.lesson.copy(body);
             this.isLessonExisted = true;
         }
         catch (error) {
-            this.lesson = null;
-            this.isLessonExisted = false;
-            console.error(error);
+            try {
+                this.lesson = null;
+                this.isLessonExisted = false;
+                let userMessage = await Request.getUserMessage(error);
+                if (userMessage != null) {
+                    this.errorMessage = userMessage;
+                }
+                Request.resolveAxiosError(error);
+                console.error(error);
+            } catch (error2){
+                console.error(error2);
+            }
         } finally {
             this.getLoadingPanel().hide();
         }

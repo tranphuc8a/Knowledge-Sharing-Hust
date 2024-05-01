@@ -158,6 +158,29 @@ class NotEmptyValidator extends Validator{
     }
 }
 
+class PositiveNumberValidator extends Validator{
+    constructor(errorMsg){
+        super(errorMsg ?? "Positive Number Validator");
+    }
+    validate(value){
+        try {
+            if (!Validator.isNotEmpty(value) && value > 0) {
+                return {
+                    isValid: false,
+                    msg: this.errorMsg
+                };
+            }
+            return super.validate(value);
+        } catch (error){
+            console.error(error);
+            return {
+                isValid: false,
+                msg: error
+            };
+        }
+    }
+}
+
 
 class UsernameValidator extends RegexValidator{
     constructor(errorMsg){
@@ -347,7 +370,7 @@ class GreaterThanTodayValidator extends Validator {
 export { 
     Validator, RegexValidator, NotEmptyValidator,
     DateValidator, PhoneValidator, EmailValidator, 
-    IdentityCardNumberValidator, MoneyValidator,
+    IdentityCardNumberValidator, MoneyValidator, PositiveNumberValidator,
     UsernameValidator, PasswordValidator, RepasswordValidator,
     ComboboxValidator, GreaterThanTodayValidator
 }

@@ -235,7 +235,7 @@ export default{
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: center;
-    gap: 4px;
+    gap: 1px;
 } 
 
 .p-editor-toolbar-item{

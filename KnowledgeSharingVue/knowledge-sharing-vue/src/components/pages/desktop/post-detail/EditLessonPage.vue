@@ -1,9 +1,13 @@
 <template>
     <DesktopHomeFrame>
         <div class="d-content">
-            <div class="p-form">
+            <div class="d-empty-panel" v-show="isLessonExisted === false">
+                <not-found-panel text="Bài giảng hiện không tồn tại hoặc đã bị xóa" />
+            </div>
+
+            <div class="p-form" v-show="isLessonExisted === true">
                 <div class="p-row p-title">
-                    Tạo mới bài giảng
+                    Chỉnh sửa bài giảng
                 </div>
                 <div class="p-row">
                     <MTextfield 
@@ -58,7 +62,7 @@
                 </div>
 
                 <div class="p-row p-submit-button">
-                    <MButton label="Tạo bài giảng" :onclick="resolveSubmitLesson" />
+                    <MButton label="Cập nhật bài giảng" :onclick="resolveSubmitLesson" />
                 </div>
             </div>
 
@@ -70,6 +74,7 @@
 <!-- title, abstract, thumbnail, categories, Privacy, estimateTimeInMinutes, content -->
 
 <script> 
+import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 import MButton from '@/components/base/buttons/MButton';
 import MRadio from '@/components/base/inputs/MRadio.vue';
 import MImageInput from '@/components/base/inputs/MImageInput.vue';
@@ -80,13 +85,16 @@ import MarkdownEditor from './components/MarkdownEditor.vue';
 import MTextfield from '@/components/base/inputs/MTextfield'
 import { NotEmptyValidator, PositiveNumberValidator } from '@/js/utils/validator';
 import { myEnum } from '@/js/resources/enum';
-import { PostRequest, Request } from '@/js/services/request';
+import { GetRequest, PatchRequest, Request } from '@/js/services/request';
+import { useRoute } from 'vue-router';
+import CurrentUser from '@/js/models/entities/current-user';
+import ResponseLessonModel from '@/js/models/api-response-models/response-lesson-model';
 
 export default {
-    name: 'CreateLessonPage',
+    name: 'EditLessonPage',
     components: {
         MTextfield, MTextArea, MImageInput,
-        MRadio, MButton,
+        MRadio, MButton, NotFoundPanel,
         DesktopHomeFrame, MarkdownEditor, CategoryInput
     },
     data(){
@@ -98,7 +106,34 @@ export default {
             },
             privacyEnum: myEnum.EPrivacy,
             inputs: [],
-            keys: []
+            keys: [],
+            route: useRoute(),
+            lesson: null,
+            lessonId: null,
+            isLessonExisted: null,
+            currentUser: null
+        }
+    },
+    async created(){
+        try {
+            this.lessonId = this.route.params.lessonId;
+            this.currentUser = CurrentUser.getInstance();
+            if (this.currentUser == null) {
+                this.getPopupManager().requiredLogin();
+                return;
+            }
+            let response = await new GetRequest('Lessons/my/' + this.lessonId)
+                .execute();
+            let body = await Request.tryGetBody(response);
+            this.lesson = new ResponseLessonModel();
+            this.lesson.copy(body);
+            this.isLessonExisted = true;
+            this.update();
+        }
+        catch (error){
+            console.error(error);
+            this.isLessonExisted = false;
+            Request.resolveAxiosError(error);
         }
     },
     methods: {
@@ -177,14 +212,14 @@ export default {
                     return;
                 }
                 let lesson = await this.getLesson();
-                let postRequest = new PostRequest('Lessons')
+                let patchRequest = new PatchRequest('Lessons/' + this.lessonId)
                     .prepareFormData();
                 for (let key in lesson){
-                    postRequest.addFormData(key, lesson[key]);
+                    patchRequest.addFormData(key, lesson[key]);
                 }
-                await postRequest.execute();
+                await patchRequest.execute();
                 
-                this.getToastManager().success("Tạo mới bài giảng thành công");
+                this.getToastManager().success("Chỉnh sửa bài giảng thành công");
             } catch (e) {
                 await Request.resolveAxiosError(e);
             }
@@ -213,20 +248,39 @@ export default {
                 console.error(error);
                 return null;
             }
+        },
+
+        async update(){
+            try {
+                if (this.isLessonExisted === true){
+                    this.keys = ["title", "abstract", "thumbnail", "category", "privacy", "estimate", "content"];
+                    for (let key of this.keys) {
+                        this.inputs[key] = this.$refs[key];
+                    }
+                    let lesson = this.lesson;
+                    this.inputs.title.setValue(lesson.Title);
+                    this.inputs.abstract.setValue(lesson.Abstract);
+                    this.inputs.thumbnail.setValue(lesson.Thumbnail);
+                    this.inputs.category.setValue(lesson.Categories);
+                    this.inputs.privacy.setValue(lesson.Privacy);
+                    this.inputs.estimate.setValue(lesson.EstimateTimeInMinutes);
+                    this.inputs.content.setValue(lesson.Content);
+                }
+            }
+            catch (error){
+                console.error(error);
+            }
         }
     },
     props: {
 
     },
     inject: {
-        getToastManager: {}
+        getToastManager: {},
+        getPopupManager: {}
     },
     mounted(){
-        this.keys = ["title", "abstract", "thumbnail", "category", "privacy", "estimate", "content"];
-        for (let key of this.keys) {
-            this.inputs[key] = this.$refs[key];
-        }
-        console.log(this.inputs)
+        this.update();
     }
 }
 

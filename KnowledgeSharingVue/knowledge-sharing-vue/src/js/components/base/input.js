@@ -65,6 +65,8 @@ let input = {
         **/
         async validate(){
             try {
+                if (this.validator?.validate == null)
+                    return true;
                 let rs = await this.validator.validate(this.data.value);
                 if (rs.isValid) {
                     return true;

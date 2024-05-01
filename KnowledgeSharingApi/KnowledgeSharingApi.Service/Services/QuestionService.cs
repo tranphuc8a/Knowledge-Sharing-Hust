@@ -362,6 +362,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiểm tra postId tồn tại
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            if (question.UserId == myUid)
+                return await UserGetMyPostDetail(myUid, postId);
 
             // Kiểm tra nếu question là private thì có chung khóa học không
             if (question.Privacy != EPrivacy.Public)

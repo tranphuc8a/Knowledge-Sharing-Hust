@@ -31,6 +31,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IStarRepository StarRepository;
         protected readonly ICourseRepository CourseRepository;
         protected readonly IDecorationRepository DecorationRepository;
+        protected readonly IKnowledgeRepository KnowledgeRepository;
         protected readonly IUserRepository UserRepository;
         protected readonly IStorage Storage;
 
@@ -43,6 +44,7 @@ namespace KnowledgeSharingApi.Services.Services
             IStarRepository starRepository,
             ICourseRepository courseRepository,
             IUserRepository userRepository,
+            IKnowledgeRepository knowledgeRepository,
             IDecorationRepository decorationRepository,
             IStorage storage
         )
@@ -52,6 +54,7 @@ namespace KnowledgeSharingApi.Services.Services
             EntityResource = ResourceFactory.GetEntityResource();
 
             DecorationRepository = decorationRepository;
+            KnowledgeRepository = knowledgeRepository;
             LessonRepository = lessonRepository;
             StarRepository = starRepository;
             CourseRepository = courseRepository;
@@ -313,7 +316,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (updated <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
 
             // Trả về thành công
-            return ServiceResult.ServerError(ResponseResource.UpdateSuccess(LessonResource), string.Empty, lesson);
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(LessonResource), string.Empty, lesson);
         } 
         
         #endregion
@@ -393,7 +396,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
         {
             // Check lesson existed and owner
-            ViewLesson lesson = await LessonRepository.CheckExistedLesson(myUid, NotExistedLesson);
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
             if (lesson.UserId != myUid)
                 return ServiceResult.Forbidden("Bài giảng này không phải của bạn");
 
@@ -421,6 +424,12 @@ namespace KnowledgeSharingApi.Services.Services
         {
             // Check lesson exist
             ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+            if (lesson.UserId == myUid) return await UserGetMyPostDetail(myUid, postId);
+
+            // Check user can access lesson:
+            bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, postId);
+            if (!isAccessible)
+                return ServiceResult.Forbidden("Bạn không có quyền truy cập bài giảng này");
 
             // DecorateResponseLessonModel
             ResponseLessonModel res = (await DecorationRepository.DecorateResponseLessonModel(myUid, [lesson])).First();

@@ -185,6 +185,14 @@ export default {
             }
         },
 
+        async focus(){
+            try {
+                this.$refs['textarea'].focus();
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
         async validate(){
             try {
                 return Validator.isNotEmpty(this.dText);
@@ -219,6 +227,10 @@ export default {
 
 <style scoped>
 
+textarea {
+    height: 100%;
+}
+
 .p-editor-frame{
     width: 100%;
     height: 100%;
@@ -227,7 +239,6 @@ export default {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: center;
-    padding: 12px;
     gap: 4px;
     background-color: transparent;
 }
@@ -275,6 +286,12 @@ export default {
     box-sizing: border-box;
     padding: 12px;
     overflow: auto;
+}
+
+.p-editor-frame .p-enter-frame .p-edit-frame,
+.p-editor-frame .p-enter-frame .p-preview-frame{
+    height: auto;
+    align-self: stretch;
 }
 
 </style>

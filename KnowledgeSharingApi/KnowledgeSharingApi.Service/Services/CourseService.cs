@@ -365,6 +365,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             // Kiểm tra course tồn tại
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            if (course.UserId == myUid) return await UserGetMyCourseDetail(myUid, courseId);
 
             // Kiểm tra accessible
             bool isAccessible = await KnowledgeRepository.CheckCourseAccessible(myUid, courseId);
