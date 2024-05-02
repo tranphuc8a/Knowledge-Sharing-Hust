@@ -77,16 +77,23 @@ namespace KnowledgeSharingApi.Domains.Models.Entities
         /// Modified: None
         public virtual Entity Copy(object entity)
         {
-            PropertyInfo[] listProps = GetProperties();
+            PropertyInfo[] listProps = this.GetType().GetProperties();
             foreach (var prop in listProps)
             {
                 var tarProp = entity.GetType().GetProperty(prop.Name);
-                if (tarProp != null && tarProp.GetType() == prop.GetType())
+                // Kiểm tra xem có thuộc tính trùng tên và có thể gán được hay không.
+                if (tarProp != null &&
+                    (prop.PropertyType.IsAssignableFrom(tarProp.PropertyType) ||
+                     Nullable.GetUnderlyingType(prop.PropertyType) == tarProp.PropertyType ||
+                     prop.PropertyType == Nullable.GetUnderlyingType(tarProp.PropertyType)))
                 {
+                    // Nếu prop là kiểu nullable và tarProp là kiểu non-nullable (hoặc ngược lại)
+                    // thì giá trị có thể được gán tùy thuộc vào kiểu cơ sở tương thích.
                     prop.SetValue(this, tarProp.GetValue(entity));
                 }
             }
             return this;
         }
+
     }
 }

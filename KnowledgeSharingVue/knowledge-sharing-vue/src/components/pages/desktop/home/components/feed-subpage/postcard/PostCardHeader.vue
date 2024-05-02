@@ -13,16 +13,13 @@
             </div>
         </div>
         <div class="p-header-right">
-            <MContextMenu>
-                <MActionIcon fa="ellipsis-h" />
-            </MContextMenu>
+            <PostCardMenuContext />
         </div>
     </div>
 </template>
 
 <script>
-import MActionIcon from '@/components/base/icons/MActionIcon'
-import MContextMenu from '@/components/base/context-menu/MContextMenu.vue';
+import PostCardMenuContext from './PostCardMenuContext.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
 import VisualizedDatetime from '@/components/base/visualized-components/VisualizedDatetime.vue';
@@ -36,7 +33,8 @@ export default {
         }
     },
     components: {
-        MActionIcon, TooltipUserAvatar, TooltipUsername, VisualizedDatetime, VisualizedPrivacy, MContextMenu
+        PostCardMenuContext,
+        TooltipUserAvatar, TooltipUsername, VisualizedDatetime, VisualizedPrivacy
     },
     methods: {
 

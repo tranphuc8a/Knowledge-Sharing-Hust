@@ -142,6 +142,7 @@ export default {
 
 .p-item{
     padding-left: 18px;
+    text-align: left;
 }
 
 .p-item a {
