@@ -1,30 +1,29 @@
 /* eslint-disable */
 <template>
     <FeedCardFrame>
-        <div class="p-feedcard-lesson">
-            <div class="p-feedcard-lesson__header">
+        <div class="p-feedcard-question">
+            <div class="p-feedcard-question__header">
                 <PostCardHeader />
             </div>
-            <div class="p-feedcard-lesson__title">
-                {{lesson?.Title ?? "Title of lesson"}}
+            <div class="p-feedcard-question__title">
+                {{question?.Title ?? "Title of question"}}
             </div>
-            <div class="p-feedcard-lesson__categories">
-                <CategoriesList :categories="lesson?.Categories ?? defaultCategoriesList" />
+            <div class="p-feedcard-question__categories">
+                <CategoriesList :categories="question?.Categories ?? defaultCategoriesList" />
             </div>
-            <div class="p-feedcard-lesson__content">
-                <textarea type="text" v-model="content"/>
-                <LatexMarkdownRender :markdown-content="content" />
+            <div class="p-feedcard-question__content">
+                <LatexMarkdownRender :markdown-content="question?.Content" />
             </div>
-            <div class="p-feedcard-lesson__thumbnail">
+            <div class="p-feedcard-question__thumbnail">
                 <PostCardThumbnail />
             </div>
-            <div class="p-feedcard-lesson__toolbar">
+            <div class="p-feedcard-question__toolbar">
                 <PostCardToolBar />
             </div>
-            <div class="p-feedcard-lesson__devide">
+            <div class="p-feedcard-question__devide">
                 <div></div>
             </div>
-            <div class="p-feedcard-lesson__comments">
+            <div class="p-feedcard-question__comments">
                 <PostCardCommentList />
             </div>
         </div>
@@ -32,16 +31,16 @@
 </template>
 
 <script>
-import PostCardCommentList from '../comment/PostCardCommentList.vue';
+import PostCardCommentList from '../../home/components/feed-subpage/comment/PostCardCommentList.vue';
 import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
-import PostCardToolBar from './PostCardToolBar.vue';
-import PostCardThumbnail from './PostCardThumbnail.vue';
+import PostCardToolBar from '../../home/components/feed-subpage/postcard/PostCardToolBar.vue';
+import PostCardThumbnail from '../../home/components/feed-subpage/postcard/PostCardThumbnail.vue';
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
-import PostCardHeader from './PostCardHeader.vue';
-import FeedCardFrame from './FeedCardFrame.vue';
+import PostCardHeader from '../../home/components/feed-subpage/postcard/PostCardHeader.vue';
+import FeedCardFrame from '../../home/components/feed-subpage/postcard/FeedCardFrame.vue';
 
 export default {
-    name: "lessonFeedCard",
+    name: "QuestionCard",
     data() {
         return {
             label: null,
@@ -53,7 +52,7 @@ export default {
                 color: 'var(--grey-color)',
             },
             content: '',
-            lesson: this.post
+            question: this.post
         }
     },
     mounted() {
@@ -79,10 +78,10 @@ export default {
             return this.label;
         },
 
-        async resolveClickAddLesson(){
+        async resolveClickAddquestion(){
             try {
                 let router = this.globalData.router;
-                router.push({name: 'add-lesson'});
+                router.push({name: 'add-question'});
             } catch (error) {
                 console.log(error);
             }
@@ -105,12 +104,12 @@ export default {
     },
     provide(){
         return {
-            getPost: () => this.lesson
+            getPost: () => this.question
         }
     },
     watch: {
         post(newValue) {
-            this.lesson = newValue
+            this.question = newValue
         }
     },
     props: {
@@ -123,6 +122,10 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/lesson.css);
+@import url(@/css/pages/desktop/components/question.css);
+
+.p-feedcard-question__content{
+    font-size: 16px;
+}
 
 </style>

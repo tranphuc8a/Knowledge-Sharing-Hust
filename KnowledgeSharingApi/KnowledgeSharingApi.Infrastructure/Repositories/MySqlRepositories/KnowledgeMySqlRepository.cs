@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     {
         protected readonly Exception notExistedException = new("Không tồn tại đối tượng");
 
-        public async Task<bool> CheckAccessible(Guid userId, Guid knowledgeId)
+        public virtual async Task<bool> CheckAccessible(Guid userId, Guid knowledgeId)
         {
             Knowledge knowledge = await DbContext.Knowledges.FindAsync(knowledgeId) ?? throw notExistedException;
             // public, owner -> true
@@ -37,7 +37,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             }
         }
 
-        public async Task<bool> CheckCourseAccessible(Guid userId, Guid courseId)
+        public virtual async Task<bool> CheckCourseAccessible(Guid userId, Guid courseId)
         {
             Course course = await DbContext.Courses.FindAsync(courseId) ?? throw notExistedException;
             // course public, owner --> true
@@ -49,7 +49,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return courseRegister != null;
         }
 
-        public async Task<bool> CheckLessonAccessible(Guid userId, Guid lessonId)
+        public virtual async Task<bool> CheckLessonAccessible(Guid userId, Guid lessonId)
         {
             Lesson lesson = await DbContext.Lessons.FindAsync(lessonId) ?? throw notExistedException;
 
@@ -66,7 +66,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return isRegistered;
         }
 
-        public async Task<bool> CheckPostAccessible(Guid userId, Guid postId)
+        public virtual async Task<bool> CheckPostAccessible(Guid userId, Guid postId)
         {
             Post post = await DbContext.Posts.FindAsync(postId) ?? throw notExistedException;
             // public, owner: OK
@@ -83,7 +83,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             }
         }
 
-        public async Task<bool> CheckQuestionAccessible(Guid userId, Guid questionId)
+        public virtual async Task<bool> CheckQuestionAccessible(Guid userId, Guid questionId)
         {
             // Kết hợp truy vấn thông tin câu hỏi và kiểm tra quyền riêng tư
             var question = await DbContext.Questions
@@ -119,7 +119,6 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return averageStar;
         }
 
-
         public virtual async Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset)
         {
             List<ViewComment> listComment = await
@@ -140,7 +139,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public async Task<IEnumerable<ViewComment>> GetListComments(Guid knowledgeId)
+        public virtual async Task<IEnumerable<ViewComment>> GetListComments(Guid knowledgeId)
         {
             return await DbContext.ViewComments
                 .Where(comment => comment.KnowledgeId == knowledgeId)

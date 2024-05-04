@@ -15,4 +15,4 @@ class CourseRegister extends Entity {
     }
 }
 
-module.exports = CourseRegister;
+export default CourseRegister;

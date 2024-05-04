@@ -73,7 +73,7 @@ export default {
         */
         getLabel(){
             if (this.getLanguage != null){
-                this.label = this.getLanguage()?.subpages?.feedpage?.lessoncard;
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },

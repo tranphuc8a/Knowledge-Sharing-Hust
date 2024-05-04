@@ -14,4 +14,4 @@ class Course extends Knowledge {
     }
 }
 
-module.exports = Course;
+export default Course;

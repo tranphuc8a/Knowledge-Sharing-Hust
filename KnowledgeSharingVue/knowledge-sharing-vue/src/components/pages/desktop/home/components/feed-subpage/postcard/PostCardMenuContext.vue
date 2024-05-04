@@ -44,7 +44,7 @@ export default {
     async mounted(){
         try {
             this.post = this.getPost();
-            this.isLesson = this.getPost().PostType == myEnum.EPostType.Lesson;
+            this.isLesson = this.getPost()?.PostType == myEnum.EPostType.Lesson;
             this.postResource = this.isLesson ? "Bài giảng" : "Bài thảo luận";
             await this.updateOptions();
         } catch (error){
@@ -58,7 +58,7 @@ export default {
                     this.onEdit();
                 }
                 let url = this.isLesson ? '/lesson-edit/' : '/question-edit/';
-                this.router.push(url + this.getPost().UserItemId);
+                this.router.push(url + this.getPost()?.UserItemId);
             }
             catch (error){
                 console.error(error);
@@ -77,10 +77,10 @@ export default {
         async submitDelete(){
             try {
                 let url = 'Lessons/';
-                if (this.getPost().PostType == myEnum.EPostType.Question){
+                if (this.getPost()?.PostType == myEnum.EPostType.Question){
                     url = 'Questions/';
                 }
-                await new DeleteRequest(url + this.getPost().UserItemId)
+                await new DeleteRequest(url + this.getPost()?.UserItemId)
                     .execute();
                 // delete success:
                 this.getPopupManager().success(`Xóa ${this.postResource} thành công!`);
@@ -95,7 +95,7 @@ export default {
         },
         async resolveMark(){
             try {
-                await new PostRequest('Knowledges/mark/' + this.getPost().UserItemId)
+                await new PostRequest('Knowledges/mark/' + this.getPost()?.UserItemId)
                     .execute();
                 this.getPost().IsMarked = true;
                 await this.updateOptions();
@@ -106,7 +106,7 @@ export default {
         },
         async resolveUnmark(){
             try {
-                await new PostRequest('Knowledges/unmark/' + this.getPost().UserItemId)
+                await new PostRequest('Knowledges/unmark/' + this.getPost()?.UserItemId)
                     .execute();
                 this.getPost().IsMarked = false;
                 await this.updateOptions();
@@ -123,9 +123,9 @@ export default {
         },
         async resolveComplete(){
             try {
-                await new PostRequest('/Questions/confirm/' + this.getPost().UserItemId + '/true')
+                await new PostRequest('/Questions/confirm/' + this.getPost()?.UserItemId + '/true')
                     .execute();
-                this.getPost().IsCompleted = true;
+                this.getPost().IsAcepted = true;
                 await this.updateOptions();
             } catch (error) {
                 console.error(error);
@@ -134,9 +134,9 @@ export default {
         },
         async resolveUncomplete(){
             try {
-                await new PostRequest('/Questions/confirm/' + this.getPost().UserItemId + '/false')
+                await new PostRequest('/Questions/confirm/' + this.getPost()?.UserItemId + '/false')
                     .execute();
-                    this.getPost().IsCompleted = false;
+                    this.getPost().IsAcepted = false;
                 await this.updateOptions();
             } catch (error) {
                 console.error(error);
@@ -145,7 +145,7 @@ export default {
         },
         async resolveLockComment(){
             try {
-                await new PostRequest('Comments/block/' + this.getPost().UserItemId)
+                await new PostRequest('Comments/block/' + this.getPost()?.UserItemId)
                     .execute();
                 this.getPost().IsBlockComment = true;
                 await this.updateOptions();
@@ -156,7 +156,7 @@ export default {
         },
         async resolveUnlockComment(){
             try {
-                await new PostRequest('Comments/unblock/' + this.getPost().UserItemId)
+                await new PostRequest('Comments/unblock/' + this.getPost()?.UserItemId)
                     .execute();
                 this.getPost().IsBlockComment = false;
                 await this.updateOptions();
@@ -189,7 +189,7 @@ export default {
                     } else {
                         this.listOptions.push(this.actions.Mark);
                     }
-                    if (this.getPost().IsBlockComment){
+                    if (this.getPost()?.IsBlockComment){
                         this.listOptions.push(this.actions.UnlockComment);
                     } else {
                         this.listOptions.push(this.actions.LockComment);
@@ -217,13 +217,13 @@ export default {
                         } else {
                             this.listOptions.push(this.actions.Mark);
                         }
-                        if (this.getPost().IsBlockComment){
+                        if (this.getPost()?.IsBlockComment){
                             this.listOptions.push(this.actions.UnlockComment);
                         } else {
                             this.listOptions.push(this.actions.LockComment);
                         }
-                        if (this.getPost().PostType === myEnum.EPostType.Question){
-                            if (this.getPost().IsCompleted){
+                        if (this.getPost()?.PostType === myEnum.EPostType.Question){
+                            if (this.getPost()?.IsAcepted){
                                 this.listOptions.push(this.actions.Uncomplete);
                             } else {
                                 this.listOptions.push(this.actions.Complete);

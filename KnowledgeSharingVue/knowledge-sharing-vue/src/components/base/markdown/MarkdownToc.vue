@@ -149,6 +149,11 @@ export default {
     width: 100%;
     padding: 8px 10px;
     border-radius: 4px;
+
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .p-item a.active {

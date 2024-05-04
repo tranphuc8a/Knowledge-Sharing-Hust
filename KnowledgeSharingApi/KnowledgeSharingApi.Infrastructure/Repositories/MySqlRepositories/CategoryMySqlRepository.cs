@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
@@ -6,6 +7,7 @@ using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Mysqlx.Crud;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,31 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Where(cate => cateIds.Contains(cate.CategoryId))
                 .OrderByDescending(cate => cate.CreatedTime)
                 .ToListAsync();
+        }
+
+        public async Task<Dictionary<Guid, IEnumerable<Category>?>> GetByKnowledgeId(IEnumerable<Guid> knowledgeIds)
+        {
+            Dictionary<Guid, IEnumerable<ViewKnowledgeCategory>> categories = await DbContext.ViewKnowledgeCategories
+                .Where(knowCate => knowledgeIds.Contains(knowCate.KnowledgeId))
+                .GroupBy(knowCate => knowCate.KnowledgeId)
+                .ToDictionaryAsync(group => group.Key, group => group.AsEnumerable());
+
+            return knowledgeIds.ToDictionary(
+                id => id,
+                id =>
+                {
+                    if (categories.TryGetValue(id, out IEnumerable<ViewKnowledgeCategory>? value))
+                    {
+                        return value.Select(viewCate =>
+                        {
+                            Category cat = new();
+                            cat.Copy(viewCate);
+                            return cat;
+                        });
+                    }
+                    return null;
+                }
+            );
         }
 
         public async Task<Category?> GetByName(string catName)

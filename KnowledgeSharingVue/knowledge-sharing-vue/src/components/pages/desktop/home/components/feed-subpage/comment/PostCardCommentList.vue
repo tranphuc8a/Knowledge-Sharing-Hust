@@ -43,6 +43,14 @@ export default {
         CommentFilterButton, PostCardEnterComment, PostCardComment
     },
     async mounted(){
+        if (this.getPost()?.TopComments?.length > 0){
+            this.listComments = this.getPost().TopComments.map(function(comment){
+                let com = new ResponseCommentModel();
+                com.copy(comment);
+                return com;
+            });
+        }
+        console.log(this.listComments);
         this.currentUser = await CurrentUser.getInstance();
         this.getLabel();
         this.getMoreComments();

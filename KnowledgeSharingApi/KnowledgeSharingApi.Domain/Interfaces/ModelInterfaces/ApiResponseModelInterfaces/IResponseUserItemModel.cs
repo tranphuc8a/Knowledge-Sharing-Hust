@@ -11,6 +11,8 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseMode
     [JsonConverter(typeof(ResponseUserItemConverter))]
     public interface IResponseUserItemModel
     {
+        Guid UserItemId { get; set; }
+
         // Stars:
         double? AverageStars { get; set; }
         double? MyStars { get; set; }
