@@ -100,8 +100,24 @@ let textarea = {
         */
         async adjustHeight() {
             try {
-                this.components.input.style.height = `auto`;
-                this.components.input.style.height = `${this.components.input.scrollHeight}px`;
+                let that = this;
+                this.$nextTick(() => {
+                    that.components.input.style.height = `auto`;
+                    that.components.input.style.height = `${that.components.input.scrollHeight}px`;
+                });
+            } catch (error){
+                console.error(error);
+            }
+        },
+        
+        // Ghi de lai
+        setValue(value){
+            try {
+                this.data.value = value;
+                if (this.data.isDynamicValidate){
+                    this.actionValidate();
+                }
+                this.adjustHeight();
             } catch (error){
                 console.error(error);
             }

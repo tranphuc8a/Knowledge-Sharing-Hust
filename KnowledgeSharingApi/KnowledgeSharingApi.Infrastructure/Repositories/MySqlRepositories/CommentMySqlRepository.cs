@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class CommentMySqlRepository(IDbContext dbContext)
         : BaseMySqlUserItemRepository<Comment>(dbContext), ICommentRepository
     {
-        public async Task<ViewComment> CheckExistedComment(Guid commentId, string errorMessage)
+        public virtual async Task<ViewComment> CheckExistedComment(Guid commentId, string errorMessage)
         {
             return await DbContext.ViewComments.Where(com => com.UserItemId == commentId)
                 .FirstOrDefaultAsync()
@@ -58,7 +58,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             }
         }
 
-        public async Task<PaginationResponseModel<ViewComment>> GetCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId, int limit, int offset)
+        public virtual async Task<PaginationResponseModel<ViewComment>> GetCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId, int limit, int offset)
         {
             IQueryable<ViewComment> comments = DbContext.ViewComments
                 .Where(com => com.UserItemId == userId && com.KnowledgeId == knowledgeId);
@@ -72,7 +72,58 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             };
         }
 
-        public async Task<PaginationResponseModel<ViewComment>> GetRepliesOfComment(Guid commentId, int limit, int offset)
+        public virtual async Task<PaginationResponseModel<ViewComment>> GetListCommentsOfKnowledge(Guid knowledgeId, int limit, int offset)
+        {
+            IQueryable<ViewComment> listComments = DbContext.ViewComments
+                .Where(comment => comment.KnowledgeId == knowledgeId)
+                .OrderBy(comment => comment.CreatedBy);
+            int total = listComments.Count();
+            IEnumerable<ViewComment> lsComments = await listComments
+                .Skip(offset).Take(limit)
+                .ToListAsync();
+            return new PaginationResponseModel<ViewComment>(total, limit, offset, lsComments);
+        }
+
+        public virtual async Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetListCommentsOfKnowledge(IEnumerable<Guid> knowledgeIds, int limit)
+        {
+            var comments = await DbContext.ViewComments
+                .Where(comment => knowledgeIds.Any(id => id == comment.KnowledgeId) && comment.ReplyId == null)
+                .OrderBy(comment => comment.CreatedBy)
+                .ToListAsync();
+
+            var groupedComments = comments
+                .GroupBy(comment => comment.KnowledgeId)
+                .ToDictionary(group => group.Key, group => group);
+
+            var mapping = groupedComments.ToDictionary(
+                kvp => kvp.Key,
+                kvp => new PaginationResponseModel<ViewComment>(
+                    kvp.Value.Count(),
+                    limit,
+                    0,
+                    kvp.Value.Take(limit)
+                )
+            );
+
+            var result = knowledgeIds.ToDictionary(
+                id => id,
+                id =>
+                {
+                    if (mapping.TryGetValue(id, out PaginationResponseModel<ViewComment>? value))
+                    {
+                        return value;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            );
+
+            return result;
+        }
+
+        public virtual async Task<PaginationResponseModel<ViewComment>> GetRepliesOfComment(Guid commentId, int limit, int offset)
         {
             IQueryable<ViewComment> comments = DbContext.ViewComments
                 .Where(com => com.UserItemId == commentId);
@@ -86,7 +137,46 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             };
         }
 
-        public async Task<Dictionary<Guid, int>> GetTotalReplies(List<Guid> commentsId)
+        public virtual async Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetRepliesOfComment(IEnumerable<Guid> commentIds, int limit)
+        {
+            var comments = await DbContext.ViewComments
+                .Where(comment => comment.ReplyId != null && commentIds.Any(id => id == comment.ReplyId))
+                .OrderBy(comment => comment.CreatedBy)
+                .ToListAsync();
+
+            var groupedComments = comments
+                .GroupBy(comment => comment.ReplyId!.Value)
+                .ToDictionary(group => group.Key, group => group);
+
+            var mapping = groupedComments.ToDictionary(
+                kvp => kvp.Key,
+                kvp => new PaginationResponseModel<ViewComment>(
+                    kvp.Value.Count(),
+                    limit,
+                    0,
+                    kvp.Value.Take(limit)
+                )
+            );
+
+            var result = commentIds.ToDictionary(
+                id => id,
+                id =>
+                {
+                    if (mapping.TryGetValue(id, out PaginationResponseModel<ViewComment>? value))
+                    {
+                        return value;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            );
+
+            return result;
+        }
+
+        public virtual async Task<Dictionary<Guid, int>> GetTotalReplies(List<Guid> commentsId)
         {
 
             Dictionary<Guid, int> result = 

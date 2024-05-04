@@ -92,8 +92,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.pages?.setnewpassword;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.pages?.setnewpassword;
             }
             return this.label;
         },
@@ -238,7 +238,7 @@ export default {
 
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         getPopupManager: {}, 
         getToastManager: {}
     }

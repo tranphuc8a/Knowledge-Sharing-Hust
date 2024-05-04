@@ -40,8 +40,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.pages?.homepage?.homeDbarResource;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.pages?.homepage?.homeDbarResource;
             }
             return this.label;
         },
@@ -87,7 +87,7 @@ export default {
 
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         getToastManager: {},
         getPopupManager: {}
     }

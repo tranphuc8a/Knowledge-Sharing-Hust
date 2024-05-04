@@ -34,7 +34,7 @@ export default {
 
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         getToastManager: {},
         getPopupManager: {}
     }

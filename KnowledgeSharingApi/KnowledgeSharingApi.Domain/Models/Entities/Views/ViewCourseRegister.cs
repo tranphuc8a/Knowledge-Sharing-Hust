@@ -30,5 +30,10 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
         public string? CourseOwnerAvatar { get; set; }
 
         public string? CourseOwnerCover { get; set; }
+
+        protected override ViewCourseRegister Init()
+        {
+            return new ViewCourseRegister();
+        }
     }
 }

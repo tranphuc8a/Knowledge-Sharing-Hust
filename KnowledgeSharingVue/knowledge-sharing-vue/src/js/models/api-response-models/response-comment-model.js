@@ -1,12 +1,12 @@
 
-import ViewComment from '../view-models/view-comment-model';
+import ViewComment from "../views/view-comment";
 class ResponseCommentModel extends ViewComment {
     constructor() {
         super();
-        this.averageStars = null;
-        this.myStars = null;
-        this.totalStars = null;
-        this.totalReplies = null;
+        this.AverageStars = null;
+        this.MyStars = null;
+        this.TotalStars = null;
+        this.TotalReplies = null;
     }
 
     init() {

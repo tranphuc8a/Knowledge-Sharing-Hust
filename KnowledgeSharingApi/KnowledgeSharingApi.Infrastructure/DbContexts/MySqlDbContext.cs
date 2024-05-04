@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -94,5 +95,6 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<ViewCourseRegister> ViewCourseRegisters { get; set; }
         public DbSet<ViewKnowledgeCategory> ViewKnowledgeCategories { get; set; }
         public DbSet<ViewCoursePayment> ViewCoursePayments { get; set; }
+        public DbSet<Image> Images { get; set; }
     }
 }

@@ -59,8 +59,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.language != null){
-                this.label = this.language.pages.login;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage().pages.login;
             }
             return this.label;
         },
@@ -87,7 +87,7 @@ export default {
         }
     },
     inject: {
-        language: {}, 
+        getLanguage: {}, 
         changeLanguage: {}, 
         getPopupManager: {}, 
         getToastManager: {},

@@ -60,8 +60,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.addpostcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.addpostcard;
             }
             return this.label;
         },
@@ -86,7 +86,7 @@ export default {
         
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         getToastManager: {},
         getPopupManager: {}
     }

@@ -1,7 +1,5 @@
-// Framework: .NET Core
-// Technology Stack: Entity Framework
 
-import Course from './course';
+import Course from '../entities/course';
 
 class ViewCourse extends Course {
     constructor() {

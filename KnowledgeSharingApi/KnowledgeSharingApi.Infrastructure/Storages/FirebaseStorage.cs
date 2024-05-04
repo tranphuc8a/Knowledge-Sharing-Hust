@@ -14,7 +14,8 @@ namespace KnowledgeSharingApi.Infrastructures.Storages
     {
         protected readonly StorageClient storageClient;
         protected readonly string BucketName;
-        private const string FirebaseStorageBaseUrl = "https://storage.googleapis.com/";
+        protected readonly string FolderName;
+        private const string FirebaseStorageBaseUrl = "https://firebasestorage.googleapis.com";
 
         public FirebaseStorage()
         {
@@ -26,6 +27,8 @@ namespace KnowledgeSharingApi.Infrastructures.Storages
 
             // Đặt tên cho bucket, nhớ bỏ tiền tố 'gs://'
             BucketName = "bksnet-e46a7.appspot.com";
+
+            FolderName = "knowledgesharing";
         }
 
         public async Task<string?> GetImageUrl(string filename)
@@ -33,8 +36,9 @@ namespace KnowledgeSharingApi.Infrastructures.Storages
             try
             {
                 // Tạo URL trực tiếp cho file dựa vào tên bucket và tên file
-                // URL dạng: https://storage.googleapis.com/bucket_name/file_name
-                var url = $"{FirebaseStorageBaseUrl}{BucketName}/{Uri.EscapeDataString(filename)}"; 
+                // URL dạng: https://firebasestorage.googleapis.com/v0/b/bucket_name/o/file_name?alt=media
+                var url = $"{FirebaseStorageBaseUrl}/v0/b/{BucketName}/o/{Uri.EscapeDataString(filename)}?alt=media";
+
                 return await Task.FromResult(url);
             }
             catch (Exception ex)
@@ -52,7 +56,7 @@ namespace KnowledgeSharingApi.Infrastructures.Storages
                 return null;
             }
 
-            var filename = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+            var filename = FolderName + "/" + Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
             using var memoryStream = new MemoryStream();
             await image.CopyToAsync(memoryStream);
             memoryStream.Position = 0;

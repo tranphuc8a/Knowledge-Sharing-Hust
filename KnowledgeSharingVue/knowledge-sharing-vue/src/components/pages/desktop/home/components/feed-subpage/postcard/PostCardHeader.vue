@@ -1,28 +1,25 @@
 <template>
     <div class="p-postcard-header">
         <div class="p-header-left">
-            <TooltipUserAvatar :user="lesson?.User" :size="36" />
-            <div class="p-lesson-infor">
-                <div class="p-lesson-owner-name">
-                    <TooltipUsername :user="lesson?.User" />
+            <TooltipUserAvatar :user="getPost()?.User" :size="36" />
+            <div class="p-post-infor">
+                <div class="p-post-owner-name">
+                    <TooltipUsername :user="getPost()?.User" />
                 </div>
-                <div class="p-lesson-detail-infor">
-                    <VisualizedDatetime :datetime="lesson?.CreatedTime" />
-                    <VisualizedPrivacy :privacy="lesson?.Privacy" />
+                <div class="p-post-detail-infor">
+                    <VisualizedDatetime :datetime="getPost()?.CreatedTime" />
+                    <VisualizedPrivacy :privacy="getPost()?.Privacy" />
                 </div>
             </div>
         </div>
         <div class="p-header-right">
-            <MContextMenu>
-                <MActionIcon fa="ellipsis-h" />
-            </MContextMenu>
+            <PostCardMenuContext />
         </div>
     </div>
 </template>
 
 <script>
-import MActionIcon from '@/components/base/icons/MActionIcon'
-import MContextMenu from '@/components/base/context-menu/MContextMenu.vue';
+import PostCardMenuContext from './PostCardMenuContext.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
 import VisualizedDatetime from '@/components/base/visualized-components/VisualizedDatetime.vue';
@@ -36,13 +33,14 @@ export default {
         }
     },
     components: {
-        MActionIcon, TooltipUserAvatar, TooltipUsername, VisualizedDatetime, VisualizedPrivacy, MContextMenu
+        PostCardMenuContext,
+        TooltipUserAvatar, TooltipUsername, VisualizedDatetime, VisualizedPrivacy
     },
     methods: {
 
     },
-    injects: {
-        post: {}
+    inject: {
+        getPost: {}
     }
 }
 </script>
@@ -65,14 +63,14 @@ export default {
     gap: 8px;
 }
 
-.p-lesson-infor{
+.p-post-infor{
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
     align-items: flex-start;
 }
 
-.p-lesson-detail-infor{
+.p-post-detail-infor{
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;

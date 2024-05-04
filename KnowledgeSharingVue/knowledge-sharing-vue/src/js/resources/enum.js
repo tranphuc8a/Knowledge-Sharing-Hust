@@ -80,13 +80,66 @@ let myEnum = {
     contentType: {
         JSON        : 'application/json',
         FORM_DATA   : 'multipart/form-data',
-        URL_ENCODED : 'application/x-www-form-urlencoded'
+        URL_ENCODED : 'application/x-www-form-urlencoded',
+        GWT         : 'text/x-gwt-rpc; charset=UTF-8'
     },
 
     commentFilterType: {
         Best: 0,
         All: 1,
         Recent: 2
+    },
+
+    editorViewMode: {
+        Normal: 0,
+        Edit: 0,
+        View: 1,
+        Preview: 1,
+        Both: 2,
+        Split: 2
+    },
+
+    editorCommand: {
+        Bold: 'bold',
+        Italic: 'italic',
+        Underline: 'underline',
+        Strikethrough: 'strikethrough',
+        Subscript: 'subscript',
+        Superscript: 'superscript',
+
+        Heading1: 'heading1',
+        Heading2: 'heading2',
+        Heading3: 'heading3',
+        Heading4: 'heading4',
+        Heading5: 'heading5',
+        Heading6: 'heading6',
+
+        Code: 'code',
+        Blockquote: 'blockquote',
+        Paragraph: 'paragraph',
+        Newline: 'newline',
+        
+        UnorderedList: 'unorderedlist',
+        OrderedList: 'orderedlist',
+        Indent: 'indent',
+        Outdent: 'outdent',
+
+        Link: 'link',
+        Unlink: 'unlink',
+        Image: 'image',
+        Table: 'table',
+        
+        AlignLeft: 'alignleft',
+        AlignCenter: 'aligncenter',
+        AlignRight: 'alignright',
+        AlignJustify: 'alignjustify',
+
+        Preview: 'preview',
+        Split: 'split',
+        Undo: 'undo',
+        Redo:'redo',
+
+        LaTeX: 'latex',
     },
 
     /**
@@ -215,6 +268,8 @@ let myEnum = {
     },
 
 
+
+    
 
 
 };

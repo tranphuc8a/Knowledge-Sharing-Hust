@@ -4,6 +4,7 @@
     <TestContextMenuPage />
     <TestToastPage />
     <TestPopupPage />
+    <AutoAdjustSize />
 </template>
 
 
@@ -14,10 +15,13 @@ import TestContextMenuPage from '@/components/base/context-menu/TestContextMenuP
 import TestToastPage from '@/components/base/toast/TestToastPage.vue';
 import TestPopupPage from '@/components/base/popup/TestPopupPage.vue';
 
+import AutoAdjustSize from './AutoAdjustSize.vue';
 
 export default {
     name: 'KSTestPage',
-    components: { TestButtonsPage, TestContextMenuPage, TestToastPage, TestInputPage, TestPopupPage },
+    components: { 
+        AutoAdjustSize,
+        TestButtonsPage, TestContextMenuPage, TestToastPage, TestInputPage, TestPopupPage },
     data(){
         return {
         }

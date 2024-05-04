@@ -1,9 +1,9 @@
 <template>
-    <div class="p-postcard-toolbar">
+    <div class="p-postcard-toolbar" v-if="isShowComponent">
         <div class="p-postcard-toolbar__info">
             <div class="p-pct-leftinfo">
                 <div class="p-pct-star">
-                    <VisualizedStar :star="post?.Star ?? 3.68" />
+                    <VisualizedStar :star="getPost()?.AverageStars ?? 3.68" />
                 </div>
                 <MIcon fa="circle" :style="dotIconStyle" />
                 <div class="p-pct-numstar" @:click="showListStar">
@@ -12,10 +12,12 @@
             </div>
             <div class="p-pct-rightinfo">
                 <div class="p-pct-numcomment">
+                    <MIcon fa="comment" family="far" :style="tinyIconStyle" />
                     {{ getComment() }}
                 </div>
                 <MIcon fa="circle" :style="dotIconStyle"/>
                 <div class="p-pct-numview">
+                    <MIcon fa="eye" family="far" :style="tinyIconStyle" />
                     {{ getView() }}
                 </div>
             </div>
@@ -27,13 +29,15 @@
                 <PostCardStarButton />
             </div>
             <div class="p-pct-comment">
-                <MEmbeddedButton fa="comment" :label="getLabel()?.comment" 
+                <MEmbeddedButton fa="comment" iconFamily="far"
+                    :label="getLabel()?.comment" 
                     :onclick="resolveClickComment" 
                     :iconStyle="iconStyle"
                     :buttonStyle="buttonStyle"/>
             </div>
             <div class="p-pct-star">
-                <MEmbeddedButton fa="share" :label="getLabel()?.viewDetail" 
+                <MEmbeddedButton fa="share"
+                    :label="getLabel()?.viewDetail" 
                     :onclick="resolveClickViewDetail" 
                     :iconStyle="iconStyle"
                     :buttonStyle="buttonStyle"
@@ -53,10 +57,12 @@ export default {
     name: "PostCardToolbar",
     data(){
         return {
+            isShowComponent: true,
             label: null,
             dotIconStyle: {fontSize: '3px', color: 'var(--grey-color-600)'},
             iconStyle: {color: 'var(--grey-color)'},
-            buttonStyle: {color: 'var(--grey-color-800)'}
+            buttonStyle: {color: 'var(--grey-color-800)'},
+            tinyIconStyle: {}
         }
     },
     components: {
@@ -74,16 +80,15 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
-            console.log(this.inject);
             return this.label;
         },
 
         getStar(){
             try {
-                let numstar = Number(this.post?.Star ?? 0);
+                let numstar = Number(this.getPost()?.Star ?? 0);
                 return Math.round(numstar * 10) / 10;
             } catch (e) {
                 console.error(e);
@@ -92,7 +97,7 @@ export default {
 
         getNumStar(){
             try {
-                let numstar = Number(this.post?.NumberStar ?? 0);
+                let numstar = Number(this.getPost()?.TotalStars ?? 0);
                 let beautyNumber = Common.formatNumber(numstar);
                 return this.getLabel()?.numberStar(beautyNumber);
             } catch (e) {
@@ -102,9 +107,10 @@ export default {
 
         getComment(){
             try {
-                let comment = Number(this.post?.NumberComment ?? 0);
+                let comment = Number(this.getPost()?.NumberComments ?? 0);
                 let beautyNumber = Common.formatNumber(comment);
-                return this.getLabel()?.numberComment(beautyNumber);
+                // return this.getLabel()?.numberComment(beautyNumber);
+                return beautyNumber;
             } catch (e) {
                 console.error(e);
             }
@@ -112,9 +118,10 @@ export default {
 
         getView(){
             try {
-                let view = Number(this.post?.Views ?? 0);
+                let view = Number(this.getPost()?.Views ?? 0);
                 let beautyNumber = Common.formatNumber(view);
-                return this.getLabel()?.numberView(beautyNumber);
+                // return this.getLabel()?.numberView(beautyNumber);
+                return beautyNumber;
             } catch (e) {
                 console.error(e);
             }
@@ -122,13 +129,32 @@ export default {
 
         async showListStar(){
 
+        },
+
+        async resolveClickComment(){
+
+        },
+
+        async resolveClickViewDetail(){
+
+        },
+        
+        async forceRender(){
+            let that = this;
+            that.isShowComponent = false;
+            that.$nextTick(() => {
+                that.isShowComponent = true;
+            });
+        }
+    },
+    provide(){
+        return {
+            forceUpdateToolbar: this.forceRender
         }
     },
     inject: {
-        inject: {},
-        post: {
-            default: null
-        }
+        getLanguage: {},
+        getPost: {}
     }
 }
 
@@ -159,16 +185,33 @@ export default {
     gap: 4px;
 }
 
+.p-pct-leftinfo, .p-pct-rightinfo{
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
 .p-pct-numstar,
 .p-pct-numcomment,
-.p-pct-numview{
+.p-pct-numview,
+.p-pct-numstar svg,
+.p-pct-numcomment svg,
+.p-pct-numview svg{
     cursor: pointer;
+    font-size: 14px;
+    font-family: 'ks-font-semibold';
+    color: var(--primary-color);
 }
 
 .p-pct-numstar:hover,
 .p-pct-numcomment:hover,
-.p-pct-numview:hover{
-    text-decoration: underline;
+.p-pct-numview:hover,
+.p-pct-numstar:hover svg,
+.p-pct-numcomment:hover svg,
+.p-pct-numview:hover svg{
+    color: var(--primary-color-700);
 }
 
 .p-postcard-toolbar__devide{

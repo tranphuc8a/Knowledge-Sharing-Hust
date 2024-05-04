@@ -2,7 +2,10 @@
     <TooltipFrame ref="tooltip" :delay-hiding="500" :delay-showing="500">
         <template #tooltipMask>
             <div class="p-star-button-frame">
-                <div v-if="myStar != null" @:click="resolveUnStar" class="p-stared-button"> {{ getStaredLabel() }} </div>
+                <div v-if="myStar != null" @:click="resolveUnStar" class="p-stared-button"> 
+                    <MIcon fa="star" :style="{fontSize: '12px'}" />
+                    {{ getStaredLabel() }} 
+                </div>
                 <div v-else @:click="resolveCommitFiveStar" class="p-not-stared-button"> {{ getStaredLabel() }} </div>
             </div>
         </template>
@@ -38,12 +41,13 @@
 
 <script>
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
+import { PutRequest } from '@/js/services/request';
 
 export default {
-    name: 'VisualizedStar',
+    name: 'CommentStarButton',
     data() {
         return {
-            myStar: this.comment?.MyStar,
+            myStar: this.getComment()?.MyStars,
             currentUser: null,
             selectStarIconStyle:{
                 fontSize: '28px'
@@ -60,14 +64,10 @@ export default {
     },
     mounted() {
         this.tooltip = this.$refs?.tooltip;
+        this.myStar = this.getComment().MyStars;
     },
     components: {
         TooltipFrame
-    },
-    props: {
-        star: {
-            required: true,
-        },
     },
     methods: {
         /**
@@ -78,8 +78,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },
@@ -114,6 +114,7 @@ export default {
             try {
                 this.myStar = index;
                 this.tooltip.hideTooltip(0);
+                this.sendStar(index);
             } catch (e){
                 console.error(e);
             }
@@ -134,15 +135,46 @@ export default {
                 this.myStar = 5;
                 this.currentStar = 5;
                 this.tooltip.hideTooltip(0);
+                this.sendStar(5);
             } catch (error) {
                 console.error(error);
+            }
+        },
+
+        async sendStar(star){
+            try {
+                let comment = this.getComment();
+                if (comment != null){
+                    let numStars = this.getComment().TotalStars ?? 0;
+                    let averageStars = this.getComment().AverageStars ?? 0;
+                    if (this.getComment().MyStars == null){
+                        averageStars = (averageStars * numStars + star) / (numStars + 1);
+                        numStars += 1;
+                        this.getComment().TotalStars = numStars;
+                        this.getComment().AverageStars = averageStars;
+                    } else if (numStars > 0) {
+                        averageStars = (averageStars * numStars + star - this.getComment().MyStars) / numStars;
+                        this.getComment().AverageStars = averageStars;
+                    }  
+                    this.forceUpdateInformationBar?.();
+                    this.getComment().MyStars = star;
+                }
+                await new PutRequest('Stars')
+                    .setBody({
+                        UserItemId: comment.UserItemId,
+                        Score: star
+                    }).execute();
+            } catch (error) {
+                console.error(error);
+                Request.resolveAxiosError(error);
             }
         }
     },
     
     inject: {
-        inject: {},
-        comment: {}
+        getLanguage: {},
+        getComment: {},
+        forceUpdateInformationBar: {}
     }
 }
 

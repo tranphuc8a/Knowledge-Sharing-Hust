@@ -152,7 +152,7 @@ builder.Services.AddScoped<ICourseRelationRepository, CourseRelationMySqlReposit
 builder.Services.AddScoped<ICoursePaymentRepository, CoursePaymentMySqlRepository>();
 builder.Services.AddScoped<IDecorationRepository, DecorationRepository>();
 builder.Services.AddScoped<ICourseLessonRepository, CourseLessonMySqlRepository>();
-
+builder.Services.AddScoped<IImageRepository, ImageMySqlRepository>();
 
 
 //
@@ -177,9 +177,11 @@ builder.Services.AddScoped<IKnowledgeService, KnowledgeService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IStarService, StarService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ICourseRelationService, CourseRelationService>();
 builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
 builder.Services.AddScoped<ICourseLessonService, CourseLessonService>();
 builder.Services.AddScoped<IOAuth2Service, OAuth2Service>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 
 

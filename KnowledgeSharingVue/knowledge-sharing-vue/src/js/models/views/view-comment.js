@@ -1,4 +1,5 @@
 
+import Comment from "../entities/comment";
 
 class ViewComment extends Comment {
     constructor() {
@@ -11,6 +12,7 @@ class ViewComment extends Comment {
     init() {
         return new ViewComment();
     }
+
 }
 
 export default ViewComment;

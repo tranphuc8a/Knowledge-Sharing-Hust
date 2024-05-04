@@ -4,7 +4,7 @@
             <div class="p-feedcard-addpost__header">
                 <TooltipUserAvatar :user="currentUser" :size="36" />
                 <div class="p-feedcard-addpost__reminder">
-                    {{ getLabel()?.remind(user?.FullName) }}
+                    {{ getLabel()?.remind(currentUser?.FullName) }}
                 </div>
             </div>
             <div class="p-feedcard-devide"></div>
@@ -64,8 +64,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.addpostcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.addpostcard;
             }
             return this.label;
         },
@@ -90,7 +90,7 @@ export default {
         
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         getToastManager: {},
         getPopupManager: {}
     }

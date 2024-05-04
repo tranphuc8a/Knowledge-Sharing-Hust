@@ -47,7 +47,9 @@ let button = {
             default: 'fas'
         },
         buttonStyle: {},
-        iconStyle: {},
+        iconStyle: {
+            color: 'white'
+        },
     },
 
     watch: {

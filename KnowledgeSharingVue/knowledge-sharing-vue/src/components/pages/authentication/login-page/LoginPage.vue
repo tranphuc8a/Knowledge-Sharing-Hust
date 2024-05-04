@@ -72,6 +72,8 @@ export default {
     name: 'KSLoginPage',
     data(){
         return {
+            global: this.globalData,
+
             label: null,
             isLoginWithCaptcha: false,
             captchaImageData: null,
@@ -127,8 +129,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.pages?.login;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.pages?.login;
             }
             return this.label;
         },
@@ -393,7 +395,7 @@ export default {
         }
     },
     inject: {
-        inject: {},
+        getLanguage: {},
         getPopupManager: {}, 
         getToastManager: {}
     }

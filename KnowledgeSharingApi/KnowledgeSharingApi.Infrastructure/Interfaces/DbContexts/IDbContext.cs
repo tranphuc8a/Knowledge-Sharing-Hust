@@ -107,6 +107,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         // UserItemDbContext
         DbSet<UserItem> UserItems {get; set;}
         DbSet<Star> Stars {get; set;}
+        DbSet<Image> Images { get; set; }
 
     }
 }

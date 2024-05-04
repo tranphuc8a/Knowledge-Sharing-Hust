@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.Entities.Tables
 {
-    [Table("Member")]
+    [Table("Course")]
     public class Course : Knowledge
     {
         public string Introduction { get; set; } = string.Empty;

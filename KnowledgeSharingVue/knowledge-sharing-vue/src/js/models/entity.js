@@ -65,7 +65,19 @@ class Entity {
                 this[prop] = entity[prop];
             }
         });
+        this.User = this.getUser();
         return this;
+    }
+
+
+    getUser(){
+        return {
+            UserId: this.UserId,
+            Username: this.Username,
+            FullName: this.FullName,
+            Avatar: this.Avatar,
+            Cover: this.Cover
+        };
     }
 }
 

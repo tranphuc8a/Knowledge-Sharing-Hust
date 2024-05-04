@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Validator } from "./validator";
 
 class Common {  
@@ -83,6 +85,53 @@ class Common {
         formatted = parseFloat(formatted).toString();
         
         return formatted + (unitName ?? "H");
+    }
+
+
+    /**
+     * Xóa những dấu / 
+     * @param {*} inputStr - chuoi markdown cần xóa
+     * @returns chuoi sau khi xoa
+     * @Created PhucTV (26/04/24)
+     * @Modified None
+     */
+    static unescapeSpecialCharacters(inputStr) {
+        try {
+            if (inputStr == null) return null;
+            const replacements = {
+                '\\n': '\n',
+                '\\r': '\r',
+                '\\t': '\t',
+                '\\b': '\b',
+                '\\f': '\f',
+                '\'': '\'',
+                '\"': '\"',
+                '\\\\': '\\'
+            };
+    
+            return inputStr.replace(/\\[nrtbf'"\\]/g, matched => replacements[matched]);
+        }
+        catch (error) {
+            console.error(error);
+            return null;
+        }   
+    }
+
+    static normalizeMarkdownText(markdownText) {
+        try {
+            if (markdownText == null) return null;
+            
+            // Xóa khoảng trắng đầu và cuối chuỗi
+            let normalizedText = markdownText.trim();
+            
+            // Xóa khoảng trắng giữa \n và #
+            normalizedText = normalizedText.replace(/\n\s+(?=#)/g, '\n');
+            
+            return normalizedText;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
     }
 }
 

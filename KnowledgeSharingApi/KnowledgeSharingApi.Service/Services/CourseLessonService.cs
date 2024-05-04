@@ -119,7 +119,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Decorate:
             IEnumerable<ResponseCourseLessonModel> insertedLesson = await DecorationRepository
-                .DecorateResponseCourseLessonModel(myUid, listLessonAdded, isDecorateLesson: true);
+                .DecorateResponseCourseLessonModel(myUid, listLessonAdded.ToList(), isDecorateLesson: true);
 
             // Tra ve thanh cong
             return ServiceResult.Success(ResponseResource.InsertMultiSuccess(ParticipantResource), string.Empty, insertedLesson);
@@ -270,7 +270,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Decorate
             IEnumerable<ResponseCourseLessonModel> listResponse = await
-                DecorationRepository.DecorateResponseCourseLessonModel(null, listLesson, isDecorateLesson: true);
+                DecorationRepository.DecorateResponseCourseLessonModel(null, listLesson.ToList(), isDecorateLesson: true);
             PaginationResponseModel<ResponseCourseLessonModel> res = new(total, limitValue, offsetValue, listResponse);
 
             // Tra ve thanh cong
@@ -297,7 +297,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Decorate
             IEnumerable<ResponseCourseLessonModel> listResponse = await
-                DecorationRepository.DecorateResponseCourseLessonModel(myUid, listLesson, isDecorateLesson: true);
+                DecorationRepository.DecorateResponseCourseLessonModel(myUid, listLesson.ToList(), isDecorateLesson: true);
             PaginationResponseModel<ResponseCourseLessonModel> res = new(total, limitValue, offsetValue, listResponse);
 
             // Tra ve thanh cong

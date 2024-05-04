@@ -4,13 +4,12 @@
         <div class="p-enter-comment-avatar">
             <UserAvatar :user="curentUser" :size="36" />
         </div>
-        <div class="p-enter-comment-textarea" ref="textarea">
+        <div class="p-enter-comment-textarea">
             <MTextArea
                 ref="textarea"
-                placeholder="Thêm bình luận"
+                :placeholder="placeholder"
                 :is-show-title="false" :is-show-error="true" 
                 :validator="commentValidator"
-                :oninput="adjustHeight"
                 max-height="150px" rows="1"
                 />
         </div>
@@ -28,12 +27,16 @@
 import UserAvatar from '@/components/base/avatar/UserAvatar.vue';
 import MTextArea from '@/components/base/inputs/MTextArea';
 import CurrentUser from '@/js/models/entities/current-user';
+import { PatchRequest, PostRequest, Request } from '@/js/services/request';
 import { NotEmptyValidator } from '@/js/utils/validator';
+import { myEnum } from '@/js/resources/enum';
+import ResponseCommentModel from '@/js/models/api-response-models/response-comment-model';
 
 export default {
     name: "p-enter-comment",
     data() {
         return {
+            isSubmiting: false,
             label: null,
             listComments: [null, null],
             curentUser: null,
@@ -46,43 +49,129 @@ export default {
         }
     },
     async mounted(){
-        this.curentUser = await CurrentUser.getInstance();
-        this.components = {
-            textarea: this.$refs.textarea,
-            submit: this.$refs.submit
+        try {
+            this.curentUser = await CurrentUser.getInstance();
+            this.components = {
+                textarea: this.$refs.textarea,
+                submit: this.$refs.submit
+            }
+            this.components.textarea.setValue(this.value);
         }
-        this.adjustHeight();
+        catch (error) {
+            console.error(error);
+        }
     },
     components: {
         MTextArea,
         UserAvatar,
     },
     methods: {
-        async adjustHeight(){
-            try {
-                let textarea = this.components.textarea;
-                let submit = this.components.submit;
-
-                submit.style.height = textarea.clientHeight + "px";
-            } catch (e){
-                console.error(e);
-            }
-        },
-
 
         async resolveSubmitComment(){
             try {
+                if (this.isSubmiting) return;
+                this.isSubmiting = true;
+
                 // validate form
+                if(!this.$refs.textarea.validate()){
+                    this.$refs['textarea'].startDynamicValidate();
+                    this.$refs['textarea'].focus();
+                    return;
+                }
 
                 // get text
+                let text = await this.components.textarea.getValue();
 
                 // submit comment
+                if (this.curentUser == null)
+                    this.getPopupManager().requiredLogin();
+                
+                if (this.isEditing){
+                    await this.editComment(text);
+                } else if (this.useritem.UserItemType == myEnum.EUserItemType.Comment){
+                    await this.replyComment(text);
+                } else {
+                    await this.addComment(text);
+                }
 
-                // update
-                let comment = {};
+                this.components.textarea.setValue("");
+            } catch (e){
+                console.error(e);
+            } finally {
+                this.isSubmiting = false;
+            }
+        },
+
+        async editComment(text){
+            try {
+                await new PatchRequest('Comments/' + this.editFor)
+                    .setBody({ Content: text })
+                    .execute();
+                // update ui
+                if (this.onCommentSubmitted) {
+                    await this.onCommentSubmitted(text);
+                }
+            } catch (e){
+                Request.resolveAxiosError(e);
+                // update ui
+                if (this.onCommentSubmitted) {
+                    await this.onCommentSubmitted(null);
+                }
+            }
+        },
+        
+        async replyComment(text){
+            try {
+                let res = await new PostRequest('Comments/reply')
+                    .setBody({
+                        ReplyId: this.useritem.UserItemId,
+                        Content: text
+                    }).execute();
+                let body = await Request.tryGetBody(res);
+                let comment = new ResponseCommentModel();
+                comment.copy(body);
+                comment.User = this.curentUser;
+
+                // update ui
                 if (this.onCommentSubmitted) {
                     await this.onCommentSubmitted(comment);
                 }
+            } catch (e){
+                Request.resolveAxiosError(e);
+            }
+        },
+
+        async addComment(text){
+            try {
+                let res = await new PostRequest('Comments')
+                    .setBody({
+                        KnowledgeId: this.useritem.UserItemId,
+                        Content: text
+                    }).execute();
+                let body = await Request.tryGetBody(res);
+                let comment = new ResponseCommentModel();
+                comment.copy(body);
+                comment.User = this.curentUser;
+
+                // update ui
+                if (this.onCommentSubmitted) {
+                    await this.onCommentSubmitted(comment);
+                }
+            } catch (e){
+                Request.resolveAxiosError(e);
+            }
+        },
+
+        /**
+         * Focus on textarea
+         * @param none
+         * @returns none
+         * @Created PhucTV (18/04/24)
+         * @Modified None
+         */
+        async focus(){
+            try {
+                this.$refs.textarea?.focus?.();
             } catch (e){
                 console.error(e);
             }
@@ -90,7 +179,20 @@ export default {
     },
     props: {
         useritem: {},
-        onCommentSubmitted: {}
+        onCommentSubmitted: {},
+        isEditing: {
+            default: false
+        },
+        editFor: {},
+        value: {
+            default: ''
+        },
+        placeholder: {
+            default: "Thêm bình luận"
+        }
+    },
+    inject: {
+        getPopupManager: {}
     }
 }
 
@@ -109,7 +211,7 @@ export default {
 
 .p-enter-comment > :first-child,
 .p-enter-comment > :last-child{
-    height: calc(100%);
+    align-self: stretch;
 }
 
 .p-enter-comment > :last-child{
@@ -123,5 +225,6 @@ export default {
     width: 0;
     flex: 1;
 }
+
 
 </style>

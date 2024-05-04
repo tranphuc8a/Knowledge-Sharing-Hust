@@ -29,9 +29,9 @@ export default {
          */
         async updateImageSrc(){
             try {
-                let imgSrc = this.post?.Thumbnail;
+                let imgSrc = this.getPost()?.Thumbnail;
                 if (! (await Common.isValidImage(imgSrc))){
-                    if (this.post?.PostType == myEnum.EPostType.Lesson){
+                    if (this.getPost()?.PostType == myEnum.EPostType.Lesson){
                         imgSrc = require('@/assets/default-thumbnail/lesson-image-icon.png');
                     } else {
                         imgSrc = require('@/assets/default-thumbnail/discussion-image-icon.jpg');
@@ -61,10 +61,8 @@ export default {
             }
         }
     },
-    injects: {
-        post: {
-            default: null
-        }
+    inject: {
+        getPost: {}
     }
 }
 

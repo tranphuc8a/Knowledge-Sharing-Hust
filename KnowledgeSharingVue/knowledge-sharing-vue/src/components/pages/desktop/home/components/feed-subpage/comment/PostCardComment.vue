@@ -1,61 +1,77 @@
 <template>
-    <div class="p-comment">
-        <div class="p-comment-left">
-            <div :class="{'p-comment-avatar': true, 'p-comment-owner': isOwner()}">
-                <TooltipUserAvatar :user="comment?.User"/>
+    <div class="p-comment" v-if="isShowComment">
+        <div class="p-comment-line" v-show="!isEditing">
+            <div class="p-comment-left">
+                <div :class="{'p-comment-avatar': true, 'p-comment-owner': isOwner()}">
+                    <TooltipUserAvatar :user="dComment?.User"/>
+                </div>
             </div>
-        </div>
-        
 
-        <div class="p-comment-content">
-            <div class="p-my-comment">
-                <div class="p-comment-card">
-                    <div class="p-comment-frame">
-                        <div class="p-comment-username">
-                            <TooltipUsername :user="comment?.User"/>
+            <div class="p-comment-right">
+                <div class="p-my-comment">
+                    <div class="p-comment-card" ref="comment-card">
+                        <div class="p-comment-frame">
+                            <div class="p-comment-username">
+                                <TooltipUsername :user="dComment?.User"/>
+                            </div>
+                            <div class="p-comment-text">
+                                <LimitLengthText :text="dComment?.Content"
+                                    :length="50" />
+                            </div>
                         </div>
-                        <div class="p-comment-text">
-                            <span v-show="!isCollapsing">
-                                {{comment?.Content ?? "Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luậnĐây là bình luậnĐây là bình luận Đây là bình luận"}}
-                            </span> 
-                            <span v-show="isCollapsing">
-                                {{ collapseText(
-                                    comment?.Content ?? "Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luận Đây là bình luậnĐây là bình luậnĐây là bình luận Đây là bình luận"
-                                ) }}
-                            </span>
-                            <span> &nbsp; </span>
-                            <span class="p-more-button" 
-                                v-show="!isCollapsing && true"
-                                @:click="toggleCollapse">Ẩn bớt</span>
-                            <span class="p-more-button" 
-                                v-show="isCollapsing"
-                                @:click="toggleCollapse">Xem thêm</span>
+                        <div class="p-comment-menu-context" ref="comment-menu-context">
+                            <CommentMenuContext 
+                                :on-edit="resolveEditComment"
+                                :on-delete="resolveDeleteComment"
+                                :on-reply="resolveReplyComment"
+                                :on-toggle-information="resolveToggleInformation"
+                            />
                         </div>
                     </div>
-                    <div class="p-comment-menu-context">
-                        <CommentMenuContext 
-                            :on-edit="resolveEditComment"
-                            :on-delete="resolveDeleteComment"
-                            :on-reply="resolveReplyComment"
-                        />
+                    <div class="p-comment-info" v-if="dComment?.isHideCommentInformation === false">
+                        <CommentInformationBar :on-reply="resolveReplyComment" />
                     </div>
                 </div>
-                <div class="p-comment-info">
-                    <CommentInformationBar :on-reply="resolveReplyComment" />
-                </div>
-            </div>
-            <div class="p-comment-replies" v-if="comment?.NumberReplies > 0">
-                <PostCardComment v-for="(comment) in comment?.Replies ?? []" :key="comment?.UserItemId" :comment="comment"/>
-            </div>
-            <div class="p-reply-enter" v-if="isShowEnterComment && comment?.ReplyId == null">
-                <PostCardEnterComment :useritem="comment"/>
             </div>
         </div>
+
+        <div class="p-comment-line p-edit-comment" v-if="isEditing">
+            <PostCardEnterComment ref="edit-comment" 
+                :is-editing="true"
+                :edit-for="this.comment.UserItemId"
+                :useritem="comment" 
+                :value="dComment?.Content ?? 'Chinh sua binh luan'"
+                :on-comment-submitted="resolveSubmittedComment"
+                />
+
+            <div class="p-cancel-edit-comment">
+                <span @:click="resolveCancelEditComment">
+                    Hủy chỉnh sửa
+                </span>
+            </div>
+        </div>
+
+        <div class="p-comment-line">
+            <div class="p-comment-left">
+                
+            </div>
+
+            <div class="p-comment-right">
+                <div class="p-comment-replies" v-if="dComment?.NumberReplies > 0">
+                    <PostCardComment v-for="(cmt) in dComment?.Replies ?? [null]" :key="cmt?.UserItemId" :comment="cmt"/>
+                </div>
+                <div class="p-reply-enter" v-if="isShowEnterComment && dComment?.ReplyId == null">
+                    <PostCardEnterComment ref="reply-enter" :useritem="comment" placeholder="Phản hồi bình luận"/>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </template>
 
 <script>
+import LimitLengthText from '@/components/base/text/LimitLengthText.vue';
 import CommentInformationBar from './CommentInformationBar.vue';
 import CommentMenuContext from './CommentMenuContext.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
@@ -66,23 +82,53 @@ export default {
     name: "p-comment",
     data() {
         return {
+            isShowComment: true,
+            dComment: this.comment,
             isShowEnterComment: false,
             isShowReplies: false,
             isCollapsing: true,
-            maxCommentLength: 50,
+            isEditing: false,
+            components: {
+                commentCard: null,
+                commentMenuContext: null,
+                replyEnter: null
+            }
         }
     },
     components: {
+        LimitLengthText,
         CommentInformationBar,
         CommentMenuContext,
         TooltipUserAvatar,
         PostCardEnterComment,
         TooltipUsername
     },
+    mounted(){
+        try {
+            if (this.dComment == null) this.dComment = {};
+            this.dComment.isHideCommentInformation = false;
+            let that = this;
+            this.dComment.ForceUpdate = async function(){
+                that.isShowComment = false;
+                that.$nextTick(() => {
+                    that.isShowComment = true;
+                });
+            };
+            this.components = {
+                commentCard: this.$refs['comment-card'],
+                commentMenuContext: this.$refs['comment-menu-context'],
+                replyEnter: this.$refs['reply-enter']
+            };
+            this.listComments = this.dComments;
+            this.getLabel();
+        } catch (error) {
+            console.error(error);
+        }
+    },
     methods: {
         isOwner(){
-            let postOwner = this.post?.UserId;
-            let commentOwner = this.comment?.UserId;
+            let postOwner = this.getPost()?.UserId;
+            let commentOwner = this.dComment?.UserId;
             return Validator.isNotEmpty(commentOwner) && postOwner === commentOwner;
         },
 
@@ -94,48 +140,77 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
-            console.log(this.inject);
             return this.label;
         },
 
 
-        collapseText(text){
+        async resolveReplyComment(){
             try {
-                text = String(text);
-                if (text.length <= this.maxCommentLength) {
-                    return text;
-                }
-                return text.slice(0, this.maxCommentLength) + '...';
-            } catch (error){
+                this.isShowEnterComment = !this.isShowEnterComment;
+                let that = this;
+                this.$nextTick(() => {
+                    try {
+                        that.$refs['reply-enter']?.focus?.();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+            } catch (error) {
                 console.error(error);
-                return "Error";
             }
         },
 
-        toggleCollapse(){
-            this.isCollapsing = !this.isCollapsing;
+        async resolveEditComment(){
+            this.isEditing = true;
         },
 
-        async resolveReplyComment(){
-            this.isShowEnterComment = true;
-        }
+        async resolveCancelEditComment(){
+            this.isEditing = false;
+        },
+
+        async resolveSubmittedComment(text){
+            try {
+                this.isEditing = false;
+                this.dComment.Content = text;
+            }
+            catch (error) {
+                console.error(error);
+            }
+        },
+
+        async resolveDeleteComment(){
+            this.$emit('on-delete', this.dComment);
+        },
+
+        async resolveToggleInformation(){
+            try {
+                this.dComment.isHideCommentInformation = !this.dComment.isHideCommentInformation;
+            } catch (error){
+                console.error(error);
+            }
+        },
+
+
     },
     props: {
-        comment: {}
-    },
-    mounted() {
-        this.listComments = this.comments;
+        comment: {
+            required: true
+        },
+
+        onPostedComment: {
+            default: null
+        }
     },
     inject: {
-        inject: {},
-        post: {}
+        getLanguage: {},
+        getPost: {}
     },
-    provider(){
+    provide(){
         return {
-            comment: this.comment
+            getComment: () => this.dComment,
         }
     }
 }
@@ -153,6 +228,12 @@ export default {
     gap: 4px;
 }
 
+.p-comment{
+    width: 100%;
+    flex-flow: column nowrap;
+    gap: 0;
+}
+
 .p-comment-left{
     flex-shrink: 0;
     flex-grow: 0;
@@ -160,6 +241,15 @@ export default {
     display: flex;
     flex-flow: row nowrap;
     justify-content: center;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+
+.p-comment-right{
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
     align-items: flex-start;
     box-sizing: border-box;
 }
@@ -178,17 +268,38 @@ export default {
     border: 3px solid var(--primary-color);
 }
 
-.p-comment-content{
-    flex: 1;
+.p-comment-line{
+    width: 100%;
     display: flex;
-    flex-flow: column nowrap;
+    flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: flex-start;
     gap: 4px;
 }
 
+.p-comment-line.p-edit-comment{
+    flex-flow: column nowrap;
+}
+.p-cancel-edit-comment{
+    width: 100%;
+    text-align: left;
+    font-size: 12px;
+    color: var(--primary-color);
+    padding-left: 40px;
+}
+.p-cancel-edit-comment span{
+    cursor: pointer;
+}
+.p-cancel-edit-comment span:hover{
+    text-decoration: underline;
+}
+
 .p-comment-card{
     gap: 4px;
+}
+
+.p-comment-info{
+    width: calc(100% - 40px);
 }
 
 .p-comment-frame{
@@ -203,18 +314,26 @@ export default {
     padding: 8px 12px;;
 }
 
+.p-comment-menu-context{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+
+    align-self: stretch;
+}
+
 .p-comment-text{
-    text-align: justify;
+    height: fit-content;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    font-size: 14px;
 }
 
-.p-more-button{
-    font-family: 'ks-font-semibold';
-    cursor: pointer;
-}
-
-.p-more-button:hover{
-    text-decoration: underline;
-}
 
 .p-my-comment{
     display: flex;
@@ -222,6 +341,10 @@ export default {
     justify-content: flex-start;
     align-items: flex-start;
     gap: 4px;
+}
+
+.p-my-comment:hover .p-comment-menu-context{
+    visibility: visible;
 }
 
 .p-reply-enter{

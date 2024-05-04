@@ -10,9 +10,16 @@
 
 ::-webkit-scrollbar-thumb{
     position: fixed;
-    background: rgba(0,0,0,0.4); 
+    /* background: rgba(0,0,0,0.4);  */
+    background-color: transparent;
     border-radius: 4px;
     width: 10px;
+    transition: background-color 1s ease;
+}
+
+:hover::-webkit-scrollbar-thumb{
+    background: rgba(0,0,0,0.2); 
+    transition: background-color 1s ease;
 }
 
 ::-webkit-scrollbar-track{

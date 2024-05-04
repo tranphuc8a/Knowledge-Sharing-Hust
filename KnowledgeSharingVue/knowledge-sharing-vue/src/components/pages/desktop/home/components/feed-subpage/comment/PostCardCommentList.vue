@@ -3,35 +3,64 @@
         <div class="p-pcl-filter-button">
             <CommentFilterButton :on-change="resolveOnchangeFilter" />
         </div>
-        <div class="p-pcl-comment-list">
-            <PostCardComment v-for="comment in listComments" :key="comment?.UserItemId" :comment="comment"/>
+        <div class="p-pcl-comment-list" v-if="listComments?.length > 0">
+            <PostCardComment v-for="comment in listComments" :key="comment?.UserItemId + randomize()" :comment="comment"/>
+            <!-- <div class="p-pcl-comment-load-more" v-show="!isOutOfComments"
+                @:click="resolveLoadMoreComment">
+                Tải thêm bình luận
+            </div> -->
+            <MLinkButton v-show="!isOutOfComments" :onclick="getMoreComments" 
+                label="Tải thêm bình luận" :href="null"
+            />
+
+        </div>
+        <div class="p-pcl-empty-comment" v-if="listComments?.length <= 0">
+            Hiện không có bình luận nào
         </div>
         <div class="p-pcl-enter-comment">
-            <PostCardEnterComment :useritem="post"/>
+            <PostCardEnterComment :useritem="getPost()" :on-comment-submitted="resolvePostedComment"/>
         </div>
     </div>
 </template>
 
 <script>
+import MLinkButton from '@/components/base/buttons/MLinkButton';
 import PostCardComment from './PostCardComment.vue';
 import PostCardEnterComment from './PostCardEnterComment.vue';
 import CommentFilterButton from './CommentFilterButton.vue';
 import { myEnum } from '@/js/resources/enum';
-
+import CurrentUser from '@/js/models/entities/current-user';
+import { Request, GetRequest } from '@/js/services/request';
+import ResponseCommentModel from '@/js/models/api-response-models/response-comment-model';
+import { MyRandom } from '@/js/utils/myrandom';
 
 export default {
     name: "PostCardcomment-list",
     data(){
         return {
             label: null,
-            listComments: [null, null],
+            listComments: [],
+            isOutOfComments: false,
+            pageSize: 10,
+            currentUser: null,
         }
     },
     components: {
+        MLinkButton,
         CommentFilterButton, PostCardEnterComment, PostCardComment
     },
-    mounted(){
+    async mounted(){
+        if (this.getPost()?.TopComments?.length > 0){
+            this.listComments = this.getPost().TopComments.map(function(comment){
+                let com = new ResponseCommentModel();
+                com.copy(comment);
+                return com;
+            });
+        }
+        // console.log(this.listComments);
+        this.currentUser = await CurrentUser.getInstance();
         this.getLabel();
+        this.getTopComments();
     },
     methods: {
         /**
@@ -42,11 +71,15 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
-            console.log(this.inject);
             return this.label;
+        },
+
+
+        randomize(){
+            return MyRandom.generateUUID();
         },
 
 
@@ -68,12 +101,93 @@ export default {
             } catch (e) {
                 console.error(e);
             }
+        },
+
+
+        async getTopComments(){
+            try {
+                let url = null;
+                let postId = this.getPost()?.UserItemId;
+                if (postId == null){
+                    return;
+                }
+                if (this.currentUser == null){
+                    url = 'Comments/anonymous/' + postId;
+                } else {
+                    url = 'Comments/' + postId;
+                }
+                let res = await new GetRequest(url)
+                    .setParams({
+                        limit: this.pageSize,
+                        offset: 0
+                    }).execute();
+                let body = await Request.tryGetBody(res);
+                let readComments = body?.Results ?? [];
+                if (readComments < this.pageSize)
+                    this.isOutOfComments = true;
+                let mappedComments = readComments.map(function(comment){
+                    let com = new ResponseCommentModel();
+                    com.copy(comment);
+                    return com;
+                });
+                this.listComments = mappedComments;
+                this.$forceUpdate();
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+
+        async getMoreComments(){
+            try {
+                let numComs = this.listComments.length;
+                let url = null;
+                let postId = this.getPost()?.UserItemId;
+                if (postId == null){
+                    return;
+                }
+                if (this.currentUser == null){
+                    url = 'Comments/anonymous/' + postId;
+                } else {
+                    url = 'Comments/' + postId;
+                }
+                let res = await new GetRequest(url)
+                    .setParams({
+                        limit: this.pageSize,
+                        offset: numComs
+                    }).execute();
+                let body = await Request.tryGetBody(res);
+                let readComments = body?.Results ?? [];
+                if (readComments < this.pageSize)
+                    this.isOutOfComments = true;
+                let mappedComments = readComments.map(function(comment){
+                    let com = new ResponseCommentModel();
+                    com.copy(comment);
+                    return com;
+                });
+                this.listComments = this.listComments.concat(mappedComments);
+                // this.listComments = this.listComments.concat(mappedComments);
+                // this.$forceUpdate();
+            } catch (e) {
+                console.error(e);
+                Request.resolveAxiosError(e);
+            }
+        },
+
+
+        async resolvePostedComment(comment){
+            try {
+                this.listComments.push(comment);
+            } catch (e) {
+                console.error(e);
+            }
         }
+
         
     },
     inject: {
-        inject: {},
-        post: {
+        getLanguage: {},
+        getPost: {
             default: null
         }
     }
@@ -90,6 +204,20 @@ export default {
     justify-content: flex-start;
     align-items: flex-start;
     gap: 18px;
+}
+
+.p-pcl-empty-comment{
+    width: 100%;
+    text-align: center;
+    padding: 12px 0px 18px 0px;
+}
+
+.p-pcl-comment-load-more{
+    cursor: pointer;
+}
+
+.p-pcl-comment-load-more:hover{
+    text-decoration: underline;
 }
 
 </style>

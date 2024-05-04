@@ -295,7 +295,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (26/3/24)
         /// Modified: None
-        [HttpGet("block/{knowledgeId}")]
+        [HttpPost("block/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserBlockKnowledge(Guid knowledgeId)
         {
@@ -311,7 +311,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (26/3/24)
         /// Modified: None
-        [HttpGet("unblock/{knowledgeId}")]
+        [HttpPost("unblock/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserUnBlockKnowledge(Guid knowledgeId)
         {

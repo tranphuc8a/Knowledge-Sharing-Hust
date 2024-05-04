@@ -67,7 +67,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.ViewCourses
                 .Where(c => listMarkedKnowledgeIds.Contains(c.UserItemId))
                 .OrderByDescending(c => c.CreatedTime)
-                .Skip(limit).Take(offset)
+                .Skip(offset).Take(limit)
                 .ToListAsync();
         }
 

@@ -43,12 +43,14 @@
 <script>
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
+import CurrentUser from '@/js/models/entities/current-user';
+import { PutRequest } from '@/js/services/request';
 
 export default {
-    name: 'VisualizedStar',
+    name: 'PostCardStarButton',
     data() {
         return {
-            myStar: this.post?.MyStar,
+            myStar: this.getPost()?.MyStars,
             currentUser: null,
             notStaredIconStyle: {
                 color: 'var(--grey-color)',
@@ -71,16 +73,19 @@ export default {
             tooltip: null,
         }
     },
-    mounted() {
-        this.tooltip = this.$refs?.tooltip;
+    async mounted() {
+        try {
+            this.tooltip = this.$refs?.tooltip;
+            this.currentUser = await CurrentUser.getInstance();
+            this.myStar = this.getPost()?.MyStars;
+        } catch (e) {
+            console.error(e);
+        }
     },
     components: {
         TooltipFrame, MEmbeddedButton
     },
     props: {
-        star: {
-            required: true,
-        },
     },
     methods: {
         /**
@@ -91,8 +96,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.subpages?.feedpage?.postcard;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },
@@ -127,8 +132,20 @@ export default {
             try {
                 this.myStar = index;
                 this.tooltip.hideTooltip(0);
+                this.submitStar(index);
             } catch (e){
                 console.error(e);
+            }
+        },
+
+        async resolveCommitFiveStar(){
+            try {
+                this.myStar = 5;
+                this.currentStar = 5;
+                this.tooltip.hideTooltip(0);
+                this.submitStar(5);
+            } catch (error) {
+                console.error(error);
             }
         },
 
@@ -142,20 +159,51 @@ export default {
             }
         },
 
-        async resolveCommitFiveStar(){
+        async submitStar(star){
             try {
-                this.myStar = 5;
-                this.currentStar = 5;
-                this.tooltip.hideTooltip(0);
-            } catch (error) {
-                console.error(error);
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                }
+                let postId = this.getPost().UserItemId;
+                this.updateToolbar(star);
+                await new PutRequest('Stars').setBody({
+                    UserItemId: postId,
+                    Score: star
+                }).execute();
+                
+            } catch (e){
+                this.myStar = this.getPost()?.MyStars;
+                this.currentStar = this.myStar;
+                console.error(e);
+            }
+        },
+
+        async updateToolbar(star){
+            try {
+                let numStars = this.getPost().TotalStars ?? 0;
+                let averageStars = this.getPost().AverageStars ?? 0;
+                if (this.getPost().MyStars == null){
+                    averageStars = (averageStars * numStars + star) / (numStars + 1);
+                    numStars += 1;
+                    this.getPost().TotalStars = numStars;
+                    this.getPost().AverageStars = averageStars;
+                } else if (numStars > 0) {
+                    averageStars = (averageStars * numStars + star - this.getPost().MyStars) / numStars;
+                    this.getPost().AverageStars = averageStars;
+                }  
+                this.getPost().MyStars = star;
+                this.forceUpdateToolbar();
+            } catch (e){
+                console.error(e);
             }
         }
     },
     
     inject: {
-        inject: {},
-        post: {}
+        forceUpdateToolbar: {},
+        getLanguage: {},
+        getPost: {},
+        getPopupManager: {}
     }
 }
 

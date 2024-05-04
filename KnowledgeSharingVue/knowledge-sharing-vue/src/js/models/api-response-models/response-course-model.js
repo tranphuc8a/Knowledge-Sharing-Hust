@@ -1,5 +1,5 @@
 
-import ViewCourse from '../view-models/view-course-model';
+import ViewCourse from "../views/view-course";
 
 class ResponseCourseModel extends ViewCourse {
     constructor() {

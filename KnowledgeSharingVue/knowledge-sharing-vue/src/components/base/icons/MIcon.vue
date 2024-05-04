@@ -10,7 +10,9 @@ let icon = {
         return {};
     },
     props: {
-        fa: {},
+        fa: {
+            required: true,
+        },
         style: {
             type: Object,
             default: {}

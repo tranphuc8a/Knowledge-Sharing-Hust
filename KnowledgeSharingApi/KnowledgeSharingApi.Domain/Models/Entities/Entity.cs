@@ -75,18 +75,29 @@ namespace KnowledgeSharingApi.Domains.Models.Entities
         /// <param name="entity"> Đối tượng được copy </param>
         /// Created: PhucTV (30/1/24)
         /// Modified: None
-        public virtual Entity Copy(object entity)
+        public virtual Entity Copy(object entity, bool isAcceptNull = false)
         {
-            PropertyInfo[] listProps = GetProperties();
+            PropertyInfo[] listProps = this.GetType().GetProperties();
             foreach (var prop in listProps)
             {
                 var tarProp = entity.GetType().GetProperty(prop.Name);
-                if (tarProp != null && tarProp.GetType() == prop.GetType())
+                // Kiểm tra xem có thuộc tính trùng tên và có thể gán được hay không.
+                if (tarProp != null &&
+                    (prop.PropertyType.IsAssignableFrom(tarProp.PropertyType) ||
+                     Nullable.GetUnderlyingType(prop.PropertyType) == tarProp.PropertyType ||
+                     prop.PropertyType == Nullable.GetUnderlyingType(tarProp.PropertyType)))
                 {
-                    prop.SetValue(this, tarProp.GetValue(entity));
+                    var value = tarProp.GetValue(entity);
+                    if (value != null || isAcceptNull)
+                    {
+                        // Nếu prop là kiểu nullable và tarProp là kiểu non-nullable (hoặc ngược lại)
+                        // thì giá trị có thể được gán tùy thuộc vào kiểu cơ sở tương thích.
+                        prop.SetValue(this, value);
+                    }
                 }
             }
             return this;
         }
+
     }
 }

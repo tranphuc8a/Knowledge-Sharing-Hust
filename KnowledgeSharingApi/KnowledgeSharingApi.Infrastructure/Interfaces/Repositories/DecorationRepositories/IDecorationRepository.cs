@@ -12,14 +12,34 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.Decoration
     public interface IDecorationRepository
     {
         /// <summary>
-        /// Bổ sung thêm thông tin cho ResponseLessonModel từ lesson
+        /// Bổ sung thêm thông tin cho ResponseLessonModel từ viewLesson
         /// </summary>
         /// <param name="myUid"> id của user thực hiện </param>
-        /// <param name="lessons"> Danh sách lesssons </param>
+        /// <param name="lessons"> Danh sách các view lessons </param>
         /// <returns></returns>
         /// Created: PhucTV (3/4/24)
         /// Modified: None
-        Task<IEnumerable<ResponseLessonModel>> DecorateResponseLessonModel(Guid? myUid, IEnumerable<ViewLesson> lessons);
+        Task<List<ResponseLessonModel>> DecorateResponseLessonModel(Guid? myUid, List<ViewLesson> lessons);
+
+        /// <summary>
+        /// Bổ sung thêm thông tin cho ResponseQuestionModel từ viewQuestion
+        /// </summary>
+        /// <param name="myUid"> id của user thực hiện </param>
+        /// <param name="questions"> Danh sách các view questions </param>
+        /// <returns></returns>
+        /// Created: PhucTV (3/5/24)
+        /// Modified: None
+        Task<List<ResponseQuestionModel>> DecorateResponseQuestionModel(Guid? myUid, List<ViewQuestion> questions);
+
+        /// <summary>
+        /// Bổ sung thêm thông tin cho ResponseCourseModel từ viewCourse
+        /// </summary>
+        /// <param name="myUid"> id của user thực hiện </param>
+        /// <param name="courses"> Danh sách các viewCourses </param>
+        /// <returns></returns>
+        /// Created: PhucTV (3/5/24)
+        /// Modified: None
+        Task<List<ResponseCourseModel>> DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses);
 
         /// <summary>
         /// Bổ sung thêm thông tin cho ResponseCourseLessonModel từ CourseLesson
@@ -31,7 +51,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.Decoration
         /// <returns></returns>
         /// Created: PhucTV (3/4/24)
         /// Modified: None
-        Task<IEnumerable<ResponseCourseLessonModel>> DecorateResponseCourseLessonModel(Guid? myUid, 
-            IEnumerable<CourseLesson> participants, bool isDecorateLesson = false, bool isDecorateCourse = false);
+        Task<List<ResponseCourseLessonModel>> DecorateResponseCourseLessonModel(Guid? myUid, 
+            List<CourseLesson> participants, bool isDecorateLesson = false, bool isDecorateCourse = false);
     }
 }

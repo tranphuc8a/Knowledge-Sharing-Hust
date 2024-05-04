@@ -239,5 +239,10 @@ namespace KnowledgeSharingApi.Domains.Resources.Vietnamese
         {
             return $"Quan hệ người dùng";
         }
+
+        public string Image()
+        {
+            return $"Ảnh";
+        }
     }
 }

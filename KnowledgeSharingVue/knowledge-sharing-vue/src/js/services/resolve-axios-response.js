@@ -1,9 +1,9 @@
 
 import statusCodeEnum from "../resources/status-code-enum";
-import appConfig from "@/app-config";
+// import appConfig from "@/app-config";
 import { myEnum } from "../resources/enum";
 import { language } from "../resources/language";
-const loginPageUrl = `${appConfig.getBackendUrl()}/login`;
+// const loginPageUrl = `${appConfig.getBackendUrl()}/login`;
 var lang = language.vi;
 
 class ResolveAxiosResponse {
@@ -67,11 +67,7 @@ class ResolveAxiosResponse {
      */
     resolveUnAuthorized = async (error) => {
         if (this.popupManager != null){
-            let msg = "Bạn chưa đăng nhập. Bạn có muốn chuyển sang trang đăng nhập không?";
-            let onOkay = async function(){
-                window.location.href = loginPageUrl;
-            }
-            this.popupManager.infor(msg, onOkay);
+            this.popupManager.requiredLogin();
         } else {
             console.error(error);
         }

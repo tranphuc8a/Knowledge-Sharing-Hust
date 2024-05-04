@@ -4,7 +4,7 @@
             <div class="p-visualized-star">
                 <div class="p-visualized-stars">
                     <template v-for="(index) in [1, 2, 3, 4, 5]">
-                        <MIcon :style="iconStyle" v-if="dStar > index" fa="star" :key="`${index}-full`"/>
+                        <MIcon :style="iconStyle" v-if="dStar >= index" fa="star" :key="`${index}-full`"/>
                         <MIcon :style="iconStyle" v-else-if="dStar + 1 > index" fa="star-half-stroke" :key="`${index}-half`" family="far" />
                         <MIcon :style="iconStyle" v-else fa="star" :key="`${index}-empty`" family="far" />
                     </template>
@@ -13,8 +13,9 @@
         </template>
         <template #tooltipContent>
             <div class="p-visualized-star-numbers">
+                <MIcon :style="{}" fa="star" />
                 {{ dStar }}
-                <MIcon :style="iconStyle" fa="star" />
+                sao
             </div>
         </template>
     </TooltipFrame>
@@ -43,7 +44,7 @@ export default {
     },
     props: {
         star: {
-            required: true,
+            required: false,
         },
     },
     methods: {
@@ -56,7 +57,7 @@ export default {
         */
         async updateStar(){
             try {
-                let round = Math.round(this.star * 10) / 10;
+                let round = Math.round((this.star ?? 0) * 10) / 10;
                 this.dStar = round;
             } catch (e){
                 console.error(e);

@@ -451,6 +451,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             // Check comment tồn tại, knowledge tồn tại
             ViewComment comment = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
+            ViewComment editableComment = (ViewComment) comment.Clone();
             Knowledge knowledge = await KnowledgeRepository.CheckExisted(comment.KnowledgeId, NotExistKnowledge);
 
             // Check accessible to knowledge
@@ -459,16 +460,16 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Bạn không có quyền truy cập bài viết này");
 
             // Update
-            comment.Content = commentModel.Content!;
-            comment.ModifiedBy = myUid.ToString();
-            comment.ModifiedTime = DateTime.Now;
+            editableComment.Content = commentModel.Content!;
+            editableComment.ModifiedBy = myUid.ToString();
+            editableComment.ModifiedTime = DateTime.Now;
             Comment commentToUpdate = new();
-            commentToUpdate.Copy(comment);
-            int res = await CommentRepository.Update(comment.UserItemId, commentToUpdate);
+            commentToUpdate.Copy(editableComment);
+            int res = await CommentRepository.Update(editableComment.UserItemId, commentToUpdate);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CommentResource));
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.UpdateSuccess(CommentResource), string.Empty, comment);
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(CommentResource), string.Empty, editableComment);
         } 
         #endregion
     }

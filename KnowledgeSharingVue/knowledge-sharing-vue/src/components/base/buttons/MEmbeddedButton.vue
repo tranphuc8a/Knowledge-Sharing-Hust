@@ -1,11 +1,11 @@
 <template>
-    <div @:click="resolveOnclick" :style="buttonStyle" class="p-button p-embedded-button" :state="data.state">
+    <div @:click="resolveOnclick" :style="data.buttonStyle" class="p-button p-embedded-button" :state="data.state">
         <div class="p-button-content">
-            <MIcon :fa="fa" :family="iconFamily" :style="iconStyle" v-if="fa != null" />
+            <MIcon :fa="fa" :family="iconFamily" :style="data.iconStyle" v-if="fa != null" />
             <div v-if="label != null"> {{ label }} </div>
         </div>
         <div class="p-loading-container">
-            <MSpinner :style="iconStyle"/>
+            <MSpinner :style="data.iconStyle"/>
         </div>
     </div>
 </template>
@@ -17,7 +17,15 @@ let button = {
     data() {
         return {
             data: {
-                state: this.state
+                state: this.state,
+                buttonStyle: {
+                    color: 'var(--primary-color)',
+                    ...this.buttonStyle
+                },
+                iconStyle: {
+                    color: 'var(--primary-color)',
+                    ...this.iconStyle
+                },
             }
         };
     },

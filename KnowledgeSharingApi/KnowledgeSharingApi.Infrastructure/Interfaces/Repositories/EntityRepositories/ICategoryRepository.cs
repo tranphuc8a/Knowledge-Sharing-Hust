@@ -40,6 +40,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         Task<IEnumerable<Category>> GetByKnowledgeId(Guid knowledgeId);
 
         /// <summary>
+        /// Lấy về danh sách categories của một danh sách knowledge
+        /// </summary>
+        /// <param name="knowledgeIds"> danh sách id của knowledge </param>
+        /// <returns> Danh sách cate </returns>
+        /// Created: PhucTV (4/5/24)
+        /// Modified: None
+        Task<Dictionary<Guid, IEnumerable<Category>?>> GetByKnowledgeId(IEnumerable<Guid> knowledgeIds);
+
+        /// <summary>
         /// Cập nhật danh sách category của một knowledge
         /// </summary>
         /// <param name="knowledgeId"> id của knowledge cần cập nhật </param>

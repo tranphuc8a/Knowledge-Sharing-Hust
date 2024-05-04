@@ -44,11 +44,8 @@ export default {
     },
     props: {
         user: {
-            default: {
-                avatar: null,
-                fullName: null,
-                username: null,
-            },
+            required: true,
+            default: null
         }
     },
 };

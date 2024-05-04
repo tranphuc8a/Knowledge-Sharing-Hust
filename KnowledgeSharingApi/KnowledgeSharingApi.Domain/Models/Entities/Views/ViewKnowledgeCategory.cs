@@ -12,5 +12,11 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
     public class ViewKnowledgeCategory : KnowledgeCategory
     {
         public string CategoryName { get; set; } = string.Empty;
+
+
+        protected override ViewKnowledgeCategory Init()
+        {
+            return new ViewKnowledgeCategory();
+        }
     }
 }

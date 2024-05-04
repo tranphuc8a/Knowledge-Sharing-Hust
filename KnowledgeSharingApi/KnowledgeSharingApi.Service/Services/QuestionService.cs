@@ -7,10 +7,13 @@ using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Mysqlx.Crud;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +31,11 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IQuestionRepository QuestionRepository;
         protected readonly ICourseRepository CourseRepository;
         protected readonly IKnowledgeRepository KnowledgeRepository;
+        protected readonly IImageRepository ImageRepository;
+        protected readonly IStorage Storage;
+        protected readonly IDecorationRepository DecorationRepository;
         protected readonly IUserRepository UserRepository;
+        protected readonly ICategoryRepository CategoryRepository;
         //        protected readonly IUnitOfWork UnitOfWork = unitOfWork
 
         protected readonly string QuestionResource;
@@ -41,14 +48,22 @@ namespace KnowledgeSharingApi.Services.Services
             ICourseRepository courseRepository,
             IKnowledgeRepository knowledgeRepository,
             IUserRepository userRepository,
+            IImageRepository imageRepository,
+            IDecorationRepository decorationRepository,
+            IStorage storage,
+            ICategoryRepository categoryRepository,
             IResourceFactory resourceFactory
-    )
+        )
         {
             ResourceFactory = resourceFactory;
             QuestionRepository = questionRepository;
             CourseRepository = courseRepository;
             KnowledgeRepository = knowledgeRepository;
+            DecorationRepository = decorationRepository;
+            CategoryRepository = categoryRepository;
+            ImageRepository = imageRepository;
             UserRepository = userRepository;
+            Storage = storage;
             ResponseResource = resourceFactory.GetResponseResource();
             EntityResource = resourceFactory.GetEntityResource();
             QuestionResource = EntityResource.Question();
@@ -58,52 +73,6 @@ namespace KnowledgeSharingApi.Services.Services
             GetMultiQuestionSuccess = ResponseResource.GetMultiSuccess(QuestionResource);
         }
 
-
-        /// <summary>
-        /// Thêm các trường thông tin bổ sung cho Post
-        /// số sao, số bình luận, top bình luận
-        /// </summary>
-        /// <param name="post"> post gốc </param>
-        /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
-        /// Modified: None
-        protected virtual async Task<ResponseQuestionModel> DecoratePost(ViewQuestion post)
-        {
-            ResponseQuestionModel model = new();
-            model.Copy(post);
-            PaginationResponseModel<ViewComment> listComments =
-                await KnowledgeRepository.GetListComments(model.UserItemId, NumberOfTopComments, 0);
-            model.NumberComments = listComments.Total;
-            model.TopComments = listComments.Results.Select(com =>
-            {
-                ResponseCommentModel comment = new();
-                comment.Copy(com);
-                return comment;
-            });
-
-            // Lấy về danh sách categories
-
-            model.AverageStars = await KnowledgeRepository.GetAverageStar(model.UserItemId);
-            return model;
-        }
-
-        /// <summary>
-        /// Thêm các trường thông tin bổ sung cho danh sách Post
-        /// số sao, số bình luận, top bình luận
-        /// </summary>
-        /// <param name="posts"> Danh sách posts gốc </param>
-        /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
-        /// Modified: None
-        protected virtual async Task<List<ResponseQuestionModel>> DecoratePost(IEnumerable<ViewQuestion> posts)
-        {
-            List<ResponseQuestionModel> res = [];
-            foreach (ViewQuestion post in posts)
-            {
-                res.Add(await DecoratePost(post));
-            }
-            return res;
-        }
 
         #region Admin Apies
         public async Task<ServiceResult> AdminDeletePost(Guid postId)
@@ -130,8 +99,9 @@ namespace KnowledgeSharingApi.Services.Services
                 Total = listQuestion.Count(),
                 Limit = limitValue,
                 Offset = offsetValue,
-                Results = await DecoratePost(
-                    listQuestion.Skip(offsetValue).Take(limitValue)
+                Results = await DecorationRepository.DecorateResponseQuestionModel(
+                    null,
+                    listQuestion.Skip(offsetValue).Take(limitValue).ToList()
                 )
             };
 
@@ -146,7 +116,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
-            ResponseQuestionModel questionItemModel = await DecoratePost(question);
+            ResponseQuestionModel questionItemModel = (await DecorationRepository.DecorateResponseQuestionModel(null, [question])).First();
 
             return ServiceResult.Success(
                 GetQuestionSuccess, string.Empty, questionItemModel);
@@ -156,7 +126,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetViewPost(limitValue, offsetValue);
-            List<ResponseQuestionModel> res = await DecoratePost(questions);
+            IEnumerable<ResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList());
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
 
@@ -168,7 +138,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetByUserId(userId);
             questions = questions.Skip(offsetValue).Take(limitValue);
 
-            List<ResponseQuestionModel> res = await DecoratePost(questions);
+            IEnumerable<ResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList());
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
         #endregion
@@ -181,7 +151,8 @@ namespace KnowledgeSharingApi.Services.Services
             if (question.Privacy != EPrivacy.Public)
                 return ServiceResult.Forbidden("Câu hỏi này đang ở chế độ riêng tư");
 
-            return ServiceResult.Success(GetQuestionSuccess, string.Empty, await DecoratePost(question));
+            return ServiceResult.Success(GetQuestionSuccess, string.Empty, 
+                (await DecorationRepository.DecorateResponseQuestionModel(null, [question])).First());
         }
 
         public async Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
@@ -189,7 +160,8 @@ namespace KnowledgeSharingApi.Services.Services
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPosts(limitValue, offsetValue);
 
-            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
+                await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList()));
         }
 
         public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset)
@@ -197,10 +169,11 @@ namespace KnowledgeSharingApi.Services.Services
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
-            IEnumerable<ViewQuestion> question = await QuestionRepository.GetPublicPostsByUserId(userId);
-            question = question.Skip(offsetValue).Take(limitValue);
+            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId);
+            questions = questions.Skip(offsetValue).Take(limitValue);
 
-            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(question));
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
+                await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList()));
         }
         #endregion
 
@@ -236,6 +209,21 @@ namespace KnowledgeSharingApi.Services.Services
                     return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
             }
 
+            // Post thumbnail if existed:
+            string? thumbnail = questionModel.Thumbnail != null ? await Storage.SaveImage(questionModel.Thumbnail) : null;
+            if (thumbnail != null)
+            {
+                Image imageToAdd = new()
+                {
+                    CreatedBy = myUid.ToString(),
+                    CreatedTime = DateTime.Now,
+                    UserId = myUid,
+                    ImageId = Guid.NewGuid(),
+                    ImageUrl = thumbnail
+                };
+                _ = ImageRepository.Insert(imageToAdd);
+            }
+
             // OK, tạo câu hỏi
             Guid newId = Guid.NewGuid();
             Question question = new()
@@ -248,6 +236,7 @@ namespace KnowledgeSharingApi.Services.Services
                 UserId = user.UserId,
                 UserItemType = EUserItemType.Knowledge,
                 // Knowledge:
+                Thumbnail = thumbnail,
                 KnowledgeType = EKnowledgeType.Post,
                 Privacy = questionModel.CourseId != null ? EPrivacy.Private : EPrivacy.Public,
                 Views = 0,
@@ -259,15 +248,69 @@ namespace KnowledgeSharingApi.Services.Services
             };
             question.Copy(model);
 
-            // Insert categories nếu có:
-            // ...
-
             // Insert câu hỏi
             Guid? inserted = await QuestionRepository.Insert(question);
             if (inserted == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(QuestionResource));
 
+            // Insert categories nếu có:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                _ = CategoryRepository.UpdateKnowledgeCategories(inserted.Value, model.Categories.ToList());
+            }
+
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.InsertSuccess(QuestionResource));
+            return ServiceResult.Success(ResponseResource.InsertSuccess(QuestionResource), string.Empty, question);
+        }
+        
+        public async Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
+        {
+            // Kiểm tra myUId tồn tại (không nhất thiết)
+
+            // Kiểm tra model đúng
+            if (model is not UpdateQuestionModel updateModel)
+                throw new NotMatchTypeException();
+
+            // Kiểm tra postId tồn tại, và chủ nhân là myUid
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            if (question.UserId != myUid)
+                return ServiceResult.Forbidden("Đây không phải là bài thảo luận của bạn");
+
+
+            // update thumbnail:
+            string? newThumbnail = null;
+            if (model.Thumbnail != null)
+            {
+                newThumbnail = await Storage.SaveImage(model.Thumbnail);
+                if (newThumbnail != null)
+                {
+                    Image imageToAdd = new()
+                    {
+                        CreatedBy = myUid.ToString(),
+                        CreatedTime = DateTime.Now,
+                        UserId = myUid,
+                        ImageId = Guid.NewGuid(),
+                        ImageUrl = newThumbnail
+                    };
+                    _ = ImageRepository.Insert(imageToAdd);
+                }
+            }
+
+            // Cập nhật question
+            Question toUpdate = new();
+            toUpdate.Copy(question);
+            toUpdate.Copy(model);
+            if (newThumbnail != null) toUpdate.Thumbnail = newThumbnail;
+            int res1 = await QuestionRepository.Update(postId, toUpdate);
+            int res2 = 0;
+            // Update categories:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                res2 = await CategoryRepository.UpdateKnowledgeCategories(postId, model.Categories.ToList());
+            }
+
+            if (res1 + res2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(QuestionResource));
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(QuestionResource), string.Empty, toUpdate);
         }
 
         public async Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
@@ -308,7 +351,8 @@ namespace KnowledgeSharingApi.Services.Services
             questions = questions.Skip(limitValue).Take(offsetValue);
 
             // Trả về thành công
-            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
         }
 
         public async Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset)
@@ -327,7 +371,8 @@ namespace KnowledgeSharingApi.Services.Services
             questions = questions.Skip(limitValue).Take(offsetValue);
 
             // Trả về thành công
-            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
         }
 
         public async Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
@@ -340,7 +385,8 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Bạn không phải chủ nhân của bài thảo luận này");
 
             // Trả về thành công
-            return ServiceResult.Success(GetQuestionSuccess, string.Empty, await DecoratePost(question));
+            return ServiceResult.Success(GetQuestionSuccess, string.Empty, 
+                (await DecorationRepository.DecorateResponseQuestionModel(myUid, [question])).First());
         }
 
         public async Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
@@ -353,7 +399,8 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetByUserId(myUid);
             questions = questions.Skip(offsetValue).Take(limitValue);
 
-            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
         }
 
         public async Task<ServiceResult> UserGetPostDetail(Guid myUid, Guid postId)
@@ -362,6 +409,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiểm tra postId tồn tại
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            if (question.UserId == myUid)
+                return await UserGetMyPostDetail(myUid, postId);
 
             // Kiểm tra nếu question là private thì có chung khóa học không
             if (question.Privacy != EPrivacy.Public)
@@ -379,7 +428,8 @@ namespace KnowledgeSharingApi.Services.Services
             }
 
             // OK pass qua bộ lọc, Trả về thành công
-            return ServiceResult.Success(GetQuestionSuccess, string.Empty, await DecoratePost(question));
+            return ServiceResult.Success(GetQuestionSuccess, string.Empty,
+                (await DecorationRepository.DecorateResponseQuestionModel(myUid, [question])).First());
         }
 
         public async Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset)
@@ -390,7 +440,8 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
 
             // Trả về thành công
-            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
         }
 
         public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
@@ -404,32 +455,11 @@ namespace KnowledgeSharingApi.Services.Services
             questions = questions.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
 
             // Trả về thành công
-            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, await DecoratePost(questions));
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty,
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
         }
         #endregion
 
-        public async Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
-        {
-            // Kiểm tra myUId tồn tại (không nhất thiết)
-
-            // Kiểm tra model đúng
-            if (model is not UpdateQuestionModel updateModel)
-                throw new NotMatchTypeException();
-
-            // Kiểm tra postId tồn tại, và chủ nhân là myUid
-            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
-            if (question.UserId != myUid)
-                return ServiceResult.Forbidden("Đây không phải là bài thảo luận của bạn");
-
-            // Cập nhật question
-            Question toUpdate = new();
-            toUpdate.Copy(model);
-            int res = await QuestionRepository.Update(postId, toUpdate);
-            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(QuestionResource));
-
-            // Trả về thành công
-            return ServiceResult.Success(ResponseResource.UpdateSuccess(QuestionResource));
-        }
 
         #endregion
 
@@ -442,7 +472,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponseQuestionModel(null, posts.ToList())
             );
         }
 
@@ -453,7 +483,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, posts.ToList())
             );
         }
 
@@ -464,7 +494,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponseQuestionModel(null, posts.ToList())
             );
         }
 
@@ -479,7 +509,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Total = total,
                 Limit = limitValue,
                 Offset = offsetValue,
-                Results = await DecoratePost(listed)
+                Results = await DecorationRepository.DecorateResponseQuestionModel(myUid, listed.ToList())
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(QuestionResource), string.Empty, res);
         }

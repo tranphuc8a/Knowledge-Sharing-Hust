@@ -55,8 +55,8 @@ export default {
          * @Modified None
         */
         getLabel(){
-            if (this.inject?.language != null){
-                this.label = this.inject?.language?.components?.changeLanguageButton;
+            if (this.getLanguage != null){
+                this.label = this.getLanguage()?.components?.changeLanguageButton;
             }
             return this.label;
         },
@@ -71,10 +71,10 @@ export default {
         resolveChangeLanguage(lang){
             try {
                 if (lang === this.languageEnum.VIETNAMESE){
-                    this.inject.changeLanguage(this.globalData.enum.language.VIETNAMESE);
+                    this.changeLanguage(this.globalData.enum.language.VIETNAMESE);
                     this.isEnglish = false;
                 } else if (lang === this.languageEnum.ENGLISH){
-                    this.inject.changeLanguage(this.globalData.enum.language.ENGLISH);
+                    this.changeLanguage(this.globalData.enum.language.ENGLISH);
                     this.isEnglish = true;
                 }
                 this.isFocus = false;
@@ -84,7 +84,8 @@ export default {
         }
     },
     inject: {
-        inject: {},
+        getLanguage: {},
+        changeLanguage: {},
         getPopupManager: {}, 
         getToastManager: {}
     }

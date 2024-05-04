@@ -12,6 +12,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepo
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Services.Interfaces;
+using Mysqlx.Crud;
 using Org.BouncyCastle.Asn1.Cms;
 using System;
 using System.Collections.Generic;
@@ -29,8 +30,11 @@ namespace KnowledgeSharingApi.Services.Services
 
         protected readonly ILessonRepository LessonRepository;
         protected readonly IStarRepository StarRepository;
+        protected readonly ICategoryRepository CategoryRepository;
         protected readonly ICourseRepository CourseRepository;
+        protected readonly IImageRepository ImageRepository;
         protected readonly IDecorationRepository DecorationRepository;
+        protected readonly IKnowledgeRepository KnowledgeRepository;
         protected readonly IUserRepository UserRepository;
         protected readonly IStorage Storage;
 
@@ -43,7 +47,10 @@ namespace KnowledgeSharingApi.Services.Services
             IStarRepository starRepository,
             ICourseRepository courseRepository,
             IUserRepository userRepository,
+            ICategoryRepository categoryRepository,
+            IKnowledgeRepository knowledgeRepository,
             IDecorationRepository decorationRepository,
+            IImageRepository imageRepository,
             IStorage storage
         )
         {
@@ -52,9 +59,12 @@ namespace KnowledgeSharingApi.Services.Services
             EntityResource = ResourceFactory.GetEntityResource();
 
             DecorationRepository = decorationRepository;
+            KnowledgeRepository = knowledgeRepository;
             LessonRepository = lessonRepository;
             StarRepository = starRepository;
+            CategoryRepository = categoryRepository;
             CourseRepository = courseRepository;
+            ImageRepository = imageRepository;
             UserRepository = userRepository;
             Storage = storage;
 
@@ -117,7 +127,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewLesson> listLessons =
                 await LessonRepository.GetPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource),
-                string.Empty, await DecorationRepository.DecorateResponseLessonModel(null, listLessons));
+                string.Empty, await DecorationRepository.DecorateResponseLessonModel(null, listLessons.ToList()));
         }
 
         public async Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset)
@@ -130,7 +140,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(null, lessons.Results);
+            IEnumerable<ResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(null, lessons.Results.ToList());
 
             // Return Success
             PaginationResponseModel<ResponseLessonModel> res =
@@ -157,7 +167,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await LessonRepository.GetViewPost(limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
+            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons.ToList());
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -173,7 +183,7 @@ namespace KnowledgeSharingApi.Services.Services
             lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
+            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons.ToList());
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -188,7 +198,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await LessonRepository.GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listLessons);
+            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listLessons.ToList());
 
             // Return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -213,7 +223,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await LessonRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listLessons);
+            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listLessons.ToList());
 
             // Return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -230,7 +240,7 @@ namespace KnowledgeSharingApi.Services.Services
             lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
+            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons.ToList());
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -269,6 +279,18 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Post thumbnail if existed:
             string? thumbnail = lessonModel.Thumbnail != null ? await Storage.SaveImage(lessonModel.Thumbnail) : null;
+            if (thumbnail != null)
+            {
+                Image imageToAdd = new()
+                {
+                    CreatedBy = myUid.ToString(),
+                    CreatedTime = DateTime.Now,
+                    UserId = myUid,
+                    ImageId = Guid.NewGuid(),
+                    ImageUrl = thumbnail
+                };
+                _ = ImageRepository.Insert(imageToAdd);
+            }
 
             // Tạo mới Lesson
             Lesson lesson = CreateLesson(user, lessonModel, thumbnail);
@@ -276,6 +298,12 @@ namespace KnowledgeSharingApi.Services.Services
             // Insert Lesson
             Guid? res = await LessonRepository.Insert(lesson.UserItemId, lesson);
             if (res == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(LessonResource));
+
+            // Insert categories nếu có:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                _ = CategoryRepository.UpdateKnowledgeCategories(lesson.UserItemId, model.Categories.ToList());
+            }
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.InsertSuccess(LessonResource), string.Empty, lesson);
@@ -307,13 +335,42 @@ namespace KnowledgeSharingApi.Services.Services
             if (lesson.UserId != myUid)
                 return ServiceResult.Forbidden("Không phải bài giảng của bạn");
 
-            // cập nhật 
-            lesson.Copy(model);
-            int updated = await LessonRepository.Update(lesson.UserItemId, lesson);
-            if (updated <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
+            // update thumbnail:
+            string? newThumbnail = null;
+            if (model.Thumbnail != null)
+            {
+                newThumbnail = await Storage.SaveImage(model.Thumbnail);
+                if (newThumbnail != null)
+                {
+                    Image imageToAdd = new()
+                    {
+                        CreatedBy = myUid.ToString(),
+                        CreatedTime = DateTime.Now,
+                        UserId = myUid,
+                        ImageId = Guid.NewGuid(),
+                        ImageUrl = newThumbnail
+                    };
+                    _ = ImageRepository.Insert(imageToAdd);
+                }
+            }
 
+            // cập nhật 
+            Lesson lessonToUpdate = new();
+            lessonToUpdate.Copy(lesson);
+            lessonToUpdate.Copy(model);
+            if (newThumbnail != null) lessonToUpdate.Thumbnail = newThumbnail;
+            int updated1 = await LessonRepository.Update(postId, lessonToUpdate);
+            int updated2 = 0;
+
+            // Update categories nếu có:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                updated2 = await CategoryRepository.UpdateKnowledgeCategories(postId, model.Categories.ToList());
+            }
+
+            if (updated1 + updated2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
             // Trả về thành công
-            return ServiceResult.ServerError(ResponseResource.UpdateSuccess(LessonResource), string.Empty, lesson);
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(LessonResource), string.Empty, lesson);
         } 
         
         #endregion
@@ -326,7 +383,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewLesson> listLessons =
                 await LessonRepository.GetPostsOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource),
-                string.Empty, await DecorationRepository.DecorateResponseLessonModel(null, listLessons));
+                string.Empty, await DecorationRepository.DecorateResponseLessonModel(myUid, listLessons.ToList()));
         }
 
         public async Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset)
@@ -343,7 +400,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.Results);
+            IEnumerable<ResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.Results.ToList());
 
             // Return Success
             PaginationResponseModel<ResponseLessonModel> res =
@@ -364,7 +421,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(null, lessons.Results);
+            IEnumerable<ResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.Results.ToList());
 
             // Return Success
             PaginationResponseModel<ResponseLessonModel> res =
@@ -383,7 +440,7 @@ namespace KnowledgeSharingApi.Services.Services
             listLessons = listLessons.Skip(offsetValue).Take(limitValue);
 
             // DecorateResponseLessonModel 
-            IEnumerable<ResponseLessonModel> listResLesson = await DecorationRepository.DecorateResponseLessonModel(myUid, listLessons);
+            IEnumerable<ResponseLessonModel> listResLesson = await DecorationRepository.DecorateResponseLessonModel(myUid, listLessons.ToList());
 
             // Trả về thành công
             PaginationResponseModel<ResponseLessonModel> res = new(total, limitValue, offsetValue, listResLesson);
@@ -393,7 +450,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
         {
             // Check lesson existed and owner
-            ViewLesson lesson = await LessonRepository.CheckExistedLesson(myUid, NotExistedLesson);
+            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
             if (lesson.UserId != myUid)
                 return ServiceResult.Forbidden("Bài giảng này không phải của bạn");
 
@@ -411,7 +468,7 @@ namespace KnowledgeSharingApi.Services.Services
             lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons);
+            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.ToList());
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -421,6 +478,12 @@ namespace KnowledgeSharingApi.Services.Services
         {
             // Check lesson exist
             ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+            if (lesson.UserId == myUid) return await UserGetMyPostDetail(myUid, postId);
+
+            // Check user can access lesson:
+            bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, postId);
+            if (!isAccessible)
+                return ServiceResult.Forbidden("Bạn không có quyền truy cập bài giảng này");
 
             // DecorateResponseLessonModel
             ResponseLessonModel res = (await DecorationRepository.DecorateResponseLessonModel(myUid, [lesson])).First();
@@ -436,7 +499,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await LessonRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
+            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.ToList());
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -452,7 +515,7 @@ namespace KnowledgeSharingApi.Services.Services
             lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
+            IEnumerable<ResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.ToList());
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);

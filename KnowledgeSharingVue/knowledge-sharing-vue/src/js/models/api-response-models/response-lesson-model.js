@@ -1,6 +1,6 @@
 
 
-import ViewLesson from '../view-models/view-lesson.js';
+import ViewLesson from "../views/view-lesson";
 
 class ResponseLessonModel extends ViewLesson {
     constructor() {

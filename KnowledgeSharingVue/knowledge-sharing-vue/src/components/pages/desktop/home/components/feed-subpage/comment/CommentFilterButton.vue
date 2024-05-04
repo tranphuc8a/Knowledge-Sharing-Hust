@@ -106,7 +106,7 @@ export default{
 }
 
 .p-cfb-content{
-    padding: 18px 0px;
+    padding: 12px 0px;
     display: flex;
     flex-flow: column nowrap;
     justify-content: space-between;
