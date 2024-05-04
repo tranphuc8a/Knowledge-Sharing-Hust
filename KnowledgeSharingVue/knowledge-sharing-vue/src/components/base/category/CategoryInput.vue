@@ -3,7 +3,7 @@
                 :state="inputFrame.state" :errorMessage="inputFrame.errorMessage"
                 :is-obligate="inputFrame.isObligate" :is-full="inputFrame.isFull" 
                 :isShowTitle="inputFrame.isShowTitle" :isShowError="inputFrame.isShowError">
-        <div class="p-category-textfield" tabindex="1" @:focus="resolveOnFocus" @:blur="resolveOnBlur" >
+        <div class="p-category-textfield" @:click="resolveClickExpand">
             <div class="p-category-textfield-left">
                 <CategoryItem 
                     v-for="(category, index) in data.listedCategories"
@@ -14,8 +14,8 @@
                 />
                 <input type="text" class="p-category-input" v-model="data.text" 
                         :placeholder="data.placeholder" 
-                        @:focus.prevent="resolveOnFocus"
-                        @:blur.prevent="()=>{}"
+                        @:focus="resolveOnFocus" 
+                        @:blur="resolveOnBlur"
                         @:input="resolveOnInput"
                         v-on:keyup.enter.prevent.stop="resolveOnPressEnter"
                         ref="input">
@@ -42,7 +42,7 @@
                     <!-- ITEMS STATE: normal, default, chosen, focus -->
                     <div v-for="(item, index) in data.filteredItems" :key="index"   
                         class="p-category-item" :state="item.state"
-                        @:click="clickItemFunction(item)()">
+                        @:click="(clickItemFunction(item))()">
                         <div class="p-category-item-label" :title="item.label">
                             {{ item.label }}
                         </div>  
@@ -253,12 +253,19 @@ export default {
         **/
         async resolveOnBlur(){
             try {
+                let that = this;
                 this.data.isFiltering = false;
-                // await new Promise(e => setTimeout(e, 250));
-                // do combobox logic when change to new value                
-                await this.setState(myEnum.inputState.NORMAL);
-                await this.resolveOnChange?.();
-                await this.onblur?.();
+                // do combobox logic when change to new value 
+                await new Promise(e => setTimeout(e, 250));
+                await that.setState(myEnum.inputState.NORMAL);
+                await that.resolveOnChange?.();
+                await that.onblur?.();
+                // this.$nextTick(async function(){
+                //     await new Promise(e => setTimeout(e, 250));
+                //     await that.setState(myEnum.inputState.NORMAL);
+                //     await that.resolveOnChange?.();
+                //     await that.onblur?.();
+                // });               
             } catch (error){
                 console.error(error);
             }
@@ -332,13 +339,22 @@ export default {
                     this.data.text = "";
                     this.data.listedCategories.push(item.label);
 
+                    console.log("clicked");
                     let that = this;
-                    this.$nextTick(async function(){
-                        await new Promise(e => setTimeout(e, 250));
-                        await that.resolveOnBlur();
-                        await that.setState(myEnum.inputState.NORMAL);
-                        await that.resolveOnChange?.();
-                    });
+                    
+                    await that.resolveOnBlur();
+                    await that.setState(myEnum.inputState.NORMAL);
+                    await that.resolveOnChange?.();
+                    // this.$nextTick(async function(){
+                    //     try {
+                    //         await new Promise(e => setTimeout(e, 550));
+                    //         await that.resolveOnBlur();
+                    //         await that.setState(myEnum.inputState.NORMAL);
+                    //         await that.resolveOnChange?.();
+                    //     } catch (e) {
+                    //         console.error(e);
+                    //     }
+                    // });
                 } catch (error){
                     console.error(error);
                 }
@@ -351,12 +367,12 @@ export default {
         * @Edit None
         **/
         async resolveClickExpand(){
-            // await this.$refs.input.focus();
-            await this.resolveOnFocus();
+            await this.$refs.input.focus();
+            // await this.resolveOnFocus();
         },
         async resolveClickCollapse(){
-            // await this.$refs.input.blur();
-            await this.resolveOnBlur();
+            await this.$refs.input.blur();
+            // await this.resolveOnBlur();
         },
         /**
         * Cập nhật chiều cao của dropdownFrame dựa trên dropdownContent
@@ -456,7 +472,7 @@ export default {
                     return String(it.label) == String(text);
                 });
                 if (item != null){
-                    await this.clickItemFunction(item)();
+                    await (this.clickItemFunction(item))();
                     await this.onPressEnter(item.value);
                 } else {
                     this.blur();

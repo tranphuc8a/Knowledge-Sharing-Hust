@@ -9,9 +9,11 @@ using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Mysqlx.Crud;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +31,11 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IQuestionRepository QuestionRepository;
         protected readonly ICourseRepository CourseRepository;
         protected readonly IKnowledgeRepository KnowledgeRepository;
+        protected readonly IImageRepository ImageRepository;
+        protected readonly IStorage Storage;
         protected readonly IDecorationRepository DecorationRepository;
         protected readonly IUserRepository UserRepository;
+        protected readonly ICategoryRepository CategoryRepository;
         //        protected readonly IUnitOfWork UnitOfWork = unitOfWork
 
         protected readonly string QuestionResource;
@@ -43,16 +48,22 @@ namespace KnowledgeSharingApi.Services.Services
             ICourseRepository courseRepository,
             IKnowledgeRepository knowledgeRepository,
             IUserRepository userRepository,
+            IImageRepository imageRepository,
             IDecorationRepository decorationRepository,
+            IStorage storage,
+            ICategoryRepository categoryRepository,
             IResourceFactory resourceFactory
-    )
+        )
         {
             ResourceFactory = resourceFactory;
             QuestionRepository = questionRepository;
             CourseRepository = courseRepository;
             KnowledgeRepository = knowledgeRepository;
             DecorationRepository = decorationRepository;
+            CategoryRepository = categoryRepository;
+            ImageRepository = imageRepository;
             UserRepository = userRepository;
+            Storage = storage;
             ResponseResource = resourceFactory.GetResponseResource();
             EntityResource = resourceFactory.GetEntityResource();
             QuestionResource = EntityResource.Question();
@@ -198,6 +209,21 @@ namespace KnowledgeSharingApi.Services.Services
                     return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
             }
 
+            // Post thumbnail if existed:
+            string? thumbnail = questionModel.Thumbnail != null ? await Storage.SaveImage(questionModel.Thumbnail) : null;
+            if (thumbnail != null)
+            {
+                Image imageToAdd = new()
+                {
+                    CreatedBy = myUid.ToString(),
+                    CreatedTime = DateTime.Now,
+                    UserId = myUid,
+                    ImageId = Guid.NewGuid(),
+                    ImageUrl = thumbnail
+                };
+                _ = ImageRepository.Insert(imageToAdd);
+            }
+
             // OK, tạo câu hỏi
             Guid newId = Guid.NewGuid();
             Question question = new()
@@ -210,6 +236,7 @@ namespace KnowledgeSharingApi.Services.Services
                 UserId = user.UserId,
                 UserItemType = EUserItemType.Knowledge,
                 // Knowledge:
+                Thumbnail = thumbnail,
                 KnowledgeType = EKnowledgeType.Post,
                 Privacy = questionModel.CourseId != null ? EPrivacy.Private : EPrivacy.Public,
                 Views = 0,
@@ -221,15 +248,69 @@ namespace KnowledgeSharingApi.Services.Services
             };
             question.Copy(model);
 
-            // Insert categories nếu có:
-            // ...
-
             // Insert câu hỏi
             Guid? inserted = await QuestionRepository.Insert(question);
             if (inserted == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(QuestionResource));
 
+            // Insert categories nếu có:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                _ = CategoryRepository.UpdateKnowledgeCategories(inserted.Value, model.Categories.ToList());
+            }
+
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.InsertSuccess(QuestionResource));
+            return ServiceResult.Success(ResponseResource.InsertSuccess(QuestionResource), string.Empty, question);
+        }
+        
+        public async Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
+        {
+            // Kiểm tra myUId tồn tại (không nhất thiết)
+
+            // Kiểm tra model đúng
+            if (model is not UpdateQuestionModel updateModel)
+                throw new NotMatchTypeException();
+
+            // Kiểm tra postId tồn tại, và chủ nhân là myUid
+            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            if (question.UserId != myUid)
+                return ServiceResult.Forbidden("Đây không phải là bài thảo luận của bạn");
+
+
+            // update thumbnail:
+            string? newThumbnail = null;
+            if (model.Thumbnail != null)
+            {
+                newThumbnail = await Storage.SaveImage(model.Thumbnail);
+                if (newThumbnail != null)
+                {
+                    Image imageToAdd = new()
+                    {
+                        CreatedBy = myUid.ToString(),
+                        CreatedTime = DateTime.Now,
+                        UserId = myUid,
+                        ImageId = Guid.NewGuid(),
+                        ImageUrl = newThumbnail
+                    };
+                    _ = ImageRepository.Insert(imageToAdd);
+                }
+            }
+
+            // Cập nhật question
+            Question toUpdate = new();
+            toUpdate.Copy(question);
+            toUpdate.Copy(model);
+            if (newThumbnail != null) toUpdate.Thumbnail = newThumbnail;
+            int res1 = await QuestionRepository.Update(postId, toUpdate);
+            int res2 = 0;
+            // Update categories:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                res2 = await CategoryRepository.UpdateKnowledgeCategories(postId, model.Categories.ToList());
+            }
+
+            if (res1 + res2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(QuestionResource));
+            // Trả về thành công
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(QuestionResource), string.Empty, toUpdate);
         }
 
         public async Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
@@ -379,28 +460,6 @@ namespace KnowledgeSharingApi.Services.Services
         }
         #endregion
 
-        public async Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
-        {
-            // Kiểm tra myUId tồn tại (không nhất thiết)
-
-            // Kiểm tra model đúng
-            if (model is not UpdateQuestionModel updateModel)
-                throw new NotMatchTypeException();
-
-            // Kiểm tra postId tồn tại, và chủ nhân là myUid
-            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
-            if (question.UserId != myUid)
-                return ServiceResult.Forbidden("Đây không phải là bài thảo luận của bạn");
-
-            // Cập nhật question
-            Question toUpdate = new();
-            toUpdate.Copy(model);
-            int res = await QuestionRepository.Update(postId, toUpdate);
-            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(QuestionResource));
-
-            // Trả về thành công
-            return ServiceResult.Success(ResponseResource.UpdateSuccess(QuestionResource));
-        }
 
         #endregion
 

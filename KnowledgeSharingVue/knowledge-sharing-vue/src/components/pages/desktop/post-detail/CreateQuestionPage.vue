@@ -109,6 +109,8 @@ export default {
                     this.course.copy(body);
                     this.isError = false;
                 }
+            } else {
+                this.courseId = null;
             }
         } catch (e) {
             console.error(e);
@@ -193,7 +195,9 @@ export default {
                 let body = await Request.tryGetBody(res);
                 
                 this.getToastManager().success("Tạo mới bài thảo luận thành công");
-                this.router.push('/question-detail/' + body.UserItemId);
+                if (body.UserItemId != null){
+                    this.router.push('/question/' + body.UserItemId);
+                }
             } catch (e) {
                 await Request.resolveAxiosError(e);
             }
@@ -207,14 +211,14 @@ export default {
                 let categories = await this.$refs.category.getValue();
                 let content = await this.$refs.content.getValue();
                 let question = {
-                    title: title,
-                    abstract: abstract,
-                    thumbnail: thumbnail,
-                    categories: categories,
-                    content: content
+                    Title: title,
+                    Abstract: abstract,
+                    Thumbnail: thumbnail,
+                    Categories: categories,
+                    Content: content
                 }
                 if (this.course == null){
-                    question.CourseId = this.courseId;
+                    question.CourseId = this.courseId ?? null;
                 }
                 return question;
             } catch (error){

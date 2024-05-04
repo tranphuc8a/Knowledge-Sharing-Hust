@@ -1,5 +1,5 @@
 <template>
-    <div class="p-comment">
+    <div class="p-comment" v-if="isShowComment">
         <div class="p-comment-line" v-show="!isEditing">
             <div class="p-comment-left">
                 <div :class="{'p-comment-avatar': true, 'p-comment-owner': isOwner()}">
@@ -82,6 +82,7 @@ export default {
     name: "p-comment",
     data() {
         return {
+            isShowComment: true,
             dComment: this.comment,
             isShowEnterComment: false,
             isShowReplies: false,
@@ -106,6 +107,13 @@ export default {
         try {
             if (this.dComment == null) this.dComment = {};
             this.dComment.isHideCommentInformation = false;
+            let that = this;
+            this.dComment.ForceUpdate = async function(){
+                that.isShowComment = false;
+                that.$nextTick(() => {
+                    that.isShowComment = true;
+                });
+            };
             this.components = {
                 commentCard: this.$refs['comment-card'],
                 commentMenuContext: this.$refs['comment-menu-context'],

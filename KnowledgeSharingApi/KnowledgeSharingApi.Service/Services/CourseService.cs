@@ -11,6 +11,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityReposito
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.VisualBasic;
+using MySqlX.XDevAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IUserRepository UserRepository;
         protected readonly IKnowledgeRepository KnowledgeRepository;
         protected readonly IDecorationRepository DecorationRepository;
+        protected readonly ICategoryRepository CategoryRepository;
+        protected readonly IImageRepository ImageRepository;
         protected readonly IStorage Storage;
 
         protected readonly IResourceFactory ResourceFactory;
@@ -43,6 +46,8 @@ namespace KnowledgeSharingApi.Services.Services
             IUserRepository userRepository,
             IKnowledgeRepository knowledgeRepository,
             IDecorationRepository decorationRepository,
+            ICategoryRepository categoryRepository,
+            IImageRepository imageRepository,
             IStorage storage
         )
         {
@@ -53,6 +58,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             CourseRepository = courseRepository;
             StarRepository = starRepository;
+            CategoryRepository = categoryRepository;
+            ImageRepository = imageRepository;
             UserRepository = userRepository;
             KnowledgeRepository = knowledgeRepository;
             DecorationRepository = decorationRepository;
@@ -310,6 +317,18 @@ namespace KnowledgeSharingApi.Services.Services
             if (model.Thumbnail != null)
             {
                 thumbnail = await Storage.SaveImage(model.Thumbnail);
+                if (thumbnail != null)
+                {
+                    Image imageToAdd = new()
+                    {
+                        CreatedBy = myUid.ToString(),
+                        CreatedTime = DateTime.Now,
+                        UserId = myUid,
+                        ImageId = Guid.NewGuid(),
+                        ImageUrl = thumbnail
+                    };
+                    _ = ImageRepository.Insert(imageToAdd);
+                }
             }
 
             // Tạo khóa học mới
@@ -318,7 +337,11 @@ namespace KnowledgeSharingApi.Services.Services
             if (id == null) return ServiceResult.ServerError(
                 ResponseResource.InsertFailure(CourseResource));
 
-            // Thêm categories ??
+            // Insert categories nếu có:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                _ = CategoryRepository.UpdateKnowledgeCategories(course.UserItemId, model.Categories.ToList());
+            }
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.InsertSuccess(CourseResource), string.Empty, course);
@@ -353,11 +376,39 @@ namespace KnowledgeSharingApi.Services.Services
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải khóa học của bạn");
 
-            // Update
-            course.Copy(model);
-            int effects = await CourseRepository.Update(course.UserItemId, course);
-            if (effects <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CourseResource));
+            // update thumbnail:
+            string? newThumbnail = null;
+            if (model.Thumbnail != null)
+            {
+                newThumbnail = await Storage.SaveImage(model.Thumbnail);
+                if (newThumbnail != null)
+                {
+                    Image imageToAdd = new()
+                    {
+                        CreatedBy = myUid.ToString(),
+                        CreatedTime = DateTime.Now,
+                        UserId = myUid,
+                        ImageId = Guid.NewGuid(),
+                        ImageUrl = newThumbnail
+                    };
+                    _ = ImageRepository.Insert(imageToAdd);
+                }
+            }
 
+            // Update
+            Course courseToUpdate = new();
+            courseToUpdate.Copy(course);
+            courseToUpdate.Copy(model);
+            if (newThumbnail != null) courseToUpdate.Thumbnail = newThumbnail;
+            int effects1 = await CourseRepository.Update(courseId, courseToUpdate);
+            int effects2 = 0;
+            // Update categories nếu có:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                effects2 = await CategoryRepository.UpdateKnowledgeCategories(courseId, model.Categories.ToList());
+            }
+
+            if (effects1 + effects2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CourseResource));
             // return success
             return ServiceResult.Success(ResponseResource.UpdateSuccess(CourseResource), string.Empty, course);
         }

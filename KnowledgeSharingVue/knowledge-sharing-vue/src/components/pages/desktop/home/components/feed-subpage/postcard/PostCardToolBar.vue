@@ -1,5 +1,5 @@
 <template>
-    <div class="p-postcard-toolbar">
+    <div class="p-postcard-toolbar" v-if="isShowComponent">
         <div class="p-postcard-toolbar__info">
             <div class="p-pct-leftinfo">
                 <div class="p-pct-star">
@@ -57,6 +57,7 @@ export default {
     name: "PostCardToolbar",
     data(){
         return {
+            isShowComponent: true,
             label: null,
             dotIconStyle: {fontSize: '3px', color: 'var(--grey-color-600)'},
             iconStyle: {color: 'var(--grey-color)'},
@@ -136,6 +137,19 @@ export default {
 
         async resolveClickViewDetail(){
 
+        },
+        
+        async forceRender(){
+            let that = this;
+            that.isShowComponent = false;
+            that.$nextTick(() => {
+                that.isShowComponent = true;
+            });
+        }
+    },
+    provide(){
+        return {
+            forceUpdateToolbar: this.forceRender
         }
     },
     inject: {

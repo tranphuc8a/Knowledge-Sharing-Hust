@@ -81,6 +81,7 @@ import MTextfield from '@/components/base/inputs/MTextfield'
 import { NotEmptyValidator, PositiveNumberValidator } from '@/js/utils/validator';
 import { myEnum } from '@/js/resources/enum';
 import { PostRequest, Request } from '@/js/services/request';
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'CreateLessonPage',
@@ -98,7 +99,8 @@ export default {
             },
             privacyEnum: myEnum.EPrivacy,
             inputs: [],
-            keys: []
+            keys: [],
+            router: useRouter()
         }
     },
     methods: {
@@ -182,9 +184,13 @@ export default {
                 for (let key in lesson){
                     postRequest.addFormData(key, lesson[key]);
                 }
-                await postRequest.execute();
-                
+                let res = await postRequest.execute();
+                let body = await Request.tryGetBody(res);
+
                 this.getToastManager().success("Tạo mới bài giảng thành công");
+                if (body.UserItemId != null){
+                    this.router.push(`/lesson/${body.UserItemId}`);
+                }
             } catch (e) {
                 await Request.resolveAxiosError(e);
             }
@@ -200,13 +206,13 @@ export default {
                 let estimateTimeInMinutes = await this.$refs.estimate.getValue();
                 let content = await this.$refs.content.getValue();
                 let lesson = {
-                    title: title,
-                    abstract: abstract,
-                    thumbnail: thumbnail,
-                    categories: categories,
-                    privacy: privacy,
-                    estimateTimeInMinutes: estimateTimeInMinutes,
-                    content: content
+                    Title: title,
+                    Abstract: abstract,
+                    Thumbnail: thumbnail,
+                    Categories: categories,
+                    Privacy: privacy,
+                    EstimateTimeInMinutes: estimateTimeInMinutes,
+                    Content: content
                 }
                 return lesson;
             } catch (error){

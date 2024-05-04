@@ -25,6 +25,7 @@ import EditLessonPage from '@/components/pages/desktop/post-detail/EditLessonPag
 import CourseLessonDetailPage from '@/components/pages/desktop/post-detail/CourseLessonDetailPage.vue';
 import CreateQuestionPage from '@/components/pages/desktop/post-detail/CreateQuestionPage.vue';
 import QuestionDetailPage from '@/components/pages/desktop/post-detail/QuestionDetailPage.vue';
+import EditQuestionPage from '@/components/pages/desktop/post-detail/EditQuestionPage.vue';
 
 import HustPage from '@/components/pages/hust-page/HustPage.vue';
 
@@ -142,6 +143,10 @@ const routers = [{
     path: '/question/:questionId',
     name: 'question-detail',
     component: QuestionDetailPage
+}, {
+    path: '/question-edit/:questionId',
+    name: 'question-edit',
+    component: EditQuestionPage
 }, ];
 
 

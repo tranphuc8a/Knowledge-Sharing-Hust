@@ -31,9 +31,18 @@ let button = {
             if (this.data.state !== myEnum.buttonState.NORMAL){
                 return;
             }
-            this.data.state = myEnum.buttonState.LOADING;
-            location.href = this.href;
-            this.data.state = myEnum.buttonState.NORMAL;
+            try {
+                this.data.state = myEnum.buttonState.LOADING;
+                if (this.href != null){
+                    location.href = this.href;
+                } else if (this.onclick != null){
+                    await this.onclick();
+                }
+            } catch (error){
+                console.error(error);
+            } finally {
+                this.data.state = myEnum.buttonState.NORMAL;
+            }
         }
     },
     watch: {

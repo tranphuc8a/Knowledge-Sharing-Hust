@@ -41,6 +41,7 @@
 
 <script>
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
+import { PutRequest } from '@/js/services/request';
 
 export default {
     name: 'CommentStarButton',
@@ -113,6 +114,7 @@ export default {
             try {
                 this.myStar = index;
                 this.tooltip.hideTooltip(0);
+                this.sendStar(index);
             } catch (e){
                 console.error(e);
             }
@@ -133,15 +135,46 @@ export default {
                 this.myStar = 5;
                 this.currentStar = 5;
                 this.tooltip.hideTooltip(0);
+                this.sendStar(5);
             } catch (error) {
                 console.error(error);
+            }
+        },
+
+        async sendStar(star){
+            try {
+                let comment = this.getComment();
+                if (comment != null){
+                    let numStars = this.getComment().TotalStars ?? 0;
+                    let averageStars = this.getComment().AverageStars ?? 0;
+                    if (this.getComment().MyStars == null){
+                        averageStars = (averageStars * numStars + star) / (numStars + 1);
+                        numStars += 1;
+                        this.getComment().TotalStars = numStars;
+                        this.getComment().AverageStars = averageStars;
+                    } else if (numStars > 0) {
+                        averageStars = (averageStars * numStars + star - this.getComment().MyStars) / numStars;
+                        this.getComment().AverageStars = averageStars;
+                    }  
+                    this.forceUpdateInformationBar?.();
+                    this.getComment().MyStars = star;
+                }
+                await new PutRequest('Stars')
+                    .setBody({
+                        UserItemId: comment.UserItemId,
+                        Score: star
+                    }).execute();
+            } catch (error) {
+                console.error(error);
+                Request.resolveAxiosError(error);
             }
         }
     },
     
     inject: {
         getLanguage: {},
-        getComment: {}
+        getComment: {},
+        forceUpdateInformationBar: {}
     }
 }
 

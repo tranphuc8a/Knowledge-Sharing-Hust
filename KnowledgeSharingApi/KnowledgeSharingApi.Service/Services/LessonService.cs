@@ -12,6 +12,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepo
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Services.Interfaces;
+using Mysqlx.Crud;
 using Org.BouncyCastle.Asn1.Cms;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,9 @@ namespace KnowledgeSharingApi.Services.Services
 
         protected readonly ILessonRepository LessonRepository;
         protected readonly IStarRepository StarRepository;
+        protected readonly ICategoryRepository CategoryRepository;
         protected readonly ICourseRepository CourseRepository;
+        protected readonly IImageRepository ImageRepository;
         protected readonly IDecorationRepository DecorationRepository;
         protected readonly IKnowledgeRepository KnowledgeRepository;
         protected readonly IUserRepository UserRepository;
@@ -44,8 +47,10 @@ namespace KnowledgeSharingApi.Services.Services
             IStarRepository starRepository,
             ICourseRepository courseRepository,
             IUserRepository userRepository,
+            ICategoryRepository categoryRepository,
             IKnowledgeRepository knowledgeRepository,
             IDecorationRepository decorationRepository,
+            IImageRepository imageRepository,
             IStorage storage
         )
         {
@@ -57,7 +62,9 @@ namespace KnowledgeSharingApi.Services.Services
             KnowledgeRepository = knowledgeRepository;
             LessonRepository = lessonRepository;
             StarRepository = starRepository;
+            CategoryRepository = categoryRepository;
             CourseRepository = courseRepository;
+            ImageRepository = imageRepository;
             UserRepository = userRepository;
             Storage = storage;
 
@@ -272,6 +279,18 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Post thumbnail if existed:
             string? thumbnail = lessonModel.Thumbnail != null ? await Storage.SaveImage(lessonModel.Thumbnail) : null;
+            if (thumbnail != null)
+            {
+                Image imageToAdd = new()
+                {
+                    CreatedBy = myUid.ToString(),
+                    CreatedTime = DateTime.Now,
+                    UserId = myUid,
+                    ImageId = Guid.NewGuid(),
+                    ImageUrl = thumbnail
+                };
+                _ = ImageRepository.Insert(imageToAdd);
+            }
 
             // Tạo mới Lesson
             Lesson lesson = CreateLesson(user, lessonModel, thumbnail);
@@ -279,6 +298,12 @@ namespace KnowledgeSharingApi.Services.Services
             // Insert Lesson
             Guid? res = await LessonRepository.Insert(lesson.UserItemId, lesson);
             if (res == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(LessonResource));
+
+            // Insert categories nếu có:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                _ = CategoryRepository.UpdateKnowledgeCategories(lesson.UserItemId, model.Categories.ToList());
+            }
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.InsertSuccess(LessonResource), string.Empty, lesson);
@@ -310,11 +335,40 @@ namespace KnowledgeSharingApi.Services.Services
             if (lesson.UserId != myUid)
                 return ServiceResult.Forbidden("Không phải bài giảng của bạn");
 
-            // cập nhật 
-            lesson.Copy(model);
-            int updated = await LessonRepository.Update(lesson.UserItemId, lesson);
-            if (updated <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
+            // update thumbnail:
+            string? newThumbnail = null;
+            if (model.Thumbnail != null)
+            {
+                newThumbnail = await Storage.SaveImage(model.Thumbnail);
+                if (newThumbnail != null)
+                {
+                    Image imageToAdd = new()
+                    {
+                        CreatedBy = myUid.ToString(),
+                        CreatedTime = DateTime.Now,
+                        UserId = myUid,
+                        ImageId = Guid.NewGuid(),
+                        ImageUrl = newThumbnail
+                    };
+                    _ = ImageRepository.Insert(imageToAdd);
+                }
+            }
 
+            // cập nhật 
+            Lesson lessonToUpdate = new();
+            lessonToUpdate.Copy(lesson);
+            lessonToUpdate.Copy(model);
+            if (newThumbnail != null) lessonToUpdate.Thumbnail = newThumbnail;
+            int updated1 = await LessonRepository.Update(postId, lessonToUpdate);
+            int updated2 = 0;
+
+            // Update categories nếu có:
+            if (model.Categories != null && model.Categories.Any())
+            {
+                updated2 = await CategoryRepository.UpdateKnowledgeCategories(postId, model.Categories.ToList());
+            }
+
+            if (updated1 + updated2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.UpdateSuccess(LessonResource), string.Empty, lesson);
         } 

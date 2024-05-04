@@ -1,14 +1,15 @@
 <template>
-    <div class="p-comment-information-bar">
+    <div class="p-comment-information-bar" v-if="isShowComponent">
         <div class="p-comment-infor">
             <div class="p-comment-time">
                 <VisualizedDatetime :datetime="getComment()?.CreatedTime" />
             </div>
-            <div class="p-comment-star">
-                <VisualizedStar :star="getComment()?.Star ?? tempStar" />
+            <div class="p-comment-star" v-if="getComment()?.AverageStars != null">
+                <VisualizedStar :star="getComment()?.AverageStars ?? tempStar" />
             </div>
-            <MIcon fa="circle" :style="dotIconStyle" />
-            <div class="p-comment-numstar">
+            <MIcon fa="circle" :style="dotIconStyle" 
+                v-if="getComment()?.AverageStars != null && getComment().TotalStars > 0" />
+            <div class="p-comment-numstar" v-if="getComment().TotalStars > 0">
                 {{ getNumStar() }}
             </div>
         </div>
@@ -42,7 +43,8 @@ export default {
     },
     data() {
         return {
-            tempStar: 3.89,
+            isShowComponent: true,
+            tempStar: 0,
             label: null,
             dotIconStyle: {fontSize: '3px', color: 'var(--grey-color-600)'},
             iconStyle: {color: 'var(--grey-color)'},
@@ -71,7 +73,7 @@ export default {
 
         getNumStar(){
             try {
-                let numstar = Number(this.getComment()?.NumberStar ?? 0);
+                let numstar = Number(this.getComment()?.TotalStars ?? 0);
                 let beautyNumber = Common.formatNumber(numstar);
                 return this.getLabel()?.numberStar(beautyNumber);
             } catch (e) {
@@ -84,6 +86,20 @@ export default {
             if (this.onReply){
                 this.onReply();
             }
+        },
+
+
+        async forceRender(){
+            let that = this;
+            that.isShowComponent = false;
+            that.$nextTick(() => {
+                that.isShowComponent = true;
+            });
+        }
+    },
+    provide(){
+        return {
+            forceUpdateInformationBar: this.forceRender
         }
     },
     inject: {

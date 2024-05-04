@@ -302,6 +302,9 @@ class PostRequest extends Request {
      * @Modified None
      */
     addFormData(key, value){
+        if (Validator.isEmpty(key) || Validator.isEmpty(value)){
+            return;
+        }
         if (this.formData == null){
             this.formData = new FormData();
         }

@@ -46,7 +46,7 @@ export default {
             this.mdContent = Common.unescapeSpecialCharacters(this.markdownContent);
             this.mdContent = Common.normalizeMarkdownText(this.mdContent);
             this.tocTree = this.createTOCTree(this.mdContent);
-            console.log(this.tocTree);
+            // console.log(this.tocTree);
         },
 
         createTOCTree(markdownText) {

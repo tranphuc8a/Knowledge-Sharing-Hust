@@ -108,9 +108,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     CategoryName = cn,
                     CreatedBy = "Knowledge Sharing Admin",
                     CreatedTime = currentTime
-                });
+                }).ToList();
 
                 DbContext.Categories.AddRange(newCategories);
+                int res1 = await DbContext.SaveChangesAsync();
 
                 // Thêm quan hệ KnowledgeCategory
                 var allCatNamesToLink = existingCatNames.Concat(newCategories).ToList();
@@ -126,7 +127,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 DbContext.KnowledgeCategories.AddRange(knowledgeCategoriesToInsert);
 
                 // Commit
-                int res = await DbContext.SaveChangesAsync();
+                int res = res1 + await DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return res;

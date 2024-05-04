@@ -36,7 +36,7 @@ export default {
     name: "p-enter-comment",
     data() {
         return {
-            isSubmiting: true,
+            isSubmiting: false,
             label: null,
             listComments: [null, null],
             curentUser: null,

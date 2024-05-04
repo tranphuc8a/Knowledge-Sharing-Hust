@@ -1,17 +1,17 @@
 <template>
     <DesktopHomeFrame>
         <div class="d-content">
-            <div class="d-empty-panel" v-show="isLessonExisted === false">
-                <not-found-panel text="Bài giảng hiện không tồn tại hoặc đã bị xóa" />
+            <div class="d-empty-panel" v-show="isQuestionExisted === false">
+                <not-found-panel text="Bài thảo luận hiện không tồn tại hoặc đã bị xóa" />
             </div>
 
-            <div class="p-form" v-show="isLessonExisted === true">
+            <div class="p-form" v-show="isQuestionExisted === true">
                 <div class="p-row p-title">
-                    Chỉnh sửa bài giảng
+                    Chỉnh sửa bài thảo luận
                 </div>
                 <div class="p-row">
                     <MTextfield 
-                        label="Tiêu đề" :title="null" placeholder="Tiêu đề của bài giảng"
+                        label="Tiêu đề" :title="null" placeholder="Tiêu đề của bài thảo luận"
                         :is-show-icon="false" :is-show-title="true" :is-show-error="true" :is-obligate="false"
                         :validator="validators.title"
                         state="normal" ref="title"/>
@@ -25,20 +25,11 @@
 
                 <div class="p-row">
                     <MTextArea 
-                        label="Mô tả" :title="null" placeholder="Mô tả của bài giảng"
+                        label="Mô tả" :title="null" placeholder="Mô tả của bài thảo luận"
                         :is-show-icon="false" :is-show-title="true" :is-show-error="true" :is-obligate="false"
                         :validator="null"
                         :rows="1" max-height="150px"
                         state="normal" ref="abstract"/>
-                    <div class="p-input-privacy">
-                            <MRadio 
-                                label="Quyền riêng tư" title="Chọn một giới tính phù hợp"
-                                :is-show-title="true" :is-show-error="false" :is-obligate="false"
-                                :items="getPrivacyItems()" direction="row" group="gender-2"
-                                :value="privacyEnum.Private" 
-                                ref="privacy"
-                            />
-                        </div>
                 </div>
 
                 <div class="p-row">
@@ -47,14 +38,6 @@
                             ref="category"
                         />
                     </div>
-
-                    <div class="p-input-estimate">
-                        <MTextfield 
-                            label="Ước lượng thời gian đọc" placeholder="Đơn vị: phút" type="number"
-                            :is-show-icon="false" :is-show-title="true" :is-show-error="true" :is-obligate="false" 
-                            :validator="validators.estimateTime"
-                            state="normal" ref="estimate"/>
-                    </div>
                 </div>
                 
                 <div class="p-row p-editor">
@@ -62,7 +45,7 @@
                 </div>
 
                 <div class="p-row p-submit-button">
-                    <MButton label="Cập nhật bài giảng" :onclick="resolveSubmitLesson" />
+                    <MButton label="Cập nhật bài thảo luận" :onclick="resolveSubmitQuestion" />
                 </div>
             </div>
 
@@ -76,7 +59,6 @@
 <script> 
 import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 import MButton from '@/components/base/buttons/MButton';
-import MRadio from '@/components/base/inputs/MRadio.vue';
 import MImageInput from '@/components/base/inputs/MImageInput.vue';
 import CategoryInput from '@/components/base/category/CategoryInput.vue';
 import MTextArea from '@/components/base/inputs/MTextArea'
@@ -88,19 +70,19 @@ import { myEnum } from '@/js/resources/enum';
 import { GetRequest, PatchRequest, Request } from '@/js/services/request';
 import { useRoute } from 'vue-router';
 import CurrentUser from '@/js/models/entities/current-user';
-import ResponseLessonModel from '@/js/models/api-response-models/response-lesson-model';
+import ResponseQuestionModel from '@/js/models/api-response-models/response-question-model';
 
 export default {
-    name: 'EditLessonPage',
+    name: 'EditQuestionPage',
     components: {
         MTextfield, MTextArea, MImageInput,
-        MRadio, MButton, NotFoundPanel,
+        MButton, NotFoundPanel,
         DesktopHomeFrame, MarkdownEditor, CategoryInput
     },
     data(){
         return {
             validators: {
-                title: new NotEmptyValidator("Tiêu đề bài giảng không được trống"),
+                title: new NotEmptyValidator("Tiêu đề bài thảo luận không được trống"),
                 estimateTime: new PositiveNumberValidator("Giá trị không hợp lệ")
                     .setIsAcceptEmpty(false, "Giá trị không được trống")
             },
@@ -108,31 +90,31 @@ export default {
             inputs: [],
             keys: [],
             route: useRoute(),
-            lesson: null,
-            lessonId: null,
-            isLessonExisted: null,
+            question: null,
+            questionId: null,
+            isQuestionExisted: null,
             currentUser: null
         }
     },
     async created(){
         try {
-            this.lessonId = this.route.params.lessonId;
+            this.questionId = this.route.params.questionId;
             this.currentUser = CurrentUser.getInstance();
             if (this.currentUser == null) {
                 this.getPopupManager().requiredLogin();
                 return;
             }
-            let response = await new GetRequest('Lessons/my/' + this.lessonId)
+            let response = await new GetRequest('Questions/my/' + this.questionId)
                 .execute();
             let body = await Request.tryGetBody(response);
-            this.lesson = new ResponseLessonModel();
-            this.lesson.copy(body);
-            this.isLessonExisted = true;
+            this.question = new ResponseQuestionModel();
+            this.question.copy(body);
+            this.isQuestionExisted = true;
             this.update();
         }
         catch (error){
             console.error(error);
-            this.isLessonExisted = false;
+            this.isQuestionExisted = false;
             Request.resolveAxiosError(error);
         }
     },
@@ -203,7 +185,7 @@ export default {
             }
         },
 
-        async resolveSubmitLesson(){
+        async resolveSubmitQuestion(){
             try {
                 let isValid = await this.validate();
                 if (!isValid){
@@ -211,43 +193,40 @@ export default {
                     this.focusError();
                     return;
                 }
-                let lesson = await this.getLesson();
-                let patchRequest = new PatchRequest('Lessons/' + this.lessonId)
+                let question = await this.getQuestion();
+                let patchRequest = new PatchRequest('Questions/' + this.questionId)
                     .prepareFormData();
-                for (let key in lesson){
-                    patchRequest.addFormData(key, lesson[key]);
+                for (let key in question){
+                    patchRequest.addFormData(key, question[key]);
                 }
-                let ress = await patchRequest.execute();
+                let res = await patchRequest.execute();
                 let body = await Request.tryGetBody(res);
-
-                this.getToastManager().success("Chỉnh sửa bài giảng thành công");
+                
+                this.getToastManager().success("Chỉnh sửa bài thảo luận thành công");                
                 if (body.UserItemId != null){
-                    this.router.push(`/lesson/${body.UserItemId}`);
+                    this.router.push('/question/' + body.UserItemId);
                 }
             } catch (e) {
                 await Request.resolveAxiosError(e);
             }
         },
 
-        async getLesson(){
+        async getQuestion(){
             try {
                 let title = await this.$refs.title.getValue();
                 let abstract = await this.$refs.abstract.getValue();
                 let thumbnail = await this.$refs.thumbnail.getValue();
                 let categories = await this.$refs.category.getValue();
-                let privacy = await this.$refs.privacy.getValue();
-                let estimateTimeInMinutes = await this.$refs.estimate.getValue();
                 let content = await this.$refs.content.getValue();
-                let lesson = {
-                    Textitle: title,
+                let question = {
+                    Title: title,
                     Abstract: abstract,
                     Thumbnail: thumbnail,
                     Categories: categories,
-                    PositiveNumberValidatorrivacy: privacy,
-                    EstimateTimeInMinutes: estimateTimeInMinutes,
-                    Content: content
+                    Content: content,
+                    CourseId: this.question.CourseId
                 }
-                return lesson;
+                return question;
             } catch (error){
                 console.error(error);
                 return null;
@@ -256,19 +235,19 @@ export default {
 
         async update(){
             try {
-                if (this.isLessonExisted === true){
-                    this.keys = ["title", "abstract", "thumbnail", "category", "privacy", "estimate", "content"];
+                if (this.isQuestionExisted === true){
+                    this.keys = ["title", "abstract", "thumbnail", "category", "content"];
                     for (let key of this.keys) {
                         this.inputs[key] = this.$refs[key];
                     }
-                    let lesson = this.lesson;
-                    this.inputs.title.setValue(lesson.Title);
-                    this.inputs.abstract.setValue(lesson.Abstract);
-                    this.inputs.thumbnail.setValue(lesson.Thumbnail);
-                    this.inputs.category.setValue(lesson.Categories);
-                    this.inputs.privacy.setValue(lesson.Privacy);
-                    this.inputs.estimate.setValue(lesson.EstimateTimeInMinutes);
-                    this.inputs.content.setValue(lesson.Content);
+                    let question = this.question;
+                    if (question != null){
+                        this.inputs.title.setValue(question.Title);
+                        this.inputs.abstract.setValue(question.Abstract);
+                        this.inputs.thumbnail.setValue(question.Thumbnail);
+                        this.inputs.category.setValue(question.Categories);
+                        this.inputs.content.setValue(question.Content);
+                    }
                 }
             }
             catch (error){

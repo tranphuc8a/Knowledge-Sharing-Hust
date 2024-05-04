@@ -134,7 +134,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 Total = listComment.Count,
                 Limit = limit,
                 Offset = offset,
-                Results = listComment
+                Results = listComment.Skip(offset).Take(limit)
             };
             return res;
         }
