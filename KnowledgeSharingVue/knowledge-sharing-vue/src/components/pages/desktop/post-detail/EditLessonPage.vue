@@ -217,7 +217,7 @@ export default {
                 for (let key in lesson){
                     patchRequest.addFormData(key, lesson[key]);
                 }
-                let ress = await patchRequest.execute();
+                let res = await patchRequest.execute();
                 let body = await Request.tryGetBody(res);
 
                 this.getToastManager().success("Chỉnh sửa bài giảng thành công");
