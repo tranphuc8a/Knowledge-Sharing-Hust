@@ -1,8 +1,8 @@
 <template>
     <DesktopHomeFrame>
-        <div class="d-content">
+        <div class="d-content p-credit-lestion">
             <div class="d-empty-panel" v-show="isLessonExisted === false">
-                <not-found-panel text="Bài giảng hiện không tồn tại hoặc đã bị xóa" />
+                <not-found-panel :text="errorMessage" />
             </div>
 
             <div class="p-form" v-show="isLessonExisted === true">
@@ -86,7 +86,7 @@ import MTextfield from '@/components/base/inputs/MTextfield'
 import { NotEmptyValidator, PositiveNumberValidator } from '@/js/utils/validator';
 import { myEnum } from '@/js/resources/enum';
 import { GetRequest, PatchRequest, Request } from '@/js/services/request';
-import { useRoute } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import CurrentUser from '@/js/models/entities/current-user';
 import ResponseLessonModel from '@/js/models/api-response-models/response-lesson-model';
 
@@ -99,6 +99,8 @@ export default {
     },
     data(){
         return {
+            errorMessage: "Bài giảng hiện không tồn tại hoặc đã bị xóa",
+            defaultErrorMessage: "Bài giảng hiện không tồn tại hoặc đã bị xóa",
             validators: {
                 title: new NotEmptyValidator("Tiêu đề bài giảng không được trống"),
                 estimateTime: new PositiveNumberValidator("Giá trị không hợp lệ")
@@ -107,6 +109,7 @@ export default {
             privacyEnum: myEnum.EPrivacy,
             inputs: [],
             keys: [],
+            router: useRouter(),
             route: useRoute(),
             lesson: null,
             lessonId: null,
@@ -131,9 +134,14 @@ export default {
             this.update();
         }
         catch (error){
-            console.error(error);
-            this.isLessonExisted = false;
-            Request.resolveAxiosError(error);
+            try {
+                Request.resolveAxiosError(error);
+                let userMsg = await Request.tryGetUserMessage(error);
+                this.errorMessage = userMsg ?? this.defaultErrorMessage;
+                this.isLessonExisted = false;
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     methods: {
@@ -215,6 +223,12 @@ export default {
                 let patchRequest = new PatchRequest('Lessons/' + this.lessonId)
                     .prepareFormData();
                 for (let key in lesson){
+                    if (key == "Categories"){
+                        for (let category of lesson[key]){
+                            patchRequest.addFormData(key, category);
+                        }
+                        continue;
+                    }
                     patchRequest.addFormData(key, lesson[key]);
                 }
                 let res = await patchRequest.execute();
@@ -265,7 +279,7 @@ export default {
                     this.inputs.title.setValue(lesson.Title);
                     this.inputs.abstract.setValue(lesson.Abstract);
                     this.inputs.thumbnail.setValue(lesson.Thumbnail);
-                    this.inputs.category.setValue(lesson.Categories);
+                    this.inputs.category.setValue(lesson.Categories.map(cat => cat.CategoryName));
                     this.inputs.privacy.setValue(lesson.Privacy);
                     this.inputs.estimate.setValue(lesson.EstimateTimeInMinutes);
                     this.inputs.content.setValue(lesson.Content);
@@ -292,81 +306,7 @@ export default {
 
 
 <style scoped>
-
-.d-content{
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-bottom: 48px;
-}
-
-.p-form{
-    width: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    background-color: #fff;
-    box-sizing: border-box;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1),
-                0 2px 4px 0 rgba(0, 0, 0, 0.06);
-
-}
-
-.p-row{
-    width: 100%;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 64px;
-}
-
-.p-row > :last-child{
-    min-width: 500px;
-}
-
-.p-title, .p-submit-button{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    font-weight: 500;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-family: 'ks-font-semibold';
-    
-}
-
-.p-input-category{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.p-input-image{
-    width: fit-content;
-}
-
-.p-input-estimate{
-    width: 500px;
-}
-
-.p-editor{
-    background-color: var(--primary-color-200);
-    border: solid 1px var(--primary-color-200);
-    border-radius: 4px;
-    height: 700px;
-    overflow: hidden;
-}
+@import url(@/css/pages/desktop/components/credit-lestion.css);
 
 </style>
 

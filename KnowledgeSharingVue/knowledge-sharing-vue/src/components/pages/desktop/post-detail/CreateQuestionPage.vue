@@ -1,6 +1,6 @@
 <template>
     <DesktopHomeFrame>
-        <div class="d-content">
+        <div class="d-content p-credit-lestion">
             <div class="d-empty-panel" v-show="isError === true">
                 <not-found-panel :text="errorMessage" />
             </div>
@@ -71,9 +71,11 @@ import { PostRequest, Request, GetRequest } from '@/js/services/request';
 import { useRoute, useRouter } from 'vue-router';
 import ResponseCourseModel from '@/js/models/api-response-models/response-course-model';
 import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
+import CurrentUser from '@/js/models/entities/current-user';
+
 
 export default {
-    name: 'CreateLessonPage',
+    name: 'CreateQuestionPage',
     components: {
         MTextfield, MTextArea, MImageInput,
         MButton, NotFoundPanel,
@@ -96,6 +98,8 @@ export default {
 
             isError: false,
             errorMessage: "",
+            currentUser: null,
+            defaultErrorMessage: "Khóa học không tồn tại hoặc đã bị xóa",
         }
     },
     async created(){
@@ -107,15 +111,28 @@ export default {
                 if (body != null){
                     this.course = new ResponseCourseModel();
                     this.course.copy(body);
+
+                    if (this.currentUser != null){
+                        if (this.course?.UserId != this.currentUser?.UserId){
+                            this.isError = true;
+                            this.errorMessage = "Bạn không có quyền tạo bài thảo luận trong khóa học này";
+                            return;
+                        }
+                    }
                     this.isError = false;
                 }
             } else {
                 this.courseId = null;
             }
-        } catch (e) {
-            console.error(e);
-            this.isError = true;
-            this.errorMessage = "Khóa học không tồn tại hoặc đã bị xóa";
+        } catch (error) {
+            try {
+                Request.resolveAxiosError(error);
+                let userMsg = await Request.tryGetUserMessage(error);
+                this.errorMessage = userMsg ?? this.defaultErrorMessage;
+                this.isError = true;
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     methods: {
@@ -184,11 +201,17 @@ export default {
                     this.focusError();
                     return;
                 }
-                let lesson = await this.getQuestion();
+                let Question = await this.getQuestion();
                 let postRequest = new PostRequest('Questions')
                     .prepareFormData();
-                for (let key in lesson){
-                    postRequest.addFormData(key, lesson[key]);
+                for (let key in Question){
+                    if (key == "Categories"){
+                        for (let category of Question[key]){
+                            postRequest.addFormData(key, category);
+                        }
+                        continue;
+                    }
+                    postRequest.addFormData(key, Question[key]);
                 }
                 
                 let res = await postRequest.execute();
@@ -217,13 +240,22 @@ export default {
                     Categories: categories,
                     Content: content
                 }
-                if (this.course == null){
-                    question.CourseId = this.courseId ?? null;
-                }
+                question.CourseId = this.courseId ?? null;
                 return question;
             } catch (error){
                 console.error(error);
                 return null;
+            }
+        },
+
+        async checkLoggedIn(){
+            try {
+                this.currentUser = await CurrentUser.getInstance();
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                }
+            } catch (error){
+                console.error(error);
             }
         }
     },
@@ -231,14 +263,21 @@ export default {
 
     },
     inject: {
-        getToastManager: {}
+        getToastManager: {},
+        getPopupManager: {}
     },
     mounted(){
-        this.keys = ["title", "abstract", "thumbnail", "category", "content"];
-        for (let key of this.keys) {
-            this.inputs[key] = this.$refs[key];
+        try {
+            this.checkLoggedIn();
+            this.keys = ["title", "abstract", "thumbnail", "category", "content"];
+            for (let key of this.keys) {
+                this.inputs[key] = this.$refs[key];
+            }
+            // console.log(this.inputs);
         }
-        console.log(this.inputs)
+        catch (error){
+            console.error(error);
+        }
     }
 }
 
@@ -246,81 +285,7 @@ export default {
 
 
 <style scoped>
-
-.d-content{
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-bottom: 48px;
-}
-
-.p-form{
-    width: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    background-color: #fff;
-    box-sizing: border-box;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1),
-                0 2px 4px 0 rgba(0, 0, 0, 0.06);
-
-}
-
-.p-row{
-    width: 100%;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 64px;
-}
-
-.p-row > :last-child{
-    min-width: 500px;
-}
-
-.p-title, .p-submit-button{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    font-weight: 500;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-family: 'ks-font-semibold';
-    
-}
-
-.p-input-category{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.p-input-image{
-    width: fit-content;
-}
-
-.p-input-estimate{
-    width: 500px;
-}
-
-.p-editor{
-    background-color: var(--primary-color-200);
-    border: solid 1px var(--primary-color-200);
-    border-radius: 4px;
-    height: 700px;
-    overflow: hidden;
-}
+@import url(@/css/pages/desktop/components/credit-lestion.css);
 
 </style>
 

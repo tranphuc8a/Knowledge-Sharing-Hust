@@ -313,23 +313,8 @@ namespace KnowledgeSharingApi.Services.Services
             // Kiểm tra chính sách tạo khóa học của myUid
 
             // Update thumbnail
-            string? thumbnail = null;
-            if (model.Thumbnail != null)
-            {
-                thumbnail = await Storage.SaveImage(model.Thumbnail);
-                if (thumbnail != null)
-                {
-                    Image imageToAdd = new()
-                    {
-                        CreatedBy = myUid.ToString(),
-                        CreatedTime = DateTime.Now,
-                        UserId = myUid,
-                        ImageId = Guid.NewGuid(),
-                        ImageUrl = thumbnail
-                    };
-                    _ = ImageRepository.Insert(imageToAdd);
-                }
-            }
+            string? thumbnail = await Storage.SaveImage(model.Thumbnail);
+            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // Tạo khóa học mới
             Course course = CreateCourse(user, model, thumbnail);
@@ -340,7 +325,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Insert categories nếu có:
             if (model.Categories != null && model.Categories.Any())
             {
-                _ = CategoryRepository.UpdateKnowledgeCategories(course.UserItemId, model.Categories.ToList());
+                _ = await CategoryRepository.UpdateKnowledgeCategories(course.UserItemId, model.Categories.ToList());
             }
 
             // Trả về thành công
@@ -377,31 +362,17 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Đây không phải khóa học của bạn");
 
             // update thumbnail:
-            string? newThumbnail = null;
-            if (model.Thumbnail != null)
-            {
-                newThumbnail = await Storage.SaveImage(model.Thumbnail);
-                if (newThumbnail != null)
-                {
-                    Image imageToAdd = new()
-                    {
-                        CreatedBy = myUid.ToString(),
-                        CreatedTime = DateTime.Now,
-                        UserId = myUid,
-                        ImageId = Guid.NewGuid(),
-                        ImageUrl = newThumbnail
-                    };
-                    _ = ImageRepository.Insert(imageToAdd);
-                }
-            }
+            string? thumbnail = await Storage.SaveImage(model.Thumbnail);
+            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // Update
             Course courseToUpdate = new();
             courseToUpdate.Copy(course);
             courseToUpdate.Copy(model);
-            if (newThumbnail != null) courseToUpdate.Thumbnail = newThumbnail;
+            if (thumbnail != null) courseToUpdate.Thumbnail = thumbnail;
             int effects1 = await CourseRepository.Update(courseId, courseToUpdate);
             int effects2 = 0;
+
             // Update categories nếu có:
             if (model.Categories != null && model.Categories.Any())
             {

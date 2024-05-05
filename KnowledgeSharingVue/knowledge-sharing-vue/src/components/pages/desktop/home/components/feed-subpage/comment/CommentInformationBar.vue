@@ -165,6 +165,10 @@ export default {
     width: 100%;
 }
 
+.p-comment-star-actions > * {
+    flex-shrink: 0;
+}
+
 .p-comment-numstar{
     color: var(--grey-color);
     font-family: 'ks-font-semibold';

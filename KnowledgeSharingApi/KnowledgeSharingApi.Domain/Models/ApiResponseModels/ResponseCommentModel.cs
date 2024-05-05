@@ -11,7 +11,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 {
     public class ResponseCommentModel : ViewComment, IResponseCommentModel
     {
-        public int Temp { get; set; } = 0;
+        // public int Temp { get; set; } = 0;
         public double? AverageStars { get; set; }
         public double? MyStars { get; set; }
         public int TotalStars { get; set; }

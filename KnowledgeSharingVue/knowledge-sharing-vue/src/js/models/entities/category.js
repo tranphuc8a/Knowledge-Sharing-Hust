@@ -1,4 +1,5 @@
-import Entity from './entity.js';
+
+import Entity from "../entity";
 
 class Category extends Entity {
     constructor() {

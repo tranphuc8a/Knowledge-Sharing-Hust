@@ -130,13 +130,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
         public virtual async Task<List<ResponseCourseLessonModel>> DecorateResponseCourseLessonModel(Guid? myUid, List<CourseLesson> participants, bool isDecorateLesson = false, bool isDecorateCourse = false)
         {
             // Atrributes: Course, Lesson
-            Dictionary<Guid, ResponseCourseCardModel> mapCourse = [];
-            Dictionary<Guid, ResponseLessonModel> mapLesson = [];
+            Dictionary<Guid, ResponseCourseModel?> mapCourse = [];
+            Dictionary<Guid, ResponseLessonModel?> mapLesson = [];
             if (isDecorateCourse)
             { // Get list course
                 List<Guid> listCourseIds = participants.Select(p => p.CourseId).Distinct().ToList();
                 List<ViewCourse> courses = await DbContext.ViewCourses.Where(c => listCourseIds.Contains(c.UserItemId)).ToListAsync();
-                List<ResponseCourseCardModel> responseCourse = courses.Select(c => (ResponseCourseCardModel)new ResponseCourseCardModel().Copy(c)).ToList();
+                List<ResponseCourseModel> responseCourse = await DecorateResponseCourseModel(myUid, courses);
+                mapCourse = listCourseIds.ToDictionary(
+                    id => id,
+                    id => (ResponseCourseModel?) null
+                );
                 foreach (var course in responseCourse) mapCourse[course.UserItemId] = course;
             }
             if (isDecorateLesson)
@@ -144,6 +148,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
                 List<Guid> listLessonIds = participants.Select(p => p.LessonId).Distinct().ToList();
                 List<ViewLesson> lessons = await DbContext.ViewLessons.Where(l => listLessonIds.Contains(l.UserItemId)).ToListAsync();
                 List<ResponseLessonModel> responseLesson = await DecorateResponseLessonModel(myUid, lessons);
+                mapLesson = listLessonIds.ToDictionary(
+                    id => id,
+                    id => (ResponseLessonModel?)null
+                );
                 foreach (var lesson in responseLesson) mapLesson[lesson.UserItemId] = lesson;
             }
 

@@ -9,7 +9,7 @@
                 {{question?.Title ?? "Title of question"}}
             </div>
             <div class="p-feedcard-question__categories">
-                <CategoriesList :categories="question?.Categories ?? defaultCategoriesList" />
+                <CategoriesList :categories="compiledCategories" />
             </div>
             <div class="p-feedcard-question__content">
                 <LatexMarkdownRender :markdown-content="question?.Content" />
@@ -44,7 +44,7 @@ export default {
     data() {
         return {
             label: null,
-            defaultCategoriesList: ["Hello", "Goodbye asjdg q22222222222222222222222222222222222222222"],
+            defaultCategoriesList: [],
             buttonStyle: {
                 color: 'var(--blue-grey-color-800)',
             },
@@ -52,11 +52,13 @@ export default {
                 color: 'var(--grey-color)',
             },
             content: '',
-            question: this.post
+            question: this.post,
+            compiledCategories: [],
         }
     },
     mounted() {
         this.getLabel();
+        this.compiledCategories = this.getCategories();
     },
     components: {
         LatexMarkdownRender, PostCardCommentList,
@@ -78,13 +80,13 @@ export default {
             return this.label;
         },
 
-        async resolveClickAddquestion(){
-            try {
-                let router = this.globalData.router;
-                router.push({name: 'add-question'});
-            } catch (error) {
-                console.log(error);
+        getCategories() {
+            if (this.question?.Categories != null
+                && this.question.Categories.length > 0){
+                return this.question.Categories
+                    .map(cate => cate.CategoryName);
             }
+            return this.defaultCategoriesList;
         },
 
         async resolveClickAddQuestion(){
@@ -109,7 +111,8 @@ export default {
     },
     watch: {
         post(newValue) {
-            this.question = newValue
+            this.question = newValue;
+            this.compiledCategories = this.getCategories();
         }
     },
     props: {

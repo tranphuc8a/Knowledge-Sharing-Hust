@@ -1,7 +1,7 @@
 <template>
     <DesktopHomeFrame>
         
-        <div class="d-content">
+        <div class="d-content p-lestion-detail">
             <div class="d-empty-panel" v-show="isLessonExisted === false">
                 <not-found-panel :text="errorMessage" />
             </div>
@@ -28,7 +28,9 @@
             </div>
 
             <div class="d-content-subpage__content" v-if="isLessonExisted === true">
-                <LessonCard :post="lesson" />
+                <div class="lestion-card">
+                    <LessonCard :post="lesson" />
+                </div>
             </div>
         </div>
         
@@ -93,7 +95,7 @@ export default {
             try {
                 this.lesson = null;
                 this.isLessonExisted = false;
-                let userMessage = await Request.getUserMessage(error);
+                let userMessage = await Request.tryGetUserMessage(error);
                 if (userMessage != null) {
                     this.errorMessage = userMessage;
                 }
@@ -146,6 +148,6 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/lesson-detail.css);
+@import url(@/css/pages/desktop/components/lestion-detail.css);
 
 </style>

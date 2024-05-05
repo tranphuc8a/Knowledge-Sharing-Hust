@@ -50,9 +50,11 @@ class ResolveAxiosResponse {
      * @Modified None
      */
     resolveBadRequest = async (error) => {
-        let msg = this.tryGetUserMessage(error);
+        let defaultMsg = "Yêu cầu không hợp lệ. Vui lòng kiểm tra lại thông tin";
+        let msg = await this.tryGetUserMessage(error);
+        let message = msg ?? defaultMsg;
         if (this.toastManager != null){
-            this.toastManager.error(msg);
+            this.toastManager.error(message);
         } else {
             console.error(error);
         }
@@ -66,10 +68,17 @@ class ResolveAxiosResponse {
      * @Modified None
      */
     resolveUnAuthorized = async (error) => {
+        let defaultMsg = "Bạn cần đăng nhập để thực hiện tác vụ này";
+        let msg = await this.tryGetUserMessage(error);
+        let message = msg ?? defaultMsg;
         if (this.popupManager != null){
             this.popupManager.requiredLogin();
         } else {
-            console.error(error);
+            if (this.toastManager != null){
+                this.toastManager.error(message);
+            } else {
+                console.error(error);
+            }
         }
     }
 
@@ -81,8 +90,11 @@ class ResolveAxiosResponse {
      * @Modified None
      */
     resolveForbidden = async (error) => {
+        let defaultMsg = "Bạn không có quyền thực hiện tác vụ này. Vui lòng liên hệ Admin để được hỗ trợ";
+        let msg = await this.tryGetUserMessage(error);
+        let message = msg ?? defaultMsg;
         if (this.toastManager != null){
-            this.toastManager.error("Bạn không có quyền thực hiện tác vụ này. Vui lòng liên hệ Admin để được hỗ trợ");
+            this.toastManager.error(message);
         } else {
             console.error(error);
         }
@@ -96,9 +108,11 @@ class ResolveAxiosResponse {
      * @Modified None
      */
     resolveServerError = async (error) => {
-        let msg = this.tryGetUserMessage(error);
+        let defaultMsg = "Có lỗi hệ thống xảy ra. Vui lòng thử lại sau";
+        let msg = await this.tryGetUserMessage(error);
+        let message = msg ?? defaultMsg;
         if (this.toastManager != null){
-            this.toastManager.infor(msg);
+            this.toastManager.infor(message);
         } else {
             console.error(error);
         }   

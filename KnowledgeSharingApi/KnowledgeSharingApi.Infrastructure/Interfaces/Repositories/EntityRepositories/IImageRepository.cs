@@ -18,5 +18,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (1/5/24)
         /// Modified: None
         Task<IEnumerable<Image>> GetByUserId(Guid userId);
+
+
+        /// <summary>
+        /// Try to insert imageUrl for user 
+        /// </summary>
+        /// <param name="userId"> id of user want to do </param>
+        /// <param name="imageUrl"> imageUrl of image </param>
+        /// <returns></returns>
+        /// Created: PhucTV (5/5/24)
+        /// Modified: None
+        Task<int> TryInsertImage(Guid userId, string? imageUrl);
     }
 }

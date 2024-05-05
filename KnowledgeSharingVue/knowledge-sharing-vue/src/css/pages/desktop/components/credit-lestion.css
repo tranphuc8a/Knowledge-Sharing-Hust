@@ -1,0 +1,78 @@
+
+
+.d-content.p-credit-lestion{
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 48px;
+}
+
+.p-credit-lestion .p-form{
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    background-color: #fff;
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1),
+                0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+}
+
+.p-credit-lestion .p-form .p-row{
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 64px;
+}
+
+.p-credit-lestion .p-form .p-row > :last-child{
+    min-width: 500px;
+}
+
+.p-credit-lestion .p-form .p-title, 
+.p-credit-lestion .p-form .p-submit-button{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: 500;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-family: 'ks-font-semibold';
+    
+}
+
+.p-credit-lestion .p-form .p-input-category{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.p-credit-lestion .p-form .p-input-image{
+    width: fit-content;
+}
+
+.p-credit-lestion .p-form .p-input-estimate{
+    width: 500px;
+}
+
+.p-credit-lestion .p-form .p-editor{
+    background-color: var(--primary-color-200);
+    border: solid 1px var(--primary-color-200);
+    border-radius: 4px;
+    height: 700px;
+    overflow: hidden;
+}
+

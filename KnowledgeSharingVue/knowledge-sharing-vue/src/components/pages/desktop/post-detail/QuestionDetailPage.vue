@@ -1,9 +1,9 @@
 <template>
     <DesktopHomeFrame>
         
-        <div class="d-content">
+        <div class="d-content p-lestion-detail">
             <div class="d-empty-panel" v-show="isQuestionExisted === false">
-                <not-found-panel text="Bài thảo luận hiện không tồn tại hoặc đã bị xóa" />
+                <not-found-panel :text="errorMessage" />
             </div>
 
             <div class="d-content-subpage__menu" v-show="isQuestionExisted === true">
@@ -13,7 +13,9 @@
             </div>
 
             <div class="d-content-subpage__content" v-if="isQuestionExisted === true">
-                <QuestionCard :post="question" />
+                <div class="lestion-card">
+                    <QuestionCard :post="question" />
+                </div>
             </div>
         </div>
         
@@ -36,6 +38,8 @@ export default {
     name: "QuestionDetailPage",
     data() {
         return {
+            errorMessage: "Bài thảo luận hiện không tồn tại hoặc đã bị xóa",
+            defaultErrorMessage: "Bài thảo luận hiện không tồn tại hoặc đã bị xóa",
             title: "Question Detail Page",
             question: null,
             isQuestionExisted: null,
@@ -66,9 +70,15 @@ export default {
             this.isQuestionExisted = true;
         }
         catch (error) {
-            this.question = null;
-            this.isQuestionExisted = false;
-            console.error(error);
+            try {
+                Request.resolveAxiosError(error);
+                let userMsg = await Request.tryGetUserMessage(error);
+                this.errorMessage = userMsg ?? this.defaultErrorMessage;
+                this.isQuestionExisted = false;
+                this.question = null;
+            } catch (e){
+                console.error(e);
+            }
         } finally {
             this.getLoadingPanel().hide();
         }
@@ -91,6 +101,6 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/question-detail.css);
+@import url(@/css/pages/desktop/components/lestion-detail.css);
 
 </style>

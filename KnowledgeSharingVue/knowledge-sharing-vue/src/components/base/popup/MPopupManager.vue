@@ -45,10 +45,12 @@ import { MyRandom } from '@/js/utils/myrandom';
 import Popup from './MPopup.vue';
 import appConfig from '@/app-config';
 import Common from '@/js/utils/common';
+import { useRouter } from 'vue-router';
 
 export default {
     data(){
         return {
+            router: useRouter(),
             fontSize: '24px',
             listPopup: [],
             lang: this.lang.components.popupManager,
@@ -157,6 +159,10 @@ export default {
 
         async requiredLogin(){
             try {
+                let currentPath = this.router.currentRoute.path;
+                if (currentPath != null){
+                    localStorage.setItem("redirect-to", currentPath);
+                }
                 let homepage = appConfig.getHomePageUrl();
                 homepage = Common.removeTrailingSlash(homepage);
                 this.inform("Bạn cần đăng nhập để thực hiện chức năng này!",

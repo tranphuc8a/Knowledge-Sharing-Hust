@@ -1,6 +1,6 @@
 <template>
     <DesktopHomeFrame>
-        <div class="d-content">
+        <div class="d-content p-credit-lestion">
             <div class="p-form">
                 <div class="p-row p-title">
                     Tạo mới bài giảng
@@ -82,6 +82,7 @@ import { NotEmptyValidator, PositiveNumberValidator } from '@/js/utils/validator
 import { myEnum } from '@/js/resources/enum';
 import { PostRequest, Request } from '@/js/services/request';
 import { useRouter } from 'vue-router';
+import CurrentUser from '@/js/models/entities/current-user';
 
 export default {
     name: 'CreateLessonPage',
@@ -100,7 +101,8 @@ export default {
             privacyEnum: myEnum.EPrivacy,
             inputs: [],
             keys: [],
-            router: useRouter()
+            router: useRouter(),
+            currentUser: null,
         }
     },
     methods: {
@@ -182,6 +184,12 @@ export default {
                 let postRequest = new PostRequest('Lessons')
                     .prepareFormData();
                 for (let key in lesson){
+                    if (key == "Categories"){
+                        for (let category of lesson[key]){
+                            postRequest.addFormData(key, category);
+                        }
+                        continue;
+                    }
                     postRequest.addFormData(key, lesson[key]);
                 }
                 let res = await postRequest.execute();
@@ -219,15 +227,29 @@ export default {
                 console.error(error);
                 return null;
             }
+        },
+
+
+        async checkLoggedIn(){
+            try {
+                this.currentUser = await CurrentUser.getInstance();
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                }
+            } catch (error){
+                console.error(error);
+            }
         }
     },
     props: {
 
     },
     inject: {
-        getToastManager: {}
+        getToastManager: {},
+        getPopupManager: {},
     },
     mounted(){
+        this.checkLoggedIn();
         this.keys = ["title", "abstract", "thumbnail", "category", "privacy", "estimate", "content"];
         for (let key of this.keys) {
             this.inputs[key] = this.$refs[key];
@@ -240,81 +262,7 @@ export default {
 
 
 <style scoped>
-
-.d-content{
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-bottom: 48px;
-}
-
-.p-form{
-    width: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    background-color: #fff;
-    box-sizing: border-box;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1),
-                0 2px 4px 0 rgba(0, 0, 0, 0.06);
-
-}
-
-.p-row{
-    width: 100%;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 64px;
-}
-
-.p-row > :last-child{
-    min-width: 500px;
-}
-
-.p-title, .p-submit-button{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    font-weight: 500;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-family: 'ks-font-semibold';
-    
-}
-
-.p-input-category{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.p-input-image{
-    width: fit-content;
-}
-
-.p-input-estimate{
-    width: 500px;
-}
-
-.p-editor{
-    background-color: var(--primary-color-200);
-    border: solid 1px var(--primary-color-200);
-    border-radius: 4px;
-    height: 700px;
-    overflow: hidden;
-}
+@import url(@/css/pages/desktop/components/credit-lestion.css);
 
 </style>
 

@@ -9,7 +9,7 @@
                 {{lesson?.Title ?? "Title of lesson"}}
             </div>
             <div class="p-feedcard-lesson__categories">
-                <CategoriesList :categories="lesson?.Categories ?? defaultCategoriesList" />
+                <CategoriesList :categories="compiledCategories" />
             </div>
             <div class="p-feedcard-lesson__content">
                 <textarea type="text" v-model="content"/>
@@ -45,7 +45,7 @@ export default {
     data() {
         return {
             label: null,
-            defaultCategoriesList: ["Hello", "Goodbye asjdg q22222222222222222222222222222222222222222"],
+            defaultCategoriesList: [],
             buttonStyle: {
                 color: 'var(--blue-grey-color-800)',
             },
@@ -53,11 +53,13 @@ export default {
                 color: 'var(--grey-color)',
             },
             content: '',
-            lesson: this.post
+            lesson: this.post,
+            compiledCategories: [],
         }
     },
     mounted() {
         this.getLabel();
+        this.compiledCategories = this.getCategories();
     },
     components: {
         LatexMarkdownRender, PostCardCommentList,
@@ -77,6 +79,15 @@ export default {
                 this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
+        },
+
+        getCategories() {
+            if (this.lesson?.Categories != null
+                && this.lesson.Categories.length > 0){
+                return this.lesson.Categories
+                    .map(cate => cate.CategoryName);
+            }
+            return this.defaultCategoriesList;
         },
 
         async resolveClickAddLesson(){
@@ -110,7 +121,8 @@ export default {
     },
     watch: {
         post(newValue) {
-            this.lesson = newValue
+            this.lesson = newValue;
+            this.compiledCategories = this.getCategories();
         }
     },
     props: {

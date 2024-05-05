@@ -278,19 +278,8 @@ namespace KnowledgeSharingApi.Services.Services
             ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
             // Post thumbnail if existed:
-            string? thumbnail = lessonModel.Thumbnail != null ? await Storage.SaveImage(lessonModel.Thumbnail) : null;
-            if (thumbnail != null)
-            {
-                Image imageToAdd = new()
-                {
-                    CreatedBy = myUid.ToString(),
-                    CreatedTime = DateTime.Now,
-                    UserId = myUid,
-                    ImageId = Guid.NewGuid(),
-                    ImageUrl = thumbnail
-                };
-                _ = ImageRepository.Insert(imageToAdd);
-            }
+            string? thumbnail = await Storage.SaveImage(model.Thumbnail);
+            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // Tạo mới Lesson
             Lesson lesson = CreateLesson(user, lessonModel, thumbnail);
@@ -302,7 +291,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Insert categories nếu có:
             if (model.Categories != null && model.Categories.Any())
             {
-                _ = CategoryRepository.UpdateKnowledgeCategories(lesson.UserItemId, model.Categories.ToList());
+                _ = await CategoryRepository.UpdateKnowledgeCategories(lesson.UserItemId, model.Categories.ToList());
             }
 
             // Trả về thành công
@@ -335,30 +324,18 @@ namespace KnowledgeSharingApi.Services.Services
             if (lesson.UserId != myUid)
                 return ServiceResult.Forbidden("Không phải bài giảng của bạn");
 
+            if (model is not UpdateLessonModel lessonModel)
+                throw new NotMatchTypeException();
+
             // update thumbnail:
-            string? newThumbnail = null;
-            if (model.Thumbnail != null)
-            {
-                newThumbnail = await Storage.SaveImage(model.Thumbnail);
-                if (newThumbnail != null)
-                {
-                    Image imageToAdd = new()
-                    {
-                        CreatedBy = myUid.ToString(),
-                        CreatedTime = DateTime.Now,
-                        UserId = myUid,
-                        ImageId = Guid.NewGuid(),
-                        ImageUrl = newThumbnail
-                    };
-                    _ = ImageRepository.Insert(imageToAdd);
-                }
-            }
+            string? thumbnail = await Storage.SaveImage(model.Thumbnail);
+            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // cập nhật 
             Lesson lessonToUpdate = new();
             lessonToUpdate.Copy(lesson);
-            lessonToUpdate.Copy(model);
-            if (newThumbnail != null) lessonToUpdate.Thumbnail = newThumbnail;
+            lessonToUpdate.Copy(lessonModel);
+            if (thumbnail != null) lessonToUpdate.Thumbnail = thumbnail;
             int updated1 = await LessonRepository.Update(postId, lessonToUpdate);
             int updated2 = 0;
 
@@ -545,7 +522,7 @@ namespace KnowledgeSharingApi.Services.Services
                 ResponseCourseLessonModel resItem = 
                     (ResponseCourseLessonModel)new ResponseCourseLessonModel().Copy(participant.Item1);
                 resItem.Lesson = (ResponseLessonModel)new ResponseLessonModel().Copy(lesson);
-                resItem.Course = (ResponseCourseCardModel)new ResponseCourseCardModel().Copy(participant.Item2);
+                resItem.Course = (ResponseCourseModel)new ResponseCourseCardModel().Copy(participant.Item2);
                 return resItem;
             }).ToList();
 
