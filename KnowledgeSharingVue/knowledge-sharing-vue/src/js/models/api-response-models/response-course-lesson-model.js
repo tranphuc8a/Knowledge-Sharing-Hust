@@ -1,6 +1,6 @@
 
 
-import CourseLesson from '../course-lesson-model';
+import CourseLesson from '../entities/course-lesson';
 import ResponseCourseModel from './response-course-model';
 import ResponseLessonModel from './response-lesson-model';
 

@@ -1,5 +1,7 @@
 
-import Entity from './entity';
+
+import Entity from "../entity";
+
 class CourseLesson extends Entity{
     constructor() {
         super();

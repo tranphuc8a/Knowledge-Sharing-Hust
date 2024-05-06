@@ -158,8 +158,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             List<ResponseCourseLessonModel> res = participants.Select(part =>
             {
                 ResponseCourseLessonModel item = (ResponseCourseLessonModel) new ResponseCourseLessonModel().Copy(part);
-                item.Course = mapCourse[item.CourseId];
-                item.Lesson = mapLesson[item.LessonId];
+                if (mapCourse.TryGetValue(item.CourseId, out ResponseCourseModel? value1))
+                {
+                    item.Course = value1;
+                }
+                if (mapLesson.TryGetValue(item.LessonId, out ResponseLessonModel? value2))
+                {
+                    item.Lesson = value2;
+                }
                 return item;
             }).ToList();
             return res;

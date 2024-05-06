@@ -10,10 +10,10 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 {
     public class ResponseCourseLessonModel : CourseLesson
     {
-        [ResponseUserItemConverter]
+        //[ResponseUserItemConverter]
         public ResponseLessonModel? Lesson { get; set; }
 
-        [ResponseUserItemConverter]
+        //[ResponseUserItemConverter]
         public ResponseCourseModel? Course { get; set; }
     }
 }
