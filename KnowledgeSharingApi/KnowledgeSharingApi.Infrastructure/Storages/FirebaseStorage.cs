@@ -49,7 +49,7 @@ namespace KnowledgeSharingApi.Infrastructures.Storages
             }
         }
 
-        public async Task<string?> SaveImage(IFormFile image)
+        public async Task<string?> SaveImage(IFormFile? image)
         {
             if (image == null || image.Length == 0)
             {

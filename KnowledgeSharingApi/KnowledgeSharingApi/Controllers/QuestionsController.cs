@@ -168,7 +168,7 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        [HttpGet("api/v1/user/questions/{userId}")]
+        [HttpGet("/api/v1/user/questions/{userId}")]
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListUserQuestion(Guid userId, int? limit, int? offset)
         {

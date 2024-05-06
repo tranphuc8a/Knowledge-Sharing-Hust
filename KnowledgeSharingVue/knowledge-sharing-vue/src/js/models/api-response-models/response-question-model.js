@@ -2,6 +2,8 @@
 
 
 import ViewQuestion from '../views/view-question';
+import ResponseCommentModel from './response-comment-model';
+import Category from '../entities/category';
 
 class ResponseQuestionModel extends ViewQuestion {
     constructor() {
@@ -12,10 +14,30 @@ class ResponseQuestionModel extends ViewQuestion {
         this.AverageStars = null;
         this.MyStars = null;
         this.TotalStars = null;
+        this.Categories = [];
     }
 
     init() {
         return new ResponseQuestionModel();
+    }
+
+    copy(entity) {
+        super.copy(entity);
+        if (this.TopComments?.length > 0){
+            this.TopComments = this.TopComments.map(function(com){
+                let comm = new ResponseCommentModel();
+                comm.copy(com);
+                return comm;
+            });
+        }
+        if (this.Categories?.length > 0){
+            this.Categories = this.Categories.map(function(cat){
+                let cate = new Category();
+                cate.copy(cat);
+                return cate;
+            });
+        }
+        return this;
     }
 }
 

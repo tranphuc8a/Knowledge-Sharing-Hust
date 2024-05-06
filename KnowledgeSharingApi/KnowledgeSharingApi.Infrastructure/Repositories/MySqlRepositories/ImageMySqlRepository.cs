@@ -13,9 +13,27 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
     public class ImageMySqlRepository(IDbContext dbContext) : BaseMySqlRepository<Image>(dbContext), IImageRepository
     {
-        public async Task<IEnumerable<Image>> GetByUserId(Guid userId)
+        public virtual async Task<IEnumerable<Image>> GetByUserId(Guid userId)
         {
             return await DbContext.Images.Where(image => image.UserId == userId).ToListAsync();
+        }
+
+        public virtual async Task<int> TryInsertImage(Guid userId, string? imageUrl)
+        {
+            if (imageUrl != null)
+            {
+                Image imageToAdd = new()
+                {
+                    CreatedBy = userId.ToString(),
+                    CreatedTime = DateTime.Now,
+                    UserId = userId,
+                    ImageId = Guid.NewGuid(),
+                    ImageUrl = imageUrl
+                };
+                Guid? inserted = await Insert(imageToAdd.ImageId, imageToAdd);
+                return inserted != null ? 1 : 0;
+            }
+            return 0;
         }
     }
 }

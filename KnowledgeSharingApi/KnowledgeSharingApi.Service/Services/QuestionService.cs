@@ -73,6 +73,36 @@ namespace KnowledgeSharingApi.Services.Services
             GetMultiQuestionSuccess = ResponseResource.GetMultiSuccess(QuestionResource);
         }
 
+        #region Functional methods
+
+        protected virtual Question CreateQuestion(ViewUser user, CreateQuestionModel questionModel, string? thumbnail)
+        {
+            Guid newId = Guid.NewGuid();
+            Question question = new()
+            {
+                // Entity:
+                CreatedBy = user.FullName,
+                CreatedTime = DateTime.Now,
+                // UserItem:
+                UserItemId = newId,
+                UserId = user.UserId,
+                UserItemType = EUserItemType.Knowledge,
+                // Knowledge:
+                Thumbnail = thumbnail,
+                KnowledgeType = EKnowledgeType.Post,
+                Privacy = questionModel.CourseId != null ? EPrivacy.Private : EPrivacy.Public,
+                Views = 0,
+                IsBlockComment = false,
+                // Post:
+                PostType = EPostType.Question,
+                // Question
+                IsAccept = false
+            };
+            return question;
+        }
+
+        #endregion
+
 
         #region Admin Apies
         public async Task<ServiceResult> AdminDeletePost(Guid postId)
@@ -197,55 +227,27 @@ namespace KnowledgeSharingApi.Services.Services
             if (model is not CreateQuestionModel questionModel)
                 throw new NotMatchTypeException();
 
-            // Kiểm tra Member tồn tại và user phài join course
+            // Kiểm tra Course tồn tại và user phài join course hoặc là chủ course
             if (questionModel.CourseId.HasValue)
             {
                 Guid courseId = questionModel.CourseId.Value;
-                _ = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
+                Course courseToCheck = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
 
                 // Kiểm tra user đã join course hay chưa, đợi course repository viết
-                ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, courseId);
-                if (courseRegister == null)
-                    return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
+                if (courseToCheck.UserId != myUid)
+                {   // Trong trường hợp không là chủ nhân, check thêm phải join course
+                    ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, courseId);
+                    if (courseRegister == null)
+                        return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
+                }
             }
 
             // Post thumbnail if existed:
-            string? thumbnail = questionModel.Thumbnail != null ? await Storage.SaveImage(questionModel.Thumbnail) : null;
-            if (thumbnail != null)
-            {
-                Image imageToAdd = new()
-                {
-                    CreatedBy = myUid.ToString(),
-                    CreatedTime = DateTime.Now,
-                    UserId = myUid,
-                    ImageId = Guid.NewGuid(),
-                    ImageUrl = thumbnail
-                };
-                _ = ImageRepository.Insert(imageToAdd);
-            }
+            string? thumbnail = await Storage.SaveImage(model.Thumbnail);
+            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // OK, tạo câu hỏi
-            Guid newId = Guid.NewGuid();
-            Question question = new()
-            {
-                // Entity:
-                CreatedBy = user.FullName,
-                CreatedTime = DateTime.Now,
-                // UserItem:
-                UserItemId = newId,
-                UserId = user.UserId,
-                UserItemType = EUserItemType.Knowledge,
-                // Knowledge:
-                Thumbnail = thumbnail,
-                KnowledgeType = EKnowledgeType.Post,
-                Privacy = questionModel.CourseId != null ? EPrivacy.Private : EPrivacy.Public,
-                Views = 0,
-                IsBlockComment = false,
-                // Post:
-                PostType = EPostType.Question,
-                // Question
-                IsAccept = false
-            };
+            Question question = CreateQuestion(user, questionModel, thumbnail);
             question.Copy(model);
 
             // Insert câu hỏi
@@ -255,7 +257,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Insert categories nếu có:
             if (model.Categories != null && model.Categories.Any())
             {
-                _ = CategoryRepository.UpdateKnowledgeCategories(inserted.Value, model.Categories.ToList());
+                _ = await CategoryRepository.UpdateKnowledgeCategories(inserted.Value, model.Categories.ToList());
             }
 
             // Trả về thành công
@@ -277,31 +279,17 @@ namespace KnowledgeSharingApi.Services.Services
 
 
             // update thumbnail:
-            string? newThumbnail = null;
-            if (model.Thumbnail != null)
-            {
-                newThumbnail = await Storage.SaveImage(model.Thumbnail);
-                if (newThumbnail != null)
-                {
-                    Image imageToAdd = new()
-                    {
-                        CreatedBy = myUid.ToString(),
-                        CreatedTime = DateTime.Now,
-                        UserId = myUid,
-                        ImageId = Guid.NewGuid(),
-                        ImageUrl = newThumbnail
-                    };
-                    _ = ImageRepository.Insert(imageToAdd);
-                }
-            }
+            string? thumbnail = await Storage.SaveImage(model.Thumbnail);
+            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // Cập nhật question
             Question toUpdate = new();
             toUpdate.Copy(question);
-            toUpdate.Copy(model);
-            if (newThumbnail != null) toUpdate.Thumbnail = newThumbnail;
+            toUpdate.Copy(updateModel);
+            if (thumbnail != null) toUpdate.Thumbnail = thumbnail;
             int res1 = await QuestionRepository.Update(postId, toUpdate);
             int res2 = 0;
+
             // Update categories:
             if (model.Categories != null && model.Categories.Any())
             {

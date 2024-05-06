@@ -3,7 +3,7 @@
         <div class="p-postcard-toolbar__info">
             <div class="p-pct-leftinfo">
                 <div class="p-pct-star">
-                    <VisualizedStar :star="getPost()?.AverageStars ?? 3.68" />
+                    <VisualizedStar :star="getPost()?.AverageStars ?? 0" />
                 </div>
                 <MIcon fa="circle" :style="dotIconStyle" />
                 <div class="p-pct-numstar" @:click="showListStar">

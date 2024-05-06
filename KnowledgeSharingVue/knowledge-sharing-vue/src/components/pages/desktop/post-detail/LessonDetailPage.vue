@@ -1,9 +1,9 @@
 <template>
     <DesktopHomeFrame>
         
-        <div class="d-content">
+        <div class="d-content p-lestion-detail">
             <div class="d-empty-panel" v-show="isLessonExisted === false">
-                <not-found-panel text="Bài giảng hiện không tồn tại hoặc đã bị xóa" />
+                <not-found-panel :text="errorMessage" />
             </div>
 
             <div class="d-content-subpage__menu" v-show="isLessonExisted === true">
@@ -13,7 +13,9 @@
             </div>
 
             <div class="d-content-subpage__content" v-if="isLessonExisted === true">
-                <LessonCard :post="lesson" />
+                <div class="lestion-card">
+                    <LessonCard :post="lesson" />
+                </div>
             </div>
         </div>
         
@@ -36,6 +38,9 @@ export default {
     name: "LessonDetailPage",
     data() {
         return {
+            errorMessage: "Bài giảng hiện không tồn tại hoặc đã bị xóa",
+            defaultErrorMessage: "Bài giảng hiện không tồn tại hoặc đã bị xóa",
+            lessonId: null,
             title: "Lesson Detail Page",
             lesson: null,
             isLessonExisted: null,
@@ -66,9 +71,15 @@ export default {
             this.isLessonExisted = true;
         }
         catch (error) {
-            this.lesson = null;
-            this.isLessonExisted = false;
-            console.error(error);
+            try {
+                Request.resolveAxiosError(error);
+                let userMsg = await Request.tryGetUserMessage(error);
+                this.errorMessage = userMsg ?? this.defaultErrorMessage;
+                this.isLessonExisted = false;
+                this.lesson = null;
+            } catch (e){
+                console.error(e);
+            }
         } finally {
             this.getLoadingPanel().hide();
         }
@@ -91,6 +102,6 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/lesson-detail.css);
+@import url(@/css/pages/desktop/components/lestion-detail.css);
 
 </style>
