@@ -131,6 +131,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             {
                 res.UserRelationType = request.SenderId == myUid ? EUserRelationType.Requester : EUserRelationType.Requestee;
                 res.UserRelationId = request.UserRelationId;
+                return res;
             }
 
             // Check follower:

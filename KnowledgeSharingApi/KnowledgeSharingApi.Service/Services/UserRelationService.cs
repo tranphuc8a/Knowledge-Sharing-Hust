@@ -78,9 +78,10 @@ namespace KnowledgeSharingApi.Services.Services
         protected virtual async Task<IEnumerable<ResponseFriendCardModel>> GetAllFriends(Guid userid)
         {
             // Danh sách bạn bè mà mình là người gửi lời mời
-            IEnumerable<ViewUserRelation> ls1 =
-                await UserRelationRepository.GetByUserIdAndType(userid, isActive: true, EUserRelationType.Friend);
-            IEnumerable<ResponseFriendCardModel> lsFriend1 = ls1.Select(
+            List<ViewUserRelation> ls1 =
+                (await UserRelationRepository.GetByUserIdAndType(userid, isActive: true, EUserRelationType.Friend))
+                .ToList();
+            List<ResponseFriendCardModel> lsFriend1 = ls1.Select(
                 relation => new ResponseFriendCardModel()
                 {
                     FriendId = relation.UserRelationId,
@@ -95,12 +96,13 @@ namespace KnowledgeSharingApi.Services.Services
                     CreatedTime = relation.CreatedTime,
                     ModifiedBy = relation.ModifiedBy,
                     ModifiedTime = relation.ModifiedTime
-                });
+                }).ToList();
 
             // Danh sách bạn bè mà mình là người nhận lời mời
-            IEnumerable<ViewUserRelation> ls2 =
-                await UserRelationRepository.GetByUserIdAndType(userid, isActive: false, EUserRelationType.Friend);
-            IEnumerable<ResponseFriendCardModel> lsFriend2 = ls1.Select(
+            List<ViewUserRelation> ls2 =
+                (await UserRelationRepository.GetByUserIdAndType(userid, isActive: false, EUserRelationType.Friend))
+                .ToList();
+            List<ResponseFriendCardModel> lsFriend2 = ls2.Select(
                 relation => new ResponseFriendCardModel()
                 {
                     FriendId = relation.UserRelationId,
@@ -115,10 +117,10 @@ namespace KnowledgeSharingApi.Services.Services
                     CreatedTime = relation.CreatedTime,
                     ModifiedBy = relation.ModifiedBy,
                     ModifiedTime = relation.ModifiedTime
-                });
+                }).ToList();
 
             // Combine and return
-            IEnumerable<ResponseFriendCardModel> listed = lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time);
+            List<ResponseFriendCardModel> listed = lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time).ToList();
             return listed;
         }
 
@@ -396,7 +398,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> ConfirmFriend(Guid myuid, Guid requestId, bool isAccept)
         {
             // Kiểm tra có tồn tại lời mời request id
-            UserRelation? relation = await UserRelationRepository.Get(myuid);
+            UserRelation? relation = await UserRelationRepository.Get(requestId);
             if (relation == null) return ServiceResult.BadRequest("Yêu cầu kết bạn không tồn tại");
 
             // Kiểm tra đúng thật sự request đang mời tới mình
@@ -422,7 +424,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> DeleteRequest(Guid myuid, Guid requestId)
         {
             // Kiểm tra có tồn tại lời mời request id
-            UserRelation? relation = await UserRelationRepository.Get(myuid);
+            UserRelation? relation = await UserRelationRepository.Get(requestId);
             if (relation == null) return ServiceResult.BadRequest("Yêu cầu kết bạn không tồn tại");
 
             // Kiểm tra đúng thật sự request id đang là của mình
@@ -446,8 +448,9 @@ namespace KnowledgeSharingApi.Services.Services
             res.Copy(user);
 
             // Decorate
-            EUserRelationType relationType = await UserRelationRepository.GetUserRelationType(myUid, userId);
-            res.UserRelationType = relationType;
+            var dict = await UserRelationRepository.GetDetailUserRelationType(myUid, [userId]);
+            res.UserRelationType = dict[userId].UserRelationType;
+            res.UserRelationId = dict[userId].UserRelationId;
 
             // Tra ve thanh cong
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);

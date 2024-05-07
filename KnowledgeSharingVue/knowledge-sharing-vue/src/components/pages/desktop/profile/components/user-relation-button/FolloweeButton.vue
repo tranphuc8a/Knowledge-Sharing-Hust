@@ -6,7 +6,7 @@
             label="Đang theo dõi bạn"
             :onclick="()=>{}"
             :buttonStyle="buttonStyle"
-            fa="user-chart" family="fas" :iconStyle="iconStyle"
+            fa="user-tag" family="fas" :iconStyle="iconStyle"
             ref="button"
         />
     </MMenuContextPopup>
@@ -50,7 +50,7 @@ export default {
                     onclick: this.resolveAddFriend.bind(this),
                     label: 'Thêm bạn bè'
                 }, {
-                    fa: 'user-chart',
+                    fa: 'user-tag',
                     onclick: this.resolveFollow.bind(this),
                     label: 'Theo dõi'
                 }

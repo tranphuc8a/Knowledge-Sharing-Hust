@@ -6,7 +6,7 @@
             label="Đã gửi lời mời"
             :onclick="()=>{}"
             :buttonStyle="buttonStyle"
-            fa="user-chart" family="fas" :iconStyle="iconStyle"
+            fa="user-tag" family="fas" :iconStyle="iconStyle"
             ref="button"
         />
     </MMenuContextPopup>
@@ -17,7 +17,7 @@
 <script>
 import MMenuContextPopup from '@/components/base/popup/MMenuContextPopup.vue';
 import MButton from '@/components/base/buttons/MButton';
-import { PostRequest, Request } from '@/js/services/request';
+import { DeleteRequest, Request } from '@/js/services/request';
 import { myEnum } from '@/js/resources/enum';
 
 
@@ -57,7 +57,7 @@ export default {
             try {
                 this.$refs['button']?.loading();
                 if (this.getUser() == null) return;
-                await new PostRequest('UserRelations/delete-request/' + this.getUser().UserRelationId)
+                await new DeleteRequest('UserRelations/delete-request/' + this.getUser().UserRelationId)
                     .execute();
                 //  success:
                 this.getUser().UserRelationType = myEnum.EUserRelationType.NotInRelation;

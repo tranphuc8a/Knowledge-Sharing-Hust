@@ -19,9 +19,9 @@ export default {
             isWaitingToHide: false,
 
             tooltipStyle: {},
-            hoverCount: 0,
             tooltipContent: null,
             tooltipMask: null,
+
             tooltipPosition: {
                 top: "top",
                 bottom: "bottom",
@@ -45,6 +45,7 @@ export default {
                 }, isNaN(delay) ? this.delayHiding : delay);
             });
             if (!this.isWaitingToHide) return;
+            
             this.isTooltipVisible = false;
         },
         async showTooltip(delay) {
@@ -133,7 +134,7 @@ export default {
             default: 500
         },
         delayHiding: {
-            default: 100
+            default: 500
         },
     }
 };

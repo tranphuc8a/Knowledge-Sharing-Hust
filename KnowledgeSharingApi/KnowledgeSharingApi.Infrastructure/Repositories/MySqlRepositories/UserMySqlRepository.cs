@@ -147,7 +147,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public async Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName)
+        public async Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName, string? avatar = null)
         {
             var transaction = await DbContext.BeginTransaction();
             try
@@ -162,7 +162,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     CreatedTime = DateTime.Now,
                     ProfileId = Guid.NewGuid(),
                     UserId = userId,
-                    FullName = fullName
+                    FullName = fullName,
+                    Avatar = avatar
                 };
 
                 DbContext.Users.Add(user);

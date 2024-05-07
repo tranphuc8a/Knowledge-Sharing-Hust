@@ -1,5 +1,5 @@
 <template>
-    <TooltipFrame>
+    <TooltipFrame ref="menu">
         <template #tooltipMask>
             <slot></slot>
         </template>
@@ -7,7 +7,7 @@
         <template #tooltipContent>
             <div class="p-tooltip-menu-context-content">
                 <template v-for="(option, index) in listOptions" :key="option.key ?? index">
-                    <div class="p-tooltip-menu-context-option" @:click="option.onclick">
+                    <div class="p-tooltip-menu-context-option" @:click="resolveClickItem(option.onclick)">
                         <MIcon :style="iconStyle" :fa="option.fa" :family="option.family" />
                         <span> {{ option.label }} </span>
                     </div>
@@ -29,14 +29,28 @@ export default {
                 fontSize: '18px',
                 color: 'var(--primary-color)'
             },
-            listOptions: this.options
+            listOptions: this.options,
+            isWaiting: false,
         }
     },
     components: {
         TooltipFrame
     },
     methods: {
-        
+        async resolveClickItem(callback){
+            try {
+                if (this.isWaiting) return;
+                this.isWaiting = true;
+                if (callback != null){
+                    await callback.call();
+                }
+                this.$refs['menu']?.hideTooltip?.(0);
+            } catch (error){
+                console.error(error);
+            } finally {
+                this.isWaiting = false;
+            }
+        }
     },
     props: {
         options: {

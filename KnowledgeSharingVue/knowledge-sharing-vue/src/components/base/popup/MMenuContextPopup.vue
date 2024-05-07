@@ -1,5 +1,5 @@
 <template>
-    <m-context-popup>
+    <m-context-popup ref="menu">
         <template #popupContextMask>
             <slot> </slot>
         </template>
@@ -7,7 +7,7 @@
         <template #popupContextContent>
             <div class="p-popup-menu-context-content">
                 <template v-for="(option, index) in listOptions" :key="option.key ?? index">
-                    <div class="p-popup-menu-context-option" @:click="option.onclick">
+                    <div class="p-popup-menu-context-option" @:click="resolveClickItem(option.onclick)">
                         <MIcon :style="iconStyle" :fa="option.fa" :family="option.family" />
                         <span> {{ option.label }} </span>
                     </div>
@@ -34,7 +34,8 @@ export default{
                 fontSize: '18px',
                 color: 'var(--primary-color)'
             },
-            listOptions: this.options
+            listOptions: this.options,
+            isWaiting: false,
         }
     },
     props: {
@@ -49,6 +50,20 @@ export default{
         },
     },
     methods: {
+        async resolveClickItem(callback){
+            try {
+                if (this.isWaiting) return;
+                this.isWaiting = true;
+                if (callback != null){
+                    await callback.call();
+                }
+                this.$refs['menu']?.hidePopup?.(0);
+            } catch (error){
+                console.error(error);
+            } finally {
+                this.isWaiting = false;
+            }
+        }
     }
 }
 

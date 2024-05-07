@@ -11,7 +11,11 @@
                 <div class="p-profile-panel">
                     <ProfilePanel />
                 </div>
+
+                <router-view>
+                </router-view>
             </div>
+
         </div>
     </DesktopHomeFrame>
 </template>
@@ -19,6 +23,7 @@
 
 
 <script>
+
 import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 import CurrentUser from '@/js/models/entities/current-user';
 import DesktopHomeFrame from '../home/DesktopHomeFrame.vue';

@@ -17,8 +17,10 @@
         data() {
             return {
                 ispopupContextVisible: false,
-                popupContextStyle: {},
+                isWaitingToShow: false,
+                isWaitingToHide: false,
 
+                popupContextStyle: {},
                 popupContextContent: null,
                 popupContextMask: null,
 
@@ -36,14 +38,14 @@
             this.popupContextMask = this.$refs["popup-context-mask"];
         },
         props: {
-                position: {
+            position: {
                 default: null
             },
             delayShowing: {
-                default: 500
+                default: 0
             },
             delayHiding: {
-                default: 100
+                default: 500
             },
         },
         methods: {
@@ -55,10 +57,28 @@
                     await this.hidePopup();
                 }
             },
-            async hidePopup() {
+            async hidePopup(delay) {
+                this.isWaitingToHide = true;
+                this.isWaitingToShow = false;
+                await new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, isNaN(delay) ? this.delayHiding : delay);
+                });
+                if (!this.isWaitingToHide) return;
+
                 this.ispopupContextVisible = false;
             },
-            async showPopup() {
+            async showPopup(delay) {
+                this.isWaitingToShow = true;
+                this.isWaitingToHide = false;
+                await new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, isNaN(delay) ? this.delayShowing : delay);
+                });
+                if (!this.isWaitingToShow) return;
+
                 this.ispopupContextVisible = true;
                 let that = this;
                 this.$nextTick(async () => {

@@ -65,7 +65,7 @@ export default {
             try {
                 this.user = this.getUser();
                 this.userRelation = this.user?.UserRelationType ?? this.userRelationType.NotInRelationType;
-                this.currentUser = CurrentUser.getInstance();
+                this.currentUser = await CurrentUser.getInstance();
                 if (this.currentUser == null){
                     this.userRelation = this.userRelationType.NotInRelation;
                     return;
@@ -76,6 +76,7 @@ export default {
                 let body = await Request.tryGetBody(res);
                 this.userCard = new ResponseUserCardModel().copy(body);
                 this.userRelation = this.userCard.UserRelationType;
+                this.getUser().UserRelationId = this.userCard.UserRelationId;
             } catch (e) {
                 console.error(e);
             }

@@ -119,7 +119,7 @@ export default {
         async submitLoginWithGoogle() {
             try {
                 if (Validator.isEmpty(this.params.access_token)) {
-                    let msg = "Token is empty";
+                    let msg = "Đăng nhập thất bại, vui lòng thử lại sau";
                     this.showErrorMsg(msg);
                     return;
                 }
@@ -132,8 +132,9 @@ export default {
                 await this.resolveLoginSuccess(tokenModel);
             } catch (error) {
                 // login error
-                this.isLoading = false;
                 await this.resolveLoginFailed(error);
+            } finally {
+                this.isLoading = false;
             }
         },
 

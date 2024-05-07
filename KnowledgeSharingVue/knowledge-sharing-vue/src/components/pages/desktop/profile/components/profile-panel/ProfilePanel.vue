@@ -14,7 +14,7 @@
                 <div></div>
             </div>
             <div class="p-profile-panel-navigations">
-
+                <ProfilePanelNavigation />
             </div>
         </div>
     </div>
@@ -25,12 +25,14 @@
 <script>
 import ProfilePanelCoverImage from './ProfilePanelCoverImage.vue';
 import ProfilePanelInformation from './ProfilePanelInformation.vue';
+import ProfilePanelNavigation from './ProfilePanelNavigation.vue';
 
 export default {
     name: 'ProfilePanel',
     components: {
         ProfilePanelCoverImage,
         ProfilePanelInformation,
+        ProfilePanelNavigation
     },
     props: {
     },
@@ -94,13 +96,18 @@ export default {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 16px;
+    gap: 4px;
 }
 
 .p-profile-panel-devider{
     width: 100%;
+    margin-top: 8px;
     height: 2px;
     background-color: var(--primary-color-200);
+}
+
+.p-profile-panel-navigations{
+    width: 100%;
 }
 
 

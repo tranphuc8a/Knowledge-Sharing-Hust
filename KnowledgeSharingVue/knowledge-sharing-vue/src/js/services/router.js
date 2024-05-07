@@ -31,6 +31,22 @@ import ProfilePage from '@/components/pages/desktop/profile/ProfilePage.vue';
 
 import HustPage from '@/components/pages/hust-page/HustPage.vue';
 
+
+
+const profileRouterChildren = [ { // when /profile
+    path: '',
+    name: 'profile-home-page',
+    component: null
+}, { // when /profile.../feed
+    path: 'feed',
+    name: 'profile-feed-page',
+    component: null, 
+}, { // when /profile.../learn
+    path: 'learn',
+    name: 'profile-learn-page',
+    component: null, 
+}];
+
 const routers = [{
     path: '/',
     name: 'home',
@@ -152,12 +168,9 @@ const routers = [{
 }, {
     path: '/profile/:username',
     name: 'profile',
-    component: ProfilePage
-}, {
-    path: '/profile',
-    name: 'profile-me',
-    component: ProfilePage
-},];
+    component: ProfilePage,
+    children: profileRouterChildren
+}];
 
 
 

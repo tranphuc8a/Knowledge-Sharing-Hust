@@ -3,7 +3,9 @@
 <template>
     <div class="p-profile-panel-user-avatar">
         <div class="p-avatar-circle">
-            <div class="p-avatar-circle_in">
+            <div class="p-avatar-circle_in"
+                @click="resolveClickAvatar"
+            >
                 <div class="p-avatar-image">
                     <img 
                         :src="imageSrc"
@@ -14,12 +16,15 @@
             </div>
         </div>
         
-        <div class="p-avatar-camera" @:click="resolveClickIcon">
+        <div class="p-avatar-camera" @:click="resolveClickIcon"
+            v-if="isMySelf"
+        >
             <MIcon 
                 fa="camera"
                 :iconStyle="iconStyle"
             />
         </div>
+        <PreviewImage :src="imageSrc" ref="preview"/>
     </div>
 </template>
 
@@ -27,18 +32,25 @@
 
 <script>
 import Common from '@/js/utils/common';
-
+import CurrentUser from '@/js/models/entities/current-user';
+import PreviewImage from '@/components/base/image/PreviewImage.vue';
 
 export default {
     name: 'ProfilePanelUserAvatar',
+    components: {
+        PreviewImage
+    },
     props: {
     },
     data(){
         return {
+            visiblePreview: false,
             imageSrc: '',
             defaultImageSrc: require('@/assets/default-thumbnail/student-image-icon.png'),
             iconStyle: {
             },
+            currentUser: null,
+            isMySelf: false,
         }
     },
     async mounted(){
@@ -47,6 +59,10 @@ export default {
             let avatar = this.getUser()?.Avatar;
             if (await Common.isValidImage(avatar)){
                 this.imageSrc = avatar;
+            }
+            this.currentUser = await CurrentUser.getInstance();
+            if (this.currentUser != null){
+                this.isMySelf = this.currentUser.UserId == this.getUser()?.UserId;
             }
         } catch (e) {
             console.error(e);
@@ -59,7 +75,15 @@ export default {
             } catch (e) {
                 console.error(e);
             }
-        }
+        },
+
+        async resolveClickAvatar(){
+            try {
+                this.$refs.preview.show();
+            } catch (e) {
+                console.error(e);
+            }
+        },
     },
     inject: {
         getUser: {},

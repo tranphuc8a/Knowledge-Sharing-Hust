@@ -120,7 +120,7 @@ export default {
     async created(){
         try {
             this.lessonId = this.route.params.lessonId;
-            this.currentUser = CurrentUser.getInstance();
+            this.currentUser = await CurrentUser.getInstance();
             if (this.currentUser == null) {
                 this.getPopupManager().requiredLogin();
                 return;

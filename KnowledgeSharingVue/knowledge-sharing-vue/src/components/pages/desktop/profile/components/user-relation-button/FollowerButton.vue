@@ -6,7 +6,7 @@
             label="Đang theo dõi"
             :onclick="()=>{}"
             :buttonStyle="buttonStyle"
-            fa="user-chart" family="fas" :iconStyle="iconStyle"
+            fa="user-tag" family="fas" :iconStyle="iconStyle"
             ref="button"
         />
     </MMenuContextPopup>

@@ -147,7 +147,7 @@ export default {
         async submitRegisterWithGoogleToken() {
             try {
                 if (Validator.isEmpty(this.params.access_token)) {
-                    let msg = "Token is empty";
+                    let msg = "Đăng ký thất bại, vui lòng thử lại sau";
                     this.showErrorMsg(msg);
                     return;
                 }
@@ -163,7 +163,6 @@ export default {
                 this.activeCode = body?.ActiveCode;
             } catch (error) {
                 // login error
-                this.isLoading = false;
                 let userMessage = await Request.tryGetUserMessage(error);
                 await this.showErrorMsg(userMessage);
             } finally {

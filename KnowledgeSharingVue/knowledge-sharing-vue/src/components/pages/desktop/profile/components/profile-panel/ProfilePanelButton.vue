@@ -47,7 +47,7 @@ export default {
             buttonStyle: {
             
             },
-            currentUser: CurrentUser.getInstance(),
+            currentUser: null,
             isNotMySelf: true,
         }
     },
@@ -70,7 +70,7 @@ export default {
         async refresh(){
             try {
                 this.isNotMySelf = true;
-                this.currentUser = CurrentUser.getInstance();
+                this.currentUser = await CurrentUser.getInstance();
                 if (this.currentUser != null && this.getUser() != null){
                     if (this.currentUser.UserId == this.getUser().UserId){
                         this.isNotMySelf = false;

@@ -134,9 +134,10 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <param name="user"> thong tin user them moi </param>
         /// <param name="password"> mat khau </param>
         /// <param name="fullName"> Ten cua user dang ky </param>
+        /// <param name="avatar"> Avatar cua user dang ky </param>
         /// <returns> Trả về id user tương ứng hoac null neu that bai </returns>
         /// Created: PhucTV (10/4/24)
         /// Modified: None
-        Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName);
+        Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName, string? avatar = null);
     }
 }

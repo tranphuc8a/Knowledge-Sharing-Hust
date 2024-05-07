@@ -4,8 +4,9 @@
 
     <div class="p-cover-image-frame">
         <img class="p-cover-image"
+            @:click="resolveClickCover"
             :src="coverImage" alt="CoverImage" />
-        <div class="p-edit-cover-image-button">
+        <div class="p-edit-cover-image-button" v-if="isMySelf">
             <MCancelButton 
                 label="Chỉnh sửa ảnh bìa"
                 :onclick="resolveClickButton"
@@ -13,20 +14,22 @@
                 fa="camera" family="fas" :iconStyle="iconStyle"
             />
         </div>
+        <PreviewImage :src="coverImage" ref="preview" />
     </div>
 </template>
 
 
 
 <script>
-
+import CurrentUser from '@/js/models/entities/current-user';
 import MCancelButton from '@/components/base/buttons/MCancelButton';
 import Common from '@/js/utils/common';
+import PreviewImage from '@/components/base/image/PreviewImage.vue';
 
 export default {
     name: 'ProfilePanelCoverImage',
     components: {
-        MCancelButton
+        MCancelButton, PreviewImage
     },
     props: {
     },
@@ -39,16 +42,22 @@ export default {
             },
             buttonStyle: {
 
-            }
+            },
+            currentUser: null,
+            isMySelf: false
         }
     },
     async created(){
         try {
+            this.currentUser = await CurrentUser.getInstance();
             this.coverImage = this.defaultCoverImage;
             let cover = this.getUser()?.Cover;
             if (await Common.isValidImage(cover)){
                 this.coverImage = cover;
             }
+            this.isMySelf = 
+                this.currentUser != null && 
+                this.currentUser.UserId == this.getUser()?.UserId;
         } catch (e) {
             console.error(e);
         }
@@ -60,6 +69,14 @@ export default {
         async resolveClickButton(){
             try {
                 console.log("click edit cover image button");
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+        async resolveClickCover(){
+            try {
+                this.$refs.preview.show();
             } catch (e) {
                 console.error(e);
             }
@@ -85,6 +102,7 @@ export default {
 
 .p-cover-image{
     width: 100%;
+    cursor: pointer;
 }
 
 .p-edit-cover-image-button{

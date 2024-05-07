@@ -102,7 +102,7 @@ export default {
     async created(){
         try {
             this.questionId = this.route.params.questionId;
-            this.currentUser = CurrentUser.getInstance();
+            this.currentUser = await CurrentUser.getInstance();
             if (this.currentUser == null) {
                 this.getPopupManager().requiredLogin();
                 return;

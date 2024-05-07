@@ -45,7 +45,7 @@ export default {
         getOptions(){
             return [
                 {
-                    fa: 'user-chart',
+                    fa: 'user-tag',
                     onclick: this.resolveFollow.bind(this),
                     label: 'Theo dõi'
                 }
