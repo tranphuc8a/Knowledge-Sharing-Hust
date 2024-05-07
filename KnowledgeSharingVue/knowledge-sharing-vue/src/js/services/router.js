@@ -27,6 +27,8 @@ import CreateQuestionPage from '@/components/pages/desktop/post-detail/CreateQue
 import QuestionDetailPage from '@/components/pages/desktop/post-detail/QuestionDetailPage.vue';
 import EditQuestionPage from '@/components/pages/desktop/post-detail/EditQuestionPage.vue';
 
+import ProfilePage from '@/components/pages/desktop/profile/ProfilePage.vue';
+
 import HustPage from '@/components/pages/hust-page/HustPage.vue';
 
 const routers = [{
@@ -147,7 +149,15 @@ const routers = [{
     path: '/question-edit/:questionId',
     name: 'question-edit',
     component: EditQuestionPage
-}, ];
+}, {
+    path: '/profile/:username',
+    name: 'profile',
+    component: ProfilePage
+}, {
+    path: '/profile',
+    name: 'profile-me',
+    component: ProfilePage
+},];
 
 
 

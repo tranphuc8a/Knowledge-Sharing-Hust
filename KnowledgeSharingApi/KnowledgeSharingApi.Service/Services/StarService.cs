@@ -5,6 +5,7 @@ using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using MimeKit.Tnef;
@@ -23,6 +24,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IResponseResource ResponseResource;
 
         protected readonly IStarRepository StarRepository;
+        protected readonly IDecorationRepository DecorationRepository;
         protected readonly IKnowledgeRepository KnowledgeRepository;
         protected readonly IUserItemRepository UserItemRepository;
         protected readonly IUserRepository UserRepository;
@@ -36,7 +38,8 @@ namespace KnowledgeSharingApi.Services.Services
             IStarRepository starRepository,
             IKnowledgeRepository knowledgeRepository,
             IUserItemRepository userItemRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IDecorationRepository decorationRepository
         )
         {
             ResourceFactory = resourceFactory;
@@ -47,53 +50,10 @@ namespace KnowledgeSharingApi.Services.Services
             KnowledgeRepository = knowledgeRepository;
             UserItemRepository = userItemRepository;
             UserRepository = userRepository;
+            DecorationRepository = decorationRepository;
 
             StarResourcse = EntityResource.Star();
             NotExistedItem = ResponseResource.NotExist(EntityResource.UserItem());
-        }
-
-        protected virtual async Task<IEnumerable<ResponseStarModel>> Decorate
-            (IEnumerable<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
-        {
-            Dictionary<Guid, ResponseUserCardModel>? mapUsers = null;
-            Dictionary<Guid, ResponseUserItemModel>? mapItems = null;
-            if (isDecorateUser)
-            {
-                mapUsers = [];
-                // Get Dictionary <userid, ViewUser -> ResponseUserCardModel>
-                Dictionary<Guid, ViewUser?> listUsers = await UserRepository
-                    .GetDetail(listStars.Select(star => star.UserId).ToArray());
-                foreach (var item in listUsers)
-                {
-                    ViewUser? user = item.Value;
-                    ResponseUserCardModel resUser = new();
-                    if (user != null) resUser.Copy(user);
-                    mapUsers[item.Key] = resUser;
-                }
-            }
-            if (isDecorateItem)
-            {
-                // Get Dictionay <useritemid, UserItem -> ResponseUserItemModel>
-            }
-            IEnumerable<ResponseStarModel> res = listStars.Select(star =>
-            {
-                ResponseStarModel resStar = new();
-                resStar.Copy(star);
-                // decorate list user
-                if (isDecorateUser)
-                {
-                    resStar.User = mapUsers?[star.UserId];
-                }
-
-                // decorate list item
-                if (isDecorateItem)
-                {
-                    resStar.Item = mapItems?[star.UserItemId];
-                }
-
-                return resStar;
-            }).ToList();
-            return res;
         }
 
         public async Task<ServiceResult> AdminGetUserItemStars(Guid userItemId, int? limit, int? offset)
@@ -110,7 +70,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Total = total,
                 Limit = limitValue,
                 Offset = offsetValue,
-                Results = await Decorate(listStars, isDecorateUser: true, isDecorateItem: false)
+                Results = await DecorationRepository.DecorateResponseStarModel(listStars.ToList(), isDecorateUser: true, isDecorateItem: false)
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(StarResourcse), string.Empty, res);
         }

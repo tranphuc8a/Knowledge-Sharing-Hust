@@ -11,6 +11,7 @@ class ResponseUserCardModel extends Entity {
         this.FullName = null;
         this.Role = null;
         this.UserRelationType = null;
+        this.UserRelationId = null;
     }
 
     init() {

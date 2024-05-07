@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
@@ -70,7 +71,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (25/3/24)
         /// Modified: None
         Task<EUserRelationType> GetUserRelationType(Guid user1, Guid user2);
-
         /// <summary>
         /// Lấy về mối quan hệ giữa hai một user với danh sách user kia
         /// </summary>
@@ -80,5 +80,45 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (25/3/24)
         /// Modified: None
         Task<Dictionary<Guid, EUserRelationType>> GetUserRelationType(Guid user1, List<Guid> users2);
+        /// <summary>
+        /// Lấy về mối quan hệ giữa hai một user với danh sách user kia
+        /// </summary>
+        /// <param name="user1"> id của user 1</param>
+        /// <param name="users2"> Danh sách id của user 2</param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<Dictionary<Guid, UserRelationTypeDto>> GetDetailUserRelationType(Guid user1, List<Guid> users2);
+
+
+        /// <summary>
+        /// Them quan he block giua blocker va blockee
+        /// </summary>
+        /// <param name="blockerId"> id nguoi chan </param>
+        /// <param name="blockeeId"> id nguoi bi chan </param>
+        /// <returns></returns>
+        /// Created: PhucTV (7/5/24)
+        /// Modified: None
+        Task<Guid?> AddBlock(Guid blockerId, Guid blockeeId);
+
+        /// <summary>
+        /// Them quan he ban be giua hai user
+        /// </summary>
+        /// <param name="idUser1"> id user 1 </param>
+        /// <param name="idUser2"> id user 2 </param>
+        /// <returns></returns>
+        /// Created: PhucTV (7/5/24)
+        /// Modified: None
+        Task<Guid?> AddFriend(Guid idUser1, Guid idUser2);
+
+        /// <summary>
+        /// Xoa quan he ban be giua hai user ve quan he NotRelation
+        /// </summary>
+        /// <param name="idUser1"> id user 1 </param>
+        /// <param name="idUser2"> id user 2 </param>
+        /// <returns></returns>
+        /// Created: PhucTV (7/5/24)
+        /// Modified: None
+        Task<int> DeleteFriend(Guid idUser1, Guid idUser2);
     }
 }

@@ -178,7 +178,6 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task<Dictionary<Guid, int>> GetTotalReplies(List<Guid> commentsId)
         {
-
             Dictionary<Guid, int> result = 
                 await DbContext.ViewComments
                 .Where(c => c.ReplyId != null && commentsId.Contains(c.ReplyId.Value))

@@ -83,6 +83,23 @@
 }
 
 
+/* SECONDARY BUTTON */
+.p-secondary-button {
+    padding: var(--button-padding);
+    background-color: var(--grey-color-300);
+    color: black;
+    box-shadow: none;
+}
+
+.p-secondary-button:not([state='loading']):hover{
+    background-color: var(--grey-color-400);
+}
+
+.p-secondary-button:not([state='loading']):active{
+    background-color: var(--grey-color-500);
+}
+
+
 /* DELETE BUTTON */
 .p-delete-button {
     padding: var(--button-padding);

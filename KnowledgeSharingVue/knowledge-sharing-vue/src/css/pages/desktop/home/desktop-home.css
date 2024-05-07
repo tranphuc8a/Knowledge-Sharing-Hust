@@ -12,6 +12,8 @@
     --bar-height: 56px;
 
     --body-min-width: 1074px;
+    
+    --profile-page-max-width: 1186px;
 }
 
 .d-home {

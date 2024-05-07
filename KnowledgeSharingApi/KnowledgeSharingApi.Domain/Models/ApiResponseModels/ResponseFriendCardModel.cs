@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KnowledgeSharingApi.Domains.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 {
-    public class ResponseFriendCardModel
+    public class ResponseFriendCardModel : Entity
     {
         public Guid FriendId {get; set; }
 
@@ -23,5 +24,10 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         public bool IsActive { get; set; }
 
         public DateTime Time { get; set; }
+
+        protected override ResponseFriendCardModel Init()
+        {
+            return new ResponseFriendCardModel();
+        }
     }
 }

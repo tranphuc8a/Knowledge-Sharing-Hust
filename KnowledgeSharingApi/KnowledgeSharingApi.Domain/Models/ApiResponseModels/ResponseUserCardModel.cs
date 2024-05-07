@@ -24,6 +24,8 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
         public EUserRelationType UserRelationType { get; set; }
 
+        public Guid? UserRelationId { get; set; }
+
         protected override ResponseUserCardModel Init()
         {
             return new ResponseUserCardModel();

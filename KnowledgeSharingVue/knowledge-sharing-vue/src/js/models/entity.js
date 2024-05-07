@@ -76,7 +76,10 @@ class Entity {
             Username: this.Username,
             FullName: this.FullName,
             Avatar: this.Avatar,
-            Cover: this.Cover
+            Cover: this.Cover,
+            Role: this.Role,
+            UserRelationType: this.UserRelationType,
+            UserRelationId: this.UserRelationId,
         };
     }
 }
