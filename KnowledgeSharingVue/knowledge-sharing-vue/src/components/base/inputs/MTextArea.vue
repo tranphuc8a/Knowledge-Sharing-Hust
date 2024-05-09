@@ -134,6 +134,10 @@ let textarea = {
             return async function(){
                 await that.onclickIcon(that.data.value);
             }
+        },
+
+        async focus(){
+            this.$refs['textarea']?.focus?.();
         }
     },
     props: {

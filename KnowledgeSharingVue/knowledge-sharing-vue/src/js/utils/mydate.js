@@ -131,6 +131,24 @@ class MyDate extends Date{
         
         return `${dayName}, ngày ${day} tháng ${month} năm ${year}, lúc ${hour}:${minutes}`;
     }
+
+    toFullyDate(){
+        const daysOfWeek = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+        
+        const dayName = daysOfWeek[this.getDay()];
+        const day = this.getDate();
+        const month = this.getMonth() + 1; // getMonth() trả về từ 0-11
+        const year = this.getFullYear();
+        
+        return `${dayName}, ngày ${day} tháng ${month} năm ${year}`;
+    }
+
+    toFullyTime(){
+        const hour = this.getHours().toString().padStart(2, '0');
+        const minutes = this.getMinutes().toString().padStart(2, '0');
+        
+        return `lúc ${hour}:${minutes}`;
+    }
     
 }
 

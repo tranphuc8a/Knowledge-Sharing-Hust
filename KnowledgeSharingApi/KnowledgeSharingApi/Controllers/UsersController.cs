@@ -90,6 +90,24 @@ namespace KnowledgeSharingApi.Controllers
         }
 
         /// <summary>
+        /// Xử lý yêu cầu cập nhật bio
+        /// </summary>
+        /// <param name="bio"> Bio cần update </param>
+        /// <returns></returns>
+        /// Created: PhucTV (8/5/24)
+        /// Modified: None
+        [HttpPatch("me/update-bio")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> UpdateMeBio([FromBody] string? bio)
+        {
+            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
+            if (userId == null) return FailedAuthentication(HttpContext.User);
+            ServiceResult service = await UserService.UpdateMyBio(Guid.Parse(userId), bio);
+            ApiResponse res = new(service);
+            return StatusCode((int)res.StatusCode, res);
+        }
+
+        /// <summary>
         /// Xử lý yêu cầu cập nhật thông tin cá nhân
         /// </summary>
         /// <param name="model"> Thông tin mới cần cập nhật </param>

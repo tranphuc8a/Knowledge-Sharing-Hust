@@ -4,7 +4,7 @@
         <div class="p-popup-context-mask" ref="popup-context-mask">
             <slot name="popupContextMask"></slot>
         </div>
-        <div v-show="ispopupContextVisible" class="p-popup-context-content" 
+        <div v-show="isPopupContextVisible" class="p-popup-context-content" 
             :style="popupContextStyle" ref="popup-context-content">
             <!-- Nội dung của popupContext -->
             <slot name="popupContextContent"></slot>
@@ -16,7 +16,7 @@
     export default {
         data() {
             return {
-                ispopupContextVisible: false,
+                isPopupContextVisible: false,
                 isWaitingToShow: false,
                 isWaitingToHide: false,
 
@@ -30,7 +30,7 @@
                 },
                 barHeight: 56,
                 padding_horizontal: 0,
-                padding_vertical: 0,
+                padding_vertical: 8,
             };
         },
         mounted() {
@@ -42,7 +42,7 @@
                 default: null
             },
             delayShowing: {
-                default: 0
+                default: 500
             },
             delayHiding: {
                 default: 500
@@ -50,11 +50,11 @@
         },
         methods: {
             async togglePopup(){
-                this.ispopupContextVisible = !this.ispopupContextVisible;
-                if (this.ispopupContextVisible){
-                    await this.showPopup();
-                } else {
+                // this.isPopupContextVisible = !this.isPopupContextVisible;
+                if (this.isPopupContextVisible){
                     await this.hidePopup();
+                } else {
+                    await this.showPopup();
                 }
             },
             async hidePopup(delay) {
@@ -67,7 +67,7 @@
                 });
                 if (!this.isWaitingToHide) return;
 
-                this.ispopupContextVisible = false;
+                this.isPopupContextVisible = false;
             },
             async showPopup(delay) {
                 this.isWaitingToShow = true;
@@ -79,7 +79,7 @@
                 });
                 if (!this.isWaitingToShow) return;
 
-                this.ispopupContextVisible = true;
+                this.isPopupContextVisible = true;
                 let that = this;
                 this.$nextTick(async () => {
                     try {
@@ -91,6 +91,7 @@
                         console.error(e);
                     }     
                 });
+
             },
             /**
              * Hàm xử lý can chinh popup theo chieu doc

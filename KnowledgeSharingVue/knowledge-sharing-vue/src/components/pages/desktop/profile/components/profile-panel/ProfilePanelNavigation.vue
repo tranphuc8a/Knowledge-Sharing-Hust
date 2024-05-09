@@ -19,6 +19,7 @@
             <!-- More profile context button -->
             <ProfilePanelMoreContextButton :items="moreItems"/>
         </div>
+
     </div>
 </template>
 
@@ -61,30 +62,8 @@ export default {
             isMySelf: false,
         }
     },
-    created(){
-        try {
-            // let index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-            let name = ["Feed", "Learn", "Lesson", "Question", "Course", "Save", 
-                        "Star", "Friend", "Comment", "Payment", "Image", "Message", "Notification", "Block", "Invitation"];
-            
-            let key = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
-                        'star', 'friend', 'comment', 'payment', 'image', 'message', 'notification', 'block', 'invitation'];
-            let label = ['Bài viết', 'Học tập', 'Bài học', 'Thảo luận', 'Khóa học', 'Lưu', 
-                        'Đánh giá', 'Bạn bè', 'Bình luận', 'Thanh toán', 'Hình ảnh', 'Tin nhắn', 'Thông báo', 'Chặn', 'Lời mời'];
-            let link = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
-                        'star', 'friend', 'comment', 'payment', 'image', 'message', 'notification', 'block', 'invitation'];
-            let totalItems = 15;
-            for (let i = 0; i < totalItems; i++){
-                this.itemEnum[name[i]] = name[i];
-                this.items[name[i]] = {
-                    key: key[i],
-                    label: label[i],
-                    link: link[i]
-                }
-            }
-        } catch (e) {
-            console.error(e);
-        }
+    async created(){
+        await this.createItems();
     },
     mounted(){
         try {
@@ -94,7 +73,33 @@ export default {
         }
     },
     methods: {
-        
+        async createItems(){
+            let username = this.getUser()?.Username;
+            try {
+                // let index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+                let name = ["Feed", "Learn", "Lesson", "Question", "Course", "Save", 
+                            "Star", "Friend", "Comment", "Payment", "Image", "Message", "Notification", "Block", "Invitation"];
+                
+                let key = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
+                            'star', 'friend', 'comment', 'payment', 'image', 'message', 'notification', 'block', 'invitation'];
+                let label = ['Bài viết', 'Học tập', 'Bài học', 'Thảo luận', 'Khóa học', 'Lưu', 
+                            'Đánh giá', 'Bạn bè', 'Bình luận', 'Thanh toán', 'Hình ảnh', 'Tin nhắn', 'Thông báo', 'Chặn', 'Lời mời'];
+                let link = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
+                            'star', 'friend', 'comment', 'payment', 'image', 'message', 'notification', 'block', 'invitation'];
+                let totalItems = 15;
+                for (let i = 0; i < totalItems; i++){
+                    this.itemEnum[name[i]] = name[i];
+                    this.items[name[i]] = {
+                        key: key[i],
+                        label: label[i],
+                        link: `/profile/${username}/${link[i]}`
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
         async refreshListItem(){
             try {
                 this.currentUser = await CurrentUser.getInstance();
@@ -144,7 +149,13 @@ export default {
     },
     inject: {
         getUser: {}
-    }
+    },
+    // watch: {
+    //     async '$route.params.username'(){
+    //         await this.createItems();
+    //         await this.refreshListItem();
+    //     }
+    // }
 }
 
 </script>
@@ -174,6 +185,9 @@ export default {
 
 .p-nav-item:has(.router-link-active){
     border-bottom: solid var(--primary-color-500) 3px;
+}
+
+.p-nav-item:has(.router-link-active) .p-nav-item-button{
     color: var(--primary-color);
 }
 

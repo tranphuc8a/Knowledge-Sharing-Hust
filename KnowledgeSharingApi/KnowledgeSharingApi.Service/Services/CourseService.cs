@@ -314,7 +314,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Update thumbnail
             string? thumbnail = await Storage.SaveImage(model.Thumbnail);
-            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
+            _ = await ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // Tạo khóa học mới
             Course course = CreateCourse(user, model, thumbnail);
@@ -363,7 +363,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // update thumbnail:
             string? thumbnail = await Storage.SaveImage(model.Thumbnail);
-            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
+            _ = await ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // Update
             Course courseToUpdate = new();

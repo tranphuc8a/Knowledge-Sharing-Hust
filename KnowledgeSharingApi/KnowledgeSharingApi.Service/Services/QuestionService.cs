@@ -244,7 +244,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Post thumbnail if existed:
             string? thumbnail = await Storage.SaveImage(model.Thumbnail);
-            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
+            _ = await ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // OK, tạo câu hỏi
             Question question = CreateQuestion(user, questionModel, thumbnail);
@@ -280,7 +280,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // update thumbnail:
             string? thumbnail = await Storage.SaveImage(model.Thumbnail);
-            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
+            _ = await ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // Cập nhật question
             Question toUpdate = new();

@@ -6,10 +6,12 @@
             <div class="p-avatar-circle_in"
                 @click="resolveClickAvatar"
             >
-                <div class="p-avatar-image">
-                    <img 
+                <div class="p-avatar-image"
+                    :style="{backgroundImage: `url(${imageSrc})`}"    
+                >
+                    <!-- <img 
                         :src="imageSrc"
-                    />
+                    /> -->
                 </div>
                 <div class="p-avatar-image-hover">            
                 </div>
@@ -95,17 +97,18 @@ export default {
 <style scoped>
 
 .p-profile-panel-user-avatar{
-    width: 180px;
+    width: 178px;
     height: 100px;
     position: relative;
 }
 
 .p-avatar-circle{
-    width: 180px;
-    height: 180px;
+    width: 178px;
+    height: 178px;
     border-radius: 100%;
     overflow: hidden;
     cursor: pointer;
+    background-color: white;
 
     position: absolute;
     bottom: 0;
@@ -125,6 +128,11 @@ export default {
     border-radius: 50%;
     position: absolute;
     overflow: hidden;
+}
+
+.p-avatar-image{
+    background-size: cover;
+    background-position: center center;
 }
 
 .p-avatar-image > img{

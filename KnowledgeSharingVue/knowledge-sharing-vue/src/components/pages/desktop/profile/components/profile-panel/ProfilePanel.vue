@@ -3,20 +3,24 @@
 
 <template>
     <div class="p-profile-panel" v-if="isShowPanel">
-        <div class="p-cover-image">
-            <ProfilePanelCoverImage />
+        <GradientBackground v-show="true" :src="getUser()?.Cover" />
+        <div class="p-profile-panel-content">
+            <div class="p-cover-image">
+                <ProfilePanelCoverImage />
+            </div>
+    
+            <div class="p-user-panel">
+                <ProfilePanelInformation />
+    
+                <div class="p-profile-panel-devider">
+                    <div></div>
+                </div>
+                <div class="p-profile-panel-navigations">
+                    <ProfilePanelNavigation />
+                </div>
+            </div>
         </div>
 
-        <div class="p-user-panel">
-            <ProfilePanelInformation />
-
-            <div class="p-profile-panel-devider">
-                <div></div>
-            </div>
-            <div class="p-profile-panel-navigations">
-                <ProfilePanelNavigation />
-            </div>
-        </div>
     </div>
 </template>
 
@@ -26,13 +30,15 @@
 import ProfilePanelCoverImage from './ProfilePanelCoverImage.vue';
 import ProfilePanelInformation from './ProfilePanelInformation.vue';
 import ProfilePanelNavigation from './ProfilePanelNavigation.vue';
+import GradientBackground from '@/components/base/image/GradientBackground.vue';
 
 export default {
     name: 'ProfilePanel',
     components: {
         ProfilePanelCoverImage,
         ProfilePanelInformation,
-        ProfilePanelNavigation
+        ProfilePanelNavigation,
+        GradientBackground
     },
     props: {
     },
@@ -78,11 +84,16 @@ export default {
 
 .p-profile-panel{
     width: 100%;
+    background-color: white;
+    position: relative;
+}
+.p-profile-panel-content{
+    width: 100%;
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
-    background-color: #fff;
+    position: relative;
 }
 .p-cover-image{
     width: 100%;

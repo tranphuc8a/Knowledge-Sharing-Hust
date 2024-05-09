@@ -28,7 +28,7 @@ export default {
             },
             barHeight: 56,
             padding_horizontal: 0,
-            padding_vertical: 0,
+            padding_vertical: 8,
         };
     },
     mounted() {

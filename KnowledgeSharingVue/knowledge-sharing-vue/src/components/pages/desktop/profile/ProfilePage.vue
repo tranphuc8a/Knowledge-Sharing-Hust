@@ -8,7 +8,7 @@
             </div>
 
             <div class="p-profile-page" v-show="isUserExisted === true">
-                <div class="p-profile-panel">
+                <div class="p-profile-panel card">
                     <ProfilePanel />
                 </div>
 
@@ -32,7 +32,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { GetRequest, Request } from '@/js/services/request';
 import ViewUser from '@/js/models/views/view-user';
 import { Validator } from '@/js/utils/validator';
-
 
 export default {
     name: 'ProfilePage',
@@ -62,7 +61,8 @@ export default {
     },
     provide(){
         return {
-            getUser: () => this.user
+            getUser: () => this.user,
+            getIsMySelf: this.isMySelf,
         }
     },
     methods: {
@@ -90,6 +90,7 @@ export default {
 
                 this.user = new ViewUser().copy(body);
                 this.isUserExisted = true;
+                this.forceRender();
             } catch (error) {
                 try {
                     Request.resolveAxiosError(error);
@@ -112,11 +113,22 @@ export default {
             } catch (e) {
                 console.error(e);
             }
+        },
+
+        async isMySelf(){
+            let currentUser = await CurrentUser.getInstance();
+            if (currentUser?.UserId != null){
+                return currentUser.UserId === this.user?.UserId;
+            }
+            return false;
         }
     },
     watch: {
         user(){
             this.forceRender();
+        },
+        '$route.params.username'(){
+            this.createPage();
         }
     },
     inject: {
@@ -128,11 +140,16 @@ export default {
 
 <style scoped>
 .d-content.p-profile{
-    margin-top: -20px;
+    padding-top: 0;
     justify-content: center;
 }
 .p-profile-page{
     width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
 }
 .p-profile-panel{
     width: 100%;

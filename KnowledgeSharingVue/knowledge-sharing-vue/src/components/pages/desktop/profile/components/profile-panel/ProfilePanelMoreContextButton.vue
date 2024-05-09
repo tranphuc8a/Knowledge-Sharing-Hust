@@ -1,7 +1,7 @@
 
 
 <template>
-    <MContextPopup position="bottom">
+    <MContextPopup position="">
 
         <template #popupContextMask>
             <MSecondaryButton
@@ -17,7 +17,7 @@
                 <template v-for="(option, index) in items" :key="option.key ?? index">
                     <router-link :to="option.link" class="router-link"> 
                         <div class="p-popup-more-context-option" >
-                            <span> {{ option.label }} </span>
+                            {{ option.label }}
                         </div>
                     </router-link>
                 </template>
@@ -44,6 +44,8 @@ export default {
     },
     data(){
         return {
+            iconStyle: {
+            },
             buttonStyle: {
                 padding: '16px'
             }
@@ -69,6 +71,13 @@ export default {
     gap: 2px;
 }
 
+.router-link{
+    text-decoration: none;
+    color: var(--grey-color-600);
+    font-family: 'ks-font-semibold';
+    width: 100%;
+}
+
 .p-popup-more-context-option{
     width: 100%;
     padding: 8px 24px 8px 24px;
@@ -81,14 +90,6 @@ export default {
     cursor: pointer;
     min-width: 200px;
 }
-
-.router-link{
-    text-decoration: none;
-    color: var(--grey-color-600);
-    font-family: 'ks-font-semibold';
-    width: 100%;
-}
-
 
 .p-popup-more-context-option:hover{
     background-color: var(--primary-color-100);

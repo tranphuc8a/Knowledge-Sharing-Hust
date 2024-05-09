@@ -42,10 +42,10 @@ export default {
     data(){
         return {
             iconStyle: {
-                fontSize: '14px'
+                fontSize: '18px'
             },
             buttonStyle: {
-            
+                padding: '16px'
             },
             currentUser: null,
             isNotMySelf: true,

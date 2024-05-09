@@ -2,10 +2,17 @@
 
 <template>
 
-    <div class="p-cover-image-frame">
-        <img class="p-cover-image"
+    <div class="p-cover-image-frame"
+        @:click="resolveClickCover"
+        :style="{
+            backgroundImage: `url('${this.coverImage}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center'
+        }"
+    >
+        <!-- <img class="p-cover-image"
             @:click="resolveClickCover"
-            :src="coverImage" alt="CoverImage" />
+            :src="coverImage" alt="CoverImage" /> -->
         <div class="p-edit-cover-image-button" v-if="isMySelf">
             <MCancelButton 
                 label="Chỉnh sửa ảnh bìa"
@@ -38,10 +45,10 @@ export default {
             defaultCoverImage: require('@/assets/default-thumbnail/default-cover.jpg'),
             coverImage: null,
             iconStyle: {
-
+                fontSize: '18px'
             },
             buttonStyle: {
-
+                padding: '16px'
             },
             currentUser: null,
             isMySelf: false
@@ -94,10 +101,12 @@ export default {
 
 .p-cover-image-frame{
     width: 100%;
+    height: 444px;
     max-height: 450px;
     border-radius: 4px;
     overflow: hidden;
     position: relative;
+    cursor: pointer;
 }
 
 .p-cover-image{

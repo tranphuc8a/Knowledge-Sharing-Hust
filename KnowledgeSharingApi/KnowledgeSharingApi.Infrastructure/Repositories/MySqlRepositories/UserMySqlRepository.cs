@@ -25,7 +25,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     {
         protected readonly IEncrypt encrypt = encrypt;
 
-        public async Task<bool> CheckPassword(string username, string password)
+        public virtual async Task<bool> CheckPassword(string username, string password)
         {
             User? user = await GetByUsername(username);
             if (user == null) return false;
@@ -34,7 +34,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return hashPassword == user.HashPassword;
         }
 
-        public async Task<int> UpdatePassword(string username, string newPassword)
+        public virtual async Task<int> UpdatePassword(string username, string newPassword)
         {
             string hashPassword = encrypt.Sha256HashPassword(username, newPassword);
             string sqlCommand = "update User set HashPassword = @hashPassword where Username = @username;";
@@ -42,17 +42,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public async Task<IEnumerable<ViewUser>> GetDetail()
+        public virtual async Task<IEnumerable<ViewUser>> GetDetail()
         {
             return await DbContext.ViewUsers.ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewUser>> GetDetail(int limit, int offset)
+        public virtual async Task<IEnumerable<ViewUser>> GetDetail(int limit, int offset)
         {
             return await DbContext.ViewUsers.Skip(offset).Take(limit).ToListAsync();
         }
 
-        public Task<ViewUser?> GetDetail(Guid userId)
+        public virtual Task<ViewUser?> GetDetail(Guid userId)
         {
             var query = from user in DbContext.ViewUsers
                         where (user.UserId == userId)
@@ -60,7 +60,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public Task<ViewUser?> GetDetailByEmail(string email)
+        public virtual Task<ViewUser?> GetDetailByEmail(string email)
         {
             var query = from viewUser in DbContext.ViewUsers
                         where (viewUser.Email == email)
@@ -68,7 +68,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public Task<ViewUser?> GetDetailByUsername(string username)
+        public virtual Task<ViewUser?> GetDetailByUsername(string username)
         {
             var query = from user in DbContext.ViewUsers
                         where (user.Username == username)
@@ -76,7 +76,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public Task<ViewUser?> GetDetailByUsernameOrUserId(string unOruid)
+        public virtual Task<ViewUser?> GetDetailByUsernameOrUserId(string unOruid)
         {
             var query = from user in DbContext.ViewUsers
                         where (user.Username == unOruid || user.UserId.ToString() == unOruid)
@@ -84,7 +84,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public Task<User?> GetByEmail(string email)
+        public virtual Task<User?> GetByEmail(string email)
         {
             var query = from user in DbContext.Users
                         where (user.Email == email)
@@ -92,7 +92,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public Task<User?> GetByUsername(string username)
+        public virtual Task<User?> GetByUsername(string username)
         {
             var query = from user in DbContext.Users
                         where (user.Username == username)
@@ -100,7 +100,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public async Task<PaginationResponseModel<T>> GetByUserId<T>(Guid userId, int limit, int offset) where T : Entity
+        public virtual async Task<PaginationResponseModel<T>> GetByUserId<T>(Guid userId, int limit, int offset) where T : Entity
         {
             string tableName = typeof(T).Name;
             // Check bảng T phải có trường UserId:
@@ -113,7 +113,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public async Task<PaginationResponseModel<T>> GetByUsername<T>(string username, int limit, int offset) where T : Entity
+        public virtual async Task<PaginationResponseModel<T>> GetByUsername<T>(string username, int limit, int offset) where T : Entity
         {
             string tableName = typeof(T).Name;
             // Check bảng T phải có trường UserId:
@@ -126,13 +126,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public async Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage)
+        public virtual async Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage)
         {
             return await DbContext.ViewUsers.Where(user => user.UserId == userId).FirstOrDefaultAsync()
                 ?? throw new NotExistedEntityException(errorMessage);
         }
 
-        public async Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds)
+        public virtual async Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds)
         {
             Dictionary<Guid, ViewUser?> res = userIds.ToDictionary(id => id, id => (ViewUser?)null);
 
@@ -147,7 +147,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public async Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName, string? avatar = null)
+        public virtual async Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName, string? avatar = null)
         {
             var transaction = await DbContext.BeginTransaction();
             try
@@ -180,6 +180,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 return null;
             }
+        }
+
+        // override delete user:
+        public override Task<int> Delete(Guid userId)
+        {
+            // Tam thoi chua cho xoa user
+            return Task.FromResult(0);
         }
     }
 }

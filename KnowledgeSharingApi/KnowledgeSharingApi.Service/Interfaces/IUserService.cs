@@ -68,6 +68,14 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (15/3/24)
         /// Modified: None
         Task<ServiceResult> UpdateMyCoverImage(Guid uid, IFormFile cover);
+
+        /// <summary>
+        /// Cập nhật Bio
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (8/5/24)
+        /// Modified: None
+        Task<ServiceResult> UpdateMyBio(Guid uid, string? Bio);
         #endregion
 
 
