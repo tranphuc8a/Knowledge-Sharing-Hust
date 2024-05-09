@@ -8,6 +8,9 @@ const profileRouter = [
         path: '/profile/:username',
         name: 'profile',
         component: ProfilePage,
+        meta: {
+            requiredAuth: false
+        },
         children: [ 
             { // when /profile
                 path: '',
@@ -76,6 +79,10 @@ const profileRouter = [
             }, { // when /profile.../profile-detail
                 path: 'profile-detail',
                 name: 'profile-profile-detail-page',
+                component: null, 
+            }, { // when /profile.../account
+                path: 'account',
+                name: 'profile-account-page',
                 component: null, 
             }
         ],

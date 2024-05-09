@@ -179,8 +179,8 @@ export default {
         },
 
         async resolveSaveBio(){
+            if (this.isWaiting) return;
             try {
-                if (this.isWaiting) return;
                 this.isWaiting = true;
 
                 let text = await this.$refs['textarea'].getValue();

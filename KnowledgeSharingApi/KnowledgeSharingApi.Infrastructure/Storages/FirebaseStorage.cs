@@ -56,18 +56,11 @@ namespace KnowledgeSharingApi.Infrastructures.Storages
 
         public async Task<string?> SaveImage(IFormFile? image)
         {
+            if (image == null || image.Length == 0)
+                return null;
+
             // Định nghĩa kích thước tối đa của hình ảnh là 50MB
             const int MaxImageSize = 50 * 1024 * 1024;
-
-            if (image == null)
-            {
-                throw new ValidatorException("Không có hình ảnh đã được cung cấp.");
-            }
-
-            if (image.Length == 0)
-            {
-                throw new ValidatorException("Hình ảnh không có dữ liệu.");
-            }
 
             if (image.Length > MaxImageSize)
             {

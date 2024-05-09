@@ -14,8 +14,8 @@
         </div>
 
         <div class="profile-home-subpage__right">
-            Right
             <!-- ProfileHomeFeedSubpage -->
+            <ProfileHomeFeedSubpage />
         </div>
     </div>
 </template>
@@ -26,6 +26,7 @@
 import ProfileHomeResumeSubpage from './ProfileHomeResumeSubpage.vue';
 import ProfileHomeImageSubpage from './ProfileHomeImageSubpage.vue';
 import ProfileHomeFriendSubpage from './ProfileHomeFriendSubpage.vue';
+import ProfileHomeFeedSubpage from './ProfileHomeFeedSubpage.vue';
 
 export default {
     name: 'ProfileHomeSubpage',
@@ -33,6 +34,7 @@ export default {
         ProfileHomeResumeSubpage,
         ProfileHomeImageSubpage,
         ProfileHomeFriendSubpage,
+        ProfileHomeFeedSubpage
     },
     props: {
     },

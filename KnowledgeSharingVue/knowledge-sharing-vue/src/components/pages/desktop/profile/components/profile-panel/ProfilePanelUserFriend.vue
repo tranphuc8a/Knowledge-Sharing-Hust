@@ -8,8 +8,7 @@
         <div class="p-list-friends">
             <div class="p-list-friends__item" 
                 v-for="(friend, index) in listFriends.slice().reverse()"
-                :key="friend.UserId"
-                :style="{zIndex: index + 1}">
+                :key="friend.UserId ?? index">
                 <div class="p-list-friends__item_container">
                     <TooltipUserAvatar :user="friend" :size="userAvatarSize"/>
                 </div>
@@ -118,6 +117,7 @@ export default {
     background-color: white;
     width: fit-content;
     height: fit-content;
+    position: relative;
 }
 
 </style>

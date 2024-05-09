@@ -2,8 +2,8 @@
 
 
 <template>
-    <div class="p-profile-panel" v-if="isShowPanel">
-        <GradientBackground v-show="true" :src="getUser()?.Cover" />
+    <div class="p-profile-panel" v-if="!isLoaded">
+        <GradientBackground :src="null" />
         <div class="p-profile-panel-content">
             <div class="p-cover-image">
                 <ProfilePanelCoverImage />
@@ -20,7 +20,26 @@
                 </div>
             </div>
         </div>
-
+    </div>
+    
+    <div class="p-profile-panel" v-if="isLoaded">
+        <GradientBackground :src="getUser()?.Cover" />
+        <div class="p-profile-panel-content">
+            <div class="p-cover-image">
+                <ProfilePanelCoverImage />
+            </div>
+    
+            <div class="p-user-panel">
+                <ProfilePanelInformation />
+    
+                <div class="p-profile-panel-devider">
+                    <div></div>
+                </div>
+                <div class="p-profile-panel-navigations">
+                    <ProfilePanelNavigation />
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -44,7 +63,7 @@ export default {
     },
     data(){
         return {
-            isShowPanel: true,
+            isLoaded: true,
             title: '',
             isLessonExisted: false,
             lesson: null
@@ -56,9 +75,9 @@ export default {
     methods: {
         async forceRender(){
             try {
-                this.isShowPanel = false;
+                this.isLoaded = false;
                 this.$nextTick(() => {
-                    this.isShowPanel = true;
+                    this.isLoaded = true;
                 });
             } catch (e) {
                 console.error(e);
@@ -113,7 +132,7 @@ export default {
 .p-profile-panel-devider{
     width: 100%;
     margin-top: 8px;
-    height: 2px;
+    height: 1.75px;
     background-color: var(--primary-color-200);
 }
 

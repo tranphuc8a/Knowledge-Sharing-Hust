@@ -54,7 +54,8 @@ export default {
                 Message: 11,
                 Notification: 12,
                 Block: 13,
-                Invitation: 14
+                Invitation: 14,
+                Account: 15
             },
             mainItems: [],
             moreItems: [],
@@ -78,15 +79,22 @@ export default {
             try {
                 // let index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
                 let name = ["Feed", "Learn", "Lesson", "Question", "Course", "Save", 
-                            "Star", "Friend", "Comment", "Payment", "Image", "Message", "Notification", "Block", "Invitation"];
+                            "Star", "Friend", "Comment", "Payment", "Image", "Message", 
+                            "Notification", "Block", "Invitation", "Account"];
                 
                 let key = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
-                            'star', 'friend', 'comment', 'payment', 'image', 'message', 'notification', 'block', 'invitation'];
+                            'star', 'friend', 'comment', 'payment', 'image', 'message', 
+                            'notification', 'block', 'invitation', 'account'];
+                
                 let label = ['Bài viết', 'Học tập', 'Bài học', 'Thảo luận', 'Khóa học', 'Lưu', 
-                            'Đánh giá', 'Bạn bè', 'Bình luận', 'Thanh toán', 'Hình ảnh', 'Tin nhắn', 'Thông báo', 'Chặn', 'Lời mời'];
+                            'Đánh giá', 'Bạn bè', 'Bình luận', 'Thanh toán', 'Hình ảnh', 'Tin nhắn', 
+                            'Thông báo', 'Chặn', 'Lời mời', 'Tài khoản'];
+                
                 let link = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
-                            'star', 'friend', 'comment', 'payment', 'image', 'message', 'notification', 'block', 'invitation'];
-                let totalItems = 15;
+                            'star', 'friend', 'comment', 'payment', 'image', 'message', 
+                            'notification', 'block', 'invitation', 'account'];
+                
+                let totalItems = 16;
                 for (let i = 0; i < totalItems; i++){
                     this.itemEnum[name[i]] = name[i];
                     this.items[name[i]] = {
@@ -124,7 +132,8 @@ export default {
                         this.items.Image,
                         this.items.Message,
                         this.items.Notification,
-                        this.items.Block
+                        this.items.Block,
+                        this.items.Account
                     ];
                 } else {
                     this.mainItems = [

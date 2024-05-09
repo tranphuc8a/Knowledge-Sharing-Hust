@@ -1,7 +1,7 @@
 
 
 <template>
-    <m-context-popup>
+    <m-context-popup :delay-hiding="0">
         <template #popupContextMask>
             <MActionIcon fa="ellipsis-h" :onclick="()=>{}"
                 :iconStyle="iconStyle" :containerStyle="containerStyle" />
@@ -71,7 +71,7 @@ export default {
             try {
                 this.currentUser = await CurrentUser.getInstance();
                 if (this.currentUser == null){
-                    this.listOptions = [this.actions.Reply, this.actions.Edit];
+                    this.listOptions = [this.actions.Reply];
                 }
                 else if (this.currentUser.UserId == this.getComment()?.UserId && this.getComment()?.UserId != null){
                     this.listOptions = [

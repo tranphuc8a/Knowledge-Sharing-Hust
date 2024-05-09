@@ -28,8 +28,8 @@ let icon = {
          * @Modified None
         */
         async resolveOnclick(){
+            if (this.dState != 'normal') return;
             try {
-                if (this.dState != 'normal') return;
                 this.dState = 'loading';
                 await this.onclick();
             } catch (e) {

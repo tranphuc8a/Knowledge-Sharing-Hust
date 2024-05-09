@@ -42,7 +42,7 @@
                 default: null
             },
             delayShowing: {
-                default: 500
+                default: 100
             },
             delayHiding: {
                 default: 500

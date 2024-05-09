@@ -285,7 +285,7 @@ textarea {
 .p-preview-frame{
     box-sizing: border-box;
     padding: 12px;
-    overflow: auto;
+    overflow: visible;
 }
 
 .p-editor-frame .p-enter-frame .p-edit-frame,

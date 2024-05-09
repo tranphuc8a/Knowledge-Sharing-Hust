@@ -103,7 +103,6 @@ export default {
 .p-user-name{
     font-size: 28px;
     font-family: 'ks-font-bold';
-    line-height: 28px;
     color: #000000;
 
     display: block;

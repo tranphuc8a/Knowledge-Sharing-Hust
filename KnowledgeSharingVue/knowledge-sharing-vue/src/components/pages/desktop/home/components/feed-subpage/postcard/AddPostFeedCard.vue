@@ -33,6 +33,7 @@ import FeedCardFrame from './FeedCardFrame.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
 import CurrentUser from '@/js/models/entities/current-user';
+import { useRouter } from 'vue-router';
 
 export default {
     name: "AddPostFeedCard",
@@ -45,7 +46,8 @@ export default {
             iconStyle: {
                 color: 'var(--grey-color)',
             },
-            currentUser: null
+            currentUser: null,
+            router: useRouter(),
         }
     },
     async mounted() {
@@ -72,8 +74,7 @@ export default {
 
         async resolveClickAddLesson(){
             try {
-                let router = this.globalData.router;
-                router.push({name: 'add-lesson'});
+                this.router.push('/lesson-create/');
             } catch (error) {
                 console.log(error);
             }
@@ -81,8 +82,7 @@ export default {
 
         async resolveClickAddQuestion(){
             try {
-                let router = this.globalData.router;
-                router.push({name: 'add-question'});
+                this.router.push('/question-create/');
             } catch (error) {
                 console.log(error);
             }

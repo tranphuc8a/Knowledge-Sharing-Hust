@@ -22,13 +22,7 @@ export default {
         }
     },
     async mounted() {
-        try {
-            this.validatedSrc = this.defaultAvatar;
-            this.validatedSrc = (await Common.isValidImage(this.src)) ? this.src : this.defaultAvatar;
-        } catch (e){
-            this.validatedSrc = this.defaultAvatar;
-            console.error(e);
-        }
+        this.refresh();
     },
     props: {
         src: {
@@ -44,6 +38,22 @@ export default {
             default: null
         }
     },
+    watch: {
+        src(){
+            this.refresh();
+        }
+    },
+    methods: {
+        async refresh(){
+            try {
+                this.validatedSrc = this.defaultAvatar;
+                this.validatedSrc = (await Common.isValidImage(this.src)) ? this.src : this.defaultAvatar;
+            } catch (e){
+                this.validatedSrc = this.defaultAvatar;
+                console.error(e);
+            }
+        }
+    }
 }
 </script>
 

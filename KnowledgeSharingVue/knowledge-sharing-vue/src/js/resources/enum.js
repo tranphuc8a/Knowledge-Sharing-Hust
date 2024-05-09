@@ -140,6 +140,14 @@ let myEnum = {
         Redo:'redo',
 
         LaTeX: 'latex',
+
+        Youtube: 'youtube',
+        Vimeo: 'vimeo',
+        Bilibili: 'bilibili',
+        Vine: 'vine',
+        Prezi: 'prezi',
+        Osf: 'osf',
+        Spotify: 'spotify',
     },
 
     /**

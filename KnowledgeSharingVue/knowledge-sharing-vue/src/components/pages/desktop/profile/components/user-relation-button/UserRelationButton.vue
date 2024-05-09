@@ -1,7 +1,13 @@
 
 
 <template>
-    <div class="p-user-relation-button" v-if="isShow">
+    <div class="p-user-relation-button" style="display: flex; gap: 12px;" v-if="!isLoaded">
+        <div class="skeleton" style="width: 100px; height: 36px; border-radius: 4px;">
+        </div>
+        <div class="skeleton" style="width: 100px; height: 36px; border-radius: 4px;">
+        </div>
+    </div>
+    <div class="p-user-relation-button" v-if="isLoaded">
         <FriendButton v-if="userRelation === userRelationType.Friend" />
         <FolloweeButton v-else-if="userRelation === userRelationType.Followee" />
         <FollowerButton v-else-if="userRelation === userRelationType.Follower" />
@@ -38,23 +44,27 @@ export default {
     data(){
         return {
             user: null,
-            isShow: true,
+            isLoaded: true,
             currentUser: null,
             userRelation: null,
             userCard: null,
             userRelationType: myEnum.EUserRelationType,
         }
     },
+    async created(){
+        this.isLoaded = false;
+        await this.refreshRelation();
+        this.isLoaded = true;
+    },
     mounted(){
-        this.refreshRelation();
     },
     methods: {
         async forceRender(){
             try {
                 this.refreshRelation();
-                this.isShow = false;
+                this.isLoaded = false;
                 this.$nextTick(() => {
-                    this.isShow = true;
+                    this.isLoaded = true;
                 });
             } catch (e) {
                 console.error(e);

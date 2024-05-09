@@ -1,17 +1,17 @@
 
 
 <template>
+    <div class="p-profile-panel-button" v-if="!isLoaded">
+        <a-skeleton-button active size="default" shape="default" 
+            :block="true" style="width: 200px" />
+    </div>
 
-    <div class="p-profile-panel-button">
+    <div class="p-profile-panel-button" v-if="isLoaded">
         <div class="p-ppb-button" v-if="isNotMySelf">
-            <UserRelationButton
-                :user="currentUser"
-            />
+            <UserRelationButton />
         </div>
         <div class="p-ppb-button" v-if="isNotMySelf">
-            <MessageButton
-                :user="currentUser"
-            />
+            <MessageButton />
         </div>
         <div class="p-ppb-button" v-if="!isNotMySelf">
             <MButton 
@@ -41,6 +41,7 @@ export default {
     },
     data(){
         return {
+            isLoaded: false,
             iconStyle: {
                 fontSize: '18px'
             },
@@ -69,13 +70,17 @@ export default {
 
         async refresh(){
             try {
-                this.isNotMySelf = true;
+                this.isLoaded = false;
+                if (this.getUser()?.UserId == null) return;
+                let tempIsNotMySelf = true;
                 this.currentUser = await CurrentUser.getInstance();
-                if (this.currentUser != null && this.getUser() != null){
+                if (this.currentUser != null){
                     if (this.currentUser.UserId == this.getUser().UserId){
-                        this.isNotMySelf = false;
+                        tempIsNotMySelf = false;
                     }
                 }
+                this.isNotMySelf = tempIsNotMySelf;
+                this.isLoaded = true;
             } catch (e) {
                 console.error(e);
             }

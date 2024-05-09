@@ -38,8 +38,8 @@ export default {
     },
     methods: {
         async resolveClickItem(callback){
+            if (this.isWaiting) return;
             try {
-                if (this.isWaiting) return;
                 this.isWaiting = true;
                 if (callback != null){
                     await callback.call();

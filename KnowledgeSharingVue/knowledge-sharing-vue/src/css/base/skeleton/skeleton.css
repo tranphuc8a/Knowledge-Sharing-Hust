@@ -1,0 +1,25 @@
+
+.skeleton {
+    border-radius: 4px;
+    background-image: 
+        linear-gradient(
+            85deg, 
+            var(--primary-color-50) 25%,
+            var(--primary-color-100) 40%, 
+            var(--primary-color-100) 48%,
+            var(--primary-color-100) 56%, 
+            var(--primary-color-50) 75%
+        );
+
+    background-size: 400% 100%;
+    animation: skeleton-animation 1.5s infinite linear;
+}
+
+@keyframes skeleton-animation {
+    0% {
+        background-position: 100% 0;
+    }
+    40%, 100% {
+        background-position: 0% 0;
+    }
+}
