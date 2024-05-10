@@ -1,5 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Algorithms;
 using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
@@ -174,7 +175,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
 
             // Return success
-            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource));
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, comments);
         }
 
         public virtual async Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset)
@@ -191,12 +192,14 @@ namespace KnowledgeSharingApi.Services.Services
                 await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
 
             // Trả về thành công
-            PaginationResponseModel<ResponseCommentModel> res = new()
+            PaginationResponseModel<IResponseCommentModel> res = new()
             {
                 Total = listComments.Total,
                 Limit = listComments.Limit,
                 Offset = listComments.Offset,
-                Results = await DecorationRepository.DecorateResponseCommentModel(null, listComments.Results.ToList())
+                Results = (await DecorationRepository
+                    .DecorateResponseCommentModel(null, listComments.Results.ToList()))
+                    .OfType<IResponseCommentModel>().ToList()
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
         }
@@ -207,11 +210,13 @@ namespace KnowledgeSharingApi.Services.Services
             ViewComment comment = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
 
             // Trang trí comment
-            ResponseCommentModel? res = (await DecorationRepository.DecorateResponseCommentModel(null, [comment])).FirstOrDefault();
+            IResponseCommentModel? res = 
+                (await DecorationRepository.DecorateResponseCommentModel(null, [comment], true))
+                .FirstOrDefault();
             if (res == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.GetSuccess(CommentResource));
+            return ServiceResult.Success(ResponseResource.GetSuccess(CommentResource), string.Empty, res);
         }
 
         public async Task<ServiceResult> GetListCommentReplies(Guid commentId, int? limit, int? offset)
@@ -224,12 +229,14 @@ namespace KnowledgeSharingApi.Services.Services
                 await CommentRepository.GetRepliesOfComment(commentId, limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel
-            PaginationResponseModel<ResponseCommentModel> res = new()
+            PaginationResponseModel<IResponseCommentModel> res = new()
             {
                 Total = comments.Total,
                 Limit = comments.Limit,
                 Offset = comments.Offset,
-                Results = await DecorationRepository.DecorateResponseCommentModel(null, comments.Results.ToList(), isDecorateReplies: false)
+                Results = (await DecorationRepository
+                    .DecorateResponseCommentModel(null, comments.Results.ToList(), isDecorateReplies: false))
+                    .OfType<IResponseCommentModel>().ToList()
             };
 
             // return success
@@ -313,12 +320,13 @@ namespace KnowledgeSharingApi.Services.Services
                 await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel comments
-            PaginationResponseModel<ResponseCommentModel> res = new()
+            PaginationResponseModel<IResponseCommentModel> res = new()
             {
                 Total = comments.Total,
                 Limit = comments.Limit,
                 Offset = comments.Offset,
-                Results = await DecorationRepository.DecorateResponseCommentModel(myUid, comments.Results.ToList(), isDecorateReplies: true)
+                Results = await DecorationRepository
+                    .DecorateResponseCommentModel(myUid, comments.Results.ToList(), isDecorateReplies: true)
             };
 
             // Trả về thành công
@@ -343,12 +351,13 @@ namespace KnowledgeSharingApi.Services.Services
                 await CommentRepository.GetCommentsOfUserInKnowledge(userId, knowledgeId, limit ?? DefaultLimit, offset ?? 0);
 
             // DecorateResponseLessonModel bình luận
-            PaginationResponseModel<ResponseCommentModel> res = new()
+            PaginationResponseModel<IResponseCommentModel> res = new()
             {
                 Total = comments.Total,
                 Limit = comments.Limit,
                 Offset = comments.Offset,
-                Results = await DecorationRepository.DecorateResponseCommentModel(myUid, comments.Results.ToList(), isDecorateReplies: true)
+                Results = await DecorationRepository
+                    .DecorateResponseCommentModel(myUid, comments.Results.ToList(), isDecorateReplies: true)
             };
 
             // Trả về thành công
@@ -402,7 +411,7 @@ namespace KnowledgeSharingApi.Services.Services
                 .Skip(offsetValue).Take(limitValue);
 
             // DecorateResponseLessonModel
-            IEnumerable<ResponseCommentModel> res = await DecorationRepository
+            IEnumerable<IResponseCommentModel> res = await DecorationRepository
                 .DecorateResponseCommentModel(myUid, listComments.ToList(), isDecorateReplies: true);
 
             // Trả về thành công

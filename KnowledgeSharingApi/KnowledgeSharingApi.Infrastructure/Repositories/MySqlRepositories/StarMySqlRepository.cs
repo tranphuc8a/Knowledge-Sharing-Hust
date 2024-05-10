@@ -156,9 +156,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<Star?> GetStarOfUserAndUserItem(Guid userId, Guid itemId)
         {
-            return await DbContext.Stars
+            return (Star?) (await DbContext.Stars
                 .Where(star => star.UserId == userId && star.UserItemId == itemId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync())?.Clone();
         }
     }
 }

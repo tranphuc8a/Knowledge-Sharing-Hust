@@ -64,6 +64,7 @@ import InputFrame from '../inputs/MInputFrame.vue';
 import { myEnum } from '@/js/resources/enum';
 import { Validator } from '@/js/utils/validator';
 import { Unicode } from '@/js/utils/unicode';
+import { GetRequest, Request } from '@/js/services/request';
 
 export default {
     name: 'CategoryInput',
@@ -106,7 +107,8 @@ export default {
                 fontSize: '16px',
                 color: 'var(--primary-color)',
                 cursor: 'pointer'
-            }
+            },
+            isLoadingCategories: false
         }
     },
     props: {
@@ -120,22 +122,22 @@ export default {
             default: "- Chọn giá trị -"
         },
         autocomplete: { default: "email" },
-        listItemLoader: {
-            type: Function,
-            default: async function(){
-                await new Promise(e => setTimeout(e, 1000));
-                return Array.from([{
-                        label: 'Hưng Yên',
-                        value: 'Hưng Yên'
-                    }, {
-                        label: 'Hà Nội',
-                        value: 'Hà Nội'
-                    }, {
-                        label: 'Nam Định',
-                        value: 'Nam Định'
-                    }, ]);
-            }
-        },
+        // listItemLoader: {
+        //     type: Function,
+        //     default: async function(){
+        //         await new Promise(e => setTimeout(e, 1000));
+        //         return Array.from([{
+        //                 label: 'Hưng Yên',
+        //                 value: 'Hưng Yên'
+        //             }, {
+        //                 label: 'Hà Nội',
+        //                 value: 'Hà Nội'
+        //             }, {
+        //                 label: 'Nam Định',
+        //                 value: 'Nam Định'
+        //             }, ]);
+        //     }
+        // },
         listItemFilter: {
             type: Function,
             default: async function(items, text){
@@ -184,6 +186,27 @@ export default {
     methods:{
         ...input.methods,
 
+        async listItemLoader(){
+            if (this.isLoadingCategories) return;
+            try {
+                let res = await new GetRequest('Categories')
+                    .execute();
+                let body = await Request.tryGetBody(res);
+                let listCategories = body.map(function(cat){
+                    return {
+                        label: cat.CategoryName,
+                        value: cat.CategoryName
+                    }
+                });
+                return listCategories;
+            } catch (error){
+                console.error(error);
+                return [];
+            } finally {
+                this.isLoadingCategories = true;
+            }
+        },
+
         getLabel(){
             if (this.data?.label == null){
                 this.data.label = this.lang?.components?.input?.combobox;
@@ -213,7 +236,17 @@ export default {
         * @Edit None
         **/
         async validate(){
-            return true;
+            try {
+                if (this.validator != null){
+                    let value = await this.getValue();
+                    let res = await this.validator.validate(value);
+                    this.inputFrame.errorMessage = res.msg;
+                    return res.isValid;
+                }
+            } catch (error){
+                console.error(error);
+                return false;
+            }
         },
         /**
         * Thực hiện xử lý logic sau khi thay đổi giá trị của input live

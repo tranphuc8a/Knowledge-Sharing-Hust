@@ -1,30 +1,30 @@
 /* eslint-disable */
 <template>
     <FeedCardFrame>
-        <div class="p-feedcard-question">
-            <div class="p-feedcard-question__header">
+        <div class="p-feedcard-lestion">
+            <div class="p-feedcard-lestion__header">
                 <PostCardHeader />
             </div>
-            <div class="p-feedcard-question__title">
+            <div class="p-feedcard-lestion__title">
                 {{question?.Title ?? "Title of question"}}
             </div>
-            <div class="p-feedcard-question__categories">
+            <div class="p-feedcard-lestion__abstract" v-show="question?.Abstract != null">
+                <!-- <textarea type="text" v-model="content"/> -->
+                <LatexMarkdownRender :markdown-content="question?.Abstract" />
+            </div>
+            <div class="p-feedcard-lestion__categories" v-show="compiledCategories?.length > 0">
                 <CategoriesList :categories="compiledCategories" />
             </div>
-            <div class="p-feedcard-question__content">
-                <textarea type="text" v-model="content"/>
-                <LatexMarkdownRender :markdown-content="content" />
-            </div>
-            <div class="p-feedcard-question__thumbnail">
+            <div class="p-feedcard-lestion__thumbnail">
                 <PostCardThumbnail />
             </div>
-            <div class="p-feedcard-question__toolbar">
+            <div class="p-feedcard-lestion__toolbar">
                 <PostCardToolBar />
             </div>
-            <div class="p-feedcard-question__devide">
+            <div class="p-feedcard-lestion__devide">
                 <div></div>
             </div>
-            <div class="p-feedcard-question__comments">
+            <div class="p-feedcard-lestion__comments">
                 <PostCardCommentList />
             </div>
         </div>
@@ -93,7 +93,7 @@ export default {
         async resolveClickAddquestion(){
             try {
                 let router = this.globalData.router;
-                router.push({name: 'add-question'});
+                router.push({name: 'add-lestion'});
             } catch (error) {
                 console.log(error);
             }
@@ -102,7 +102,7 @@ export default {
         async resolveClickAddQuestion(){
             try {
                 let router = this.globalData.router;
-                router.push({name: 'add-question'});
+                router.push({name: 'add-lestion'});
             } catch (error) {
                 console.log(error);
             }
@@ -135,6 +135,6 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/question.css);
+@import url(@/css/pages/desktop/components/lestion.css);
 
 </style>

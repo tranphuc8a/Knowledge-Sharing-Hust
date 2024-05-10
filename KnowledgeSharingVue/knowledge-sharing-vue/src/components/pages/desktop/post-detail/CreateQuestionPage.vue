@@ -36,7 +36,7 @@
                 <div class="p-row">
                     <div class="p-input-category">
                         <CategoryInput :label="'Nhập category'" 
-                            ref="category"
+                            ref="category" :validator="validators.category"
                         />
                     </div>
                 </div>
@@ -65,7 +65,7 @@ import MTextArea from '@/components/base/inputs/MTextArea'
 import DesktopHomeFrame from '../home/DesktopHomeFrame.vue';
 import MarkdownEditor from './components/MarkdownEditor.vue';
 import MTextfield from '@/components/base/inputs/MTextfield'
-import { NotEmptyValidator, PositiveNumberValidator } from '@/js/utils/validator';
+import { NotEmptyValidator, PositiveNumberValidator, LimitItemNumberValidator } from '@/js/utils/validator';
 import { myEnum } from '@/js/resources/enum';
 import { PostRequest, Request, GetRequest } from '@/js/services/request';
 import { useRoute, useRouter } from 'vue-router';
@@ -86,7 +86,9 @@ export default {
             validators: {
                 title: new NotEmptyValidator("Tiêu đề bài thảo luận không được trống"),
                 estimateTime: new PositiveNumberValidator("Giá trị không hợp lệ")
-                    .setIsAcceptEmpty(false, "Giá trị không được trống")
+                    .setIsAcceptEmpty(false, "Giá trị không được trống"),
+                category: new LimitItemNumberValidator("Số lượng category phải từ 2-5 loại khác nhau")
+                    .setBoundary(2, 5),
             },
             privacyEnum: myEnum.EPrivacy,
             inputs: [],

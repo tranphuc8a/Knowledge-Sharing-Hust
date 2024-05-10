@@ -38,7 +38,7 @@
 
 
 <script>
-import ResumeBio from '../components/resume-subpage/ResumeBio.vue';
+import ResumeBio from '../../components/resume-subpage/ResumeBio.vue';
 import { myEnum } from '@/js/resources/enum';
 import { MyDate } from '@/js/utils/mydate';
 import { Validator } from '@/js/utils/validator';

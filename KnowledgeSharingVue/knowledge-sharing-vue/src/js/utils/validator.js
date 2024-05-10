@@ -367,10 +367,58 @@ class GreaterThanTodayValidator extends Validator {
     }
 }
 
+class LimitItemNumberValidator extends Validator {
+    constructor(errorMsg){
+        super(errorMsg ?? "Limit item number validator");
+        this.min = null;
+        this.max = null;
+    }
+
+    /**
+     * Hàm đặt giới hạn số lượng phần tử
+     * @param {*} min - số lượng tối thiểu
+     * @param {*} max - số lượng tối đa
+     * @returns this
+     * @Created PhucTV (11/5/24)
+     * @Modified None
+     */
+    setBoundary(min, max) {
+        this.min = min;
+        this.max = max;
+        return this;
+    }
+
+    validate(value){
+        try {
+            let numbers = value?.length ?? 0;
+            if (this.min != null && numbers < this.min){
+                return {
+                    isValid: false,
+                    msg: this.errorMsg
+                };
+            }
+            if (this.max != null && numbers > this.max){
+                return {
+                    isValid: false,
+                    msg: this.errorMsg
+                };
+            }
+            return super.validate(value);
+        } catch (error){
+            console.error(error);
+            return {
+                isValid: false,
+                msg: error
+            }
+        }
+    }
+}
+
 export { 
     Validator, RegexValidator, NotEmptyValidator,
     DateValidator, PhoneValidator, EmailValidator, 
     IdentityCardNumberValidator, MoneyValidator, PositiveNumberValidator,
     UsernameValidator, PasswordValidator, RepasswordValidator,
-    ComboboxValidator, GreaterThanTodayValidator
+    ComboboxValidator, GreaterThanTodayValidator,
+    LimitItemNumberValidator
 }

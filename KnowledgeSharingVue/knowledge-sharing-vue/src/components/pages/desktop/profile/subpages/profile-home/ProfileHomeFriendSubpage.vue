@@ -36,7 +36,7 @@
 
 <script>
 import { useRouter } from 'vue-router';
-import SquareUserItem from '../components/profile-home-friend-subpage/SquareUserItem.vue';
+import SquareUserItem from '../../components/profile-home-friend-subpage/SquareUserItem.vue';
 import { GetRequest, Request } from '@/js/services/request';
 import ResponseFriendCardModel from '@/js/models/api-response-models/response-friend-card-model';
 import MSecondaryButton from '@/components/base/buttons/MSecondaryButton';

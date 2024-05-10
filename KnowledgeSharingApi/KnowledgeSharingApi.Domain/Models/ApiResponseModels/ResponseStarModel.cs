@@ -14,7 +14,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
     {
         public ResponseUserCardModel? User { get; set; }
 
-        [JsonConverter(typeof(ResponseUserItemConverter))]
+        //[JsonConverter(typeof(ResponseUserItemConverter))]
         public IResponseUserItemModel? Item { get; set; }
     }
 }

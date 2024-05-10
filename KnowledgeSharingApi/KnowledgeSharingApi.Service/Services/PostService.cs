@@ -1,9 +1,11 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using OfficeOpenXml.Drawing.Controls;
@@ -21,6 +23,7 @@ namespace KnowledgeSharingApi.Services.Services
         IUserRepository userRepository,
         IResourceFactory resourceFactory,
         IQuestionService questionService,
+        IDecorationRepository decorationRepository,
         IKnowledgeRepository knowledgeRepository,
         ILessonService lessonService
     ) : IPostService
@@ -28,6 +31,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IPostRepository PostRepository = postRepository;
         protected readonly IUserRepository UserRepository = userRepository;
         protected readonly IResourceFactory ResourceFactory = resourceFactory;
+        protected readonly IDecorationRepository DecorationRepository = decorationRepository;
         protected readonly IQuestionService QuestionService = questionService;
         protected readonly ILessonService LessonService = lessonService;
         protected readonly IKnowledgeRepository KnowledgeRepository = knowledgeRepository;
@@ -40,49 +44,33 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly int NumberOfTopComments = 5;
 
 
-        /// <summary>
-        /// Thêm các trường thông tin bổ sung cho Post
-        /// số sao, số bình luận, top bình luận
-        /// </summary>
-        /// <param name="post"> post gốc </param>
-        /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
-        /// Modified: None
-        protected virtual async Task<ResponsePostModel> DecoratePost(ViewPost post)
-        {
-            ResponsePostModel model = new();
-            model.Copy(post);
-            PaginationResponseModel<ViewComment> listComments =
-                await KnowledgeRepository.GetListComments(model.UserItemId, NumberOfTopComments, 0);
-            model.NumberComments = listComments.Total;
-            model.TopComments = listComments.Results.Select(com =>
-            {
-                ResponseCommentModel rescom = new();
-                rescom.Copy(com);
-                return rescom;
-            });
+        ///// <summary>
+        ///// Thêm các trường thông tin bổ sung cho Post
+        ///// số sao, số bình luận, top bình luận
+        ///// </summary>
+        ///// <param name="post"> post gốc </param>
+        ///// <returns></returns>
+        ///// Created: PhucTV (24/3/24)
+        ///// Modified: None
+        //protected virtual async Task<ResponsePostModel> DecorationRepository.DecorateResponsePostModel(ViewPost post)
+        //{
+        //    ResponsePostModel model = new();
+        //    model.Copy(post);
+        //    PaginationResponseModel<ViewComment> listComments =
+        //        await KnowledgeRepository.GetListComments(model.UserItemId, NumberOfTopComments, 0);
+        //    model.NumberComments = listComments.Total;
+        //    model.TopComments = listComments.Results.Select(com =>
+        //    {
+        //        ResponseCommentModel rescom = new();
+        //        rescom.Copy(com);
+        //        return rescom;
+        //    });
 
-            model.AverageStars = await KnowledgeRepository.GetAverageStar(model.UserItemId);
-            return model;
-        }
+        //    model.AverageStars = await KnowledgeRepository.GetAverageStar(model.UserItemId);
+        //    return model;
+        //}
 
-        /// <summary>
-        /// Thêm các trường thông tin bổ sung cho danh sách Post
-        /// số sao, số bình luận, top bình luận
-        /// </summary>
-        /// <param name="posts"> Danh sách posts gốc </param>
-        /// <returns></returns>
-        /// Created: PhucTV (24/3/24)
-        /// Modified: None
-        protected virtual async Task<List<ResponsePostModel>> DecoratePost(IEnumerable<ViewPost> posts)
-        {
-            List<ResponsePostModel> res = [];
-            foreach (ViewPost post in posts)
-            {
-                res.Add(await DecoratePost(post));
-            }
-            return res;
-        }
+        
 
         #region Admin APIes
 
@@ -107,7 +95,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetSuccess(PostResource),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
             );
         }
 
@@ -124,7 +112,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
             );
         }
 
@@ -142,7 +130,8 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecoratePost(posts)
+                (await DecorationRepository.DecorateResponsePostModel(null, posts.ToList()))
+                     //.OfType<IResponseUserItemModel>().ToList()
             );
         }
 
@@ -155,16 +144,10 @@ namespace KnowledgeSharingApi.Services.Services
                 (await PostRepository.GetPublicPostsByUserId(user.UserId))
                 .Skip(offsetValue).Take(limitValue);
 
-            List<ResponsePostModel> res = [];
-            foreach (ViewPost post in posts)
-            {
-                res.Add(await DecoratePost(post));
-            }
-
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                res
+                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
             );
         }
 
@@ -186,16 +169,16 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
         {
             int offsetValue = offset ?? 0, limitValue = limit ?? DefaultLimit;
-            ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+            //ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
             IEnumerable<ViewPost> listPosts = 
-                (await PostRepository.GetByUserId(user.UserId))
+                (await PostRepository.GetByUserId(myUid))
                 .Skip(offsetValue).Take(limitValue);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecoratePost(listPosts)
+                await DecorationRepository.DecorateResponsePostModel(myUid, listPosts.ToList())
             );
         }
 
@@ -203,7 +186,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             // Tìm kiếm và lọc thông minh hơn cho myUid
 
-            _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+            //_ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             IEnumerable<ViewPost> posts = await PostRepository.GetPublicPosts(limitValue, offsetValue);
@@ -213,13 +196,14 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository
+                    .DecorateResponsePostModel(myUid, posts.ToList())
             );
         }
 
         public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
         {
-            _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+            //_ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
@@ -230,7 +214,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponsePostModel(myUid, posts.ToList())
             );
         }
         #endregion
@@ -242,12 +226,13 @@ namespace KnowledgeSharingApi.Services.Services
 
         public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
         {
-            IEnumerable<ViewPost> posts = await PostRepository.GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            IEnumerable<ViewPost> posts = await PostRepository
+                .GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
             );
         }
 
@@ -258,7 +243,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponsePostModel(myUid, posts.ToList())
             );
         }
 
@@ -269,7 +254,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecoratePost(posts)
+                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
             );
         }
 
@@ -279,12 +264,12 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewPost> listed = await PostRepository.GetMarkedPosts(myUid);
             int total = listed.Count();
             listed = listed.Skip(offsetValue).Take(limitValue);
-            PaginationResponseModel<ResponsePostModel> res = new()
+            PaginationResponseModel<IResponsePostModel> res = new()
             {
                 Total = total,
                 Limit = limitValue,
                 Offset = offsetValue,
-                Results = await DecoratePost(listed)
+                Results = await DecorationRepository.DecorateResponsePostModel(myUid, listed.ToList())
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(PostResource), string.Empty, res);
         }

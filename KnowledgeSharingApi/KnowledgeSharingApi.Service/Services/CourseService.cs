@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
@@ -71,7 +72,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Functionality Methods
 
-        //protected virtual async Task<IEnumerable<ResponseCourseModel>> DecorationRepository.DecorateResponseCourseModel(Guid? myUid, IEnumerable<ViewCourse> courses)
+        //protected virtual async Task<List<IResponseCourseModel>> DecorationRepository.DecorateResponseCourseModel(Guid? myUid, IEnumerable<ViewCourse> courses)
         //{
         //    List<Guid> courseIds = courses.Select(course => course.UserItemId).ToList();
         //    Dictionary<Guid, int?>? myStars = null;
@@ -152,7 +153,7 @@ namespace KnowledgeSharingApi.Services.Services
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
 
             // Trả về thành công
-            ResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(null, [course])).First();
+            IResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(null, [course])).First();
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
@@ -163,7 +164,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await CourseRepository.GetViewCourse(limit ?? DefaultLimit, offset ?? 0);
 
             // decorate:
-            IEnumerable<ResponseCourseModel> res =
+            List<IResponseCourseModel> res =
                 await DecorationRepository.DecorateResponseCourseModel(null, listCourses.ToList());
 
             // Return success
@@ -184,8 +185,8 @@ namespace KnowledgeSharingApi.Services.Services
             listCourses = listCourses.Skip(offsetValue).Take(limitValue);
 
             // decorate
-            IEnumerable<ResponseCourseModel> resLists = await DecorationRepository.DecorateResponseCourseModel(null, listCourses.ToList());
-            PaginationResponseModel<ResponseCourseModel> res =
+            List<IResponseCourseModel> resLists = await DecorationRepository.DecorateResponseCourseModel(null, listCourses.ToList());
+            PaginationResponseModel<IResponseCourseModel> res =
                 new(total, limitValue, offsetValue, resLists);
 
             // Trả về thành công
@@ -218,7 +219,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await CourseRepository.GetViewCourseOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
 
             // decorate
-            IEnumerable<ResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, listCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, listCourses.ToList());
 
             // Thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
@@ -235,7 +236,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Khóa học ở trạng thái riêng tư");
 
             // decorate và trả về thành công
-            ResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(null, [course])).First();
+            IResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(null, [course])).First();
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
@@ -245,7 +246,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourse(limit ?? DefaultLimit, offset ?? 0);
 
             // decorate 
-            IEnumerable<ResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
 
             // return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
@@ -258,7 +259,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await CourseRepository.GetPublicViewCourseOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
 
             // decorate
-            IEnumerable<ResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
 
             // return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
@@ -278,8 +279,8 @@ namespace KnowledgeSharingApi.Services.Services
             lsCourses = lsCourses.Skip(offsetValue).Take(limitValue);
 
             // decorate
-            IEnumerable<ResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
-            PaginationResponseModel<ResponseCourseModel> res =
+            List<IResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
+            PaginationResponseModel<IResponseCourseModel> res =
                 new(total, limitValue, offsetValue, lsRes);
 
             // Trả về thành công
@@ -399,7 +400,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Bạn không có quyền truy cập khóa học này");
 
             // decorate và trả về thành công
-            ResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(myUid, [course])).First();
+            IResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(myUid, [course])).First();
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
@@ -410,7 +411,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await CourseRepository.GetViewCourseOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
 
             // decorate
-            IEnumerable<ResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, listCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, listCourses.ToList());
 
             // Thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
@@ -423,7 +424,7 @@ namespace KnowledgeSharingApi.Services.Services
                 await CourseRepository.GetViewCourse(myUid, limit ?? DefaultLimit, offset ?? 0);
 
             // decorate
-            IEnumerable<ResponseCourseModel> res =
+            List<IResponseCourseModel> res =
                 await DecorationRepository.DecorateResponseCourseModel(myUid, listCourses.ToList());
 
             // Return success
@@ -435,7 +436,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewCourse> lsCourses = 
                 await CourseRepository.GetMarkedCoursesOfUse(myUid, limit ?? DefaultLimit, offset ?? 0);
 
-            IEnumerable<ResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
 
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
@@ -448,7 +449,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Đây không phải khóa học của bạn");
 
             // decorate
-            ResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(myUid, [course])).First();
+            IResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(myUid, [course])).First();
 
             // return Success
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
@@ -465,8 +466,8 @@ namespace KnowledgeSharingApi.Services.Services
             lsCourses = lsCourses.Skip(offsetValue).Take(limitValue);
 
             // decorate
-            IEnumerable<ResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
-            PaginationResponseModel<ResponseCourseModel> res =
+            List<IResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
+            PaginationResponseModel<IResponseCourseModel> res =
                 new(total, limitValue, offsetValue, lsRes);
 
             // Trả về thành công
@@ -502,8 +503,8 @@ namespace KnowledgeSharingApi.Services.Services
             lsCourses = lsCourses.Skip(offsetValue).Take(limitValue);
 
             // decorate
-            IEnumerable<ResponseCourseModel> lsres = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
-            PaginationResponseModel<ResponseCourseModel> res = new(total, limitValue, offsetValue, lsres);
+            List<IResponseCourseModel> lsres = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
+            PaginationResponseModel<IResponseCourseModel> res = new(total, limitValue, offsetValue, lsres);
 
             // return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);

@@ -1,6 +1,7 @@
 <template>
     <div class="p-fitcontent-button-container">
-        <div @:click.prevent="resolveOnclick" class="p-button p-link-button" :state="data.state">
+        <div @:click.prevent="resolveOnclick" :style="buttonStyle"
+            class="p-button p-link-button" :state="data.state">
             <div class="p-button-content">
                 <a :href="href"> {{ label }} </a>  
             </div>

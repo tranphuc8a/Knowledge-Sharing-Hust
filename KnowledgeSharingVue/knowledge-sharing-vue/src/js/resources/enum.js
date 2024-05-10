@@ -222,7 +222,8 @@ let myEnum = {
         Followee: 22,
         Blocker: 31,
         Blockee: 32,
-        NotInRelation: -1
+        NotInRelation: -1,
+        IsMySelf: -2,
     },
 
     /**

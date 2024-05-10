@@ -13,6 +13,7 @@
 .p-button{
     width: 100%;
     height: var(--component-height);
+    /* min-height: var(--component-height); */
     display: flex;
     position: relative;
     justify-content: center;
@@ -37,7 +38,7 @@
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: center;
-    height: var(--component-height);
+    height: 100%;
     gap: 8px
 }
 

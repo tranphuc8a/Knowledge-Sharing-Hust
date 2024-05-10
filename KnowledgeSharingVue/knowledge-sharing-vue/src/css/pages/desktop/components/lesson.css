@@ -50,18 +50,30 @@
 
 
 .p-feedcard-lesson__title{
-    padding: 4px 16px;
+    padding: 12px 16px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: center;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 22px;
+    width: 100%;
+}
+
+.p-feedcard-lesson__abstract{
+    padding: 0 16px;
+    padding-bottom: 12px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    /* font-weight: 600; */
+    font-size: 16px;
     width: 100%;
 }
 
 .p-feedcard-lesson__categories,
-.p-feedcard-lesson__content,ques
+.p-feedcard-lesson__content,
 .p-feedcard-lesson__devide,
 .p-feedcard-lesson__comments{
     width: 100%;

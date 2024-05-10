@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories
 {
-    public interface IKnowledgeRepository : IRepository<Knowledge>
+    public interface IKnowledgeRepository : IRepository<Knowledge>, IBaseUserItemRepository
     {
 
         /// <summary>

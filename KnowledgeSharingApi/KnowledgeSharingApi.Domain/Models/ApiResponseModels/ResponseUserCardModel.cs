@@ -22,6 +22,8 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
         public string Role { get; set; } = string.Empty;
 
+        public string? Bio { get; set; }
+
         public EUserRelationType UserRelationType { get; set; }
 
         public Guid? UserRelationId { get; set; }

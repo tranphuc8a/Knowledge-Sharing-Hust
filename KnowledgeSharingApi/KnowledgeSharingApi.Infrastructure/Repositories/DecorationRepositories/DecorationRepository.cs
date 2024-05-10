@@ -23,6 +23,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
         IKnowledgeRepository knowledgeRepository,
         ICategoryRepository categoryRepository,
         ICommentRepository commentRepository,
+        IPostRepository postRepository,
         IMarkRepository markRepository,
         IUserRelationRepository userRelationRepository,
         IUserItemRepository userItemRepository,
@@ -35,6 +36,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
         protected readonly ICommentRepository CommentRepository = commentRepository;
         protected readonly ICategoryRepository CategoryRepository = categoryRepository;
         protected readonly IMarkRepository MarkRepository = markRepository;
+        protected readonly IPostRepository PostRepository = postRepository;
         protected readonly IUserItemRepository UserItemRepository = userItemRepository;
         protected readonly IUserRepository UserRepository = userRepository;
         protected readonly IUserRelationRepository UserRelationRepository = userRelationRepository;
@@ -153,16 +155,16 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
         public virtual async Task<List<ResponseCourseLessonModel>> DecorateResponseCourseLessonModel(Guid? myUid, List<CourseLesson> participants, bool isDecorateLesson = false, bool isDecorateCourse = false)
         {
             // Atrributes: Course, Lesson
-            Dictionary<Guid, ResponseCourseModel?> mapCourse = [];
-            Dictionary<Guid, ResponseLessonModel?> mapLesson = [];
+            Dictionary<Guid, IResponseCourseModel?> mapCourse = [];
+            Dictionary<Guid, IResponseLessonModel?> mapLesson = [];
             if (isDecorateCourse)
             { // Get list course
                 List<Guid> listCourseIds = participants.Select(p => p.CourseId).Distinct().ToList();
                 List<ViewCourse> courses = await DbContext.ViewCourses.Where(c => listCourseIds.Contains(c.UserItemId)).ToListAsync();
-                List<ResponseCourseModel> responseCourse = await DecorateResponseCourseModel(myUid, courses);
+                List<IResponseCourseModel> responseCourse = await DecorateResponseCourseModel(myUid, courses);
                 mapCourse = listCourseIds.ToDictionary(
                     id => id,
-                    id => (ResponseCourseModel?) null
+                    id => (IResponseCourseModel?) null
                 );
                 foreach (var course in responseCourse) mapCourse[course.UserItemId] = course;
             }
@@ -170,10 +172,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             { // get list lesson
                 List<Guid> listLessonIds = participants.Select(p => p.LessonId).Distinct().ToList();
                 List<ViewLesson> lessons = await DbContext.ViewLessons.Where(l => listLessonIds.Contains(l.UserItemId)).ToListAsync();
-                List<ResponseLessonModel> responseLesson = await DecorateResponseLessonModel(myUid, lessons);
+                List<IResponseLessonModel> responseLesson = await DecorateResponseLessonModel(myUid, lessons);
                 mapLesson = listLessonIds.ToDictionary(
                     id => id,
-                    id => (ResponseLessonModel?)null
+                    id => (IResponseLessonModel?)null
                 );
                 foreach (var lesson in responseLesson) mapLesson[lesson.UserItemId] = lesson;
             }
@@ -181,11 +183,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             List<ResponseCourseLessonModel> res = participants.Select(part =>
             {
                 ResponseCourseLessonModel item = (ResponseCourseLessonModel) new ResponseCourseLessonModel().Copy(part);
-                if (mapCourse.TryGetValue(item.CourseId, out ResponseCourseModel? value1))
+                if (mapCourse.TryGetValue(item.CourseId, out IResponseCourseModel? value1))
                 {
                     item.Course = value1;
                 }
-                if (mapLesson.TryGetValue(item.LessonId, out ResponseLessonModel? value2))
+                if (mapLesson.TryGetValue(item.LessonId, out IResponseLessonModel? value2))
                 {
                     item.Lesson = value2;
                 }
@@ -194,31 +196,31 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             return res;
         }
 
-        public virtual async Task<List<ResponseLessonModel>> DecorateResponseLessonModel(Guid? myUid, List<ViewLesson> lessons)
+        public virtual async Task<List<IResponseLessonModel>> DecorateResponseLessonModel(Guid? myUid, List<ViewLesson> lessons)
         {
-            List<ResponseLessonModel> res = lessons.Select(lesson =>
+            List<IResponseLessonModel> res = lessons.Select(lesson =>
             {
                 ResponseLessonModel les = new();
                 les.Copy(lesson);
-                return les;
+                return (IResponseLessonModel) les;
             }).ToList();
             await DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
             return res;
         }
 
-        public virtual async Task<List<ResponseQuestionModel>> DecorateResponseQuestionModel(Guid? myUid, List<ViewQuestion> questions)
+        public virtual async Task<List<IResponseQuestionModel>> DecorateResponseQuestionModel(Guid? myUid, List<ViewQuestion> questions)
         {
-            List<ResponseQuestionModel> res = questions.Select(question =>
+            List<IResponseQuestionModel> res = questions.Select(question =>
             {
                 ResponseQuestionModel ques = new();
                 ques.Copy(question);
-                return ques;
+                return (IResponseQuestionModel) ques;
             }).ToList();
             await DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
             return res;
         }
 
-        public virtual async Task<List<ResponseCourseModel>> DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses)
+        public virtual async Task<List<IResponseCourseModel>> DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses)
         {
             List<ResponseCourseModel> res = courses.Select(course =>
             {
@@ -227,7 +229,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
                 return resCourse;
             }).ToList();
             await DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
-            return res;
+            return res.OfType<IResponseCourseModel>().ToList();
         }
 
         public virtual async Task<List<ResponseUserCardModel>> DecorateResponseUserCardModel(Guid? myUid, List<ResponseUserCardModel> responseUserCardModels)
@@ -249,7 +251,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
 
 
 
-        public virtual async Task<List<ResponseCommentModel>> DecorateResponseCommentModel(Guid? myUid, List<ViewComment> viewComments, bool isDecorateReplies = true)
+        public virtual async Task<List<IResponseCommentModel>> DecorateResponseCommentModel(Guid? myUid, List<ViewComment> viewComments, bool isDecorateReplies = true)
         {
             List<ResponseCommentModel> res = viewComments.Select(comment =>
             {
@@ -267,7 +269,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             {
                 com.TotalReplies = totalReplies[com.UserItemId];
             }
-            return res;
+            return res.OfType<IResponseCommentModel>().ToList();
         }
 
         public virtual async Task<List<ResponseCourseRelationModel>> DecorateResponseCourseRelationModel(Guid? myUid, List<CourseRelation> relations, ECourseRelationType relationType, bool isDecorateUser = false, bool isDecorateCourse = false)
@@ -282,7 +284,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
         public virtual async Task<List<ResponseStarModel>> DecorateResponseStarModel(List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
         {
             Dictionary<Guid, ResponseUserCardModel>? mapUsers = null;
-            Dictionary<Guid, ResponseUserItemModel>? mapItems = null;
+            Dictionary<Guid, IResponseUserItemModel?>? mapItems = null;
             if (isDecorateUser)
             {
                 // Get Dictionary <userid, ViewUser -> ResponseUserCardModel>
@@ -302,6 +304,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             if (isDecorateItem)
             {
                 // Get Dictionay <useritemid, UserItem -> ResponseUserItemModel>
+                mapItems = await UserItemRepository
+                    .GetExactlyResponseUserItemModel(listStars.Select(st => st.UserItemId).ToList());
+
             }
             List<ResponseStarModel> res = listStars.Select(star =>
             {
@@ -314,13 +319,34 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
                 }
 
                 // decorate list item
-                if (isDecorateItem && mapItems != null && mapItems.TryGetValue(star.UserItemId, out ResponseUserItemModel? value2))
+                if (isDecorateItem && mapItems != null && mapItems.TryGetValue(star.UserItemId, out IResponseUserItemModel? value2))
                 {
                     resStar.Item = value2;
                 }
 
                 return resStar;
             }).ToList();
+            return res;
+        }
+
+        public async Task<List<IResponsePostModel>> DecorateResponsePostModel(Guid? myUid, List<ViewPost> posts)
+        {
+            List<Guid> postIds = posts.Select(p => p.UserItemId).ToList();
+            Dictionary<Guid, IResponseUserItemModel?> postDict = await PostRepository.GetExactlyResponseUserItemModel(postIds);
+            List<IResponsePostModel> res = posts.Select(p =>
+            {
+                IResponseUserItemModel? rPost = postDict[p.UserItemId];
+                if (rPost != null && rPost is IResponsePostModel value)
+                {
+                    return value;
+                }
+                if (p.PostType == EPostType.Lesson)
+                {
+                    return (ResponseLessonModel)new ResponseLessonModel().Copy(p);
+                }
+                return (ResponseQuestionModel)new ResponseQuestionModel().Copy(p);
+            }).ToList();
+            await DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
             return res;
         }
     }

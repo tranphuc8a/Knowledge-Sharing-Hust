@@ -1,30 +1,30 @@
 /* eslint-disable */
 <template>
     <FeedCardFrame>
-        <div class="p-feedcard-lesson">
-            <div class="p-feedcard-lesson__header">
+        <div class="p-feedcard-lestion">
+            <div class="p-feedcard-lestion__header">
                 <PostCardHeader />
             </div>
-            <div class="p-feedcard-lesson__title">
+            <div class="p-feedcard-lestion__title">
                 {{lesson?.Title ?? "Title of lesson"}}
             </div>
-            <div class="p-feedcard-lesson__categories">
+            <div class="p-feedcard-lestion__abstract" v-show="lesson?.Abstract != null">
+                <!-- <textarea type="text" v-model="content"/> -->
+                <LatexMarkdownRender :markdown-content="lesson?.Abstract" />
+            </div>
+            <div class="p-feedcard-lestion__categories" v-show="compiledCategories?.length > 0">
                 <CategoriesList :categories="compiledCategories" />
             </div>
-            <div class="p-feedcard-lesson__content">
-                <textarea type="text" v-model="content"/>
-                <LatexMarkdownRender :markdown-content="content" />
-            </div>
-            <div class="p-feedcard-lesson__thumbnail">
+            <div class="p-feedcard-lestion__thumbnail">
                 <PostCardThumbnail />
             </div>
-            <div class="p-feedcard-lesson__toolbar">
+            <div class="p-feedcard-lestion__toolbar">
                 <PostCardToolBar />
             </div>
-            <div class="p-feedcard-lesson__devide">
+            <div class="p-feedcard-lestion__devide">
                 <div></div>
             </div>
-            <div class="p-feedcard-lesson__comments">
+            <div class="p-feedcard-lestion__comments">
                 <PostCardCommentList />
             </div>
         </div>
@@ -56,6 +56,7 @@ export default {
             lesson: this.post,
             compiledCategories: [],
         }
+
     },
     mounted() {
         this.getLabel();
@@ -89,25 +90,6 @@ export default {
             }
             return this.defaultCategoriesList;
         },
-
-        async resolveClickAddLesson(){
-            try {
-                let router = this.globalData.router;
-                router.push({name: 'add-lesson'});
-            } catch (error) {
-                console.log(error);
-            }
-        },
-
-        async resolveClickAddQuestion(){
-            try {
-                let router = this.globalData.router;
-                router.push({name: 'add-question'});
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        
     },
     inject: {
         getLanguage: {},
@@ -135,6 +117,6 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/lesson.css);
+@import url(@/css/pages/desktop/components/lestion.css);
 
 </style>

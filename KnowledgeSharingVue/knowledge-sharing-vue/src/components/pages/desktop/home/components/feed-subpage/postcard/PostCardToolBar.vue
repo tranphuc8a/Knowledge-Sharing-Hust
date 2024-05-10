@@ -52,6 +52,8 @@ import PostCardStarButton from './PostCardStarButton.vue';
 import VisualizedStar from '@/components/base/visualized-components/VisualizedStar.vue';
 import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton'
 import Common from '@/js/utils/common';
+import { useRouter } from 'vue-router';
+import { myEnum } from '@/js/resources/enum';
 
 export default {
     name: "PostCardToolbar",
@@ -62,7 +64,8 @@ export default {
             dotIconStyle: {fontSize: '3px', color: 'var(--grey-color-600)'},
             iconStyle: {color: 'var(--grey-color)'},
             buttonStyle: {color: 'var(--grey-color-800)'},
-            tinyIconStyle: {}
+            tinyIconStyle: {},
+            router: useRouter(),
         }
     },
     components: {
@@ -136,7 +139,21 @@ export default {
         },
 
         async resolveClickViewDetail(){
-
+            try {
+                let userItemId = this.getPost().UserItemId;
+                if (userItemId == null) return;
+                let knowledgeType = this.getPost().KnowledgeType;
+                if (knowledgeType == myEnum.EKnowledgeType.Course){
+                    return this.router.push('/course/' + userItemId.toString());
+                }
+                let postType = this.getPost().PostType;
+                if (postType == myEnum.EPostType.Lesson){
+                    return this.router.push('/lesson/' + userItemId.toString());
+                }
+                return this.router.push('/question/' + userItemId.toString());
+            } catch (error){
+                console.error(error);
+            }
         },
         
         async forceRender(){

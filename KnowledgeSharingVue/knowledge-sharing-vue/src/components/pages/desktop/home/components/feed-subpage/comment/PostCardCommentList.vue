@@ -10,7 +10,7 @@
                 Tải thêm bình luận
             </div> -->
             <MLinkButton v-show="!isOutOfComments" :onclick="getMoreComments" 
-                label="Tải thêm bình luận" :href="null"
+                label="Tải thêm bình luận" :href="null" :buttonStyle="buttonStyle"
             />
 
         </div>
@@ -38,6 +38,7 @@ export default {
     name: "PostCardcomment-list",
     data(){
         return {
+            buttonStyle: { padding: '0px', fontSize: '13px', height: '24px' },
             label: null,
             listComments: [],
             isOutOfComments: false,
@@ -203,7 +204,7 @@ export default {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 18px;
+    gap: 12px;
 }
 
 .p-pcl-empty-comment{

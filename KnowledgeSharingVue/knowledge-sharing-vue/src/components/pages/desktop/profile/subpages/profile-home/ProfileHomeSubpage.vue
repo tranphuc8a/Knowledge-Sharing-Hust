@@ -75,6 +75,7 @@ export default {
     gap: 16px;
     justify-content: space-between;
     align-items: flex-start;
+    padding-bottom: 32px;
 }
 
 .profile-home-subpage__left{

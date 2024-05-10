@@ -1,7 +1,9 @@
 
 
 import ProfilePage from '@/components/pages/desktop/profile/ProfilePage.vue';
-import ProfileHomeSubpage from '@/components/pages/desktop/profile/subpages/ProfileHomeSubpage.vue';
+import ProfileHomeSubpage from '@/components/pages/desktop/profile/subpages/profile-home/ProfileHomeSubpage.vue';
+
+
 
 const profileRouter = [
     {

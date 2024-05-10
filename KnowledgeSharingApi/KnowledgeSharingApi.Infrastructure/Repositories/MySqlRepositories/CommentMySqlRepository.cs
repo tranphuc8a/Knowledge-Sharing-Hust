@@ -61,7 +61,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public virtual async Task<PaginationResponseModel<ViewComment>> GetCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId, int limit, int offset)
         {
             IQueryable<ViewComment> comments = DbContext.ViewComments
-                .Where(com => com.UserItemId == userId && com.KnowledgeId == knowledgeId);
+                .Where(com => com.UserId == userId && com.KnowledgeId == knowledgeId);
             int total = comments.Count();
             return new PaginationResponseModel<ViewComment>()
             {
@@ -126,7 +126,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public virtual async Task<PaginationResponseModel<ViewComment>> GetRepliesOfComment(Guid commentId, int limit, int offset)
         {
             IQueryable<ViewComment> comments = DbContext.ViewComments
-                .Where(com => com.UserItemId == commentId);
+                .Where(com => com.ReplyId == commentId);
             int total = comments.Count();
             return new PaginationResponseModel<ViewComment>()
             {

@@ -165,6 +165,17 @@ export default {
                 Request.resolveAxiosError(error);
             }
         },
+        async resolveCopyUserItemId(){
+            try {
+                let itemId = this.getPost()?.UserItemId;
+                if (itemId != null){
+                    navigator.clipboard.writeText(itemId.toString());
+                    this.getToastManager().success('Đã sao chép vào clipboard');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        },
 
         async updateOptions(){
             try {
@@ -174,7 +185,8 @@ export default {
                     this.listOptions = [
                         this.actions.Report,
                         this.actions.Comment,
-                        this.actions.History
+                        this.actions.History,
+                        this.actions.CopyUserItemId,
                     ];
                 } else if (this.currentUser.Role == myEnum.EUserRole.Admin){
                     // Admin
@@ -182,7 +194,8 @@ export default {
                         this.actions.Delete,
                         this.actions.Comment,
                         this.actions.Report,
-                        this.actions.History
+                        this.actions.History,
+                        this.actions.CopyUserItemId,
                     ];
                     if (this.getPost().IsMarked){
                         this.listOptions.push(this.actions.Unmark);
@@ -199,7 +212,8 @@ export default {
                     this.listOptions = [
                         this.actions.Report,
                         this.actions.Comment,
-                        this.actions.History
+                        this.actions.History,
+                        this.actions.CopyUserItemId,
                     ];
                 } else {
                     // User:
@@ -210,7 +224,8 @@ export default {
                             this.actions.Delete,
                             this.actions.Comment,
                             this.actions.Report,
-                            this.actions.History
+                            this.actions.History,
+                            this.actions.CopyUserItemId,
                         ];
                         if (this.getPost().IsMarked){
                             this.listOptions.push(this.actions.Unmark);
@@ -234,7 +249,8 @@ export default {
                         this.listOptions = [
                             this.actions.Comment,
                             this.actions.Report,
-                            this.actions.History
+                            this.actions.History,
+                            this.actions.CopyUserItemId,
                         ];
                         if (this.getPost().IsMarked){
                             this.listOptions.push(this.actions.Unmark);
@@ -277,7 +293,8 @@ export default {
                 Complete: 8,
                 Uncomplete: 9,
                 LockComment: 10,
-                UnlockComment: 11
+                UnlockComment: 11,
+                CopyUserItemId: 12,
             },
             listOptions: [],
             options: {
@@ -349,6 +366,12 @@ export default {
                     fa: 'unlock',
                     onClick: this.resolveUnlockComment,
                 },
+                [12]: {
+                    id: 12,
+                    label: 'Sao chép id phần tử',
+                    fa: 'copy',
+                    onClick: this.resolveCopyUserItemId,
+                }
             }
         }
     },

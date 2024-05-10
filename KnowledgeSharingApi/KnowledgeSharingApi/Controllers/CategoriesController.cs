@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace KnowledgeSharingApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class CategoriesController(
         ICategoryService categoryService

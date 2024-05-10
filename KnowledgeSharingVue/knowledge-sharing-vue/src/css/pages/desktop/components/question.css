@@ -50,18 +50,30 @@
 
 
 .p-feedcard-question__title{
-    padding: 4px 16px;
+    padding: 12px 16px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: center;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 22px;
+    width: 100%;
+}
+
+.p-feedcard-question__abstract{
+    padding: 0 16px;
+    padding-bottom: 12px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    /* font-weight: 600; */
+    font-size: 16px;
     width: 100%;
 }
 
 .p-feedcard-question__categories,
-.p-feedcard-question__content,ques
+.p-feedcard-question__content,
 .p-feedcard-question__devide,
 .p-feedcard-question__comments{
     width: 100%;

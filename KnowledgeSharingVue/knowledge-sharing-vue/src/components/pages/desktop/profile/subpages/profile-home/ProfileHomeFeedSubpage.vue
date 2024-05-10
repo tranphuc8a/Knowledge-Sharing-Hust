@@ -27,15 +27,26 @@
             v-bind="{post: item}">
             Hello
         </component>
+
+        <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
+            class="card" v-if="!isOutOfPost">
+            <div class="skeleton" style="width: 30%; height: 20px; margin-bottom: 18px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 50%; height: 20px; margin-bottom: 10px;"></div>
+        </div>
     </div>
+
+    
 </template>
 
 
 
 <script>
-import AddPostFeedCard from '../../home/components/feed-subpage/postcard/AddPostFeedCard.vue';
-import LessonFeedCard from '../../home/components/feed-subpage/postcard/LessonFeedCard.vue';
-import QuestionFeedCard from '../../home/components/feed-subpage/postcard/QuestionFeedCard.vue';
+import AddPostFeedCard from '../../../home/components/feed-subpage/postcard/AddPostFeedCard.vue';
+import LessonFeedCard from '../../../home/components/feed-subpage/postcard/LessonFeedCard.vue';
+import QuestionFeedCard from '../../../home/components/feed-subpage/postcard/QuestionFeedCard.vue';
+
 import { myEnum } from '@/js/resources/enum';
 import CurrentUser from '@/js/models/entities/current-user';
 import ResponseLessonModel from '@/js/models/api-response-models/response-lesson-model';
@@ -115,6 +126,8 @@ export default {
                 let url = 'Users/posts/' + userId;
                 if (this.currentUser == null){
                     url = 'Users/anonymous/posts/' + userId;
+                } else if (await this.getIsMySelf()){
+                    url = 'Posts/my';
                 }
                 let res = await new GetRequest(url)
                     .setParams({
