@@ -1,8 +1,8 @@
 <template>
     <div class="markdown-body" :style="style" v-html="renderedMarkdown"></div>
- </template>
+</template>
 
- <script>
+<script>
 // Import thư viện marked
 import marked from 'marked'
 
@@ -22,10 +22,10 @@ export default {
         }
     }
 }
- </script>
- <style scoped>
-    .markdown-body {
-        line-height: 1.6;
-        font-size: 16px;
-    }
- </style>
+</script>
+<style scoped>
+.markdown-body {
+    line-height: 1.6;
+    font-size: 16px;
+}
+</style>

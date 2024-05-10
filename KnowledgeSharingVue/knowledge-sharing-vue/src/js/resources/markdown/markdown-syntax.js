@@ -115,5 +115,33 @@ export default {
         syntax: '\b\b\b\b',
         delta: 4
     },
+    [commandType.Youtube]: {
+        syntax: '@[youtube](Id video hoặc đường dẫn video)',
+        delta: 12
+    },
+    [commandType.Vimeo]: {
+        syntax: '@[vimeo](Id video hoặc đường dẫn video)',
+        delta: 10
+    },
+    [commandType.Vine]: {
+        syntax: '@[vine](Id video hoặc đường dẫn video)',
+        delta: 9
+    },
+    [commandType.Bilibili]: {
+        syntax: '@[bilibili](Id video hoặc đường dẫn video)',
+        delta: 13
+    },
+    [commandType.Osf]: {
+        syntax: '@[osf](Id video hoặc đường dẫn video)',
+        delta: 8
+    },
+    [commandType.Spotify]: {
+        syntax: '@[spotify](Id video hoặc đường dẫn video)',
+        delta: 12
+    },
+    [commandType.Prezi]: {
+        syntax: '@[prezi](Id video hoặc đường dẫn video)',
+        delta: 10
+    },
 
 }

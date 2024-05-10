@@ -1,4 +1,5 @@
 import { Validator } from "@/js/utils/validator";
+import { MyDate } from "../utils/mydate";
 
 class Entity {
     constructor() {
@@ -65,6 +66,12 @@ class Entity {
                 this[prop] = entity[prop];
             }
         });
+        if (this.CreatedTime != null){
+            this.CreatedTime = new MyDate(this.CreatedTime);
+        }
+        if (this.ModifiedTime != null){
+            this.ModifiedTime = new MyDate(this.ModifiedTime);
+        }
         this.User = this.getUser();
         return this;
     }
@@ -76,7 +83,10 @@ class Entity {
             Username: this.Username,
             FullName: this.FullName,
             Avatar: this.Avatar,
-            Cover: this.Cover
+            Cover: this.Cover,
+            Role: this.Role,
+            UserRelationType: this.UserRelationType,
+            UserRelationId: this.UserRelationId,
         };
     }
 }

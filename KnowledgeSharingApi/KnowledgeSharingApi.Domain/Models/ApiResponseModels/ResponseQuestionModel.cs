@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 {
-    public class ResponseQuestionModel : ViewQuestion, IResponseKnowledgeModel
+    public class ResponseQuestionModel : ViewQuestion, IResponseQuestionModel
     {
         public int NumberComments { get; set; }
         public IEnumerable<ResponseCommentModel> TopComments { get; set; } = [];

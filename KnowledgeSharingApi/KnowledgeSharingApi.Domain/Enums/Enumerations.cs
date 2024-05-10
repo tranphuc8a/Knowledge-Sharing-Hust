@@ -170,7 +170,8 @@ namespace KnowledgeSharingApi.Domains.Enums
         Blockee = 32,
 
         // Not in Relation
-        NotInRelation = -1
+        NotInRelation = -1,
+        IsMySelf = -2
     }
 
 

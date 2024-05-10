@@ -9,9 +9,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace KnowledgeSharingApi.Domains.Annotations.Converters
+namespace KnowledgeSharingApi.Domains.Annotations.Converters.ResponseModel
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
     public class ResponseUserItemConverterAttribute : JsonConverterAttribute
     {
         public override JsonConverter CreateConverter(Type typeToConvert)

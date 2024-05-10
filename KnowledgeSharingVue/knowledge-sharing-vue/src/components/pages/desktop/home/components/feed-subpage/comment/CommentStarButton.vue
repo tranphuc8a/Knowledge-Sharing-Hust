@@ -42,6 +42,7 @@
 <script>
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 import { PutRequest } from '@/js/services/request';
+import CurrentUser from '@/js/models/entities/current-user';
 
 export default {
     name: 'CommentStarButton',
@@ -62,9 +63,10 @@ export default {
             tooltip: null,
         }
     },
-    mounted() {
+    async mounted() {
         this.tooltip = this.$refs?.tooltip;
         this.myStar = this.getComment().MyStars;
+        this.currentUser = await CurrentUser.getInstance();
     },
     components: {
         TooltipFrame
@@ -112,6 +114,10 @@ export default {
         },
         resolveClickStar(index){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 this.myStar = index;
                 this.tooltip.hideTooltip(0);
                 this.sendStar(index);
@@ -122,6 +128,10 @@ export default {
 
         async resolveUnStar(){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 this.myStar = null;
                 this.currentStar = null;
                 this.tooltip.hideTooltip(0);
@@ -132,6 +142,10 @@ export default {
 
         async resolveCommitFiveStar(){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 this.myStar = 5;
                 this.currentStar = 5;
                 this.tooltip.hideTooltip(0);
@@ -143,6 +157,10 @@ export default {
 
         async sendStar(star){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 let comment = this.getComment();
                 if (comment != null){
                     let numStars = this.getComment().TotalStars ?? 0;
@@ -174,7 +192,8 @@ export default {
     inject: {
         getLanguage: {},
         getComment: {},
-        forceUpdateInformationBar: {}
+        forceUpdateInformationBar: {},
+        getPopupManager: {}
     }
 }
 

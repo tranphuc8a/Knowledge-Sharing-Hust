@@ -1,6 +1,10 @@
 <template>
-    <div class="p-avatar" :style="iconStyle">
-        <img :src="validatedSrc" :style="iconStyle" :alt="title" class="p-avatar__img" />
+    <div class="p-avatar" 
+        :style="{
+            ...iconStyle,
+            backgroundImage: `url(${validatedSrc})`,
+        }">
+        <!-- <img :src="validatedSrc" :style="iconStyle" :alt="title" class="p-avatar__img" /> -->
         <!-- <MIcon v-else fa="user" :style="iconStyle" class="p-avatar__icon" /> -->
     </div>
 </template>
@@ -18,7 +22,7 @@ export default {
         }
     },
     async mounted() {
-        this.validatedSrc = (await Common.isValidImage(this.src)) ? this.src : this.defaultAvatar;
+        this.refresh();
     },
     props: {
         src: {
@@ -34,6 +38,22 @@ export default {
             default: null
         }
     },
+    watch: {
+        src(){
+            this.refresh();
+        }
+    },
+    methods: {
+        async refresh(){
+            try {
+                this.validatedSrc = this.defaultAvatar;
+                this.validatedSrc = (await Common.isValidImage(this.src)) ? this.src : this.defaultAvatar;
+            } catch (e){
+                this.validatedSrc = this.defaultAvatar;
+                console.error(e);
+            }
+        }
+    }
 }
 </script>
 
@@ -45,5 +65,7 @@ export default {
     box-sizing: border-box;
     overflow: hidden;
     cursor: pointer;
+    background-size: cover;
+    background-position: center center;
 }
 </style>

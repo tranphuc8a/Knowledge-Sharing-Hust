@@ -161,7 +161,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> RegsiterUserByActiveCode(ActiveCodeRegisterModel model)
         {
             // Check token
-            string? emailDecoded = CheckActiveCode(model.ActiveCode!);
+            CheckActiveCode(model.ActiveCode!, out string? emailDecoded, out string? name, out string? picture);
             if (emailDecoded == null)
                 return ServiceResult.UnAuthorized(ResponseResource.InvalidToken());
 
@@ -185,7 +185,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Username = model.Username!,
                 Role = UserRoles.User
             };
-            Guid? id = await UserRepository.RegisterUser(user.UserId, user, model.Password!, model.Username!);
+            Guid? id = await UserRepository.RegisterUser(user.UserId, user, model.Password!, name ?? model.Username!, picture);
             if (id == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Tra ve thanh cong
@@ -199,14 +199,20 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns> email hoac null </returns>
         /// Created: PhucTV (10/4/24)
         /// Modified: None
-        protected virtual string? CheckActiveCode(string activeCode)
+        protected virtual void CheckActiveCode(string activeCode, out string? email, out string? name, out string? picture)
         {
+            email = null;
+            name = null;
+            picture = null;
+
             List<Claim>? claims = Encrypt.JwtDecryptToListClaims(activeCode, isValidateLifeTime: true)?.ToList();
-            if (claims == null) return null;
+            if (claims == null) return;
             string? roleType = claims.Where(c => c.Type == ClaimTypes.Role).FirstOrDefault()?.Value;
-            if (roleType != RoleType) return null;
-            string? emailToCheck = claims.Where(c => c.Type == ClaimTypes.Email).FirstOrDefault()?.Value;
-            return emailToCheck;
+            if (roleType != RoleType) return;
+
+            email   = claims.Where(c => c.Type == ClaimTypes.Email).FirstOrDefault()?.Value;
+            name    = claims.Where(c => c.Type == ClaimTypes.Name).FirstOrDefault()?.Value;
+            picture = claims.Where(c => c.Type == ClaimTypes.Thumbprint).FirstOrDefault()?.Value;
         }
 
         public async Task<ServiceResult> RequestSignupByGoogle(string googleToken)
@@ -222,7 +228,9 @@ namespace KnowledgeSharingApi.Services.Services
             // Sinh Active code va tra ve
             List<Claim> claims = [
                 new(ClaimTypes.Role, RoleType),
-                new(ClaimTypes.Email, userInfor.email)
+                new(ClaimTypes.Email, userInfor.email),
+                new(ClaimTypes.Name, userInfor.name),
+                new(ClaimTypes.Thumbprint, userInfor.picture ?? string.Empty)
             ];
             string? token = Encrypt.JwtEncrypt(claims);
             if (token == null) return ServiceResult.ServerError(ResponseResource.ServerError());

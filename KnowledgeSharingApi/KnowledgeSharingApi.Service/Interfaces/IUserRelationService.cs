@@ -37,6 +37,15 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> GetRelations(Guid userid, EUserRelationType relationType, bool isActive, int? limit, int? offset);
 
+        /// <summary>
+        /// Lay ve tinh trang quan he hien tai giua hai user
+        /// </summary>
+        /// <param name="myUid"> id user can lay </param>
+        /// <param name="userId"> id doi phuong </param>
+        /// <returns></returns>
+        /// Created: PhucTV (7/5/24)
+        /// Modified: None
+        Task<ServiceResult> GetRelationState(Guid myUid, Guid userId);
 
         /// <summary>
         /// Thực hiện theo dõi/bỏ theo dõi

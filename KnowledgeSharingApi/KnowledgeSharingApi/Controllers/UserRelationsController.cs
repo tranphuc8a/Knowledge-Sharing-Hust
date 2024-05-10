@@ -22,6 +22,22 @@ namespace KnowledgeSharingApi.Controllers
 
         #region Get Others list relations
         /// <summary>
+        /// Xử lý yêu cầu lấy về quan he hien tai voi mot user
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("relation-status/{userId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> GetUserFriends(Guid userId)
+        {
+            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
+            ServiceResult res = await UserRelationService.GetRelationState(Guid.Parse(myUId), userId);
+            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+        }
+
+        /// <summary>
         /// Xử lý yêu cầu lấy về danh sách bạn bè của một người dùng
         /// </summary>
         /// <param name="userId"> id của người dùng cần lấy </param>

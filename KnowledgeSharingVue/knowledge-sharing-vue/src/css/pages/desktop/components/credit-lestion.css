@@ -73,6 +73,6 @@
     border: solid 1px var(--primary-color-200);
     border-radius: 4px;
     height: 700px;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 

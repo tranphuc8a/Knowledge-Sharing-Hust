@@ -1,10 +1,12 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using MimeKit.Tnef;
@@ -23,6 +25,8 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IResponseResource ResponseResource;
 
         protected readonly IStarRepository StarRepository;
+        protected readonly IPostRepository PostRepository;
+        protected readonly IDecorationRepository DecorationRepository;
         protected readonly IKnowledgeRepository KnowledgeRepository;
         protected readonly IUserItemRepository UserItemRepository;
         protected readonly IUserRepository UserRepository;
@@ -36,7 +40,9 @@ namespace KnowledgeSharingApi.Services.Services
             IStarRepository starRepository,
             IKnowledgeRepository knowledgeRepository,
             IUserItemRepository userItemRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IPostRepository postRepository,
+            IDecorationRepository decorationRepository
         )
         {
             ResourceFactory = resourceFactory;
@@ -47,53 +53,11 @@ namespace KnowledgeSharingApi.Services.Services
             KnowledgeRepository = knowledgeRepository;
             UserItemRepository = userItemRepository;
             UserRepository = userRepository;
+            PostRepository = postRepository;
+            DecorationRepository = decorationRepository;
 
             StarResourcse = EntityResource.Star();
             NotExistedItem = ResponseResource.NotExist(EntityResource.UserItem());
-        }
-
-        protected virtual async Task<IEnumerable<ResponseStarModel>> Decorate
-            (IEnumerable<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
-        {
-            Dictionary<Guid, ResponseUserCardModel>? mapUsers = null;
-            Dictionary<Guid, ResponseUserItemModel>? mapItems = null;
-            if (isDecorateUser)
-            {
-                mapUsers = [];
-                // Get Dictionary <userid, ViewUser -> ResponseUserCardModel>
-                Dictionary<Guid, ViewUser?> listUsers = await UserRepository
-                    .GetDetail(listStars.Select(star => star.UserId).ToArray());
-                foreach (var item in listUsers)
-                {
-                    ViewUser? user = item.Value;
-                    ResponseUserCardModel resUser = new();
-                    if (user != null) resUser.Copy(user);
-                    mapUsers[item.Key] = resUser;
-                }
-            }
-            if (isDecorateItem)
-            {
-                // Get Dictionay <useritemid, UserItem -> ResponseUserItemModel>
-            }
-            IEnumerable<ResponseStarModel> res = listStars.Select(star =>
-            {
-                ResponseStarModel resStar = new();
-                resStar.Copy(star);
-                // decorate list user
-                if (isDecorateUser)
-                {
-                    resStar.User = mapUsers?[star.UserId];
-                }
-
-                // decorate list item
-                if (isDecorateItem)
-                {
-                    resStar.Item = mapItems?[star.UserItemId];
-                }
-
-                return resStar;
-            }).ToList();
-            return res;
         }
 
         public async Task<ServiceResult> AdminGetUserItemStars(Guid userItemId, int? limit, int? offset)
@@ -110,7 +74,8 @@ namespace KnowledgeSharingApi.Services.Services
                 Total = total,
                 Limit = limitValue,
                 Offset = offsetValue,
-                Results = await Decorate(listStars, isDecorateUser: true, isDecorateItem: false)
+                Results = await DecorationRepository
+                    .DecorateResponseStarModel(listStars.ToList(), isDecorateUser: true, isDecorateItem: false)
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(StarResourcse), string.Empty, res);
         }
@@ -202,16 +167,23 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetMyScoredPosts(Guid myUid, int? limit, int? offset)
         {
             // Lấy về
-            IEnumerable<Tuple<ViewPost, Star>> stars = await StarRepository.GetStaredPosts(myUid);
+            IEnumerable<Tuple<ViewPost, Star>> stars = (await StarRepository.GetStaredPosts(myUid)).ToList();
             int total = stars.Count();
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             stars = stars.Skip(offsetValue).Take(limitValue);
-            IEnumerable<ResponseStarModel> results = stars.Select(star =>
+            
+            Dictionary<Guid, IResponseUserItemModel?> itemsDict = await PostRepository
+                .GetExactlyResponseUserItemModel(stars.Select(star => star.Item1.UserItemId)
+                .ToList());
+            List<ResponseStarModel> results = stars.Select(star =>
             {
                 ResponseStarModel model = (ResponseStarModel)new ResponseStarModel().Copy(star.Item2);
-                model.Item = (ResponsePostModel)new ResponsePostModel().Copy(star.Item1);
+                if (itemsDict.TryGetValue(model.Item?.UserItemId ?? Guid.Empty, out IResponseUserItemModel? value))
+                {
+                    model.Item = (ResponsePostModel?) value;
+                }
                 return model;
-            });
+            }).ToList();
 
             // DecorateResponseLessonModel
             PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
@@ -250,13 +222,8 @@ namespace KnowledgeSharingApi.Services.Services
             listStars = listStars.Skip(offsetValue).Take(limitValue);
 
             // DecorateResponseLessonModel
-            List<ResponseStarModel> res = [];
-            foreach (Star star in listStars)
-            {
-                ResponseStarModel resStar = (ResponseStarModel)new ResponseStarModel().Copy(star);
-                resStar.Item = await UserItemRepository.GetExactlyResponseUserItemModel(star.UserItemId);
-                res.Add(resStar);
-            }
+            List<ResponseStarModel> res = await DecorationRepository
+                .DecorateResponseStarModel(listStars.ToList(), isDecorateUser: false, isDecorateItem: true);
 
             // Return Response
             PaginationResponseModel<ResponseStarModel> pageRes = new(total, limitValue, offsetValue, res);
@@ -291,7 +258,7 @@ namespace KnowledgeSharingApi.Services.Services
             UserItem item = await UserItemRepository.CheckExisted(userItemId, NotExistedItem);
             if (item.UserItemType == EUserItemType.Knowledge)
             {
-                Knowledge knowledge = await KnowledgeRepository.CheckExisted(userItemId, NotExistedItem);
+                _ = await KnowledgeRepository.CheckExisted(userItemId, NotExistedItem);
                 bool isAccessible = await KnowledgeRepository.CheckAccessible(myUid, userItemId);
                 if (!isAccessible)
                     return ServiceResult.Forbidden("Bạn không có quyền truy cập tài nguyên này");
@@ -315,7 +282,8 @@ namespace KnowledgeSharingApi.Services.Services
                 };
                 Guid? res = await StarRepository.Insert(star.StarId, star);
                 if (res == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(StarResourcse));
-            } else
+            } 
+            else
             {
                 // Rồi: Update
                 star.Stars = scoreModel.Score ?? 0;

@@ -2,7 +2,7 @@
 
     <div class="p-enter-comment"  @keydown.shift.enter.prevent.stop="resolveSubmitComment">
         <div class="p-enter-comment-avatar">
-            <UserAvatar :user="curentUser" :size="36" />
+            <UserAvatar :user="currentUser" :size="36" />
         </div>
         <div class="p-enter-comment-textarea">
             <MTextArea
@@ -39,7 +39,7 @@ export default {
             isSubmiting: false,
             label: null,
             listComments: [null, null],
-            curentUser: null,
+            currentUser: null,
             commentValidator: new NotEmptyValidator().setErrorMsg("Bình luận không được trống"),
 
             components: {
@@ -50,7 +50,7 @@ export default {
     },
     async mounted(){
         try {
-            this.curentUser = await CurrentUser.getInstance();
+            this.currentUser = await CurrentUser.getInstance();
             this.components = {
                 textarea: this.$refs.textarea,
                 submit: this.$refs.submit
@@ -68,8 +68,12 @@ export default {
     methods: {
 
         async resolveSubmitComment(){
+            if (this.isSubmiting) return;
             try {
-                if (this.isSubmiting) return;
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 this.isSubmiting = true;
 
                 // validate form
@@ -81,10 +85,6 @@ export default {
 
                 // get text
                 let text = await this.components.textarea.getValue();
-
-                // submit comment
-                if (this.curentUser == null)
-                    this.getPopupManager().requiredLogin();
                 
                 if (this.isEditing){
                     await this.editComment(text);
@@ -104,6 +104,10 @@ export default {
 
         async editComment(text){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 await new PatchRequest('Comments/' + this.editFor)
                     .setBody({ Content: text })
                     .execute();
@@ -122,6 +126,10 @@ export default {
         
         async replyComment(text){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 let res = await new PostRequest('Comments/reply')
                     .setBody({
                         ReplyId: this.useritem.UserItemId,
@@ -130,7 +138,7 @@ export default {
                 let body = await Request.tryGetBody(res);
                 let comment = new ResponseCommentModel();
                 comment.copy(body);
-                comment.User = this.curentUser;
+                comment.User = this.currentUser;
 
                 // update ui
                 if (this.onCommentSubmitted) {
@@ -143,6 +151,10 @@ export default {
 
         async addComment(text){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 let res = await new PostRequest('Comments')
                     .setBody({
                         KnowledgeId: this.useritem.UserItemId,
@@ -151,7 +163,7 @@ export default {
                 let body = await Request.tryGetBody(res);
                 let comment = new ResponseCommentModel();
                 comment.copy(body);
-                comment.User = this.curentUser;
+                comment.User = this.currentUser;
 
                 // update ui
                 if (this.onCommentSubmitted) {

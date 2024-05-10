@@ -16,5 +16,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         public double? MyStars { get; set; }
         public int TotalStars { get; set; }
         public int TotalReplies { get; set; }
+        public ResponseCommentModel? Reply { get; set; }
     }
 }

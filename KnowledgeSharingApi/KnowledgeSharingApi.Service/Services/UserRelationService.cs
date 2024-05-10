@@ -78,9 +78,10 @@ namespace KnowledgeSharingApi.Services.Services
         protected virtual async Task<IEnumerable<ResponseFriendCardModel>> GetAllFriends(Guid userid)
         {
             // Danh sách bạn bè mà mình là người gửi lời mời
-            IEnumerable<ViewUserRelation> ls1 =
-                await UserRelationRepository.GetByUserIdAndType(userid, isActive: true, EUserRelationType.Friend);
-            IEnumerable<ResponseFriendCardModel> lsFriend1 = ls1.Select(
+            List<ViewUserRelation> ls1 =
+                (await UserRelationRepository.GetByUserIdAndType(userid, isActive: true, EUserRelationType.Friend))
+                .ToList();
+            List<ResponseFriendCardModel> lsFriend1 = ls1.Select(
                 relation => new ResponseFriendCardModel()
                 {
                     FriendId = relation.UserRelationId,
@@ -90,13 +91,18 @@ namespace KnowledgeSharingApi.Services.Services
                     FullName = relation.ReceiverName,
                     Avatar = relation.ReceiverAvatar,
                     Time = relation.Time,
-                    IsActive = true
-                });
+                    IsActive = true,
+                    CreatedBy = relation.CreatedBy,
+                    CreatedTime = relation.CreatedTime,
+                    ModifiedBy = relation.ModifiedBy,
+                    ModifiedTime = relation.ModifiedTime
+                }).ToList();
 
             // Danh sách bạn bè mà mình là người nhận lời mời
-            IEnumerable<ViewUserRelation> ls2 =
-                await UserRelationRepository.GetByUserIdAndType(userid, isActive: false, EUserRelationType.Friend);
-            IEnumerable<ResponseFriendCardModel> lsFriend2 = ls1.Select(
+            List<ViewUserRelation> ls2 =
+                (await UserRelationRepository.GetByUserIdAndType(userid, isActive: false, EUserRelationType.Friend))
+                .ToList();
+            List<ResponseFriendCardModel> lsFriend2 = ls2.Select(
                 relation => new ResponseFriendCardModel()
                 {
                     FriendId = relation.UserRelationId,
@@ -106,11 +112,15 @@ namespace KnowledgeSharingApi.Services.Services
                     FullName = relation.SenderName,
                     Avatar = relation.SenderAvatar,
                     Time = relation.Time,
-                    IsActive = false
-                });
+                    IsActive = false,
+                    CreatedBy = relation.CreatedBy,
+                    CreatedTime = relation.CreatedTime,
+                    ModifiedBy = relation.ModifiedBy,
+                    ModifiedTime = relation.ModifiedTime
+                }).ToList();
 
             // Combine and return
-            IEnumerable<ResponseFriendCardModel> listed = lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time);
+            List<ResponseFriendCardModel> listed = lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time).ToList();
             return listed;
         }
 
@@ -152,13 +162,18 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ResponseFriendCardModel> lsRelation = ls1.Select(
                 relation => new ResponseFriendCardModel()
                 {
+                    FriendId = relation.UserRelationId,
                     UserId = isActive ? relation.ReceiverId : relation.SenderId,
                     Email = isActive ? relation.ReceiverEmail : relation.SenderEmail,
                     Username = isActive ? relation.ReceiverUsername : relation.SenderUsername,
                     FullName = isActive ? relation.ReceiverName : relation.SenderName,
                     Avatar = isActive ? relation.ReceiverAvatar : relation.SenderAvatar,
                     Time = relation.Time,
-                    IsActive = isActive
+                    IsActive = isActive,
+                    CreatedBy = relation.CreatedBy,
+                    CreatedTime = relation.CreatedTime,
+                    ModifiedBy = relation.ModifiedBy,
+                    ModifiedTime = relation.ModifiedTime
                 }
             ).OrderByDescending(relation => relation.Time);
 
@@ -181,15 +196,20 @@ namespace KnowledgeSharingApi.Services.Services
             // Check myuid và uid có tồn tại
             await CheckExistedUser(myuid, uid);
 
-            // Check my uid đã follow uid hay chưa
-            IEnumerable<ViewUserRelation>? relations = await UserRelationRepository.GetByUserIdAndType(myuid, true, EUserRelationType.Follow);
-            if (relations.Any(relation => relation.ReceiverId == uid))
-            {
-                return ServiceResult.BadRequest("Bạn đã theo dõi người dùng này rồi");
-            }
-
-            // Check myuid và uid có chặn nhau hay không
-            await CheckBlockEachOther(myuid, uid);
+            // Chinh sach follow: Chi co the follow khi chua co quan he: Block, Friend, Request, Following
+            EUserRelationType relationType = await UserRelationRepository.GetUserRelationType(myuid, uid);
+            if (relationType == EUserRelationType.Friend)
+                return ServiceResult.BadRequest("Không thể theo dõi khi đang là bạn bè");
+            if (relationType == EUserRelationType.Blocker)
+                return ServiceResult.BadRequest("Không thể theo dõi khi đang chặn user này");
+            if (relationType == EUserRelationType.Blockee)
+                return ServiceResult.BadRequest("Không thể theo dõi khi đang bị user này chặn");
+            if (relationType == EUserRelationType.Requester)
+                return ServiceResult.BadRequest("Không thể theo dõi khi đang gửi lời mời kết bạn tới user này");
+            if (relationType == EUserRelationType.Requestee)
+                return ServiceResult.BadRequest("Hãy phản hồi lời mời kết bạn từ user này trước");
+            if (relationType == EUserRelationType.Follower)
+                return ServiceResult.BadRequest("Bạn đã theo dõi người dùng này trước đó rồi");
 
             // OK cho myuid follow uid
             UserRelation userRelation = new()
@@ -198,26 +218,21 @@ namespace KnowledgeSharingApi.Services.Services
                 ReceiverId = uid,
                 Time = DateTime.Now,
                 UserRelationType = EUserRelationType.Follow,
+                UserRelationId = Guid.NewGuid(),
                 CreatedTime = DateTime.Now,
                 CreatedBy = myuid.ToString()
             };
-            Guid? id = await UserRelationRepository.Insert(userRelation);
+            Guid? id = await UserRelationRepository.Insert(userRelation.UserRelationId, userRelation);
             if (id == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Gửi thông báo tới người dùng kia
             // Làm sau...
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.Success());
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, userRelation);
         }
         public virtual async Task<ServiceResult> Unfollow(Guid myuid, Guid uid)
         {
-            // Kiểm tra myuid và uid phải tồn tại
-            await CheckExistedUser(myuid, uid);
-
-            // Kiểm tra myuid và uid không chặn nhau
-            await CheckBlockEachOther(myuid, uid);
-
             // Kiểm tra myuid có follow uid chưa
             IEnumerable<ViewUserRelation> relations = await UserRelationRepository.GetByUserIdAndType(myuid, true, EUserRelationType.Follow);
             IEnumerable<ViewUserRelation> relation = relations.Where(relation => relation.ReceiverId == uid);
@@ -243,10 +258,11 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewUserRelation> relations = (await UserRelationRepository
                 .GetByUserIdAndType(myuid, true, EUserRelationType.Block))
                 .Where(relation => relation.ReceiverId == uid);
-            if (relations.Any()) return ServiceResult.BadRequest("Bạn đã chặn người dùng này rồi mà");
+            if (relations.Any()) return ServiceResult.BadRequest("Bạn đã chặn người dùng này rồi");
 
             // Ok cho myuid block uid
-            await ResolveBlock(myuid, uid);
+            Guid? id = await UserRelationRepository.AddBlock(myuid, uid);
+            if (id == null) return ServiceResult.ServerError(ResponseResource.BlockFailure());
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.Success());
@@ -308,7 +324,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Kiểm tra myuid phải block user rồi
             IEnumerable<ViewUserRelation> relations = (await UserRelationRepository.GetByUserIdAndType(myuid, true, EUserRelationType.Block))
                 .Where(relation => relation.ReceiverId == uid);
-            if (!relations.Any()) return ServiceResult.BadRequest("Bạn đã chặn người dùng này đâu");
+            if (!relations.Any()) return ServiceResult.BadRequest("Bạn chưa chặn người dùng này");
 
             // OK xóa block
             int res = await UserRelationRepository.Delete(
@@ -325,27 +341,24 @@ namespace KnowledgeSharingApi.Services.Services
             // Kiểm tra người dùng tồn tại
             await CheckExistedUser(myuid, uid);
 
-            // Kiểm tra không chặn nhau
-            await CheckBlockEachOther(myuid, uid);
-
-            // Kiểm tra phải chưa phải là bạn bè
-            IEnumerable<ResponseFriendCardModel> friends = (await GetAllFriends(myuid))
-                .Where(friend => friend.UserId == uid);
-            if (friends.Any()) return ServiceResult.BadRequest("Các bạn đã là bạn bè của nhau rồi mà");
-
-            // Kiểm tra phải chưa gửi lời mời kết bạn
-            IEnumerable<ViewUserRelation> requestings = (await UserRelationRepository.GetByUserIdAndType(myuid, true, EUserRelationType.FriendRequest))
-                .Where(requesting => requesting.ReceiverId == uid);
-            if (requestings.Any()) return ServiceResult.BadRequest("Bạn đã gửi lời mời kết bạn tới người dùng này trước đó rồi, hãy kiểm tra lại");
-
-            // Kiểm tra xem uid phải chưa gửi lời mời kết bạn
-            IEnumerable<ViewUserRelation> requesteds = (await UserRelationRepository.GetByUserIdAndType(uid, true, EUserRelationType.FriendRequest))
-                .Where(requested => requested.ReceiverId == myuid);
-            if (requesteds.Any()) return ServiceResult.BadRequest("Người dùng này đã gửi lời mời kết bạn tới bạn, không cần gửi lại lời mời kết bạn tới họ");
+            // Chinh sach gui loi moi ket ban: 
+            // khong có quan he: Block, Friend, Request
+            EUserRelationType relationType = await UserRelationRepository.GetUserRelationType(myuid, uid);
+            if (relationType == EUserRelationType.Friend)
+                return ServiceResult.BadRequest("Không thể gửi lời mời kết bạn khi đang là bạn bè");
+            if (relationType == EUserRelationType.Blocker)
+                return ServiceResult.BadRequest("Không thể gửi lời mời kết bạn khi đang chặn user này");
+            if (relationType == EUserRelationType.Blockee)
+                return ServiceResult.BadRequest("Không thể gửi lời mời kết bạn khi đang bị user này chặn");
+            if (relationType == EUserRelationType.Requester)
+                return ServiceResult.BadRequest("Bạn đã gửi lời mời kết bạn trước đó rồi");
+            if (relationType == EUserRelationType.Requestee)
+                return ServiceResult.BadRequest("Hãy phản hồi lời mời kết bạn từ user này trước");
 
             // OK, thêm lời mời kết bạn
             UserRelation relation = new()
             {
+                UserRelationId = Guid.NewGuid(),
                 SenderId = myuid,
                 ReceiverId = uid,
                 UserRelationType = EUserRelationType.FriendRequest,
@@ -353,14 +366,14 @@ namespace KnowledgeSharingApi.Services.Services
                 CreatedTime = DateTime.Now,
                 CreatedBy = uid.ToString()
             };
-            Guid? id = await UserRelationRepository.Insert(relation);
+            Guid? id = await UserRelationRepository.Insert(relation.UserRelationId, relation);
             if (id == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Gửi thông báo tới người dùng kia
             // Làm sau...
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.Success());
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, relation);
         }
         public virtual async Task<ServiceResult> DeleteFriend(Guid myuid, Guid uid)
         {
@@ -371,7 +384,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ResponseFriendCardModel> friends =
                 (await GetAllFriends(myuid))
                 .Where(friend => friend.UserId == uid);
-            if (!friends.Any()) return ServiceResult.BadRequest("Hai người có phải bạn bè đâu");
+            if (!friends.Any()) return ServiceResult.BadRequest("Không thể thực hiện do các bạn hiện không phải bạn bè");
 
             // OK xóa bạn bè
             int deleted = await UserRelationRepository.Delete(friends.Select(friend => friend.FriendId).ToArray());
@@ -384,37 +397,24 @@ namespace KnowledgeSharingApi.Services.Services
 
         public virtual async Task<ServiceResult> ConfirmFriend(Guid myuid, Guid requestId, bool isAccept)
         {
-            // Kiểm tra người dùng tồn tại
-            User? user = await UserRepository.Get(myuid);
-            if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
-
             // Kiểm tra có tồn tại lời mời request id
-            UserRelation? relation = await UserRelationRepository.Get(myuid);
+            UserRelation? relation = await UserRelationRepository.Get(requestId);
             if (relation == null) return ServiceResult.BadRequest("Yêu cầu kết bạn không tồn tại");
 
             // Kiểm tra đúng thật sự request đang mời tới mình
             if (relation.ReceiverId != myuid)
-                return new ServiceResult()
-                {
-                    IsSuccess = false,
-                    StatusCode = EStatusCode.Forbidden,
-                    UserMessage = "Đây không phải lời mời kết bạn tới bạn",
-                    DevMessage = "Đây không phải lời mời kết bạn tới bạn"
-                };
+                return ServiceResult.Forbidden("Đây không phải lời mời kết bạn tới bạn");
 
             if (isAccept)
             {
-                // OK cập nhật quan hệ từ request thành friend
-                relation.UserRelationType = EUserRelationType.Friend;
-                relation.Time = DateTime.Now;
-                relation.CreatedTime = DateTime.Now;
-                int res = await UserRelationRepository.Update(relation.UserRelationId, relation);
-                if (res <= 0) return ServiceResult.ServerError(ResponseResource.ServerError());
+                // OK thêm quan hệ bạn bè:
+                Guid? id = await UserRelationRepository.AddFriend(relation.SenderId, myuid);
+                if (id == null) return ServiceResult.ServerError(ResponseResource.ServerError());
             }
             else
             {
                 // Xóa lời mời
-                int deleted = await UserRelationRepository.Delete(myuid);
+                int deleted = await UserRelationRepository.Delete(requestId);
                 if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.ServerError());
             }
 
@@ -423,22 +423,12 @@ namespace KnowledgeSharingApi.Services.Services
         }
         public virtual async Task<ServiceResult> DeleteRequest(Guid myuid, Guid requestId)
         {
-            // Kiểm tra người dùng tồn tại
-            User? user = await UserRepository.Get(myuid);
-            if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
-
             // Kiểm tra có tồn tại lời mời request id
-            UserRelation? relation = await UserRelationRepository.Get(myuid);
+            UserRelation? relation = await UserRelationRepository.Get(requestId);
             if (relation == null) return ServiceResult.BadRequest("Yêu cầu kết bạn không tồn tại");
 
             // Kiểm tra đúng thật sự request id đang là của mình
-            if (relation.SenderId != myuid) return new ServiceResult()
-            {
-                IsSuccess = false,
-                StatusCode = EStatusCode.Forbidden,
-                UserMessage = "Đây không phải lời mời của bạn",
-                DevMessage = "Đây không phải lời mời của bạn"
-            };
+            if (relation.SenderId != myuid) return ServiceResult.Forbidden("Đây không phải lời mời của bạn");
 
             // Ok xóa quan hệ
             int res = await UserRelationRepository.Delete(relation.UserRelationId);
@@ -446,6 +436,24 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.Success());
+        }
+
+        public virtual async Task<ServiceResult> GetRelationState(Guid myUid, Guid userId)
+        {
+            // Check myUid va userId ton tai
+            ViewUser user = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+
+            // Lay ve UserCardItem
+            ResponseUserCardModel res = new();
+            res.Copy(user);
+
+            // Decorate
+            var dict = await UserRelationRepository.GetDetailUserRelationType(myUid, [userId]);
+            res.UserRelationType = dict[userId].UserRelationType;
+            res.UserRelationId = dict[userId].UserRelationId;
+
+            // Tra ve thanh cong
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
     }
 }

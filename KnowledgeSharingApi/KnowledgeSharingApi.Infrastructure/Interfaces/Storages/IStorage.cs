@@ -16,7 +16,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Storages
         /// <returns> url của ảnh </returns>
         /// Created: PhucTV (5/3/24)
         /// Modified: None
-        public Task<string?> SaveImage(IFormFile? image);
+        Task<string?> SaveImage(IFormFile? image);
 
         /// <summary>
         /// Hàm thực hiện lấy Url của ảnh được lưu trữ khi chỉ biết tên ảnh
@@ -25,6 +25,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Storages
         /// <returns> Url của ảnh hoặc null nếu không tìm thấy </returns>
         /// Created: PhucTV (5/3/24)
         /// Modified: None
-        public Task<string?> GetImageUrl(string filename);
+        Task<string?> GetImageUrl(string filename);
+
+        /// <summary>
+        /// Hàm thực hiện nen anh
+        /// </summary>
+        /// <param name="image"> Ảnh cần nen </param>
+        /// <returns> anh sau khi nen </returns>
+        /// Created: PhucTV (8/5/24)
+        /// Modified: None
+        Task<byte[]?> CompressImage(IFormFile? image);
     }
 }

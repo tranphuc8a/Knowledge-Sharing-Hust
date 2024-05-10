@@ -13,6 +13,7 @@
 .p-button{
     width: 100%;
     height: var(--component-height);
+    /* min-height: var(--component-height); */
     display: flex;
     position: relative;
     justify-content: center;
@@ -37,7 +38,7 @@
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: center;
-    height: var(--component-height);
+    height: 100%;
     gap: 8px
 }
 
@@ -80,6 +81,23 @@
 
 .p-normal-button:not([state='loading']):active{
     background-color: var(--primary-color-600);
+}
+
+
+/* SECONDARY BUTTON */
+.p-secondary-button {
+    padding: var(--button-padding);
+    background-color: var(--grey-color-300);
+    color: black;
+    box-shadow: none;
+}
+
+.p-secondary-button:not([state='loading']):hover{
+    background-color: var(--grey-color-400);
+}
+
+.p-secondary-button:not([state='loading']):active{
+    background-color: var(--grey-color-500);
 }
 
 

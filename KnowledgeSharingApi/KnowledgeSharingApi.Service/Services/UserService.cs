@@ -22,6 +22,7 @@ namespace KnowledgeSharingApi.Services.Services
         IResourceFactory resourceFactory, 
         IUserRepository userRepository, 
         IProfileRepository profileRepository, 
+        IImageRepository imageRepository,
         IStorage storage, 
         IUserRelationRepository userRelationRepository
         ) : IUserService
@@ -32,6 +33,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IResourceFactory ResourceFactory = resourceFactory;
         protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
         protected readonly IUserRelationRepository UserRelationRepository = userRelationRepository;
+        protected readonly IImageRepository ImageRepository = imageRepository;
         protected readonly string ResponseTableName = resourceFactory.GetEntityResource().User();
         protected readonly IStorage Storage = storage;
         // Giá trị mặc định của Limit nếu bằng null
@@ -45,8 +47,8 @@ namespace KnowledgeSharingApi.Services.Services
             User? user = await UserRepository.Get(uid);
             if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
 
-            // Kiểm tra user phải có role bằng Banned
-            if (user.Role != UserRoles.Banned)
+            // Kiểm tra user phải có role bang User
+            if (user.Role != UserRoles.User)
                 return new ServiceResult()
                 {
                     StatusCode = EStatusCode.Forbidden,
@@ -56,7 +58,7 @@ namespace KnowledgeSharingApi.Services.Services
                 };
 
             // Block user
-            user.Role = UserRoles.User;
+            user.Role = UserRoles.Banned;
             int res = await UserRepository.Update(uid, user);
 
             // Kiểm tra update thành công
@@ -129,8 +131,6 @@ namespace KnowledgeSharingApi.Services.Services
                 .Select(user => user.User)
                 .ToList();
 
-            // Lọc không chặn, làm sau
-
             // Trả về thành công
             PaginationResponseModel<ViewUser> res = new()
             {
@@ -148,8 +148,8 @@ namespace KnowledgeSharingApi.Services.Services
             User? user = await UserRepository.Get(uid);
             if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
 
-            // Kiểm tra user phải có role bằng User
-            if (user.Role != UserRoles.User)
+            // Kiểm tra user phải có role bằng Banned
+            if (user.Role != UserRoles.Banned)
                 return new ServiceResult()
                 {
                     StatusCode = EStatusCode.Forbidden,
@@ -158,8 +158,8 @@ namespace KnowledgeSharingApi.Services.Services
                     Data = user
                 };
 
-            // Block user
-            user.Role = UserRoles.Banned;
+            // Unblock user
+            user.Role = UserRoles.User;
             int res = await UserRepository.Update(uid, user);
 
             // Kiểm tra update thành công
@@ -190,8 +190,9 @@ namespace KnowledgeSharingApi.Services.Services
                 };
 
             // Copy dữ liệu từ model vào profile rồi update
-            user.Copy(model);
-            int res = await UserRepository.Update(uid, user);
+            User userToUpdate = (User)user.Clone();
+            userToUpdate.Copy(model);
+            int res = await UserRepository.Update(uid, userToUpdate);
 
             // Kiểm tra update thành công
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
@@ -200,7 +201,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.UpdateSuccess(),
                 string.Empty,
-                user
+                userToUpdate
             );
         }
 
@@ -256,7 +257,7 @@ namespace KnowledgeSharingApi.Services.Services
                 {
                     IsSuccess = false,
                     StatusCode = EStatusCode.Forbidden,
-                    UserMessage = ResponseResource.Failure(),
+                    UserMessage = "Không xem được thông tin do bạn đã chặn người dùng này hoặc bạn đã bị người dùng này chặn",
                     DevMessage = ResponseResource.Failure()
                 };
 
@@ -310,50 +311,57 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UpdateMyAvatarImage(Guid uid, IFormFile avatar)
         {
             // Kiểm tra uid tồn tại trong database
-            Profile? profile = await ProfileRepository.Get(uid);
-            if (profile == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
+            ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
+            Profile profile = new();
+            profile.Copy(user);
 
             // Upload ảnh lên storage lấy về image url
             string? avatarUrl = await Storage.SaveImage(avatar);
-            if (avatarUrl == null) return ServiceResult.BadRequest(ResponseResource.UpdateFailure());
+            if (avatarUrl == null) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
+
+            _ = await ImageRepository.TryInsertImage(uid, avatarUrl);
 
             // Cập nhật ảnh đại diện vào db
             profile.Avatar = avatarUrl;
-            int row = await ProfileRepository.Update(uid, profile);
+            int row = await ProfileRepository.Update(user.ProfileId, profile);
 
             // Kiểm tra cập nhật thành công
-            if (row <= 0) return ServiceResult.BadRequest(ResponseResource.UpdateFailure());
+            if (row <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
             return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, profile);
         }
 
         public async Task<ServiceResult> UpdateMyCoverImage(Guid uid, IFormFile cover)
         {
-            // Kiểm tra uid phải tồn tại trong db
-            Profile? profile = await ProfileRepository.Get(uid);
-            if (profile == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
+            // Kiểm tra uid tồn tại trong database
+            ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
+            Profile profile = new();
+            profile.Copy(user);
 
             // Upload file ảnh ra storage và lấy về url của ảnh
             string? coverUrl = await Storage.SaveImage(cover);
-            if (coverUrl == null) return ServiceResult.BadRequest(ResponseResource.UpdateFailure());
+            if (coverUrl == null) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
+
+            _ = await ImageRepository.TryInsertImage(uid, coverUrl);
 
             // Cập nhật url của cover image vào database
             profile.Cover = coverUrl;
-            int row = await ProfileRepository.Update(uid, profile);
+            int row = await ProfileRepository.Update(user.ProfileId, profile);
 
             // Kiểm tra cập nhật thành công
-            if (row <= 0) return ServiceResult.BadRequest(ResponseResource.UpdateFailure());
+            if (row <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
             return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, profile);
         }
 
         public async Task<ServiceResult> UpdateMyUserProfile(Guid uid, UpdateProfileModel updateModel)
         {
-            // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu
-            Profile? profile = await ProfileRepository.Get(uid);
-            if (profile == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
+            // Kiểm tra uid tồn tại trong database
+            ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
+            Profile profile = new();
+            profile.Copy(user);
 
             // Copy dữ liệu từ updateModel vào profile rồi update
             profile.Copy(updateModel);
-            int res = await ProfileRepository.Update(uid, profile);
+            int res = await ProfileRepository.Update(user.ProfileId, profile);
 
             // Kiểm tra update thành công
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
@@ -366,6 +374,22 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
+        public async Task<ServiceResult> UpdateMyBio(Guid uid, string? newBio)
+        {
+            if (newBio == null)
+                return ServiceResult.BadRequest("Bio không được trống");
+            ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
+
+            if (newBio == user.Bio)
+                return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, user);
+
+            Profile pro = new();
+            pro.Copy(user);
+            pro.Bio = newBio;
+            int raws = await ProfileRepository.Update(user.ProfileId, pro);
+            if (raws <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, pro);
+        }
 
         #endregion
     }

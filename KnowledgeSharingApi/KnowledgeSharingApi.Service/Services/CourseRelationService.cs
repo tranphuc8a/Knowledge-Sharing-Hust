@@ -4,6 +4,7 @@ using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -20,6 +21,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IEntityResource EntityResource;
 
         protected readonly IUserRepository UserRepository;
+        protected readonly IDecorationRepository DecorationRepository;
         protected readonly ICourseRepository CourseRepository;
         protected readonly ICourseRelationRepository CourseRelationRepository;
         protected readonly ICoursePaymentRepository CoursePaymentRepository;
@@ -38,6 +40,7 @@ namespace KnowledgeSharingApi.Services.Services
             ICourseRelationRepository courseRelationRepository,
             ICoursePaymentRepository coursePaymentRepository,
             ICourseRegisterRepository courseRegisterRepository,
+            IDecorationRepository decorationRepository,
             ICourseRepository courseRepository
         )
         {
@@ -50,6 +53,7 @@ namespace KnowledgeSharingApi.Services.Services
             CourseRelationRepository = courseRelationRepository;
             CoursePaymentRepository = coursePaymentRepository;
             CourseRegisterRepository = courseRegisterRepository;
+            DecorationRepository = decorationRepository;
 
             CourseResource = EntityResource.Course();
             NotExistedCourse = ResponseResource.NotExist(CourseResource);
@@ -58,31 +62,6 @@ namespace KnowledgeSharingApi.Services.Services
 
 
         #region Functionality methods
-
-        /// <summary>
-        /// Trang tri va bo sung them thong tin cho ResponseRelationModel tu COurseRelation
-        /// </summary>
-        /// <param name="myUid"> id cua user thuc hien </param>
-        /// <param name="relations"> Danh sach relation can trang tri </param>
-        /// <param name="relationType"> Loai relation </param>
-        /// <param name="isDecorateUser"> Co trang tri user khong </param>
-        /// <param name="isDecorateCourse"> Co trang tri course khong </param>
-        /// <returns></returns>
-        /// Created: PhucTV (30/3/24)
-        /// Modified: None
-        protected virtual async Task<IEnumerable<ResponseCourseRelationModel>> Decorate(
-            Guid? myUid,
-            IEnumerable<CourseRelation> relations,
-            ECourseRelationType relationType,
-            bool isDecorateUser = false,
-            bool isDecorateCourse = false)
-        {
-            IEnumerable<ResponseCourseRelationModel> res = relations.Select(relation =>
-            {
-                return (ResponseCourseRelationModel)new ResponseCourseRelationModel().Copy(relation);
-            });
-            return await Task.FromResult(res);
-        }
 
         /// <summary>
         /// Ket hop phan trang va decoration
@@ -104,7 +83,8 @@ namespace KnowledgeSharingApi.Services.Services
             relations = relations.Skip(offsetValue).Take(limitValue);
 
             // Decoration:
-            IEnumerable<ResponseCourseRelationModel> lsRes = await Decorate(myUid, relations, relationType, isDecorateUser, isDecorateCourse);
+            IEnumerable<ResponseCourseRelationModel> lsRes = await 
+                DecorationRepository.DecorateResponseCourseRelationModel(myUid, relations.ToList(), relationType, isDecorateUser, isDecorateCourse);
 
             // Return:
             return new PaginationResponseModel<ResponseCourseRelationModel>(total, limitValue, offsetValue, lsRes);

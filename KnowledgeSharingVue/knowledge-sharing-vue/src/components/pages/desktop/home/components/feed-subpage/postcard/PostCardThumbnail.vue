@@ -1,15 +1,21 @@
 <template>
     <div class="p-postcard-thumbnail">
-        <img :src="imgSrc" class="p-postcard-thumbnail__img" @:click="resolveClickThumbnail"/>
+        <img :src="imgSrc" class="p-postcard-thumbnail__img" 
+            @:click="resolveClickThumbnail"/>
+        <PreviewImage :src="imgSrc" ref="preview" />
     </div>
 </template>
 
 <script>
 import Common from '@/js/utils/common';
 import { myEnum } from '@/js/resources/enum';
+import PreviewImage from '@/components/base/image/PreviewImage.vue';
 
 export default {
     name: "PostCardThumbnail",
+    components: {
+        PreviewImage
+    },
     data(){
         return {
             imgSrc: null
@@ -54,8 +60,7 @@ export default {
          */
         async resolveClickThumbnail(){
             try {
-                let router = this.globalData.router;
-                router.push({name: 'post-detail', params: {id: this.post.Id}});
+                this.$refs.preview.show();
             } catch (error) {
                 console.log(error);
             }

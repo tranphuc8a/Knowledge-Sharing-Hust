@@ -140,6 +140,14 @@ let myEnum = {
         Redo:'redo',
 
         LaTeX: 'latex',
+
+        Youtube: 'youtube',
+        Vimeo: 'vimeo',
+        Bilibili: 'bilibili',
+        Vine: 'vine',
+        Prezi: 'prezi',
+        Osf: 'osf',
+        Spotify: 'spotify',
     },
 
     /**
@@ -214,7 +222,8 @@ let myEnum = {
         Followee: 22,
         Blocker: 31,
         Blockee: 32,
-        NotInRelation: -1
+        NotInRelation: -1,
+        IsMySelf: -2,
     },
 
     /**

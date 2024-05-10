@@ -1,55 +1,70 @@
+/* eslint-disable */
 <template>
     <FeedCardFrame>
-        <div class="p-feedcard-addpost">
-            <div class="p-feedcard-addpost__header">
-                <TooltipUserAvatar />
-                <div class="p-feedcard-addpost__reminder">
-                    {{ getLabel()?.remind(user?.FullName) }}
-                </div>
+        <div class="p-feedcard-lestion">
+            <div class="p-feedcard-lestion__header">
+                <PostCardHeader />
             </div>
-            <div class="p-feedcard-devide"></div>
-            <div class="p-feedcard-buttons">
-                <MEmbeddedButton 
-                    fa="book-open"
-                    :label="getLabel()?.addLesson"
-                    :onclick="resolveClickAddLesson"
-                    :buttonStyle="buttonStyle"
-                    :iconStyle="iconStyle"
-                />
-                <MEmbeddedButton 
-                    fa="comments"
-                    :label="getLabel()?.addQuestion"
-                    :onclick="resolveClickAddQuestion"
-                    :buttonStyle="buttonStyle"
-                    :iconStyle="iconStyle"
-                />
+            <div class="p-feedcard-lestion__title">
+                {{question?.Title ?? "Title of question"}}
+            </div>
+            <div class="p-feedcard-lestion__abstract" v-show="question?.Abstract != null">
+                <!-- <textarea type="text" v-model="content"/> -->
+                <LatexMarkdownRender :markdown-content="question?.Abstract" />
+            </div>
+            <div class="p-feedcard-lestion__categories" v-show="compiledCategories?.length > 0">
+                <CategoriesList :categories="compiledCategories" />
+            </div>
+            <div class="p-feedcard-lestion__thumbnail">
+                <PostCardThumbnail />
+            </div>
+            <div class="p-feedcard-lestion__toolbar">
+                <PostCardToolBar />
+            </div>
+            <div class="p-feedcard-lestion__devide">
+                <div></div>
+            </div>
+            <div class="p-feedcard-lestion__comments">
+                <PostCardCommentList />
             </div>
         </div>
     </FeedCardFrame>
 </template>
 
 <script>
+import PostCardCommentList from '../comment/PostCardCommentList.vue';
+import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
+import PostCardToolBar from './PostCardToolBar.vue';
+import PostCardThumbnail from './PostCardThumbnail.vue';
+import CategoriesList from '@/components/base/category/CategoriesList.vue';
+import PostCardHeader from './PostCardHeader.vue';
 import FeedCardFrame from './FeedCardFrame.vue';
-import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
-import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
+
 export default {
-    name: "AddPostFeedCard",
+    name: "questionFeedCard",
     data() {
         return {
             label: null,
+            defaultCategoriesList: [],
             buttonStyle: {
                 color: 'var(--blue-grey-color-800)',
             },
             iconStyle: {
                 color: 'var(--grey-color)',
             },
+            content: '',
+            question: this.post,
+            compiledCategories: [],
         }
     },
     mounted() {
         this.getLabel();
+        this.compiledCategories = this.getCategories();
     },
     components: {
-        FeedCardFrame, TooltipUserAvatar, MEmbeddedButton
+        LatexMarkdownRender, PostCardCommentList,
+        PostCardThumbnail, PostCardToolBar,
+        FeedCardFrame, PostCardHeader, CategoriesList
     },
     methods: {
         /**
@@ -61,15 +76,24 @@ export default {
         */
         getLabel(){
             if (this.getLanguage != null){
-                this.label = this.getLanguage()?.subpages?.feedpage?.addpostcard;
+                this.label = this.getLanguage()?.subpages?.feedpage?.postcard;
             }
             return this.label;
         },
 
-        async resolveClickAddLesson(){
+        getCategories() {
+            if (this.question?.Categories != null
+                && this.question.Categories.length > 0){
+                return this.question.Categories
+                    .map(cate => cate.CategoryName);
+            }
+            return this.defaultCategoriesList;
+        },
+
+        async resolveClickAddquestion(){
             try {
                 let router = this.globalData.router;
-                router.push({name: 'add-lesson'});
+                router.push({name: 'add-lestion'});
             } catch (error) {
                 console.log(error);
             }
@@ -78,7 +102,7 @@ export default {
         async resolveClickAddQuestion(){
             try {
                 let router = this.globalData.router;
-                router.push({name: 'add-question'});
+                router.push({name: 'add-lestion'});
             } catch (error) {
                 console.log(error);
             }
@@ -89,67 +113,28 @@ export default {
         getLanguage: {},
         getToastManager: {},
         getPopupManager: {}
+    },
+    provide(){
+        return {
+            getPost: () => this.question
+        }
+    },
+    watch: {
+        post(newValue) {
+            this.question = newValue;
+            this.compiledCategories = this.getCategories();
+        }
+    },
+    props: {
+        post: {
+            required: true
+        }
     }
 }
 </script>
 
 <style scoped>
-.p-feedcard-addpost{
-    padding: 16px 16px;
-    box-sizing: border-box;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-}
 
-.p-feedcard-addpost__header{
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    gap: 8px;
-}
+@import url(@/css/pages/desktop/components/lestion.css);
 
-.p-feedcard-addpost__reminder{
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-
-    font-weight: 500;
-    flex: 1;
-    text-align: justify;
-    font-size: 16px;
-    min-height: 42px;
-    border-radius: 32px;
-    background-color: var(--grey-color-200);
-    padding: 4px 12px;
-    box-sizing: border-box;
-    cursor: pointer;
-    color: var(--grey-color-600);
-}
-.p-feedcard-addpost__reminder:hover{
-    background-color: var(--grey-color-300);
-    color: var(--blue-grey-color-800);
-}
-
-.p-feedcard-devide{
-    width: 100%;
-    height: 1px;
-    background-color: var(--grey-color-300);
-}
-
-.p-feedcard-buttons{
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.p-feedcard-buttons .p-button{
-    border-radius: 8px;
-}
 </style>

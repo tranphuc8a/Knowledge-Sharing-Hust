@@ -1,29 +1,38 @@
 /* eslint-disable */
 <template>
     <FeedCardFrame>
-        <div class="p-feedcard-question">
-            <div class="p-feedcard-question__header">
+        <div class="p-feedcard-lestion">
+            <div class="p-feedcard-lestion__header">
                 <PostCardHeader />
             </div>
-            <div class="p-feedcard-question__title">
+            <div class="p-feedcard-lestion__title">
                 {{question?.Title ?? "Title of question"}}
             </div>
-            <div class="p-feedcard-question__categories">
+            <div class="p-feedcard-lestion__abstract" v-show="question?.Abstract != null">
+                <!-- <textarea type="text" v-model="content"/> -->
+                <LatexMarkdownRender :markdown-content="question?.Abstract" />
+            </div>
+            <div class="p-feedcard-lestion__categories" v-show="compiledCategories?.length > 0">
                 <CategoriesList :categories="compiledCategories" />
             </div>
-            <div class="p-feedcard-question__content">
-                <LatexMarkdownRender :markdown-content="question?.Content" />
-            </div>
-            <div class="p-feedcard-question__thumbnail">
-                <PostCardThumbnail />
-            </div>
-            <div class="p-feedcard-question__toolbar">
-                <PostCardToolBar />
-            </div>
-            <div class="p-feedcard-question__devide">
+            <div class="p-feedcard-lestion__devide" 
+                v-if="question?.Content != null"
+                >
                 <div></div>
             </div>
-            <div class="p-feedcard-question__comments">
+            <div class="p-feedcard-lestion__content" v-if="question?.Content != null">
+                <LatexMarkdownRender :markdown-content="question?.Content" />
+            </div>
+            <div class="p-feedcard-lestion__thumbnail">
+                <PostCardThumbnail />
+            </div>
+            <div class="p-feedcard-lestion__toolbar">
+                <PostCardToolBar />
+            </div>
+            <div class="p-feedcard-lestion__devide">
+                <div></div>
+            </div>
+            <div class="p-feedcard-lestion__comments">
                 <PostCardCommentList />
             </div>
         </div>
@@ -79,24 +88,6 @@ export default {
             }
             return this.label;
         },
-
-        getCategories() {
-            if (this.question?.Categories != null
-                && this.question.Categories.length > 0){
-                return this.question.Categories
-                    .map(cate => cate.CategoryName);
-            }
-            return this.defaultCategoriesList;
-        },
-
-        async resolveClickAddQuestion(){
-            try {
-                let router = this.globalData.router;
-                router.push({name: 'add-question'});
-            } catch (error) {
-                console.log(error);
-            }
-        }
         
     },
     inject: {
@@ -125,9 +116,9 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/question.css);
+@import url(@/css/pages/desktop/components/lestion.css);
 
-.p-feedcard-question__content{
+.p-feedcard-lestion__content{
     font-size: 16px;
 }
 

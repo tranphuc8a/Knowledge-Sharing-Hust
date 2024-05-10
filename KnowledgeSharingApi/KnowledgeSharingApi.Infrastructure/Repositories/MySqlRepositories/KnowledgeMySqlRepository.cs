@@ -1,5 +1,7 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Exceptions;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
@@ -176,5 +178,109 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         {
             return DbContext.Knowledges;
         }
+
+
+        #region Get Exactly:
+
+        public override async Task<IResponseUserItemModel?> GetExactlyResponseUserItemModel(Guid knowledgeId)
+        {
+            // Knowledges:
+            Knowledge? knowledge = await DbContext.Knowledges.FindAsync(knowledgeId);
+            if (knowledge == null) return null;
+
+            // Member
+            if (knowledge.KnowledgeType == EKnowledgeType.Course)
+            {
+                ViewCourse? course = await DbContext.ViewCourses
+                    .Where(c => c.UserItemId == knowledgeId).FirstOrDefaultAsync();
+                return course != null ? (ResponseCourseModel)new ResponseCourseModel().Copy(course) : null;
+            }
+
+            // Post
+            Post? p = await DbContext.Posts.FindAsync(knowledgeId);
+            if (p == null) return null;
+
+            if (p.PostType == EPostType.Question)
+            {
+                // Question:
+                ViewQuestion? question = await DbContext.ViewQuestions.FindAsync(knowledgeId);
+                return question != null ? (ResponseQuestionModel)new ResponseQuestionModel().Copy(question) : null;
+            }
+            // Leson: 
+            ViewLesson? lesson = await DbContext.ViewLessons.FindAsync(knowledgeId);
+            return lesson != null ? (ResponseLessonModel)new ResponseLessonModel().Copy(lesson) : null;
+        }
+
+        public override async Task<Dictionary<Guid, IResponseUserItemModel?>> GetExactlyResponseUserItemModel(List<Guid> knowledgeIds)
+        {
+            Dictionary<Guid, IResponseUserItemModel?> res = knowledgeIds
+                .ToDictionary(id => id, id => (IResponseUserItemModel?)null);
+
+            // Get List courseIds, lessonIds and questionsIds:
+            var knowledges = await DbContext.Knowledges
+                .Where(knowledge => knowledgeIds.Contains(knowledge.UserItemId))
+                .ToListAsync();
+            var courseIds = knowledges
+                .Where(knowledge => knowledge.KnowledgeType == EKnowledgeType.Course)
+                .Select(knowledge => knowledge.UserItemId).ToList();
+            var postIds = knowledges.Select(u => u.UserItemId).Except(courseIds).ToList();
+
+            var lessonIds = await DbContext.Posts
+                .Where(p => p.PostType == EPostType.Lesson && postIds.Contains(p.UserItemId))
+                .Select(p => p.UserItemId)
+                .ToListAsync();
+
+            var questionIds = postIds.Except(lessonIds).ToList();
+
+            var vCourses = await DbContext.ViewCourses.Where(course => courseIds.Contains(course.UserItemId)).ToListAsync();
+            var vLessons = await DbContext.ViewLessons.Where(lesson => lessonIds.Contains(lesson.UserItemId)).ToListAsync();
+            var vQuestions = await DbContext.ViewQuestions.Where(question => questionIds.Contains(question.UserItemId)).ToListAsync();
+
+            // Return result:
+            foreach (ViewCourse vCourse in vCourses)
+            {
+                ResponseCourseModel resCourse = new();
+                res[vCourse.UserItemId] = (ResponseCourseModel)resCourse.Copy(vCourse);
+            }
+            foreach (ViewLesson vLes in vLessons)
+            {
+                ResponseLessonModel resLes = new();
+                res[vLes.UserItemId] = (ResponseLessonModel)resLes.Copy(vLes);
+            }
+            foreach (ViewQuestion vQues in vQuestions)
+            {
+                ResponseQuestionModel resQues = new();
+                res[vQues.UserItemId] = (ResponseQuestionModel)resQues.Copy(vQues);
+            }
+            return res;
+        }
+
+        public override async Task<IUserItemView?> GetExactlyUserItem(Guid knowledgeId)
+        {
+            // Knowledges:
+            Knowledge? knowledge = await DbContext.Knowledges.FindAsync(knowledgeId);
+            if (knowledge == null) return null;
+
+            // Member
+            if (knowledge.KnowledgeType == EKnowledgeType.Course)
+            {
+                return await DbContext.ViewCourses
+                    .Where(c => c.UserItemId == knowledgeId).FirstOrDefaultAsync();
+            }
+
+            // Post
+            Post? p = await DbContext.Posts.FindAsync(knowledgeId);
+            if (p == null) return null;
+
+            if (p.PostType == EPostType.Question)
+            {
+                // Question:
+                return await DbContext.ViewQuestions.FindAsync(knowledgeId);
+            }
+            // Leson: 
+            return await DbContext.ViewLessons.FindAsync(knowledgeId);
+        }
+
+        #endregion
     }
 }

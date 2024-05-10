@@ -138,10 +138,10 @@ export default {
 }
 .p-item-level-2{
     font-size: 14px;
+    padding-left: 18px;
 }
 
 .p-item{
-    padding-left: 18px;
     text-align: left;
 }
 

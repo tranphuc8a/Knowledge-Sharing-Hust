@@ -16,10 +16,15 @@
 <script>
 import TooltipUser from './TooltipUser.vue';
 import TooltipFrame from '../tooltip/TooltipFrame.vue';
+import { useRouter } from 'vue-router';
+import { Validator } from '@/js/utils/validator';
+
 export default {
     name: "TooltipUsername",
     data() {
-        return {}
+        return {
+            router: useRouter(),
+        }
     },
     components: {
         TooltipUser, TooltipFrame
@@ -33,10 +38,11 @@ export default {
          * @Modified None
         */
         async resolveClickUsername(){
-            try{
-                if (this.globalData?.router != null){
-                    await this.globalData.router.push(`/profile/${this.user?.Username}`);
-                }
+            try {
+                let username = this.user?.Username;
+                if (Validator.isEmpty(username))
+                    return;
+                this.router.push('/profile/' + username);
             } catch (e){
                 console.error(e);
             }

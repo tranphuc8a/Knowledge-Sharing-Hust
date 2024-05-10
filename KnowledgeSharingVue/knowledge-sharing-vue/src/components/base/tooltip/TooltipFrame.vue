@@ -19,16 +19,16 @@ export default {
             isWaitingToHide: false,
 
             tooltipStyle: {},
-            hoverCount: 0,
             tooltipContent: null,
             tooltipMask: null,
+
             tooltipPosition: {
                 top: "top",
                 bottom: "bottom",
             },
             barHeight: 56,
             padding_horizontal: 0,
-            padding_vertical: 0,
+            padding_vertical: 8,
         };
     },
     mounted() {
@@ -45,6 +45,7 @@ export default {
                 }, isNaN(delay) ? this.delayHiding : delay);
             });
             if (!this.isWaitingToHide) return;
+            
             this.isTooltipVisible = false;
         },
         async showTooltip(delay) {
@@ -133,7 +134,7 @@ export default {
             default: 500
         },
         delayHiding: {
-            default: 100
+            default: 500
         },
     }
 };

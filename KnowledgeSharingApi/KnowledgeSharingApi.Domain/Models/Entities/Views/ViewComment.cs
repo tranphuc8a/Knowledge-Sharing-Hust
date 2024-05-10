@@ -20,6 +20,10 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
 
         public string? Cover { get; set; }
 
+        public string Username { get; set; } = string.Empty;
+
+        public string Role { get; set; } = string.Empty;
+
         protected override ViewComment Init() {
             return new ViewComment();
         }

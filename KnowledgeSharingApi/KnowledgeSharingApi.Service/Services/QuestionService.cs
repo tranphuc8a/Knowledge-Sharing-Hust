@@ -1,5 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Exceptions;
+using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
@@ -124,7 +125,7 @@ namespace KnowledgeSharingApi.Services.Services
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             IEnumerable<ViewQuestion> listQuestion = await QuestionRepository.GetQuestionInCourse(courseId);
 
-            PaginationResponseModel<ViewQuestion> res = new()
+            PaginationResponseModel<IResponseQuestionModel> res = new()
             {
                 Total = listQuestion.Count(),
                 Limit = limitValue,
@@ -146,7 +147,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
 
-            ResponseQuestionModel questionItemModel = (await DecorationRepository.DecorateResponseQuestionModel(null, [question])).First();
+            IResponseQuestionModel questionItemModel = (await DecorationRepository.DecorateResponseQuestionModel(null, [question])).First();
 
             return ServiceResult.Success(
                 GetQuestionSuccess, string.Empty, questionItemModel);
@@ -156,7 +157,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetViewPost(limitValue, offsetValue);
-            IEnumerable<ResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList());
+            List<IResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList());
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
 
@@ -168,7 +169,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewQuestion> questions = await QuestionRepository.GetByUserId(userId);
             questions = questions.Skip(offsetValue).Take(limitValue);
 
-            IEnumerable<ResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList());
+            List<IResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList());
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
         #endregion
@@ -244,7 +245,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Post thumbnail if existed:
             string? thumbnail = await Storage.SaveImage(model.Thumbnail);
-            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
+            _ = await ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // OK, tạo câu hỏi
             Question question = CreateQuestion(user, questionModel, thumbnail);
@@ -280,7 +281,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // update thumbnail:
             string? thumbnail = await Storage.SaveImage(model.Thumbnail);
-            _ = ImageRepository.TryInsertImage(myUid, thumbnail);
+            _ = await ImageRepository.TryInsertImage(myUid, thumbnail);
 
             // Cập nhật question
             Question toUpdate = new();
@@ -492,7 +493,7 @@ namespace KnowledgeSharingApi.Services.Services
             IEnumerable<ViewQuestion> listed = await QuestionRepository.GetMarkedPosts(myUid);
             int total = listed.Count();
             listed = listed.Skip(offsetValue).Take(limitValue);
-            PaginationResponseModel<ResponseQuestionModel> res = new()
+            PaginationResponseModel<IResponseQuestionModel> res = new()
             {
                 Total = total,
                 Limit = limitValue,

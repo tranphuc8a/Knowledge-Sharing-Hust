@@ -104,8 +104,8 @@ export default {
 
         async setValue(value){
             try {
-                this.data.file = value;
-                this.components.input.files = [value];
+                this.data.imgSrc = value;
+                // this.components.input.files = null;
             }
             catch (error){
                 console.error(error);

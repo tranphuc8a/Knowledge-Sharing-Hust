@@ -1,13 +1,18 @@
 <template>
-   <Avatar :src="user?.avatar" :size="size" :title="user?.fullName" @:click="resolveClickUserAvatar" />
+    <Avatar :src="user?.Avatar" :size="size" :title="user?.fullName" @:click="resolveClickUserAvatar" />
 </template>
 
 <script>
 import Avatar from '@/components/base/avatar/Avatar.vue';
+import { useRouter } from 'vue-router';
+import { Validator } from '@/js/utils/validator';
+
 export default {
     name: 'UserAvatar',
     data() {
-        return {}
+        return {
+            router: useRouter()
+        }
     },
     components: {
         Avatar
@@ -22,11 +27,12 @@ export default {
          */
         async resolveClickUserAvatar() {
             try {
-                let router = this.globalData?.router;
-                // navigate to user profile page
-                router.push({name: 'profile', params: {username: this.user?.username}});
-            } catch (error) {
-                console.log(error);
+                let username = this.user?.Username;
+                if (Validator.isEmpty(username))
+                    return;
+                this.router.push('/profile/' + username);
+            } catch (e){
+                console.error(e);
             }
         }
     },

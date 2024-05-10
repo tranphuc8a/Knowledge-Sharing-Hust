@@ -57,12 +57,25 @@
             </div>
 
             <div class="p-comment-right">
-                <div class="p-comment-replies" v-if="dComment?.NumberReplies > 0">
-                    <PostCardComment v-for="(cmt) in dComment?.Replies ?? [null]" :key="cmt?.UserItemId" :comment="cmt"/>
+                <div class="p-comment-replies" v-if="dComment?.TotalReplies > 0">
+                    <PostCardComment 
+                        v-for="(cmt, index) in listReplies" 
+                        :key="cmt?.UserItemId ?? index" 
+                        :comment="cmt"
+                    />
                 </div>
                 <div class="p-reply-enter" v-if="isShowEnterComment && dComment?.ReplyId == null">
                     <PostCardEnterComment ref="reply-enter" :useritem="comment" placeholder="Phản hồi bình luận"/>
                 </div>
+                <MLinkButton v-show="!isOutOfReplies && (listReplies?.length <= 0)" 
+                    :onclick="getMoreReplies" 
+                    :label="`Có ${dComment.TotalReplies ?? 0} phản hồi`" :href="null"
+                    :buttonStyle="buttonStyle"
+                />
+                <MLinkButton v-show="!isOutOfReplies && (listReplies?.length > 0)" :onclick="getMoreReplies" 
+                    label="Tải thêm phản hồi" :href="null"
+                    :buttonStyle="buttonStyle"
+                />
             </div>
         </div>
 
@@ -78,11 +91,18 @@ import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
 import PostCardEnterComment from './PostCardEnterComment.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import { Validator } from '@/js/utils/validator';
+import ResponseCommentModel from '@/js/models/api-response-models/response-comment-model';
+import { GetRequest, Request } from '@/js/services/request';
+import MLinkButton from './../../../../../../base/buttons/MLinkButton.vue'
+
+
 export default {
     name: "p-comment",
     data() {
         return {
+            buttonStyle: { padding: '0px', fontSize: '13px', height: '24px' },
             isShowComment: true,
+            isOutOfReplies: false,
             dComment: this.comment,
             isShowEnterComment: false,
             isShowReplies: false,
@@ -92,7 +112,9 @@ export default {
                 commentCard: null,
                 commentMenuContext: null,
                 replyEnter: null
-            }
+            },
+            listReplies: [],
+            isLoadingMoreReplies: false,
         }
     },
     components: {
@@ -101,29 +123,10 @@ export default {
         CommentMenuContext,
         TooltipUserAvatar,
         PostCardEnterComment,
-        TooltipUsername
+        TooltipUsername, MLinkButton
     },
     mounted(){
-        try {
-            if (this.dComment == null) this.dComment = {};
-            this.dComment.isHideCommentInformation = false;
-            let that = this;
-            this.dComment.ForceUpdate = async function(){
-                that.isShowComment = false;
-                that.$nextTick(() => {
-                    that.isShowComment = true;
-                });
-            };
-            this.components = {
-                commentCard: this.$refs['comment-card'],
-                commentMenuContext: this.$refs['comment-menu-context'],
-                replyEnter: this.$refs['reply-enter']
-            };
-            this.listComments = this.dComments;
-            this.getLabel();
-        } catch (error) {
-            console.error(error);
-        }
+        this.refreshComment();
     },
     methods: {
         isOwner(){
@@ -146,6 +149,34 @@ export default {
             return this.label;
         },
 
+        async forceRender(){
+            let that = this;
+            that.isShowComment = false;
+            that.$nextTick(() => {
+                that.isShowComment = true;
+            });
+        },
+
+        async refreshComment(){
+            try {
+                let tempComment = this.comment;
+                if (tempComment == null) tempComment = {};
+                tempComment.isHideCommentInformation = false;
+                tempComment.ForceUpdate = this.forceRender.bind(this);
+
+                this.components = {
+                    commentCard: this.$refs['comment-card'],
+                    commentMenuContext: this.$refs['comment-menu-context'],
+                    replyEnter: this.$refs['reply-enter']
+                };
+
+                this.dComment = tempComment;
+                this.isOutOfReplies = ! (this.dComment?.TotalReplies > 0); 
+                this.getLabel();
+            } catch (error) {
+                console.error(error);
+            }
+        },
 
         async resolveReplyComment(){
             try {
@@ -193,6 +224,35 @@ export default {
             }
         },
 
+        async getMoreReplies(){
+            if (this.isOutOfReplies || this.isLoadingMoreReplies)
+                return;
+            try {
+                this.isLoadingMoreReplies = true;
+                let offset = this.listReplies.length;
+                let limit = 10;
+                let res = await new GetRequest('Comments/replies/' + this.comment.UserItemId)
+                    .setParams({
+                        offset: offset,
+                        limit: limit
+                    })
+                    .execute();
+                let body = await Request.tryGetBody(res);
+                if (body.Count < limit || body.Count <= 0){
+                    this.isOutOfReplies = true;
+                }
+                let results = body.Results;
+                let tempComment = results.map(function(com){
+                    return new ResponseCommentModel().copy(com);
+                });
+                
+                this.listReplies = this.listReplies.concat(tempComment);
+            } catch (error){
+                Request.resolveAxiosError(error);
+            } finally {
+                this.isLoadingMoreReplies = false;
+            }
+        }
 
     },
     props: {
@@ -202,6 +262,11 @@ export default {
 
         onPostedComment: {
             default: null
+        }
+    },
+    watch: {
+        comment(){
+            this.refreshComment();
         }
     },
     inject: {
@@ -231,7 +296,7 @@ export default {
 .p-comment{
     width: 100%;
     flex-flow: column nowrap;
-    gap: 0;
+    gap: 8px;
 }
 
 .p-comment-left{

@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
@@ -18,7 +19,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class UserRelationMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<UserRelation>(dbContext), IUserRelationRepository
     {
-        public Task<bool> CheckBlock(Guid blockerId, Guid blockeeId)
+        public virtual Task<bool> CheckBlock(Guid blockerId, Guid blockeeId)
         {
             IEnumerable<UserRelation> listBlock = DbContext.UserRelations
                 .Where(relation => 
@@ -29,7 +30,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(listBlock.Any());
         }
 
-        public Task<bool> CheckBlockByUsername(string blockerUsername, string blockeeUsername)
+        public virtual Task<bool> CheckBlockByUsername(string blockerUsername, string blockeeUsername)
         {
             IEnumerable<ViewUserRelation> listBlock = 
                 from relation in DbContext.ViewUserRelations
@@ -41,7 +42,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         }
 
-        public Task<bool> CheckBlockByUsernameEachOther(string username1, string username2)
+        public virtual Task<bool> CheckBlockByUsernameEachOther(string username1, string username2)
         {
             IEnumerable<ViewUserRelation> listBlock =
                 from relation in DbContext.ViewUserRelations
@@ -52,7 +53,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(listBlock.Any());
         }
 
-        public Task<bool> CheckBlockEachOther(Guid user1Id, Guid user2Id)
+        public virtual Task<bool> CheckBlockEachOther(Guid user1Id, Guid user2Id)
         {
             IEnumerable<UserRelation> listBlock = DbContext.UserRelations
                 .Where(relation =>
@@ -63,7 +64,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(listBlock.Any());
         }
 
-        public async Task<IEnumerable<ViewUserRelation>> GetByUserId(Guid userId, bool isActive)
+        public virtual async Task<IEnumerable<ViewUserRelation>> GetByUserId(Guid userId, bool isActive)
         {
             var query = DbContext.ViewUserRelations.AsQueryable();
 
@@ -74,7 +75,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type)
+        public virtual async Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type)
         {
             // Sử dụng biến 'userIdProperty' để đại diện cho SenderId hay ReceiverId dựa trên 'isActive'
             Expression<Func<ViewUserRelation, bool>> userIdPredicate = isActive
@@ -90,43 +91,91 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await query.ToListAsync();
         }
 
-        public async Task<EUserRelationType> GetUserRelationType(Guid user1, Guid user2)
+
+        protected virtual UserRelationTypeDto GetUserRelationType(Guid myUid, IEnumerable<ViewUserRelation> userRelations)
         {
-            // Lấy về relation
-            ViewUserRelation? userRelation = await
+            UserRelationTypeDto res = new()
+            {
+                UserRelationType = EUserRelationType.NotInRelation,
+                UserRelationId = null
+            };
+            if (!userRelations.Any()) return res;
+
+            // Check block:
+            ViewUserRelation? block = userRelations
+                .Where(relation => relation.UserRelationType == EUserRelationType.Block)
+                .FirstOrDefault();
+            if (block != null)
+            {
+                res.UserRelationType = block.SenderId == myUid ? EUserRelationType.Blocker : EUserRelationType.Blockee;
+                res.UserRelationId = block.UserRelationId;
+                return res;
+            }
+
+            // Check friend:
+            ViewUserRelation? friend = userRelations
+                .Where(relation => relation.UserRelationType == EUserRelationType.Friend)
+                .FirstOrDefault();
+            if (friend != null)
+            {
+                res.UserRelationType = EUserRelationType.Friend;
+                res.UserRelationId = friend.UserRelationId;
+                return res;
+            }
+
+            // Check request:
+            ViewUserRelation? request = userRelations
+                .Where(relation => relation.UserRelationType == EUserRelationType.FriendRequest)
+                .FirstOrDefault();
+            if (request != null)
+            {
+                res.UserRelationType = request.SenderId == myUid ? EUserRelationType.Requester : EUserRelationType.Requestee;
+                res.UserRelationId = request.UserRelationId;
+                return res;
+            }
+
+            // Check follower:
+            ViewUserRelation? follower = userRelations
+                .Where(rel => rel.SenderId == myUid && rel.UserRelationType == EUserRelationType.Follow)
+                .FirstOrDefault();
+            if (follower != null)
+            {
+                res.UserRelationType = EUserRelationType.Follower;
+                res.UserRelationId = follower.UserRelationId;
+                return res;
+            }
+
+            // Check followee:
+            ViewUserRelation? followee = userRelations
+                .Where(rel => rel.ReceiverId == myUid && rel.UserRelationType == EUserRelationType.Follow)
+                .FirstOrDefault();
+            if (followee != null)
+            {
+                res.UserRelationType = EUserRelationType.Followee;
+                res.UserRelationId = followee.UserRelationId;
+                return res;
+            }
+
+            // Not Relation
+            return res;
+        }
+
+        public virtual async Task<EUserRelationType> GetUserRelationType(Guid user1, Guid user2)
+        {
+            List<ViewUserRelation> userRelations = await
                 DbContext.ViewUserRelations
                 .Where(relation => (
                     relation.SenderId == user1 && relation.ReceiverId == user2
                 ) || (
                     relation.SenderId == user2 && relation.ReceiverId == user1
-                )).FirstOrDefaultAsync();
-            
-            // Không quan hệ
-            if (userRelation == null) return EUserRelationType.NotInRelation;
+                )).ToListAsync();
 
-            // Bạn bè
-            EUserRelationType type = userRelation.UserRelationType;
-            if (type == EUserRelationType.Friend)
-                return type;
-
-            // Yêu cầu kết bạn
-            if (type == EUserRelationType.FriendRequest)
-                return user1 == userRelation.SenderId ? EUserRelationType.FriendRequester : EUserRelationType.FriendRequestee;
-
-            // Theo dõi
-            if (type == EUserRelationType.Follow)
-                return user1 == userRelation.SenderId ? EUserRelationType.Follower : EUserRelationType.Followee;
-
-            // Chặn
-            if (type == EUserRelationType.Block)
-                return user1 == userRelation.SenderId ? EUserRelationType.Blocker : EUserRelationType.Blockee;
-
-            return EUserRelationType.NotInRelation;
+            return GetUserRelationType(user1, userRelations).UserRelationType;
         }
 
-        public async Task<Dictionary<Guid, EUserRelationType>> GetUserRelationType(Guid user1, List<Guid> users2)
+        public virtual async Task<Dictionary<Guid, EUserRelationType>> GetUserRelationType(Guid user1, List<Guid> users2)
         {
-            var userRelations = await DbContext.ViewUserRelations
+            List<ViewUserRelation> userRelations = await DbContext.ViewUserRelations
                 .Where(relation => (relation.SenderId == user1 && users2.Contains(relation.ReceiverId)) ||
                                    (relation.ReceiverId == user1 && users2.Contains(relation.SenderId)))
                 .ToListAsync();
@@ -135,30 +184,150 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             var results = users2.ToDictionary(user => user, user => EUserRelationType.NotInRelation);
 
             // Xác định loại quan hệ cho từng cặp người dùng
-            foreach (var userRelation in userRelations)
+            foreach (Guid otherUser in users2)
             {
-                var otherUser = userRelation.SenderId == user1 ? userRelation.ReceiverId : userRelation.SenderId;
-
-                var relationType = userRelation.UserRelationType switch
-                {
-                    EUserRelationType.Friend => EUserRelationType.Friend,
-                    EUserRelationType.FriendRequest => user1 == userRelation.SenderId
-                        ? EUserRelationType.FriendRequester
-                        : EUserRelationType.FriendRequestee,
-                    EUserRelationType.Follow => user1 == userRelation.SenderId
-                        ? EUserRelationType.Follower
-                        : EUserRelationType.Followee,
-                    EUserRelationType.Block => user1 == userRelation.SenderId
-                        ? EUserRelationType.Blocker
-                        : EUserRelationType.Blockee,
-                    _ => EUserRelationType.NotInRelation
-                };
-
+                IEnumerable<ViewUserRelation> relations = userRelations
+                    .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser);
+                EUserRelationType relationType = GetUserRelationType(user1, relations).UserRelationType;
                 results[otherUser] = relationType;
             }
 
             return results;
         }
 
+        public virtual async Task<Dictionary<Guid, UserRelationTypeDto>> GetDetailUserRelationType(Guid user1, List<Guid> users2)
+        {
+            List<ViewUserRelation> userRelations = await DbContext.ViewUserRelations
+                .Where(relation => (relation.SenderId == user1 && users2.Contains(relation.ReceiverId)) ||
+                                   (relation.ReceiverId == user1 && users2.Contains(relation.SenderId)))
+                .ToListAsync();
+
+            // Khởi tạo kết quả mặc định là NotInRelation
+            var results = users2.ToDictionary(user => user, user => new UserRelationTypeDto()
+            {
+                UserRelationType = EUserRelationType.NotInRelation,
+                UserRelationId = null
+            });
+
+            // Xác định loại quan hệ cho từng cặp người dùng
+            foreach (Guid otherUser in users2)
+            {
+                IEnumerable<ViewUserRelation> relations = userRelations
+                    .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser);
+                UserRelationTypeDto relationType = GetUserRelationType(user1, relations);
+                results[otherUser] = relationType;
+            }
+
+            return results;
+        }
+
+
+        #region Operation in relations
+        public async Task<Guid?> AddBlock(Guid blockerId, Guid blockeeId)
+        {
+            var transaction = await DbContext.BeginTransaction();
+            try
+            {
+                // Xoa di nhung relation khac
+                IQueryable<UserRelation> relationsToDelete = DbContext.UserRelations
+                    .Where(rel => rel.UserRelationType != EUserRelationType.Block)
+                    .Where(rel => (rel.SenderId == blockerId && rel.ReceiverId == blockeeId)
+                        || (rel.SenderId == blockeeId && rel.ReceiverId == blockerId));
+                DbContext.UserRelations.RemoveRange(relationsToDelete);
+
+                // Them block
+                Guid idToInsert = Guid.NewGuid();
+                DateTime now = DateTime.Now;
+                UserRelation blockObject = new() {
+                    // Entity:
+                    CreatedBy = blockerId.ToString(),
+                    CreatedTime = now,
+                    // UserRelation:
+                    UserRelationId = idToInsert,
+                    SenderId = blockerId,
+                    ReceiverId = blockeeId,
+                    UserRelationType = EUserRelationType.Block,
+                    Time = now
+                };
+                DbContext.UserRelations.Add(blockObject);
+
+                // Save Change
+                int raws = await DbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return raws > 0 ? idToInsert : null;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return null;
+            }
+        }
+
+        public async Task<Guid?> AddFriend(Guid idUser1, Guid idUser2)
+        {
+            var transaction = await DbContext.BeginTransaction();
+            try
+            {
+                // Xoa di nhung relation khac
+                IQueryable<UserRelation> relationsToDelete = DbContext.UserRelations
+                    .Where(rel => rel.UserRelationType != EUserRelationType.Block)
+                    .Where(rel => (rel.SenderId == idUser1 && rel.ReceiverId == idUser2)
+                        || (rel.SenderId == idUser2 && rel.ReceiverId == idUser1));
+                DbContext.UserRelations.RemoveRange(relationsToDelete);
+
+                // Them friend
+                Guid idToInsert = Guid.NewGuid();
+                DateTime now = DateTime.Now;
+                UserRelation friendObject = new()
+                {
+                    // Entity:
+                    CreatedBy = idUser1.ToString(),
+                    CreatedTime = now,
+                    // UserRelation:
+                    UserRelationId = idToInsert,
+                    SenderId = idUser1,
+                    ReceiverId = idUser2,
+                    UserRelationType = EUserRelationType.Friend,
+                    Time = now
+                };
+                DbContext.UserRelations.Add(friendObject);
+
+                // Save Change
+                int raws = await DbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return raws > 0 ? idToInsert : null;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return null;
+            }
+        }
+
+        public async Task<int> DeleteFriend(Guid idUser1, Guid idUser2)
+        {
+            var transaction = await DbContext.BeginTransaction();
+            try
+            {
+                // Xoa di toan bo user relation
+                IQueryable<UserRelation> relationsToDelete = DbContext.UserRelations
+                    .Where(rel => rel.UserRelationType != EUserRelationType.Block)
+                    .Where(rel => (rel.SenderId == idUser1 && rel.ReceiverId == idUser2)
+                        || (rel.SenderId == idUser2 && rel.ReceiverId == idUser1));
+                DbContext.UserRelations.RemoveRange(relationsToDelete);
+
+                // Save Change
+                int raws = await DbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return raws;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return -1;
+            }
+        }
+
+        #endregion
     }
 }

@@ -4,7 +4,7 @@
         <div class="p-popup-context-mask" ref="popup-context-mask">
             <slot name="popupContextMask"></slot>
         </div>
-        <div v-show="ispopupContextVisible" class="p-popup-context-content" 
+        <div v-show="isPopupContextVisible" class="p-popup-context-content" 
             :style="popupContextStyle" ref="popup-context-content">
             <!-- Nội dung của popupContext -->
             <slot name="popupContextContent"></slot>
@@ -16,9 +16,11 @@
     export default {
         data() {
             return {
-                ispopupContextVisible: false,
-                popupContextStyle: {},
+                isPopupContextVisible: false,
+                isWaitingToShow: false,
+                isWaitingToHide: false,
 
+                popupContextStyle: {},
                 popupContextContent: null,
                 popupContextMask: null,
 
@@ -28,7 +30,7 @@
                 },
                 barHeight: 56,
                 padding_horizontal: 0,
-                padding_vertical: 0,
+                padding_vertical: 8,
             };
         },
         mounted() {
@@ -36,30 +38,48 @@
             this.popupContextMask = this.$refs["popup-context-mask"];
         },
         props: {
-                position: {
+            position: {
                 default: null
             },
             delayShowing: {
-                default: 500
+                default: 100
             },
             delayHiding: {
-                default: 100
+                default: 500
             },
         },
         methods: {
             async togglePopup(){
-                this.ispopupContextVisible = !this.ispopupContextVisible;
-                if (this.ispopupContextVisible){
-                    await this.showPopup();
-                } else {
+                // this.isPopupContextVisible = !this.isPopupContextVisible;
+                if (this.isPopupContextVisible){
                     await this.hidePopup();
+                } else {
+                    await this.showPopup();
                 }
             },
-            async hidePopup() {
-                this.ispopupContextVisible = false;
+            async hidePopup(delay) {
+                this.isWaitingToHide = true;
+                this.isWaitingToShow = false;
+                await new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, isNaN(delay) ? this.delayHiding : delay);
+                });
+                if (!this.isWaitingToHide) return;
+
+                this.isPopupContextVisible = false;
             },
-            async showPopup() {
-                this.ispopupContextVisible = true;
+            async showPopup(delay) {
+                this.isWaitingToShow = true;
+                this.isWaitingToHide = false;
+                await new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, isNaN(delay) ? this.delayShowing : delay);
+                });
+                if (!this.isWaitingToShow) return;
+
+                this.isPopupContextVisible = true;
                 let that = this;
                 this.$nextTick(async () => {
                     try {
@@ -71,6 +91,7 @@
                         console.error(e);
                     }     
                 });
+
             },
             /**
              * Hàm xử lý can chinh popup theo chieu doc

@@ -1,5 +1,5 @@
 <template>
-    <m-context-popup>
+    <m-context-popup :delay-hiding="0" :delay-showing="0">
         <template #popupContextMask>
             <div class="p-cfb-mask">
                 <span> {{ options[selected]?.label }} </span>

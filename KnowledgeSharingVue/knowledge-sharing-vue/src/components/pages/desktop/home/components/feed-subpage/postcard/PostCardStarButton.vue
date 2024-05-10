@@ -130,6 +130,10 @@ export default {
         },
         resolveClickStar(index){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 this.myStar = index;
                 this.tooltip.hideTooltip(0);
                 this.submitStar(index);
@@ -140,6 +144,10 @@ export default {
 
         async resolveCommitFiveStar(){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 this.myStar = 5;
                 this.currentStar = 5;
                 this.tooltip.hideTooltip(0);
@@ -151,6 +159,10 @@ export default {
 
         async resolveUnStar(){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 this.myStar = null;
                 this.currentStar = null;
                 this.tooltip.hideTooltip(0);
@@ -161,6 +173,10 @@ export default {
 
         async submitStar(star){
             try {
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 if (this.currentUser == null){
                     this.getPopupManager().requiredLogin();
                 }

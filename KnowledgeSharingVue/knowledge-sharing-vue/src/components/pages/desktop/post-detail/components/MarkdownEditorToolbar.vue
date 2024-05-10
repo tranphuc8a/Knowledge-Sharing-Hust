@@ -112,6 +112,11 @@
                 @:click="emitCommand(commandType.Image)">
                 <MIcon fa="image" family="fas" :style="iconStyle"/>
             </div>
+            <div title="Video" class="p-editor-toolbar-item">
+                <MMenuContextPopup :options="getVideoOptions()">
+                    <MIcon fa="photo-video" family="fas" :style="iconStyle"/>
+                </MMenuContextPopup>
+            </div>
             <div title="Table" class="p-editor-toolbar-item"
                 @:click="emitCommand(commandType.Table)">
                 <MIcon fa="table" family="fas" :style="iconStyle"/>
@@ -185,11 +190,15 @@
 
 
 <script>
+import MMenuContextPopup from '@/components/base/popup/MMenuContextPopup.vue';
 
 import { myEnum } from '@/js/resources/enum';
 
 export default{
     name: 'MarkdownEditorToolbar',
+    components: {
+        MMenuContextPopup
+    },
     data(){
         return {
             iconStyle: {
@@ -204,6 +213,62 @@ export default{
         emitCommand(command){
             // console.log(command);
             this.resolveCommand?.(command);
+        },
+
+        getVideoOptions(){
+            let that = this;
+            return [
+                {
+                    family: 'fab',
+                    fa: 'youtube',
+                    onclick: async function(){
+                        return await that.emitCommand(that.commandType.Youtube)
+                    }, 
+                    label: 'YouTube',
+                }, {
+                    family: 'fab',
+                    fa: 'vimeo',
+                    onclick: async function(){
+                        return await that.emitCommand(that.commandType.Vimeo)
+                    }, 
+                    label: 'Vimeo',
+                }, {
+                    family: 'fab',
+                    fa: 'vine',
+                    onclick: async function(){
+                        return await that.emitCommand(that.commandType.Vine)
+                    }, 
+                    label: 'Vine',
+                }, {
+                    family: 'fab',
+                    fa: 'bilibili',
+                    onclick: async function(){
+                        return await that.emitCommand(that.commandType.Bilibili)
+                    }, 
+                    label: 'Bilibili',
+                }, {
+                    family: 'fas',
+                    fa: 'film',
+                    onclick: async function(){
+                        return await that.emitCommand(that.commandType.Prezi)
+                    }, 
+                    label: 'Prezi',
+                }, {
+                    family: 'fas',
+                    fa: 'film',
+                    onclick: async function(){
+                        return await that.emitCommand(that.commandType.Osf)
+                    }, 
+                    label: 'OSF',
+                }, {
+                    family: 'fab',
+                    fa: 'spotify',
+                    onclick: async function(){
+                        return await that.emitCommand(that.commandType.Spotify)
+                    }, 
+                    label: 'Spotify',
+                }, 
+            ]
         }
     },
     props: {
