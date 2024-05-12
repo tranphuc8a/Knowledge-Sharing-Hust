@@ -1,47 +1,56 @@
 <template>
+
     <InputFrame :label="inputFrame.label" :title="inputFrame.title" 
                 :state="inputFrame.state" :errorMessage="inputFrame.errorMessage"
                 :is-obligate="inputFrame.isObligate" :is-full="inputFrame.isFull" 
                 :isShowTitle="inputFrame.isShowTitle" :isShowError="inputFrame.isShowError">
-        <div class="p-combobox-textfield">
-            <div class="p-combobox-textfield-left">
-                <input type="text" class="p-combobox-input" v-model="data.text" 
-                        :placeholder="data.placeholder" 
-                        @:focus="resolveOnFocus" @:blur="resolveOnBlur" 
-                        @:input="resolveOnInput"
-                        v-on:keyup.enter.prevent.stop="resolveOnPressEnter"
-                        ref="input">
+        <div class="p-select-option-frame" tabindex="1" @:blur="resolveOnBlur">
+            <div class="p-select-option-box">
+                <div class="p-select-option-box-left" @:click="toggleSelectOption">
+                    <div class="p-select-option-value" v-show="data.value != null">
+                        {{ data.text }}
+                    </div>
+                    <div class="p-select-option-placeholder" v-show="data.value == null">
+                        {{ data.placeholder }}
+                    </div>
+                </div>
+                <div class="p-select-option-box-right">
+                    <div class="p-icon-container p-icon-down" @:click="resolveClickExpand">
+                        <MIcon fa="chevron-down" />
+                    </div>
+                    <div class="p-icon-container p-icon-up" @:click="resolveClickCollapse">
+                        <MIcon fa="chevron-up" />
+                    </div>
+                </div>
             </div>
-            <div class="p-combobox-textfield-right">
-                <div class="p-icon-container p-icon-down" @:click="resolveClickExpand">
-                    <MIcon fa="chevron-down" />
-                </div>
-                <div class="p-icon-container p-icon-up" @:click="resolveClickCollapse">
-                    <MIcon fa="chevron-up" />
-                </div>
-            </div>
-        </div>
-        <!-- STATE OF FRAME: normal, loading, empty -->
-        <div class="p-combobox-dropdown-frame" :state="data.dropdownState" ref="dropdownFrame">
-            <div class="p-combobox-dropdown-content" ref="dropdownContent">
-                <div class="p-combobox-dropdown-loading">
-                    <MSpinner :style="{ fontSize: '24px' }" />
-                </div>
-                <div class="p-combobox-dropdown-empty">
-                    {{ label.noOptions }}
-                </div>
-                <div class="p-combobox-dropdown-items">
-                    <!-- ITEMS STATE: normal, default, chosen, focus -->
-                    <div v-for="(item, index) in data.filteredItems" :key="index"   
-                        class="p-combobox-item" :state="item.state"
-                        @:click="clickItemFunction(item)">
-                        <div class="p-combobox-item-label" :title="item.label">
-                            {{ item.label }}
-                        </div>
-                        <div class="p-combobox-item-checked">
-                            <MIcon fa="check" />
-                        </div>
-                    </div>                            
+            <!-- STATE OF DROPDOWN FRAME: normal, loading, empty -->
+            <div class="p-select-option-dropdown-frame" :state="data.dropdownState" ref="dropdownFrame">
+                <div class="p-select-option-dropdown-content" ref="dropdownContent">
+                    <div class="p-select-option-dropdown-loading">
+                        <MSpinner :style="{ fontSize: '24px' }" />
+                    </div>
+                    <div class="p-select-option-dropdown-empty">
+                        {{ label.noOptions }}
+                    </div>
+                    <div class="p-select-option-dropdown-items">
+                        <!-- ITEMS STATE: normal, default, chosen, focus -->
+                        <div v-for="(item, index) in data.items" :key="index"   
+                            class="p-select-option-item" :state="item.state"
+                            @:click="clickItemFunction(item)">
+                            <div class="p-select-option-item-label" 
+                                :title="item.label"
+                                v-show="item.value != null">
+                                {{ item.label }}
+                            </div>
+                            <div class="p-select-option-item-placeholder" 
+                                v-show="item.value == null">
+                                {{ item.label }}
+                            </div>
+                            <div class="p-select-option-item-checked">
+                                <MIcon fa="check" />
+                            </div>
+                        </div>                            
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,14 +58,13 @@
 </template>
 
 <script>
-import { Unicode } from '@/js/utils/unicode';
 import { Validator } from '@/js/utils/validator';
 import { input } from '@/js/components/base/input';
 import InputFrame from './MInputFrame.vue';
 import { myEnum } from '@/js/resources/enum';
 
-let combobox = {
-    name: "Combobox",
+let selectOption = {
+    name: "SelectOption",
     components: { InputFrame },
     data() {
         return {
@@ -71,7 +79,7 @@ let combobox = {
                 isShowError: this.isShowError
             },
             data: {
-                text: this.value,
+                text: this.placeholder,
                 value: this.value,
                 isDynamicValidate: this.isDynamicValidate,
                 validator: this.validator,
@@ -80,29 +88,22 @@ let combobox = {
                 dropdownState: myEnum.dropdownState.NORMAL,
                 chosen: null,
                 items: [],
-                filteredItems: [],
-                callFilter: 0,
-                isFiltering: false
             },
-            dlabel: this.lang.components.input.combobox,
             components: {
                 dropdownContent: null,
-                dropdownFrame: null,
-                input: null
+                dropdownFrame: null
             }
         };
     },
     mounted() {
-        // this.refreshListItems();
         this.components.dropdownContent = this.$refs.dropdownContent;
         this.components.dropdownFrame = this.$refs.dropdownFrame;
-        this.components.input = this.$refs.input;
+        this.setValue(this.value);
     },
     watch: {
         ...input.watch,
         placeholder(newVal)     { this.data.placeholder = newVal; },
         listItemLoader()        { this.refreshListItems(); },
-        listItemFilter()        { this.refreshListItems(); },
     },
     methods: {
         ...input.methods,
@@ -114,6 +115,7 @@ let combobox = {
         **/
         async validate(){
             try {
+                if (this.validator?.validate == null) return;
                 let rsVal = await this.validator.validate(this.data.items, this.data.text);
                 if (!rsVal.isValid){
                     this.inputFrame.errorMessage = rsVal.msg;
@@ -124,98 +126,65 @@ let combobox = {
                 console.error(error);
             }
         },
-        /**
-        * Thực hiện xử lý logic sau khi thay đổi giá trị của input live
-        * @param none
-        * @Author TVPhuc (12/12/23)
-        * @Edit None
-        **/
-        async resolveOnInput(){
-            try {
-                this.data.isFiltering = true;
-                await this.resolveFilterItem();
-                await this.oninput();
-            } catch (error){
-                console.error(error);
-            }
-        },
+        
         /* Override
-        * Thực hiện xử lý logic sau khi focus vào input
+        * Thực hiện xử lý logic khi expand
         * @param none
         * @Author TVPhuc (12/12/23)
         * @Edit None
         **/
-        async resolveOnFocus(){
+        async resolveOnExpand(){
             try {
                 this.setState(myEnum.inputState.EXPAND);
-                await this.resolveFilterItem();
-                await this.onfocus();
+                await this.resolveRefreshItem();
             } catch (error){
                 console.error(error);
             }
         },
         /* Override
-        * Thực hiện xử lý logic khi unfocus input
+        * Thực hiện xử lý logic khi blur component
         * @param none
         * @Author TVPhuc (12/12/23)
         * @Edit None
         **/
         async resolveOnBlur(){
             try {
-                this.data.isFiltering = false;
-                await new Promise(e => setTimeout(e, 250));
-                // if (this.data.isClickItem === false){
-                // }
-                // this.data.isClickItem = false;
-                // update chosen item when unfocus combobox:
-                let that = this;
+                // await new Promise(e => setTimeout(e, 250));
+                
+                // update chosen item when unfocus selectOption:
+                let text = this.data.text;
                 if (this.data.chosen){
                     this.data.chosen.state = myEnum.comboboxItemState.NORMAL;
                 }
                 this.data.chosen = this.data.items.filter(function(item){
-                    return item.label === that.data.text;
+                    return item.label === text;
                 });
                 this.data.chosen = this.data.chosen.length > 0 ? this.data.chosen[0] : null;
-                if (this.data.chosen) {
+                if (this.data.chosen?.value != null) {
                     this.data.chosen.state = myEnum.comboboxItemState.CHOSEN;
                 } 
-                // do combobox logic when change to new value                
+                // do selectOption logic when change to new value                
                 await this.setState(myEnum.inputState.NORMAL);
-                await this.resolveOnChange();
-                await this.onblur();
+                await this.resolveOnChange?.();
             } catch (error){
                 console.error(error);
             }
         },
-        /* Override
-        * Hai hàm thực hiện focus và blur vào thẻ input
-        * @param none
-        * @Author TVPhuc (12/12/23)
-        * @Edit None
-        **/
-        async focus(){
-            try {
-                this.$refs.input.focus();
-            } catch (error){
-                console.error(error);
-            }
-        },
-        async blur(){
-            try {
-                this.$refs.input.blur();
-            } catch (error){
-                console.error(error);
-            }
-        },
+        
 
         /* Override
-        * Hàm thực hiện đặt giá trị vào combobox
+        * Hàm thực hiện đặt giá trị vào select option
         * @param none
         * @Author TVPhuc (12/12/23)
         * @Edit None
         **/
         async setValue(value){
             try {
+                if (Validator.isEmpty(value)){
+                    this.data.text = this.placeholder;
+                    this.data.value = null;
+                    return;
+                }
                 if (this.data.items.length <= 0){
                     await this.refreshListItems();
                 }
@@ -245,19 +214,19 @@ let combobox = {
 
         // OTHER METHODS:
         /* *
-        * Xử lý logic khi click chuột vào một item của combobox
+        * Xử lý logic khi click chuột vào một item của selectOption
         * @param none
         * @Author TVPhuc (12/12/23)
         * @Edit None
         **/
         async clickItemFunction(item){
             try {
-                item.state = myEnum.comboboxItemState.CHOSEN;
+                // item.state = myEnum.comboboxItemState.CHOSEN;
                 this.chosen = item;
                 this.data.text = item.label;
                 this.data.value = item.value;
                 // this.data.isClickItem = true;
-                await this.blur();
+                await this.resolveOnBlur();
             } catch (error) {
                 console.error(error);
             }
@@ -269,10 +238,10 @@ let combobox = {
         * @Edit None
         **/
         async resolveClickExpand(){
-            await this.$refs.input.focus();
+            await this.resolveOnExpand();
         },
         async resolveClickCollapse(){
-            await this.$refs.input.blur();
+            await this.resolveOnBlur();
         },
         /**
         * Cập nhật chiều cao của dropdownFrame dựa trên dropdownContent
@@ -285,98 +254,90 @@ let combobox = {
             this.components.dropdownFrame.style.height = `${this.components.dropdownContent.clientHeight}px`;
         },
         /* *
-        * Xử lý sự kiện yêu cầu lọc item theo text
+        * Xử lý sự kiện lam moi danh sach items cua select a
         * @param none
         * @Author TVPhuc (12/12/23)
         * @Edit None
         **/
-        async resolveFilterItem(){
+        async resolveRefreshItem(){
             try {
+                if (this.data.items.length > 1) return;
+
                 this.data.dropdownState = myEnum.dropdownState.LOADING;
-                if (this.data.items.length <= 0){
-                    await this.refreshListItems();
-                }
-                setTimeout(this.updateDropdownHeight.bind(this), 50);
+                this.$nextTick(this.updateDropdownHeight.bind(this));
 
-
-                this.data.callFilter += 1;
-                if (this.data.isFiltering){
-                    this.data.filteredItems = await this.listItemFilter(this.data.items, String(this.data.text));
-                } else {
-                    this.data.filteredItems = this.data.items;
-                }
-                this.data.callFilter -= 1;
-
-                // if (this.data.callFilter > 0) {
-                //     // còn nhiều lời gọi call filter đằng sau nữa.
-                //     return;
-                // }
-                if (this.data.filteredItems.length <= 0){
-                    this.data.dropdownState = myEnum.dropdownState.EMPTY;
-                } else {
-                    this.data.dropdownState = myEnum.dropdownState.NORMAL;
-                }
-                setTimeout(this.updateDropdownHeight.bind(this), 50);
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        /* *
-        * Xử lý yêu cầu làm mới danh sách items của combobox
-        * @param none
-        * @Author TVPhuc (12/12/23)
-        * @Edit None
-        **/
-        async refreshListItems(){
-            try {
+                let tempItems = [{
+                    value: null,
+                    label: this.data.placeholder
+                }];
+                
                 let response = await this.listItemLoader();
                 response ??= [];
-                if (response != null && response.length > 0){
-                    this.data.items = response.map(function(item){
+                if (response?.length >= 0){
+                    tempItems = tempItems.concat(response.map(function(item){
                         if (Validator.isEmpty(item.state)){
                             item.state = myEnum.comboboxItemState.NORMAL;
                         }
                         return item;
-                    });
-                } else {
-                    this.data.items = [];
+                    }));
                 }
-                // await this.resolveFilterItem();
-                // console.log(this.data.filteredItems);
-            } catch (error){
+                if (tempItems.length <= 1){
+                    this.data.items = [];
+                    this.data.text = "";
+                    this.data.value = null;
+                    this.data.chosen = null;
+                    this.data.dropdownState = myEnum.dropdownState.EMPTY;
+                } else {
+                    this.data.items = tempItems;
+                    this.data.dropdownState = myEnum.dropdownState.NORMAL;
+                }
+                this.$nextTick(this.updateDropdownHeight.bind(this));
+            } catch (error) {
                 console.error(error);
             }
         },
 
+
+
         // override resolveOnPressEnter
         async resolveOnPressEnter(){
             try {
-                let text = this.data.text;
-                let item = this.data.items.find(function(it){
-                    return String(it.label) == String(text);
-                });
-                if (item != null){
-                    await this.clickItemFunction(item);
-                    await this.onPressEnter(item.value);
+                if (this.state == myEnum.inputState.EXPAND){
+                    let text = this.data.text;
+                    let item = this.data.items.find(function(it){
+                        return String(it.label) == String(text);
+                    });
+                    if (item != null){
+                        await this.clickItemFunction(item);
+                    }
+                    let value = this.getValue();
+                    await this.onPressEnter?.(value);
                 } else {
-                    this.blur();
+                    await this.resolveOnExpand();
                 }
             } catch (error){
                 console.log(error);
+            }
+        },
+
+        async focus(){
+            await this.resolveOnExpand();
+        },
+
+        async toggleSelectOption(){
+            if (this.inputFrame.state == myEnum.inputState.EXPAND){
+                await this.resolveOnBlur();
+            } else {
+                await this.resolveOnExpand();
             }
         }
     },
     props: {
         ...input.props,
-        oninput: {
-            type: Function,
-            default: async function(){}
-        },
         placeholder: {
             type: String,
             default: "- Chọn giá trị -"
         },
-        autocomplete: { default: "email" },
         listItemLoader: {
             type: Function,
             default: async function(){
@@ -391,19 +352,6 @@ let combobox = {
                         label: 'Nam Định',
                         value: 3
                     }, ]);
-            }
-        },
-        listItemFilter: {
-            type: Function,
-            default: async function(items, text){
-                await new Promise(e => setTimeout(e, 500));
-                if (text === null || text === undefined){
-                    text = "";
-                }
-                if (Validator.isEmpty(items)) return [];
-                return items.filter(function(item){
-                    return Unicode.unicodeToAscii(item.label).includes(Unicode.unicodeToAscii(text));
-                });
             }
         },
         isDynamicValidate: { default: false },
@@ -440,11 +388,11 @@ let combobox = {
         }
     },
 };
-export default combobox;
+export default selectOption;
 </script>
 
 <style>
-    @import url(@/css/base/input/combobox.css);
+    @import url(@/css/base/input/select-option.css);
 </style>
 
 

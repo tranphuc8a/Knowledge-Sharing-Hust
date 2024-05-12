@@ -4,7 +4,7 @@
             <CommentFilterButton :on-change="resolveOnchangeFilter" />
         </div>
         <div class="p-pcl-comment-list" v-if="listComments?.length > 0">
-            <PostCardComment v-for="comment in listComments" :key="comment?.UserItemId + randomize()" :comment="comment"/>
+            <PostCardComment v-for="comment in listComments" :key="comment?.UserItemId" :comment="comment"/>
             <!-- <div class="p-pcl-comment-load-more" v-show="!isOutOfComments"
                 @:click="resolveLoadMoreComment">
                 Tải thêm bình luận

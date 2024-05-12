@@ -23,6 +23,24 @@
             :listItemLoader="getComboboxItems" :isDynamicValidate="true"
             state="error"
         />  
+        <MSelectOption 
+            label="Chọn tỉnh" title="Chọn một tỉnh của VN" placeholder="--Chọn 1 tỉnh--"
+            :is-show-title="true" :is-show-error="true" :is-obligate="true"
+            :listItemLoader="getComboboxItems" :isDynamicValidate="true"
+            state="normal"
+        /> 
+        <MSelectOption 
+            label="Chọn tỉnh" title="Chọn một tỉnh của VN" placeholder="--Chọn 1 tỉnh--"
+            :is-show-title="true" :is-show-error="true" :is-obligate="true"
+            :listItemLoader="getComboboxItems" :isDynamicValidate="true"
+            state="validated"
+        />  
+        <MSelectOption 
+            label="Chọn tỉnh" title="Chọn một tỉnh của VN" placeholder="--Chọn 1 tỉnh--"
+            :is-show-title="true" :is-show-error="true" :is-obligate="true"
+            :listItemLoader="getComboboxItems" :isDynamicValidate="true"
+            state="error"
+        />   
         <MDatePicker 
             label="Ngày sinh" title="Chọn ngày sinh nhật của bạn" placeholder="<--dd/mm/yy-->"
             :is-show-title="true" :is-show-error="true" :is-obligate="true"
@@ -68,6 +86,12 @@
             :onclick-icon="()=>{}" 
             :validator="null" value="tranphuc8a9a@gmail.com" error-message="Tên tài khoản không hợp lệ"
             state="error"/>
+        
+        <CategoryInput 
+            label="Chọn danh mục" 
+            title="Chọn một danh mục phù hợp" 
+            placeholder="--Chọn 1 danh mục--" 
+        />
     </div>
 </template>
 
@@ -79,10 +103,15 @@ import MDatePicker from '@/components/base/inputs/MDatePicker';
 import MRadio from '@/components/base/inputs/MRadio';
 import MTextfield from '@/components/base/inputs/MTextfield';
 import MPasswordTextfield from '@/components/base/inputs/MPasswordTextfield.vue';
+import MSelectOption from './MSelectOption.vue';
+import CategoryInput from '../category/CategoryInput.vue';
 
 export default {
     name: 'TestInputsPage',
-    components: { MCheckbox, MCombobox, MDatePicker, MRadio, MTextfield, MPasswordTextfield },
+    components: { 
+        MCheckbox, MCombobox, MDatePicker, MRadio, MTextfield,
+        MPasswordTextfield, MSelectOption, CategoryInput
+    },
     methods: {
         async getComboboxItems(){
             await new Promise(e => setTimeout(e, 1000));

@@ -3,15 +3,19 @@
                 :state="inputFrame.state" :errorMessage="inputFrame.errorMessage"
                 :is-obligate="inputFrame.isObligate" :is-full="inputFrame.isFull" 
                 :isShowTitle="inputFrame.isShowTitle" :isShowError="inputFrame.isShowError">
-        <div class="p-category-textfield" @:click="resolveClickExpand">
-            <div class="p-category-textfield-left">
-                <CategoryItem 
+        <div class="p-category-textfield">
+            <div class="p-category-textfield-left"
+            >
+                <div class="pic-category-item"
                     v-for="(category, index) in data.listedCategories"
                     :key="category + index"
-                    :category="category"
-                    :is-editing="true"
-                    :on-delete-category="resolveDeleteCategory(category)"
-                />
+                >    
+                    <CategoryItem 
+                        :category="category"
+                        :is-editing="true"
+                        :on-delete-category="resolveDeleteCategory(category)"
+                    />
+                </div>
                 <input type="text" class="p-category-input" v-model="data.text" 
                         :placeholder="data.placeholder" 
                         @:focus="resolveOnFocus" 
@@ -222,6 +226,7 @@ export default {
                     if (index >= 0){
                         that.data.listedCategories.splice(index, 1);
                     }
+                    await that.resolveOnBlur();
                 } catch (error){
                     console.error(error);
                 }
@@ -286,19 +291,19 @@ export default {
         **/
         async resolveOnBlur(){
             try {
-                let that = this;
-                this.data.isFiltering = false;
-                // do combobox logic when change to new value 
+                this.data.isFiltering = false; 
+                let listCategories = this.data.listedCategories;
+                this.data.items.forEach(function(item){
+                    item.state = myEnum.comboboxItemState.NORMAL;
+                    if (listCategories.includes(item.value)){
+                        item.state = myEnum.comboboxItemState.CHOSEN;
+                    }
+                });
+
                 await new Promise(e => setTimeout(e, 250));
-                await that.setState(myEnum.inputState.NORMAL);
-                await that.resolveOnChange?.();
-                await that.onblur?.();
-                // this.$nextTick(async function(){
-                //     await new Promise(e => setTimeout(e, 250));
-                //     await that.setState(myEnum.inputState.NORMAL);
-                //     await that.resolveOnChange?.();
-                //     await that.onblur?.();
-                // });               
+                await this.setState(myEnum.inputState.NORMAL);
+                await this.resolveOnChange?.();
+                await this.onblur?.();            
             } catch (error){
                 console.error(error);
             }
@@ -370,24 +375,14 @@ export default {
             return async function(){
                 try {
                     this.data.text = "";
-                    this.data.listedCategories.push(item.label);
-
-                    console.log("clicked");
-                    let that = this;
+                    if (this.data.listedCategories.includes(item.value)){
+                        await this.resolveDeleteCategory(item.value)();
+                    } else {
+                        this.data.listedCategories.push(item.value);
+                    }
                     
-                    await that.resolveOnBlur();
-                    await that.setState(myEnum.inputState.NORMAL);
-                    await that.resolveOnChange?.();
-                    // this.$nextTick(async function(){
-                    //     try {
-                    //         await new Promise(e => setTimeout(e, 550));
-                    //         await that.resolveOnBlur();
-                    //         await that.setState(myEnum.inputState.NORMAL);
-                    //         await that.resolveOnChange?.();
-                    //     } catch (e) {
-                    //         console.error(e);
-                    //     }
-                    // });
+                    await this.resolveOnBlur();
+                    await this.resolveOnChange?.();
                 } catch (error){
                     console.error(error);
                 }

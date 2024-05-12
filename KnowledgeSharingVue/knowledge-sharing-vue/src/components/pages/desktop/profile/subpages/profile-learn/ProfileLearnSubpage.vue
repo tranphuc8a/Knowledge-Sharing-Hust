@@ -2,13 +2,22 @@
 
 <template>
     <div class="profile-learn-subpage p-profile-main-subpage">
-        
+        <div class="pls-top">            
+            <!-- Profile Learn Toolbar Subpage -->
+        </div>
+
+        <div class="pls-bottom">
+            <!-- Profile Learn Content Subpage -->
+        </div>
+            
     </div>
 </template>
 
 
 
 <script>
+import { GetRequest } from '@/js/services/request';
+
 
 
 export default {
@@ -21,16 +30,42 @@ export default {
     data(){
         return {
             isMySelf: false,
+            listFilteredCourse: null,
+            listCourse: [],
         }
     },
-    async mounted(){
+    async created(){
         try {
-            this.isMySelf = await this.getIsMySelf();
+            this.refresh();
         } catch (error){
             console.error(error);
         }
     },
+    async mounted(){
+    },
     methods: {
+        async resolveOnchangeConfig(config){
+            try {
+                let { text, isLatest } = config;
+
+            } catch (error){
+                console.error(error);
+            }
+        },
+
+        async refresh(){
+            try {
+                this.isMySelf = await this.getIsMySelf();
+                this.listFilteredCourse = null;
+                let res = await new GetRequest('')
+            } catch (error){
+                console.error(error);
+            }
+        },
+
+        similitary(course, text){
+
+        }
     },
     inject: {
         getIsMySelf: {}
@@ -49,6 +84,10 @@ export default {
     justify-content: space-between;
     align-items: flex-start;
     padding-bottom: 32px;
+}
+
+.profile-learn-subpage > div{
+    width: 100%;
 }
 
 </style>
