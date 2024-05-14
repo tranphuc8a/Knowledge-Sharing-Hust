@@ -112,7 +112,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminSearchUser(string searchKey, int? limit, int? offset)
+        public async Task<ServiceResult> AdminSearchUser(string searchKey, int? limit, int? offset, List<(string, bool)>? orders)
         {
             // Format limit và offset
             int offsetValue = offset ??= 0;
@@ -120,7 +120,8 @@ namespace KnowledgeSharingApi.Services.Services
             searchKey = searchKey.ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
-            IEnumerable<ViewUser> lsUser = await UserRepository.GetDetail();
+            List<ViewUser> lsUser = (await UserRepository.GetDetail()).ToList();
+            lsUser = UserRepository.GetOrderedList(lsUser, orders ?? []);
             IEnumerable<ViewUser> filteredUser = lsUser
                 .Select(user => new
                 {
@@ -275,7 +276,7 @@ namespace KnowledgeSharingApi.Services.Services
             return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
         }
 
-        public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset)
+        public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset, List<(string, bool)>? order)
         {
             // Format limit và offset
             int offsetValue = offset ??= 0;
@@ -283,7 +284,8 @@ namespace KnowledgeSharingApi.Services.Services
             searchKey = searchKey.ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
-            IEnumerable<ViewUser> lsUser = await UserRepository.GetDetail();
+            List<ViewUser> lsUser = (await UserRepository.GetDetail()).ToList();
+            lsUser = UserRepository.GetOrderedList(lsUser, order ?? []);
             IEnumerable<ViewUser> filteredUser = lsUser
                 .Where(lsUser => lsUser.Role != UserRoles.Banned)
                 .Select(user => new

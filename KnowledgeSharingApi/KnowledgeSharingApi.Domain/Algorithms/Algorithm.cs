@@ -62,6 +62,19 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             return dp[text1.Length, text2.Length];
         }
 
+        public static double CalculateLCSimilarity(string text1, string text2)
+        {
+            int lcsLength = LongestCommonSubsequence(text1, text2);
+            int maxLength = Math.Max(text1.Length, text2.Length);
+
+            if (maxLength == 0)
+            {
+                return 1.0; // Cả hai chuỗi đều rỗng
+            }
+
+            return (double)lcsLength / maxLength;
+        }
+
         public static int LongestCommonSubsequenceContinuous(string str1, string str2)
         {
             int[,] lengths = new int[str1.Length + 1, str2.Length + 1];
@@ -82,6 +95,19 @@ namespace KnowledgeSharingApi.Domains.Algorithms
 
             // Return the length of longest common subsequence
             return lengths[str1.Length, str2.Length];
+        }
+
+        public static double CalculateLCSCimilarity(string str1, string str2)
+        {
+            int lcscLength = LongestCommonSubsequenceContinuous(str1, str2);
+            int maxLength = Math.Max(str1.Length, str2.Length);
+
+            if (maxLength == 0)
+            {
+                return 1.0; // Cả hai chuỗi đều rỗng
+            }
+
+            return (double)lcscLength / maxLength;
         }
 
         public static int CalculateLevenshteinDistance(string a, string b)
@@ -118,5 +144,110 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             return d[n, m];
         }
 
+        public static double CalculateLevenshteinSimilarity(string a, string b)
+        {
+            if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b))
+            {
+                return 0.0;
+            }
+
+            int levenshteinDistance = CalculateLevenshteinDistance(a, b);
+            int maxLength = Math.Max(a.Length, b.Length);
+
+            // Đảm bảo không chia cho 0
+            if (maxLength == 0)
+            {
+                return 1.0; // cả hai chuỗi đều rỗng
+            }
+
+            double similarity = 1.0 - (double)levenshteinDistance / maxLength;
+            return similarity;
+        }
+
+        public static double CalculateJaccardSimilarity(string a, string b)
+        {
+            // Kiểm tra nếu một trong hai chuỗi là null hoặc rỗng
+            if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b))
+            {
+                return 0.0;
+            }
+
+            // Tạo các tập hợp ký tự từ hai chuỗi
+            HashSet<char> setA = new(a);
+            HashSet<char> setB = new(b);
+
+            // Tính giao của hai tập hợp
+            HashSet<char> intersection = new(setA);
+            intersection.IntersectWith(setB);
+
+            // Tính hợp của hai tập hợp
+            HashSet<char> union = new(setA);
+            union.UnionWith(setB);
+
+            // Tính điểm số Jaccard
+            double jaccardScore = (double)intersection.Count / union.Count;
+            return jaccardScore;
+        }
+
+
+        public static double CalculateCompositeSimilarity(string a, string b)
+        {
+            double levenshteinSimilarity = CalculateLevenshteinSimilarity(a, b);
+            double jaccardSimilarity = CalculateJaccardSimilarity(a, b);
+            double lcsSimilarity = CalculateLCSimilarity(a, b);
+            double lcscSimilarity = CalculateLCSCimilarity(a, b);
+
+            // Kết hợp các độ tương đồng bằng trung bình cộng
+            double compositeSimilarity = (levenshteinSimilarity + jaccardSimilarity + lcsSimilarity + lcscSimilarity) / 4;
+
+            return compositeSimilarity;
+        }
+
+        public static double AggregateUsingMax(params double[] criteria)
+        {
+            return criteria.Max();
+        }
+        public static double AggregateWithWeight(params double[] criteria)
+        {
+            double product = 1.0;
+            foreach (double criterion in criteria)
+            {
+                product *= Math.Pow(criterion, 0.5); // Sử dụng căn bậc hai để tăng tốc độ khi giá trị gần 1
+            }
+            return product;
+        }
+        public static double AggregateWithBoost(params double[] criteria)
+        {
+            double sum = 0.0;
+            double boost = 0.0;
+
+            foreach (double criterion in criteria)
+            {
+                sum += criterion;
+                boost += 1 - Math.Pow(1 - criterion, 5); // Sử dụng lũy thừa lớn để tăng tốc độ khi giá trị gần 1
+            }
+
+            double average = sum / criteria.Length;
+            double boostedAverage = (average + boost) / (1 + criteria.Length); // Kết hợp với yếu tố bù đắp
+
+            return boostedAverage;
+        }
+
+        public static double MaxCriteria(params double[] criteria)
+        {
+            return criteria.Max();
+        }
+
+        public static double ExponentialCriteria(params double[] criteria)
+        {
+            double sum = criteria.Sum();
+            return 1 - Math.Exp(-sum);
+        }
+
+        public static double YagerCriteria(double p, params double[] criteria)
+        {
+            double sumOfPowers = criteria.Select(a => Math.Pow(1 - a, p)).Sum();
+            return 1 - Math.Min(1, Math.Pow(sumOfPowers, 1 / p));
+        }
     }
 }

@@ -31,21 +31,24 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         // Override lại hàm xóa comment
         public override async Task<int> Delete(Guid commentId)
         {
-            using IDbContextTransaction transaction = await DbContext.Database.BeginTransactionAsync();
+            using IDbContextTransaction transaction = await DbContext.BeginTransaction();
             try
             {
                 // Chuyển tất cả reply comment về reply null
-                string commandText = "UPDATE Comments SET ReplyId = NULL WHERE ReplyId = @p0";
-                SqlParameter[] parameters = [new SqlParameter("@p0", commentId)];
-                int affectedRows = await DbContext.Database.ExecuteSqlRawAsync(commandText, parameters);
+                var commentsToUpdate = DbContext.Comments.Where(c => c.ReplyId == commentId);
+                foreach (var comment in commentsToUpdate)
+                {
+                    comment.ReplyId = null;
+                }
 
                 // Xóa comment
                 var commentToDelete = await DbContext.Comments.FindAsync(commentId);
                 if (commentToDelete != null)
                 {
                     DbContext.Comments.Remove(commentToDelete);
-                    affectedRows += await DbContext.SaveChangesAsync();
                 }
+
+                int affectedRows = await DbContext.SaveChangesAsync();
 
                 // Commit and return affected rows
                 await transaction.CommitAsync();

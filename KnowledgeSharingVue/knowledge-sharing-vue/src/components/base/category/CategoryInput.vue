@@ -365,7 +365,7 @@ export default {
 
 
         // OTHER METHODS:
-        /* *
+        /**
         * Xử lý logic khi click chuột vào một item của combobox
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -388,7 +388,7 @@ export default {
                 }
             }.bind(this);
         },  
-        /* *
+        /**
         * Hai hàm xử lý sự kiện click vào nút expand và collapse
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -416,7 +416,7 @@ export default {
                 console.error(e);
             }
         },
-        /* *
+        /**
         * Xử lý sự kiện yêu cầu lọc item theo text
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -465,7 +465,7 @@ export default {
                 console.error(error);
             }
         },
-        /* *
+        /**
         * Xử lý yêu cầu làm mới danh sách items của combobox
         * @param none
         * @Author TVPhuc (12/12/23)

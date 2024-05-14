@@ -1,14 +1,16 @@
 <template>
-    <div class="p-postcard-comment-list">
+    <div class="p-postcard-comment-list" v-if="isLoaded">
         <div class="p-pcl-filter-button">
             <CommentFilterButton :on-change="resolveOnchangeFilter" />
         </div>
         <div class="p-pcl-comment-list" v-if="listComments?.length > 0">
-            <PostCardComment v-for="comment in listComments" :key="comment?.UserItemId" :comment="comment"/>
-            <!-- <div class="p-pcl-comment-load-more" v-show="!isOutOfComments"
-                @:click="resolveLoadMoreComment">
-                Tải thêm bình luận
-            </div> -->
+            <PostCardComment 
+                v-for="comment in listComments" 
+                :key="comment?.UserItemId" 
+                :comment="comment"
+                :on-delete-comment="resolveDeletedComment(comment)"
+            />
+            
             <MLinkButton v-show="!isOutOfComments" :onclick="getMoreComments" 
                 label="Tải thêm bình luận" :href="null" :buttonStyle="buttonStyle"
             />
@@ -38,6 +40,7 @@ export default {
     name: "PostCardcomment-list",
     data(){
         return {
+            isLoaded: true,
             buttonStyle: { padding: '0px', fontSize: '13px', height: '24px' },
             label: null,
             listComments: [],
@@ -132,9 +135,14 @@ export default {
                     return com;
                 });
                 this.listComments = mappedComments;
-                this.$forceUpdate();
             } catch (e) {
                 console.error(e);
+            } finally {
+                let that = this;
+                this.isLoaded = false;
+                this.$nextTick(() => {
+                    that.isLoaded = true;
+                });
             }
         },
 
@@ -181,6 +189,19 @@ export default {
                 this.listComments.push(comment);
             } catch (e) {
                 console.error(e);
+            }
+        },
+
+        resolveDeletedComment(comment){
+            return async function(){
+                try {
+                    let index = this.listComments.indexOf(comment);
+                    if (index >= 0){
+                        this.listComments.splice(index, 1);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
             }
         }
 

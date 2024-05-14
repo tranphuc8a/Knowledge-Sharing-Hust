@@ -83,7 +83,7 @@ export default {
                 await new DeleteRequest(url + this.getPost()?.UserItemId)
                     .execute();
                 // delete success:
-                this.getPopupManager().success(`Xóa ${this.postResource} thành công!`);
+                this.getToastManager().success(`Xóa ${this.postResource} thành công!`);
                 window.location.reload();
             } catch (error) {
                 console.error(error);

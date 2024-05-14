@@ -7,9 +7,9 @@
             </div>
             <div class="toc-items">
                 <div v-for="entry in tocTree" :key="entry.id" class="p-item p-item-level-1">
-                    <a :href="'#' + entry.id">{{ entry.title }}</a>
+                    <a :href="'#' + entry.id" class="p-a" :title="entry.title">{{ entry.title }}</a>
                     <div v-for="child in entry.children ?? []" :key="child.id" class="p-item p-item-level-2">
-                        <a :href="'#' + child.id">{{ child.title }}</a>
+                        <a :href="'#' + child.id" class="p-a" :title="child.title">{{ child.title }}</a>
                     </div>
                 </div>
             </div>
@@ -145,7 +145,7 @@ export default {
     text-align: left;
 }
 
-.p-item a {
+.p-item > .p-a {
     width: 100%;
     padding: 8px 10px;
     border-radius: 4px;

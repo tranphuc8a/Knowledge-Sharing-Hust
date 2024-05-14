@@ -19,16 +19,12 @@ namespace KnowledgeSharingApi.Controllers
     public class CoursePaymentsController(
         ICoursePaymentService coursePaymentService,
         IUserRepository userRepository
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly ICoursePaymentService CoursePaymentService = coursePaymentService;
         protected readonly IUserRepository UserRepository = userRepository;
 
         #region Functionality methods
-        protected virtual IActionResult StatusCode(ServiceResult result)
-        {
-            return StatusCode((int)result.StatusCode, new ApiResponse(result));
-        }
 
         /// <summary>
         /// Thực hiện kiểm tra email có trùng khớp với current user hay không
@@ -41,21 +37,9 @@ namespace KnowledgeSharingApi.Controllers
         {
             ValidatorException invalidEmail = new(ViConstantResource.INVALID_EMAIL);
             if (string.IsNullOrEmpty(email)) throw invalidEmail;
-            Guid myUid = GetCurrentUserId();
+            Guid myUid = GetCurrentUserIdStrictly();
             User? myUser = await UserRepository.Get(myUid);
             if (myUser?.Email != email) throw invalidEmail;
-        }
-
-        /// <summary>
-        /// Lấy về user id của current User
-        /// </summary>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        protected virtual Guid GetCurrentUserId()
-        {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return Guid.Parse(myUid);
         }
 
         #endregion
@@ -77,8 +61,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetCoursePayments(Guid courseId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CoursePaymentService.UserGetCoursePayments(Guid.Parse(myUid), courseId, limit, offset));
+            return StatusCode(await CoursePaymentService.UserGetCoursePayments(GetCurrentUserIdStrictly(), courseId, limit, offset));
         }
 
         /// <summary>
@@ -94,8 +77,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetMyPayments(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CoursePaymentService.UserGetMyPayments(Guid.Parse(myUid), limit, offset));
+            return StatusCode(await CoursePaymentService.UserGetMyPayments(GetCurrentUserIdStrictly(), limit, offset));
         }
 
         /// <summary>
@@ -110,8 +92,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetPayment(Guid paymentId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CoursePaymentService.UserGetPayment(Guid.Parse(myUid), paymentId));
+            return StatusCode(await CoursePaymentService.UserGetPayment(GetCurrentUserIdStrictly(), paymentId));
         }
 
         #endregion

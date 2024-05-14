@@ -1,6 +1,9 @@
 
 
-
+.p-lestion-detail{
+    padding-left: 10%;
+    padding-right: 10%;
+}
 
 .p-lestion-detail .d-empty-panel{
     width: 100%;
@@ -45,7 +48,7 @@
 
 .p-lestion-detail .lestion-card{
     min-width: 600px;
-    max-width: 95%;
+    max-width: 90%;
     width: fit-content;
 }
 

@@ -1,6 +1,6 @@
 
 
-import Entity from './entity';
+import Entity from "../entity";
 
 class CourseRegister extends Entity {
     constructor() {

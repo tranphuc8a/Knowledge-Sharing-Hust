@@ -209,13 +209,13 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(msg);
         }
 
-        public virtual async Task<ServiceResult> FilterService(string search, int? limit = null, int? offset = null)
+        public virtual async Task<ServiceResult> FilterService(string search, int? limit = null, int? offset = null, List<(string Field, bool IsAscending)>? orders = null)
         {
             var repository = GetRepository();
             PaginationResponseModel<T> paginationResponseModel;
             if (limit != null)
             {
-                paginationResponseModel = await repository.Filter(search, limit ?? 0, offset ?? 0);
+                paginationResponseModel = await repository.Filter(search, limit ?? 0, offset ?? 0, orders ?? []);
             }
             else
             {

@@ -106,6 +106,16 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Modified: None
         Task<ServiceResult> UserGetMyCourseRequests(Guid myUId, int? limit, int? offset);
 
+        /// <summary>
+        /// Lay ve trang thai quan he giua user va course
+        /// </summary>
+        /// <param name="myUid"> id user thuc hien </param>
+        /// <param name="courseId"> id course can lay </param>
+        /// <returns></returns>
+        /// CReated: PhucTV (15/5/24)
+        /// Modified: None
+        Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid courseId);
+
         #endregion
 
 

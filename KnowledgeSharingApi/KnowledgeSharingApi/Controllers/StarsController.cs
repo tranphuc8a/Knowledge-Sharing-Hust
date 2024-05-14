@@ -15,7 +15,7 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class StarsController(
         IStarService starService    
-    ): ControllerBase
+    ): BaseController
     {
         protected IStarService StarService = starService;
 
@@ -36,7 +36,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AnonymousGetUserItemStars(Guid itemId, int? limit, int? offset)
         {
             ServiceResult res = await StarService.AnonymousGetUserItemStars(itemId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -52,9 +52,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> UserGetUserItemStars(Guid itemId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetUserItemStars(Guid.Parse(myUid), itemId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserGetUserItemStars(GetCurrentUserIdStrictly(), itemId, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetUserItemStars(Guid itemId, int? limit, int? offset)
         {
             ServiceResult res = await StarService.AdminGetUserItemStars(itemId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         #endregion
@@ -91,9 +90,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyStaredUserItems(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredUserItems(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserGetMyScoredUserItems(GetCurrentUserIdStrictly(), limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -109,9 +107,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyStaredComments(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredComments(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserGetMyScoredComments(GetCurrentUserIdStrictly(), limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -126,9 +123,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyStaredCourse(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredCourses(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserGetMyScoredCourses(GetCurrentUserIdStrictly(), limit, offset);
+            return StatusCode(res);
         }
 
 
@@ -144,9 +140,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyStaredPosts(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredPosts(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserGetMyScoredPosts(GetCurrentUserIdStrictly(), limit, offset);
+            return StatusCode(res);
         }
 
 
@@ -162,9 +157,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyStaredQuestions(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredQuestions(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserGetMyScoredQuestions(GetCurrentUserIdStrictly(), limit, offset);
+            return StatusCode(res);
         }
 
 
@@ -180,9 +174,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyStaredLessons(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredLessons(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserGetMyScoredLessons(GetCurrentUserIdStrictly(), limit, offset);
+            return StatusCode(res);
         }
 
         #endregion
@@ -199,9 +192,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> StarAnUserItem(PutScoreModel starModel)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserPutScores(Guid.Parse(myUid), starModel);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserPutScores(GetCurrentUserIdStrictly(), starModel);
+            return StatusCode(res);
         }
 
         #endregion

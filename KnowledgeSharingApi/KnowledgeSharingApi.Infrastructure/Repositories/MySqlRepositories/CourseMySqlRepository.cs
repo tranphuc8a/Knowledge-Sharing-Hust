@@ -123,8 +123,21 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<IEnumerable<ViewCourse>> GetViewCourse(Guid myUid, int limit, int offset)
         {
+            IQueryable<Guid> listRegisteredCourseIds = DbContext.ViewCourseRegisters
+                .Where(cr => cr.UserId == myUid)
+                .Select(cr => cr.CourseId);
+            // Lấy danh sách course mà myUid được invite vào
+            IQueryable<Guid> listInvitedCourseIds = DbContext.CourseRelations
+                .Where(invite => invite.ReceiverId == myUid && invite.CourseRelationType == ECourseRelationType.Invite)
+                .Select(invite => invite.CourseId);
+
             return await DbContext.ViewCourses
-                .Where(c => c.UserId == myUid)
+                .Where(vc => (
+                    vc.Privacy == EPrivacy.Public ||
+                    vc.UserId == myUid ||
+                    listRegisteredCourseIds.Contains(vc.UserItemId) ||
+                    listInvitedCourseIds.Contains(vc.UserItemId)
+                ))
                 .OrderByDescending(c => c.CreatedTime)
                 .Skip(offset).Take(limit)
                 .ToListAsync();

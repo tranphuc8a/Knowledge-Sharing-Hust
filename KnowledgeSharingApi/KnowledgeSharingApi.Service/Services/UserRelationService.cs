@@ -34,24 +34,6 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly int DefaultLimit = 50;
 
         /// <summary>
-        /// Kiểm tra hai người có chặn nhau không
-        /// </summary>
-        /// <param name="myUid"> Id của mình </param>
-        /// <param name="uid"> Id của người khác </param>
-        /// <returns></returns>
-        /// <exception cref="ValidatorException"> Hai người dùng chặn nhau </exception>
-        /// Created: PhucTV (19/3/24)
-        /// Modified: None
-        protected virtual async Task CheckBlockEachOther(Guid myUid, Guid uid)
-        {
-            bool isBlocker = await UserRelationRepository.CheckBlock(myUid, uid);
-            if (isBlocker) throw new ValidatorException("Không thể thực hiện vì bạn đã chặn người dùng này");
-
-            bool isBlockee = await UserRelationRepository.CheckBlock(uid, myUid);
-            if (isBlockee) throw new ValidatorException("Không thể thực hiện vì bạn đã bị người dùng này chặn");
-        }
-
-        /// <summary>
         /// Kiểm tra xem người dùng có tồn tại không
         /// </summary>
         /// <param name="myUid"> Id của mình </param>
@@ -193,6 +175,10 @@ namespace KnowledgeSharingApi.Services.Services
 
         public virtual async Task<ServiceResult> Follow(Guid myuid, Guid uid)
         {
+            if (myuid == uid)
+            {
+                return ServiceResult.BadRequest("Không thể tự follow");
+            }
             // Check myuid và uid có tồn tại
             await CheckExistedUser(myuid, uid);
 
@@ -233,6 +219,11 @@ namespace KnowledgeSharingApi.Services.Services
         }
         public virtual async Task<ServiceResult> Unfollow(Guid myuid, Guid uid)
         {
+            if (myuid == uid)
+            {
+                return ServiceResult.BadRequest("Không thể tự unfollow");
+            }
+
             // Kiểm tra myuid có follow uid chưa
             IEnumerable<ViewUserRelation> relations = await UserRelationRepository.GetByUserIdAndType(myuid, true, EUserRelationType.Follow);
             IEnumerable<ViewUserRelation> relation = relations.Where(relation => relation.ReceiverId == uid);
@@ -251,6 +242,10 @@ namespace KnowledgeSharingApi.Services.Services
 
         public virtual async Task<ServiceResult> Block(Guid myuid, Guid uid)
         {
+            if (myuid == uid)
+            {
+                return ServiceResult.BadRequest("Không thể tự block");
+            }
             // Check user tồn tại
             await CheckExistedUser(myuid, uid);
 
@@ -318,6 +313,10 @@ namespace KnowledgeSharingApi.Services.Services
         }
         public virtual async Task<ServiceResult> Unblock(Guid myuid, Guid uid)
         {
+            if (myuid == uid)
+            {
+                return ServiceResult.BadRequest("Không thể tự unblock");
+            }
             // Check user tồn tại
             await CheckExistedUser(myuid, uid);
 
@@ -338,6 +337,11 @@ namespace KnowledgeSharingApi.Services.Services
 
         public virtual async Task<ServiceResult> AddFriend(Guid myuid, Guid uid)
         {
+            if (myuid == uid)
+            {
+                return ServiceResult.BadRequest("Không thể tự thêm bạn bè chính mình");
+            }
+
             // Kiểm tra người dùng tồn tại
             await CheckExistedUser(myuid, uid);
 
@@ -377,6 +381,11 @@ namespace KnowledgeSharingApi.Services.Services
         }
         public virtual async Task<ServiceResult> DeleteFriend(Guid myuid, Guid uid)
         {
+            if (myuid == uid)
+            {
+                return ServiceResult.BadRequest("Không thể tự xóa bạn bè chính mình");
+            }
+
             // Kiểm tra user tồn tại
             await CheckExistedUser(myuid, uid);
 

@@ -2,7 +2,7 @@
 
 import ProfilePage from '@/components/pages/desktop/profile/ProfilePage.vue';
 import ProfileHomeSubpage from '@/components/pages/desktop/profile/subpages/profile-home/ProfileHomeSubpage.vue';
-
+import ProfileLearnSubpage from '@/components/pages/desktop/profile/subpages/profile-learn/ProfileLearnSubpage.vue';
 
 
 const profileRouter = [
@@ -25,7 +25,7 @@ const profileRouter = [
             }, { // when /profile.../learn
                 path: 'learn',
                 name: 'profile-learn-page',
-                component: null, 
+                component: ProfileLearnSubpage, 
             }, { // when /profile.../lesson
                 path: 'lesson',
                 name: 'profile-lesson-page',

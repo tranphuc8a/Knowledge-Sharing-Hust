@@ -6,22 +6,22 @@
                 <PostCardHeader />
             </div>
             <div class="p-feedcard-lestion__title">
-                {{question?.Title ?? "Title of question"}}
+                {{dPost?.Title ?? "Title of post"}}
             </div>
-            <div class="p-feedcard-lestion__abstract" v-show="question?.Abstract != null">
+            <div class="p-feedcard-lestion__abstract" v-show="dPost?.Abstract != null">
                 <!-- <textarea type="text" v-model="content"/> -->
-                <LatexMarkdownRender :markdown-content="question?.Abstract" />
+                <LatexMarkdownRender :markdown-content="dPost?.Abstract" />
             </div>
             <div class="p-feedcard-lestion__categories" v-show="compiledCategories?.length > 0">
                 <CategoriesList :categories="compiledCategories" />
             </div>
             <div class="p-feedcard-lestion__devide" 
-                v-if="question?.Content != null"
+                v-if="dPost?.Content != null"
                 >
                 <div></div>
             </div>
-            <div class="p-feedcard-lestion__content" v-if="question?.Content != null">
-                <LatexMarkdownRender :markdown-content="question?.Content" />
+            <div class="p-feedcard-lestion__content" v-if="dPost?.Content != null">
+                <LatexMarkdownRender :markdown-content="dPost?.Content" />
             </div>
             <div class="p-feedcard-lestion__thumbnail">
                 <PostCardThumbnail />
@@ -29,10 +29,10 @@
             <div class="p-feedcard-lestion__toolbar">
                 <PostCardToolBar />
             </div>
-            <div class="p-feedcard-lestion__devide">
+            <div class="p-feedcard-lestion__devide" v-if="isShowComment">
                 <div></div>
             </div>
-            <div class="p-feedcard-lestion__comments">
+            <div class="p-feedcard-lestion__comments" v-if="isShowComment">
                 <PostCardCommentList />
             </div>
         </div>
@@ -49,7 +49,7 @@ import PostCardHeader from '../../home/components/feed-subpage/postcard/PostCard
 import FeedCardFrame from '../../home/components/feed-subpage/postcard/FeedCardFrame.vue';
 
 export default {
-    name: "QuestionCard",
+    name: "PostCard",
     data() {
         return {
             label: null,
@@ -61,7 +61,7 @@ export default {
                 color: 'var(--grey-color)',
             },
             content: '',
-            question: this.post,
+            dPost: this.post,
             compiledCategories: [],
         }
     },
@@ -90,9 +90,9 @@ export default {
         },
 
         getCategories() {
-            if (this.question?.Categories != null
-                && this.question.Categories.length > 0){
-                return this.question.Categories
+            if (this.dPost?.Categories != null
+                && this.dPost.Categories.length > 0){
+                return this.dPost.Categories
                     .map(cate => cate.CategoryName);
             }
             return this.defaultCategoriesList;
@@ -106,18 +106,22 @@ export default {
     },
     provide(){
         return {
-            getPost: () => this.question
+            getPost: () => this.dPost
         }
     },
     watch: {
         post(newValue) {
-            this.question = newValue;
+            this.dPost = newValue;
             this.compiledCategories = this.getCategories();
         }
     },
     props: {
         post: {
             required: true
+        },
+
+        isShowComment: {
+            default: true
         }
     }
 }

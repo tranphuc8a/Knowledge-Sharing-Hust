@@ -16,14 +16,9 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class QuestionsController(
         IQuestionService questionService
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly IQuestionService QuestionService = questionService;
-
-        protected virtual IActionResult StatusCode(ServiceResult result)
-        {
-            return StatusCode((int)result.StatusCode, new ApiResponse(result));
-        }
 
         #region Anonymous Apies
 
@@ -155,8 +150,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListQuestion(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetPosts(Guid.Parse(myUid), limit, offset));
+            return StatusCode(await QuestionService.UserGetPosts(GetCurrentUserIdStrictly(), limit, offset));
         }
 
         /// <summary>
@@ -172,8 +166,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListUserQuestion(Guid userId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetUserPosts(Guid.Parse(myUid), userId, limit, offset));
+            return StatusCode(await QuestionService.UserGetUserPosts(GetCurrentUserIdStrictly(), userId, limit, offset));
         }
 
         /// <summary>
@@ -188,8 +181,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListMyQuestion(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetMyPosts(Guid.Parse(myUid), limit, offset));
+            return StatusCode(await QuestionService.UserGetMyPosts(GetCurrentUserIdStrictly(), limit, offset));
         }
 
         /// <summary>
@@ -203,8 +195,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetDetailQuestion(Guid questionId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetPostDetail(Guid.Parse(myUid), questionId));
+            return StatusCode(await QuestionService.UserGetPostDetail(GetCurrentUserIdStrictly(), questionId));
         }
 
         /// <summary>
@@ -218,8 +209,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetDetailMyQuestion(Guid questionId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetMyPostDetail(Guid.Parse(myUid), questionId));
+            return StatusCode(await QuestionService.UserGetMyPostDetail(GetCurrentUserIdStrictly(), questionId));
         }
 
         /// <summary>
@@ -235,8 +225,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListCourseQuestion(Guid courseId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetListPostsOfCourse(Guid.Parse(myUid), courseId, limit, offset));
+            return StatusCode(await QuestionService.UserGetListPostsOfCourse(GetCurrentUserIdStrictly(), courseId, limit, offset));
         }
 
         /// <summary>
@@ -252,8 +241,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListMyCourseQuestion(Guid courseId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetListPostsOfMyCourse(Guid.Parse(myUid), courseId, limit, offset));
+            return StatusCode(await QuestionService.UserGetListPostsOfMyCourse(GetCurrentUserIdStrictly(), courseId, limit, offset));
         }
 
 
@@ -271,8 +259,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserAddNewQuestion([FromForm] CreateQuestionModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserCreatePost(Guid.Parse(myUid), model));
+            return StatusCode(await QuestionService.UserCreatePost(GetCurrentUserIdStrictly(), model));
         }
 
 
@@ -288,8 +275,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserUpdateQuestion(Guid questionId, [FromForm] UpdateQuestionModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserUpdatePost(Guid.Parse(myUid), questionId, model));
+            return StatusCode(await QuestionService.UserUpdatePost(GetCurrentUserIdStrictly(), questionId, model));
         }
 
 
@@ -304,8 +290,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserDeleteQuestion(Guid questionId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserDeletePost(Guid.Parse(myUid), questionId));
+            return StatusCode(await QuestionService.UserDeletePost(GetCurrentUserIdStrictly(), questionId));
         }
 
 
@@ -321,8 +306,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserConfirmQuestion(Guid questionId, bool isConfirm)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.ConfirmQuestion(Guid.Parse(myUid), questionId, isConfirm));
+            return StatusCode(await QuestionService.ConfirmQuestion(GetCurrentUserIdStrictly(), questionId, isConfirm));
         }
 
         #endregion
@@ -378,8 +362,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListPostsOfCategory(string category, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await QuestionService.UserGetListPostsOfCategory(Guid.Parse(myUid), category, limit, offset);
+            ServiceResult res = await QuestionService.UserGetListPostsOfCategory(GetCurrentUserIdStrictly(), category, limit, offset);
             return StatusCode(res);
         }
 
@@ -395,8 +378,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListMarkedQuestions(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await QuestionService.UserGetMyMarkedPosts(Guid.Parse(myUid), limit, offset);
+            ServiceResult res = await QuestionService.UserGetMyMarkedPosts(GetCurrentUserIdStrictly(), limit, offset);
             return StatusCode(res);
         }
 

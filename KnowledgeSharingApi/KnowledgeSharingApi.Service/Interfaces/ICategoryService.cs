@@ -1,5 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;

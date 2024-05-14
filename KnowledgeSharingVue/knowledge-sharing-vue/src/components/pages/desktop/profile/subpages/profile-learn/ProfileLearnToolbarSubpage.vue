@@ -5,11 +5,11 @@
     <div class="p-profile-learn-toolbar-subpage">
         <div class="p-plts-card card">
             <div class="p-plts-card__header">
-                <div class="p-header">
+                <div class="p-plts-header">
                     Các khóa học bạn đang học
                 </div>
-                <div class="p-button">
-                    <MButton 
+                <div class="p-plts-button">
+                    <MSecondaryButton 
                         label="Khám phá các khóa học khác"
                         :onclick="resolveClickOtherCourse"
                         :buttonStyle="buttonStyle"
@@ -17,14 +17,33 @@
                 </div>
             </div>
             <div class="p-plts-card__descrition">
-                
+                {{ description }}
             </div>
             <div class="p-plts-card__control">
                 <div class="p-control-textfield">
-
+                    <MTextfieldButton 
+                        title="Nhập từ khóa tìm kiếm" placeholder="Tìm kiếm"
+                        :is-show-icon="true" 
+                        :is-show-title="false" 
+                        :is-show-error="false" 
+                        :is-obligate="false"
+                        :onclick-icon="resolveClickSearch" 
+                        :validator="null"
+                        :oninput="resolveInputSearch"
+                        state="normal"
+                        ref="search"
+                    />
+            
                 </div>
                 <div class="p-control-order">
-
+                    <MSelectOption 
+                        placeholder="-- Chọn thứ tự --"
+                        :is-show-title="false" :is-show-error="false" :is-obligate="false"
+                        :listItemLoader="getOptions"
+                        state="normal"
+                        :onchange="resolveChangeOrder"
+                        red="option"
+                    /> 
                 </div>
             </div>
         </div>
@@ -35,35 +54,99 @@
 
 <script>
 import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue'
-
+import MTextfieldButton from './../../../../../base/inputs/MTextfieldButton.vue'
+import MSelectOption from './../../../../../base/inputs/MSelectOption.vue'
 
 export default {
     name: 'ProfileLearnToolbarSubpage',
     components: {
-        MSecondaryButton
+        MSecondaryButton,
+        MTextfieldButton,
+        MSelectOption
     },
     props: {
+        onChangeConfig: {},
+        listCourses: {}
     },
     data(){
         return {
             buttonStyle: {
 
-            }
+            },
+            description: 'Bạn đang học 2 khóa học. Bạn có thể khám phá các khóa học khác tại đây.'
         }
     },
     mounted(){
-
+        this.refresh();
     },
     methods: {
+        async refresh(){
+            try {
+                let numberCourse = this.listCourses?.length ?? 0;
+                if (this.numberCourse > 0){
+                    this.description = `Bạn đang học ${numberCourse} khóa học. Bạn có thể khám phá các khóa học khác tại đây.`;
+                } else {
+                    this.description = 'Bạn chưa học khóa học nào. Bạn có thể khám phá các khóa học khác tại đây.';
+                }
+            } catch (error){
+                console.error(error);
+            }
+        },
+
         async resolveClickOtherCourse(){
             try {
                 await this.$store.dispatch('course/getOtherCourse')
                 this.$router.push({
                     name: 'course.other-course'
                 })
-            } cactch (error){
+            } catch (error){
                 console.error(error)
             }
+        },
+
+        getOptions(){
+            return [
+                {
+                    label: 'Mới nhất',
+                    value: 'newest'
+                },
+                {
+                    label: 'Cũ nhất',
+                    value: 'oldest'
+                }
+            ];
+        },
+
+        async resolveChangeConfig(){
+            try {
+                if (this.onChangeConfig){
+                    let searchText = await this.$refs.search.getValue();
+                    let order = await this.$refs.option.getValue();
+                    let config = {
+                        text: searchText,
+                        isLatest: (order === null ? null : order === 'newest' ? true : false)
+                    }
+                    await this.onChangeConfig(config);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+        async resolveInputSearch(){
+            return await this.resolveChangeConfig();
+        },
+
+        async resolveChangeOrder(){
+            return await this.resolveChangeConfig();
+        }
+    },
+    watch: {
+        listCourses: {
+            handler: function(){
+                this.refresh();
+            },
+            deep: true
         }
     }
 }
@@ -71,6 +154,53 @@ export default {
 </script>
 
 <style scoped>
+
+.p-profile-learn-toolbar-subpage{
+    width: 100%;
+}
+
+.p-plts-card{
+    width: 100%;
+    padding: 16px;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.p-plts-card__header{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 16px;
+}
+.p-plts-header{
+    font-size: 24px;
+    font-weight: 600;
+    font-family: 'ks-font-semibold';
+}
+.p-plts-button{
+    width: fit-content;
+}
+.p-plts-card__descrition{
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.p-plts-card__control{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+}
+
+.p-control-order{
+    width: 200px;
+}
 
 </style>
 

@@ -14,6 +14,8 @@ class ResponseCourseModel extends ViewCourse {
         this.TotalStars = null;
         this.Role = null;
         this.Categories = [];
+        this.CourseRoleType = null;
+        this.CourseRelationId = null;
     }
 
     init() {

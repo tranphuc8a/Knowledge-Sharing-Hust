@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,17 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (30/3/24)
         /// Modified: None
         Task<IEnumerable<CourseRelation>> GetRelationsOfUser(Guid userId, ECourseRelationType relationType);
+
+
+        /// <summary>
+        /// Lay ve quan he cua user voi mot danh sach khoa hoc
+        /// </summary>
+        /// <param name="userId"> id cua user thuc hien </param>
+        /// <param name="courseIds"> Danh sach course id </param>
+        /// <returns></returns>
+        /// Created: PhucTV (13/5/24)
+        /// Modified: None
+        Task<Dictionary<Guid, CourseRoleTypeDto>> GetCourseRoleType(Guid userId, List<Guid> courseIds);
 
 
         /// <summary>

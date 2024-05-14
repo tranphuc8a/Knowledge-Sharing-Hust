@@ -1,6 +1,10 @@
-﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
+﻿using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +18,7 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class CategoriesController(
         ICategoryService categoryService
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly ICategoryService CategoryService = categoryService;
 
@@ -33,7 +37,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> GetAll(int? limit, int? offset)
         {
             ServiceResult res = await CategoryService.GetListCategories(limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -48,7 +52,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> GetOfKnowledge(Guid knowledgeId)
         {
             ServiceResult res = await CategoryService.GetListCategoryOfKnowledge(knowledgeId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Get(Guid categoryId)
         {
             ServiceResult res = await CategoryService.GetCategory(categoryId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -78,7 +82,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Get(string category)
         {
             ServiceResult res = await CategoryService.GetCategory(category);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         #endregion
@@ -98,7 +102,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Create(string category)
         {
             ServiceResult res = await CategoryService.AddCategory(category);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -114,7 +118,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Update(Guid categoryId, string category)
         {
             ServiceResult res = await CategoryService.UpdateCategory(categoryId, category);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -129,7 +133,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Delete(Guid categoryId)
         {
             ServiceResult res = await CategoryService.DeleteCategory(categoryId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -144,7 +148,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Delete(string category)
         {
             ServiceResult res = await CategoryService.DeleteCategoryByName(category);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -158,10 +162,10 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> Update([FromBody] UpdateKnowledgeCategoriesModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CategoryService.UpdateKnowledgeCategories(Guid.Parse(myUid), model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CategoryService.UpdateKnowledgeCategories(GetCurrentUserIdStrictly(), model);
+            return StatusCode(res);
         }
+
 
         #endregion
     }

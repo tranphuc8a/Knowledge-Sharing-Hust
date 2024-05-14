@@ -94,7 +94,7 @@ namespace KnowledgeSharingApi.Services.Services
 
 
         #region Admin apies
-        public async Task<ServiceResult> AdminDeleteUserFromCourse(Guid registerId)
+        public virtual async Task<ServiceResult> AdminDeleteUserFromCourse(Guid registerId)
         {
             // Check register is existed
             ViewCourseRegister? register = await CourseRegisterRepository.GetCourseRegister(registerId);
@@ -114,7 +114,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(MemberResource));
         }
 
-        public async Task<ServiceResult> AdminGetCourseRegisters(Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetCourseRegisters(Guid courseId, int? limit, int? offset)
         {
             // CHeck course Existed
             _ = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -136,7 +136,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region User gets
-        public async Task<ServiceResult> UserGetCourseInvites(Guid myUid, Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetCourseInvites(Guid myUid, Guid courseId, int? limit, int? offset)
         {
             // Check course exist
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -157,7 +157,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, int? limit, int? offset)
         {
             // Check course is existed
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -177,7 +177,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyCourseInvites(Guid myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetMyCourseInvites(Guid myUid, int? limit, int? offset)
         {
             // Get list
             IEnumerable<CourseRelation> lisRelations = await CourseRelationRepository.GetRelationsOfUser(myUid, ECourseRelationType.Invite);
@@ -190,7 +190,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyCourseRequests(Guid myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetMyCourseRequests(Guid myUid, int? limit, int? offset)
         {
             // Get list
             IEnumerable<CourseRelation> lisRelations = await CourseRelationRepository.GetRelationsOfUser(myUid, ECourseRelationType.Request);
@@ -203,7 +203,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetRegisters(Guid myUid, Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetRegisters(Guid myUid, Guid courseId, int? limit, int? offset)
         {
             // Check course existed
             _ = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -228,12 +228,36 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(MemberResource), string.Empty, res);
         }
 
+        public virtual async Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid courseId)
+        {
+            // check course exist
+            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+
+            // get course role type type
+            Dictionary<Guid, CourseRoleTypeDto> dictRoleType = await CourseRelationRepository.GetCourseRoleType(myUid, [courseId]);
+            if (dictRoleType.TryGetValue(courseId, out CourseRoleTypeDto? value))
+            {
+                if (value.CourseRoleType == ECourseRoleType.NotAccessible)
+                {
+                    return ServiceResult.Forbidden("Bạn không có quyền truy cập khóa học này");
+                }
+                ResponseCourseCardModel res = new();
+                res.Copy(course);
+                res.CourseRoleType = value.CourseRoleType;
+                res.CourseRelationId = value.CourseRelationId;
+                return ServiceResult.Success(ResponseResource.GetSuccess(), string.Empty, res);
+            }
+
+            // return server error
+            return ServiceResult.ServerError(ResponseResource.GetFailure());
+        }
+
         #endregion
 
 
         #region User Operations apies
         #region Requestation
-        public async Task<ServiceResult> UserRequestCourse(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserRequestCourse(Guid myUid, Guid courseId)
         {
             // Check course is existed
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -278,7 +302,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success());
         }
 
-        public async Task<ServiceResult> UserDeleteCourseRequest(Guid myUid, Guid requestId)
+        public virtual async Task<ServiceResult> UserDeleteCourseRequest(Guid myUid, Guid requestId)
         {
             // Check course relation is existed
             CourseRelation? courseRelation = await CourseRelationRepository.GetRelation(requestId);
@@ -297,7 +321,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public async Task<ServiceResult> UserConfirmCourseRequest(Guid myUid, Guid requestId, bool isAccept)
+        public virtual async Task<ServiceResult> UserConfirmCourseRequest(Guid myUid, Guid requestId, bool isAccept)
         {
             // Check course relation is existed
             CourseRelation? courseRelation = await CourseRelationRepository.GetRelation(requestId);
@@ -329,7 +353,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Invitation
 
-        public async Task<ServiceResult> UserInviteUserToCourse(Guid myUid, Guid courseId, Guid userId)
+        public virtual async Task<ServiceResult> UserInviteUserToCourse(Guid myUid, Guid courseId, Guid userId)
         {
             // CHeck two id is different
             if (myUid == userId)
@@ -377,7 +401,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success());
         }
 
-        public async Task<ServiceResult> UserInviteListUserToCourse(Guid myUid, Guid courseId, IEnumerable<Guid> listUserIds)
+        public virtual async Task<ServiceResult> UserInviteListUserToCourse(Guid myUid, Guid courseId, IEnumerable<Guid> listUserIds)
         {
             // Check course exist
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -386,12 +410,14 @@ namespace KnowledgeSharingApi.Services.Services
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOnwner);
 
-            // lam sau
+            // Kiem tra danh sach user phai chua tham gia khoa hoc, chưa request khoa hoc, khong phai chu nhan khoa hoc
+
+            // Bỏ không làm vì quá phức tạp
 
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResult> UserDeleteCourseInvite(Guid myUid, Guid inviteId)
+        public virtual async Task<ServiceResult> UserDeleteCourseInvite(Guid myUid, Guid inviteId)
         {
             // Kiem tra relation ton tai
             CourseRelation? invite = await CourseRelationRepository.Get(inviteId);
@@ -409,7 +435,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public async Task<ServiceResult> UserConfirmCourseInvite(Guid myUid, Guid inviteId, bool isAccept)
+        public virtual async Task<ServiceResult> UserConfirmCourseInvite(Guid myUid, Guid inviteId, bool isAccept)
         {
             // Check course relation is existed
             CourseRelation? courseRelation = await CourseRelationRepository.GetRelation(inviteId);
@@ -439,7 +465,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region Register
-        public async Task<ServiceResult> UserRegisterCourse(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserRegisterCourse(Guid myUid, Guid courseId)
         {
             // Kiem tra khoa hoc ton tai
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -477,7 +503,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success());
         }
 
-        public async Task<ServiceResult> UserDeleteRegister(Guid myUid, Guid registerId)
+        public virtual async Task<ServiceResult> UserDeleteRegister(Guid myUid, Guid registerId)
         {
             // Check register is existed
             ViewCourseRegister? register = await CourseRegisterRepository.GetCourseRegister(registerId);
@@ -502,7 +528,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(MemberResource));
         }
 
-        public async Task<ServiceResult> UserUnregisterCourse(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserUnregisterCourse(Guid myUid, Guid courseId)
         {
             // Kiem tra khoa hoc ton tai
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);

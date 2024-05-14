@@ -5,7 +5,8 @@ import UserConversation from '../entities/user-conversation';
 class ViewUserConversation extends UserConversation {
     constructor() {
         super();
-        this.FullName = "";
+        this.Username = null;
+        this.FullName = null;
         this.Avatar = null;
         this.Cover = null;
     }

@@ -34,7 +34,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns> Danh sách User tìm được </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset);
+        Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset, List<(string Field, bool IsAscending)>? orders = null);
 
         /// <summary>
         /// Lấy về chi tiết Profile của chính user
@@ -93,7 +93,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns> Danh sách Profile </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminSearchUser(string searchKey, int? limit, int? offset);
+        Task<ServiceResult> AdminSearchUser(string searchKey, int? limit, int? offset, List<(string Field, bool IsAscending)>? orders = null);
 
         /// <summary>
         /// Admin Lấy về chi tiết Profile của user khác

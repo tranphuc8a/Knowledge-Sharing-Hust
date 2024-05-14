@@ -1,7 +1,9 @@
-﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
+﻿using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +17,7 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class CommentsController(
         ICommentService commentService
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly ICommentService CommentService = commentService;
 
@@ -35,7 +37,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> AnonymousGetCommentsOfKnowledge(Guid knowledgeId, int? limit, int? offset)
         {
             ServiceResult res = await CommentService.AnonymousGetListKnowledgeComments(knowledgeId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -50,9 +52,10 @@ namespace KnowledgeSharingApi.Controllers
         [HttpGet("replies/{commentId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetCommentReplies(Guid commentId, int? limit, int? offset)
-        {
-            ServiceResult res = await CommentService.GetListCommentReplies(commentId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+        { 
+            ServiceResult res = await CommentService.GetListCommentReplies(
+                GetCurrentUserId(), commentId, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -66,8 +69,8 @@ namespace KnowledgeSharingApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetCommentDetail(Guid commentId)
         {
-            ServiceResult res = await CommentService.GetComment(commentId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.GetComment(GetCurrentUserId(), commentId);
+            return StatusCode(res);
         }
         #endregion
 
@@ -88,7 +91,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> AdminGetListComments(Guid knowledgeId, int? limit, int? offset)
         {
             ServiceResult res = await CommentService.AdminGetListKnowledgeComments(knowledgeId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -103,7 +106,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> AdminDeleteComment(Guid commentId)
         {
             ServiceResult res = await CommentService.AdminDeleteComment(commentId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -118,7 +121,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> AdminBlockComment(Guid knowledgeId)
         {
             ServiceResult res = await CommentService.AdminBlockCommentOfKnowledge(knowledgeId, isBlock: true);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -133,7 +136,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> AdminUnBlockComment(Guid knowledgeId)
         {
             ServiceResult res = await CommentService.AdminBlockCommentOfKnowledge(knowledgeId, isBlock: false);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -156,9 +159,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListComments(Guid knowledgeId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserGetListKnowledgeComments(Guid.Parse(myUid), knowledgeId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserGetListKnowledgeComments(GetCurrentUserIdStrictly(), knowledgeId, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -174,9 +176,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListMyComments(Guid knowledgeId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserGetMyCommentsOfKnowledge(Guid.Parse(myUid), knowledgeId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserGetMyCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -193,9 +194,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListUserComments(Guid userId, Guid knowledgeId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserGetUserCommentsOfKnowledge(Guid.Parse(myUid), userId, knowledgeId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserGetUserCommentsOfKnowledge(GetCurrentUserIdStrictly(), userId, knowledgeId, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -210,11 +210,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("search/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserSearchListComments(Guid knowledgeId, string search, int? limit, int? offset)
+        public async Task<IActionResult> UserSearchListComments(Guid knowledgeId, string search, int? limit, int? offset, string? order)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserSearchCommentsOfKnowledge(Guid.Parse(myUid), knowledgeId, search, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            List<(string, bool)> orders = ParseSortFields(order);
+            ServiceResult res = await CommentService.UserSearchCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, search, limit, offset, orders);
+            return StatusCode(res);
         }
 
         #endregion
@@ -233,9 +233,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserComment([FromBody] CreateCommentModel commentModel)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserAddComment(Guid.Parse(myUid), commentModel);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserAddComment(GetCurrentUserIdStrictly(), commentModel);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -250,9 +249,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserUpdateComment(Guid commentId, [FromBody] UpdateCommentModel updateModel)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserUpdateComment(Guid.Parse(myUid), commentId, updateModel);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserUpdateComment(GetCurrentUserIdStrictly(), commentId, updateModel);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -266,9 +264,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListMyComments(Guid commentId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserDeleteComment(Guid.Parse(myUid), commentId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserDeleteComment(GetCurrentUserIdStrictly(), commentId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -283,9 +280,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserReplyComment([FromBody] ReplyCommentModel replyModel)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserReplyComment(Guid.Parse(myUid), replyModel);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserReplyComment(GetCurrentUserIdStrictly(), replyModel);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -299,9 +295,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserBlockKnowledge(Guid knowledgeId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserBlockKnowledgeComments(Guid.Parse(myUid), knowledgeId, isBlock: true);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserBlockKnowledgeComments(GetCurrentUserIdStrictly(), knowledgeId, isBlock: true);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -315,9 +310,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserUnBlockKnowledge(Guid knowledgeId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CommentService.UserBlockKnowledgeComments(Guid.Parse(myUid), knowledgeId, isBlock: false);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await CommentService.UserBlockKnowledgeComments(GetCurrentUserIdStrictly(), knowledgeId, isBlock: false);
+            return StatusCode(res);
         }
 
         #endregion

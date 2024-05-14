@@ -92,6 +92,18 @@
             title="Chọn một danh mục phù hợp" 
             placeholder="--Chọn 1 danh mục--" 
         />
+
+        <MTextfieldButton 
+            title="Nhập từ khóa tìm kiếm" placeholder="Tìm kiếm"
+            :is-show-icon="true" 
+            :is-show-title="false" 
+            :is-show-error="false" 
+            :is-obligate="false"
+            :onclick-icon="resolveClickSearch" 
+            :validator="null"
+            :oninput="resolveInputSearch"
+            state="normal"
+        />
     </div>
 </template>
 
@@ -105,12 +117,15 @@ import MTextfield from '@/components/base/inputs/MTextfield';
 import MPasswordTextfield from '@/components/base/inputs/MPasswordTextfield.vue';
 import MSelectOption from './MSelectOption.vue';
 import CategoryInput from '../category/CategoryInput.vue';
+import MTextfieldButton from './MTextfieldButton.vue';
+
 
 export default {
     name: 'TestInputsPage',
     components: { 
         MCheckbox, MCombobox, MDatePicker, MRadio, MTextfield,
-        MPasswordTextfield, MSelectOption, CategoryInput
+        MPasswordTextfield, MSelectOption, CategoryInput,
+        MTextfieldButton
     },
     methods: {
         async getComboboxItems(){

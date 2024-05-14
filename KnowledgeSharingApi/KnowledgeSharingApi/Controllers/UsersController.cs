@@ -18,7 +18,7 @@ namespace KnowledgeSharingApi.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [CustomAuthorization]
-    public class UsersController : ControllerBase
+    public class UsersController : BaseController
     {
         #region Fields and Constructor
         protected readonly IUserService UserService;
@@ -49,8 +49,7 @@ namespace KnowledgeSharingApi.Controllers
             string? uId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (uId == null) return FailedAuthentication(HttpContext.User);
             ServiceResult service = await UserService.GetMyUserProfile(Guid.Parse(uId));
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
         /// <summary>
@@ -67,8 +66,7 @@ namespace KnowledgeSharingApi.Controllers
             string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (userId == null) return FailedAuthentication(HttpContext.User);
             ServiceResult service = await UserService.UpdateMyAvatarImage(Guid.Parse(userId), avatar);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
         /// <summary>
@@ -85,8 +83,7 @@ namespace KnowledgeSharingApi.Controllers
             string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (userId == null) return FailedAuthentication(HttpContext.User);
             ServiceResult service = await UserService.UpdateMyCoverImage(Guid.Parse(userId), cover);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
         /// <summary>
@@ -103,8 +100,7 @@ namespace KnowledgeSharingApi.Controllers
             string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (userId == null) return FailedAuthentication(HttpContext.User);
             ServiceResult service = await UserService.UpdateMyBio(Guid.Parse(userId), bio);
-            ApiResponse res = new(service);
-            return StatusCode((int)res.StatusCode, res);
+            return StatusCode(service);
         }
 
         /// <summary>
@@ -121,8 +117,7 @@ namespace KnowledgeSharingApi.Controllers
             string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (userId == null) return FailedAuthentication(HttpContext.User);
             ServiceResult service = await UserService.UpdateMyUserProfile(Guid.Parse(userId), model);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
         /// <summary>
@@ -139,8 +134,7 @@ namespace KnowledgeSharingApi.Controllers
             string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (userId == null) return FailedAuthentication(HttpContext.User);
             ServiceResult service = await UserService.GetUserDetail(Guid.Parse(userId), unOruid);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
 
@@ -160,8 +154,7 @@ namespace KnowledgeSharingApi.Controllers
             string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (userId == null) return FailedAuthentication(HttpContext.User);
             ServiceResult service = await UserService.SearchUser(Guid.Parse(userId), searchKey, limit, offset);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
         /// <summary>
@@ -181,7 +174,7 @@ namespace KnowledgeSharingApi.Controllers
                 DevMessage = msg,
                 Body = user
             };
-            return StatusCode((int)res.StatusCode, res);
+            return StatusCode((int) res.StatusCode, res);
         }
 
         #endregion
@@ -202,8 +195,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminUpdateUser(Guid uid, [FromBody] UpdateUserModel model)
         {
             ServiceResult service = await UserService.AdminUpdateUserInfo(uid, model);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
         /// <summary>
@@ -218,8 +210,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminUnblockUser(Guid uid)
         {
             ServiceResult service = await UserService.AdminUnblockUser(uid);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
 
@@ -235,8 +226,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminBlockUser(Guid uid)
         {
             ServiceResult service = await UserService.AdminBlockUser(uid);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
 
@@ -254,8 +244,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminSearchUser(string searchKey, int? limit, int? offset)
         {
             ServiceResult service = await UserService.AdminSearchUser(searchKey, limit, offset);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
         /// <summary>
@@ -270,8 +259,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetUserProfile(string usernameOruid)
         {
             ServiceResult service = await UserService.AdminGetUserProfile(usernameOruid);
-            ApiResponse res = new(service);
-            return StatusCode((int) res.StatusCode, res);
+            return StatusCode(service);
         }
 
 
@@ -287,8 +275,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminDeleteUser(Guid uid)
         {
             ServiceResult service = await UserService.AdminDeleteUser(uid);
-            ApiResponse res = new(service);
-        return StatusCode((int)res.StatusCode, res);
+        return StatusCode(service);
         }
 
         /// <summary>
@@ -302,8 +289,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetListUser(int? limit, int? offset)
         {
             ServiceResult service = await UserService.AdminGetListUser(limit, offset);
-            ApiResponse res = new(service);
-            return StatusCode((int)res.StatusCode, res);
+            return StatusCode(service);
         }
 
         #endregion

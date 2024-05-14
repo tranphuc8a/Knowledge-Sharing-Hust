@@ -15,14 +15,9 @@ namespace KnowledgeSharingApi.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class CoursesController(ICourseService courseService) : ControllerBase
+    public class CoursesController(ICourseService courseService) : BaseController
     {
         protected readonly ICourseService CourseService = courseService;
-
-        protected virtual IActionResult StatusCode(ServiceResult result)
-        {
-            return StatusCode((int)result.StatusCode, new ApiResponse(result));
-        }
 
         #region Anonymous APies
 
@@ -186,8 +181,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListCoursesOfCategory(string category, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CourseService.UserGetListCourseOfCategory(Guid.Parse(myUid), category, limit, offset);
+            ServiceResult res = await CourseService.UserGetListCourseOfCategory(GetCurrentUserIdStrictly(), category, limit, offset);
             return StatusCode(res);
         }
 
@@ -203,8 +197,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListMarkedCourses(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await CourseService.UserGetMarkedCourses(Guid.Parse(myUid), limit, offset);
+            ServiceResult res = await CourseService.UserGetMarkedCourses(GetCurrentUserIdStrictly(), limit, offset);
             return StatusCode(res);
         }
 
@@ -225,8 +218,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListCourse(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserGetListCourses(Guid.Parse(myUid), limit, offset));
+            return StatusCode(await CourseService.UserGetListCourses(GetCurrentUserIdStrictly(), limit, offset));
         }
 
         /// <summary>
@@ -242,8 +234,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListUserCourse(Guid userId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserGetUserCourses(Guid.Parse(myUid), userId, limit, offset));
+            return StatusCode(await CourseService.UserGetUserCourses(GetCurrentUserIdStrictly(), userId, limit, offset));
         }
 
         /// <summary>
@@ -258,8 +249,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListMyCourse(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserGetMyCourses(Guid.Parse(myUid), limit, offset));
+            return StatusCode(await CourseService.UserGetMyCourses(GetCurrentUserIdStrictly(), limit, offset));
         }
 
         /// <summary>
@@ -273,8 +263,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetDetailCourse(Guid courseId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserGetCourseDetail(Guid.Parse(myUid), courseId));
+            return StatusCode(await CourseService.UserGetCourseDetail(GetCurrentUserIdStrictly(), courseId));
         }
 
         /// <summary>
@@ -288,8 +277,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetDetailMyCourse(Guid courseId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserGetMyCourseDetail(Guid.Parse(myUid), courseId));
+            return StatusCode(await CourseService.UserGetMyCourseDetail(GetCurrentUserIdStrictly(), courseId));
         }
 
 
@@ -305,8 +293,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetMyRegisteredCourse(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserGetMyRegisteredCourses(Guid.Parse(myUid), limit, offset));
+            return StatusCode(await CourseService.UserGetMyRegisteredCourses(GetCurrentUserIdStrictly(), limit, offset));
         }
 
         #endregion
@@ -326,8 +313,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserAddNewCourse([FromForm] CreateCourseModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserCreateCourse(Guid.Parse(myUid), model));
+            return StatusCode(await CourseService.UserCreateCourse(GetCurrentUserIdStrictly(), model));
         }
 
 
@@ -343,8 +329,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserUpdateCourse(Guid courseId, [FromForm] UpdateCourseModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserUpdateCourse(Guid.Parse(myUid), courseId, model));
+            return StatusCode(await CourseService.UserUpdateCourse(GetCurrentUserIdStrictly(), courseId, model));
         }
 
 
@@ -359,8 +344,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserDeleteCourse(Guid courseId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.UserDeleteCourse(Guid.Parse(myUid), courseId));
+            return StatusCode(await CourseService.UserDeleteCourse(GetCurrentUserIdStrictly(), courseId));
         }
 
 
@@ -375,8 +359,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserUpdatePrivacy([FromBody] ChangeKnowledgePrivacyModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseService.ChangePrivacy(Guid.Parse(myUid), model));
+            return StatusCode(await CourseService.ChangePrivacy(GetCurrentUserIdStrictly(), model));
         }
 
         #endregion

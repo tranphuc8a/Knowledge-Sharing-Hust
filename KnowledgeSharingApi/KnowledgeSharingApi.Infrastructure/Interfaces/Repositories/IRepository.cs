@@ -141,7 +141,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Danh sách bản ghi </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: PhucTV (10/1/24) move up to IBaseRepo
-        Task<PaginationResponseModel<T>> Filter(string text, int limit, int offset);
+        Task<PaginationResponseModel<T>> Filter(string text, int limit, int offset, List<(string Field, bool IsAscending)> order);
 
 
         /// <summary>
@@ -151,5 +151,17 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Created: PhucTV (12/3/24)
         /// Modified: None
         public void RegisterTransaction(IDbTransaction transaction);
+
+        /// <summary>
+        /// Sap xep danh sach theo orders
+        /// </summary>
+        /// <param name="beforeList"> danh sach truoc khi sap xep </param>
+        /// <param name="orders"> Dieu kien sap xep </param>
+        /// <returns></returns>
+        /// Created: PhucTV (14/5/24)
+        /// Modified: None
+        List<T> GetOrderedList(List<T> beforeList, List<(string Field, bool Ascending)> orders);
+        List<Q> GetOrderedList<Q>(List<Q> beforeList, List<(string Field, bool Ascending)> orders);
     }
+
 }

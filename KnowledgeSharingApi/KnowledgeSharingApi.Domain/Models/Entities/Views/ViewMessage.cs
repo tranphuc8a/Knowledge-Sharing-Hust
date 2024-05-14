@@ -14,6 +14,8 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
     {
         public Guid UserId { get; set; }
 
+        public string Username { get; set; } = string.Empty;
+
         public Guid ConversationId { get; set; }
 
         public string Nickname { get; set; } = string.Empty;

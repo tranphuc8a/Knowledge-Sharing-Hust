@@ -107,9 +107,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             _ = typeof(T).GetProperty("UserId") ?? throw new NotMatchTypeException();
             string sqlCommand = $"Select * from {tableName} " +
                                 $"where UserId = @userId; ";
-            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, new { userId, limit, offset });
-            res.Limit = limit;
-            res.Offset = offset;
+            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, limit, offset, null, new { userId });
             return res;
         }
 
@@ -120,9 +118,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             _ = typeof(T).GetProperty("UserId") ?? throw new NotMatchTypeException();
             string sqlCommand = $"Select * from {tableName} " +
                                 $"where UserId in (Select UserId from User where Username = @username); ";
-            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, new { username, limit, offset });
-            res.Limit = limit;
-            res.Offset = offset;
+            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, limit, offset, null, new { username });
             return res;
         }
 

@@ -13,14 +13,9 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class PostsController(
         IPostService postService    
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly IPostService PostService = postService;
-
-        protected virtual IActionResult StatusCode(ServiceResult result)
-        {
-            return StatusCode((int)result.StatusCode, new ApiResponse(result));
-        }
 
         #region Anonymous APIes
         
@@ -126,8 +121,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListPosts(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserGetPosts(Guid.Parse(myUid), limit, offset);
+            ServiceResult res = await PostService.UserGetPosts(GetCurrentUserIdStrictly(), limit, offset);
             return StatusCode(res);
         }
 
@@ -143,8 +137,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListMyPosts(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserGetMyPosts(Guid.Parse(myUid), limit, offset);
+            ServiceResult res = await PostService.UserGetMyPosts(GetCurrentUserIdStrictly(), limit, offset);
             return StatusCode(res);
         }
 
@@ -161,8 +154,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Adminm, User")]
         public async Task<IActionResult> UserGetPost(Guid userId, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserGetUserPosts(Guid.Parse(myUid), userId, limit, offset);
+            ServiceResult res = await PostService.UserGetUserPosts(GetCurrentUserIdStrictly(), userId, limit, offset);
             return StatusCode(res);
         }
 
@@ -177,8 +169,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> AdminGetListPosts(Guid postId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserDeletePost(Guid.Parse(myUid), postId);
+            ServiceResult res = await PostService.UserDeletePost(GetCurrentUserIdStrictly(), postId);
             return StatusCode(res);
         }
 
@@ -234,8 +225,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListPostsOfCategory(string category, int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserGetListPostsOfCategory(Guid.Parse(myUid), category, limit, offset);
+            ServiceResult res = await PostService.UserGetListPostsOfCategory(GetCurrentUserIdStrictly(), category, limit, offset);
             return StatusCode(res);
         }
 
@@ -252,8 +242,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserGetListMarkedPosts(int? limit, int? offset)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await PostService.UserGetMyMarkedPosts(Guid.Parse(myUid), limit, offset);
+            ServiceResult res = await PostService.UserGetMyMarkedPosts(GetCurrentUserIdStrictly(), limit, offset);
             return StatusCode(res);
         }
         #endregion

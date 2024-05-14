@@ -204,14 +204,14 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> GetComment(Guid commentId)
+        public async Task<ServiceResult> GetComment(Guid? myUid, Guid commentId)
         {
             // Check comment tồn tại
             ViewComment comment = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
 
             // Trang trí comment
             IResponseCommentModel? res = 
-                (await DecorationRepository.DecorateResponseCommentModel(null, [comment], true))
+                (await DecorationRepository.DecorateResponseCommentModel(myUid, [comment], true))
                 .FirstOrDefault();
             if (res == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
@@ -219,7 +219,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CommentResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> GetListCommentReplies(Guid commentId, int? limit, int? offset)
+        public async Task<ServiceResult> GetListCommentReplies(Guid? myUid, Guid commentId, int? limit, int? offset)
         {
             // Check comment existed
             _ = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
@@ -235,7 +235,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Limit = comments.Limit,
                 Offset = comments.Offset,
                 Results = (await DecorationRepository
-                    .DecorateResponseCommentModel(null, comments.Results.ToList(), isDecorateReplies: false))
+                    .DecorateResponseCommentModel(myUid, comments.Results.ToList(), isDecorateReplies: false))
                     .OfType<IResponseCommentModel>().ToList()
             };
 
@@ -375,6 +375,10 @@ namespace KnowledgeSharingApi.Services.Services
             if (!isAccessible)
                 return ServiceResult.Forbidden("Bạn không có quyền truy cập được bài viết này");
 
+            // Kiểm tra knowledge đang mở cho phép bình luận
+            if (knowledge.IsBlockComment)
+                return ServiceResult.Forbidden("Bài viết hiện đang bị khóa bình luận, vui lòng thử lại sau");
+
             // Kiểm tra Comment level 0 (chưa reply comment nào khác)
             if (comment.ReplyId != null)
                 return ServiceResult.BadRequest("Chỉ có thể reply comment gốc của bài viết");
@@ -385,11 +389,11 @@ namespace KnowledgeSharingApi.Services.Services
             if (res == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(CommentResource));
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.InsertSuccess(CommentResource));
+            return ServiceResult.Success(ResponseResource.InsertSuccess(CommentResource), string.Empty, commentToAdd);
 
         }
 
-        public async Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myUid, Guid knowledgeId, string search, int? limit, int? offset)
+        public async Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myUid, Guid knowledgeId, string search, int? limit, int? offset, List<(string, bool)>? order)
         {
             // Check từ khóa khác rỗng
             if (String.IsNullOrEmpty(search))
@@ -403,12 +407,14 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Search
             // Lấy về toàn bộ
-            IEnumerable<ViewComment> listComments = await KnowledgeRepository.GetListComments(knowledgeId);
+            List<ViewComment> listComments = (await KnowledgeRepository.GetListComments(knowledgeId)).ToList();
+            listComments = CommentRepository.GetOrderedList(listComments, order ?? []);
             int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
 
             // Lọc theo từ khóa
-            listComments = listComments.Where(comment => IsSimiliar(comment.Content, search))
-                .Skip(offsetValue).Take(limitValue);
+            listComments = listComments
+                .Where(comment => IsSimiliar(comment.Content, search))
+                .Skip(offsetValue).Take(limitValue).ToList();
 
             // DecorateResponseLessonModel
             IEnumerable<IResponseCommentModel> res = await DecorationRepository

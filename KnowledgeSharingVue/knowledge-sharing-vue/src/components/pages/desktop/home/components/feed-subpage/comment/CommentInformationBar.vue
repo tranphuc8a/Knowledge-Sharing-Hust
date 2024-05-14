@@ -17,7 +17,9 @@
             <div class="p-comment-star-button">
                 <CommentStarButton />
             </div>
-            <div class="p-comment-reply-button" @:click="resolveReplyComment">
+            <div class="p-comment-reply-button" 
+                @:click="resolveReplyComment"
+                v-show="getComment().ReplyId == null">
                 Phản hồi
             </div>
         </div>

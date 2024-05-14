@@ -16,7 +16,7 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class UserRelationsController(
         IUserRelationService userRelationService
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly IUserRelationService UserRelationService = userRelationService;
 
@@ -32,9 +32,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetUserFriends(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.GetRelationState(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.GetRelationState(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -51,7 +50,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> GetUserFriends(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetFriends(userId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -68,7 +67,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> GetUserFollowers(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: true, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -85,7 +84,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> GetUserFollowees(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: false, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
         #endregion
 
@@ -102,9 +101,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyFriends(int? limit, int? offset)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.GetFriends(Guid.Parse(myUId), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.GetFriends(GetCurrentUserIdStrictly(), limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -119,9 +117,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyFollowers(int? limit, int? offset)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.GetRelations(Guid.Parse(myUId), EUserRelationType.Follow, isActive: true, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Follow, isActive: true, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -136,9 +133,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyFollowees(int? limit, int? offset)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.GetRelations(Guid.Parse(myUId), EUserRelationType.Follow, isActive: false, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Follow, isActive: false, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -153,9 +149,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyRequesters(int? limit, int? offset)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.GetRelations(Guid.Parse(myUId), EUserRelationType.FriendRequest, isActive: true, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.FriendRequest, isActive: true, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -170,9 +165,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyRequestees(int? limit, int? offset)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.GetRelations(Guid.Parse(myUId), EUserRelationType.FriendRequest, isActive: false, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.FriendRequest, isActive: false, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -187,9 +181,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyBlockers(int? limit, int? offset)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.GetRelations(Guid.Parse(myUId), EUserRelationType.Block, isActive: true, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Block, isActive: true, limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -204,9 +197,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMyBlockees(int? limit, int? offset)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.GetRelations(Guid.Parse(myUId), EUserRelationType.Block, isActive: false, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Block, isActive: false, limit, offset);
+            return StatusCode(res);
         }
         #endregion
 
@@ -225,7 +217,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetFriends(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetFriends(userId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -242,7 +234,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetFollowers(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: true, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -259,7 +251,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetFollowees(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: false, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -276,7 +268,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetRequesters(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.FriendRequest, isActive: true, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -293,7 +285,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetRequestees(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.FriendRequest, isActive: false, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -310,7 +302,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetBlockers(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Block, isActive: true, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -327,7 +319,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> AdminGetBlockees(Guid userId, int? limit, int? offset)
         {
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Block, isActive: false, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
         #endregion
 
@@ -343,9 +335,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> Follow(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.Follow(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.Follow(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -359,9 +350,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> Unfollow(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.Unfollow(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.Unfollow(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
         #endregion
 
@@ -378,9 +368,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> AddFriend(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.AddFriend(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.AddFriend(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -394,9 +383,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> DeleteFriend(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.DeleteFriend(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.DeleteFriend(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -411,9 +399,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> ConfirmFriend(Guid requestId, bool isAccept)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.ConfirmFriend(Guid.Parse(myUId), requestId, isAccept);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.ConfirmFriend(GetCurrentUserIdStrictly(), requestId, isAccept);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -427,9 +414,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> DeleteRequest(Guid requestId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.DeleteRequest(Guid.Parse(myUId), requestId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.DeleteRequest(GetCurrentUserIdStrictly(), requestId);
+            return StatusCode(res);
         }
 
         #endregion
@@ -447,9 +433,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> BlockUser(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.Block(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.Block(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -463,9 +448,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> UnblockUser(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await UserRelationService.Unblock(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await UserRelationService.Unblock(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
 
 

@@ -20,7 +20,7 @@ namespace KnowledgeSharingApi.Controllers
             IAuthenticationService authenticationService,
             IResourceFactory resourceFactory,
             IOAuth2Service OAuth2Service
-        ) : ControllerBase
+        ) : BaseController
     {
         protected readonly IRegisterNewUserService registerNewUserService = registerNewUserService;
         protected readonly IOAuth2Service OAuth2Service = OAuth2Service;
@@ -151,7 +151,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> GetRegisterActiveCodeByGoogleToken(string token)
         {
             ServiceResult res = await OAuth2Service.RequestSignupByGoogle(token);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> CreateNewUser(ActiveCodeRegisterModel model)
         {
             ServiceResult res = await OAuth2Service.RegsiterUserByActiveCode(model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         #endregion

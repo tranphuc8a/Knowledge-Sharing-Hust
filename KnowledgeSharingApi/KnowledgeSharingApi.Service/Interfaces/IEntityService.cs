@@ -89,7 +89,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (27/12/23)
         /// Modified: PhucTV (10/1/24) Move up to IBaseService
-        Task<ServiceResult> FilterService(string search, int? limit = null, int? offset = null);
+        Task<ServiceResult> FilterService(string search, int? limit = null, int? offset = null, List<(string Field, bool IsAscending)>? orders = null);
 
     }
 }

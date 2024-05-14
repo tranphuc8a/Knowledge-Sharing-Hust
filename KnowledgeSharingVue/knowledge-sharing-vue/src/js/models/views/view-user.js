@@ -8,6 +8,14 @@ class ViewUser extends Profile {
         this.Email = null;
         this.Username = null;
         this.Role = null;
+
+        this.TotalFriend = null; 
+        this.TotalRequester = null; 
+        this.TotalRequestee = null; 
+        this.TotalFollower = null; 
+        this.TotalFolowee = null; 
+        this.TotalBlocker = null; 
+        this.TotalBlockee = null; 
     }
 
     init() {

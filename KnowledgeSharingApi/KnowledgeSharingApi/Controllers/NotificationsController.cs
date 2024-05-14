@@ -12,7 +12,7 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class NotificationsController(
         INotificationService notificationService    
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly INotificationService NotificationService = notificationService;
 
@@ -28,9 +28,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> Get(int? limit, int? offset)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.GetNotifications(Guid.Parse(myUId), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.GetNotifications(GetCurrentUserIdStrictly(), limit, offset);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -44,9 +43,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> Get(Guid notiId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.GetNotification(Guid.Parse(myUId), notiId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.GetNotification(GetCurrentUserIdStrictly(), notiId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -60,9 +58,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> Get([FromBody] Guid[] ids)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.GetNotifications(Guid.Parse(myUId), ids);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.GetNotifications(GetCurrentUserIdStrictly(), ids);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -76,9 +73,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> SetReadNotification(Guid notificationId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.SetReadNotification(Guid.Parse(myUId), notificationId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.SetReadNotification(GetCurrentUserIdStrictly(), notificationId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -92,9 +88,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> SetReadNotification([FromBody] Guid[] ids)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.SetReadNotifications(Guid.Parse(myUId), ids);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.SetReadNotifications(GetCurrentUserIdStrictly(), ids);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -107,9 +102,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> SetReadNotification()
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.SetReadNotifications(Guid.Parse(myUId));
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.SetReadNotifications(GetCurrentUserIdStrictly());
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -123,9 +117,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> DeleteNotification(Guid notificationId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.DeleteNotification(Guid.Parse(myUId), notificationId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.DeleteNotification(GetCurrentUserIdStrictly(), notificationId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -138,9 +131,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> DeleteNotification()
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.DeleteNotifications(Guid.Parse(myUId));
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.DeleteNotifications(GetCurrentUserIdStrictly());
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -154,9 +146,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> DeleteNotification([FromBody] Guid[] ids)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await NotificationService.GetNotifications(Guid.Parse(myUId), ids);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await NotificationService.GetNotifications(GetCurrentUserIdStrictly(), ids);
+            return StatusCode(res);
         }
     }
 }

@@ -44,11 +44,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             Course course = await DbContext.Courses.FindAsync(courseId) ?? throw notExistedException;
             // course public, owner --> true
             if (course.Privacy == EPrivacy.Public || course.UserId == userId) return true;
-            // private: join
+            // private: join, invite
             ViewCourseRegister? courseRegister = await DbContext.ViewCourseRegisters
                 .Where(cr => cr.UserId == userId && cr.CourseId == courseId)
                 .FirstOrDefaultAsync();
-            return courseRegister != null;
+            if (courseRegister != null) return true;
+            // Lấy danh sách course mà myUid được invite vào
+            IQueryable<Guid> listInvitedCourseIds = DbContext.CourseRelations
+                .Where(invite => invite.ReceiverId == userId && invite.CourseRelationType == ECourseRelationType.Invite)
+                .Select(invite => invite.CourseId);
+            if (listInvitedCourseIds.Contains(courseId)) return true;
+            return false;
         }
 
         public virtual async Task<bool> CheckLessonAccessible(Guid userId, Guid lessonId)

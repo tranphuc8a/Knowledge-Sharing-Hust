@@ -27,22 +27,24 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// Lấy về danh sách comment đã reply một comment khác
         /// </summary>
+        /// <param name="myUid"> id cua user can lay</param>
         /// <param name="commentId"> id của comment </param>
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
-        /// Modified: None
-        Task<ServiceResult> GetListCommentReplies(Guid commentId, int? limit, int? offset);
+        /// Modified: PhucTV (13/5/24)
+        Task<ServiceResult> GetListCommentReplies(Guid? myUid, Guid commentId, int? limit, int? offset);
 
         /// <summary>
         /// Lấy về chi tiết một comment
         /// </summary>
+        /// <param name="myUid"> id cua user can lay </param>
         /// <param name="commentId"> id của comment </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> GetComment(Guid commentId);
+        Task<ServiceResult> GetComment(Guid? myUid, Guid commentId);
 
         #endregion
 
@@ -134,7 +136,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string search, int? limit, int? offset);
+        Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string search, int? limit, int? offset, List<(string Field, bool IsAscending)>? orders);
         #endregion
 
 

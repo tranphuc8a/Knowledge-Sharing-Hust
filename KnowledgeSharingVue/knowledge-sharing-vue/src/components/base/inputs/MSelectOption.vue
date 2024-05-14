@@ -30,7 +30,7 @@
                         <MSpinner :style="{ fontSize: '24px' }" />
                     </div>
                     <div class="p-select-option-dropdown-empty">
-                        {{ label.noOptions }}
+                        {{ getLabel()?.noOptions }}
                     </div>
                     <div class="p-select-option-dropdown-items">
                         <!-- ITEMS STATE: normal, default, chosen, focus -->
@@ -107,6 +107,11 @@ let selectOption = {
     },
     methods: {
         ...input.methods,
+
+        async getLabel(){
+            return this.lang?.components?.input?.combobox;
+        },
+        
         /**
         * Override validate function
         * @param none
@@ -213,7 +218,7 @@ let selectOption = {
 
 
         // OTHER METHODS:
-        /* *
+        /**
         * Xử lý logic khi click chuột vào một item của selectOption
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -231,7 +236,7 @@ let selectOption = {
                 console.error(error);
             }
         },  
-        /* *
+        /**
         * Hai hàm xử lý sự kiện click vào nút expand và collapse
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -253,7 +258,7 @@ let selectOption = {
             // let clH = 
             this.components.dropdownFrame.style.height = `${this.components.dropdownContent.clientHeight}px`;
         },
-        /* *
+        /**
         * Xử lý sự kiện lam moi danh sach items cua select a
         * @param none
         * @Author TVPhuc (12/12/23)
