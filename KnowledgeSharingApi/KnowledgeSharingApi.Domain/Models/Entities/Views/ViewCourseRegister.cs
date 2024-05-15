@@ -21,6 +21,10 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
 
         public string? Thumbnail { get; set; }
 
+        public decimal? Fee { get; set; }
+
+        public bool? IsFree { get; set; }
+
         public string Title { get; set; } = string.Empty;
 
         public string? Abstract { get; set; } = string.Empty;

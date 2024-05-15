@@ -4,7 +4,9 @@
     <div class="profile-learn-subpage p-profile-main-subpage">
         <div class="pls-top">            
             <!-- Profile Learn Toolbar Subpage -->
-            <ProfileLearnToolbarSubpage @:onchange-config="resolveOnchangeConfig" />
+            <ProfileLearnToolbarSubpage 
+                :list-courses="listCourse"
+                :on-change-config="resolveOnchangeConfig" />
         </div>
 
         <div class="pls-bottom">
@@ -20,7 +22,7 @@
 
 
 <script>
-import { GetRequest } from '@/js/services/request';
+import { GetRequest, Request } from '@/js/services/request';
 import ViewCourseRegister from '@/js/models/views/view-course-register';
 import StringAlgorithm from '@/js/utils/string-algorithm';
 import { MyDate } from '@/js/utils/mydate';
@@ -56,22 +58,23 @@ export default {
         async resolveOnchangeConfig(config){
             try {
                 let { text, isLatest } = config;
-                if (Validator.isEmpty(text) && (isLatest !== false && isLatest !== true))
-                {
+                this.listFilteredCourse = null;
+                if (Validator.isEmpty(text) && (isLatest !== true && isLatest !== false)){
+                    this.listFilteredCourse = this.listCourse;
                     return;
                 }
-                this.listFilteredCourse = null;
                 if (Validator.isNotEmpty(text)){
                     let mapTextScore = {};
                     this.listCourse.forEach(function(vCourse){
                         let titleScore = StringAlgorithm.similiar(text, vCourse.Title);
-                        let abstractScore = StringAlgorithm.similiar(text, vCourse.Abstract);
+                        // let abstractScore = vCourse.Abstract != null ? StringAlgorithm.similiar(text, vCourse.Abstract) : 0;
                         let usernameScore = StringAlgorithm.similiar(text, vCourse.CourseOwnerFullName);
-                        let titleWeight = 0.5, abstractWeight = 0.25, usernameWeight = 0.25;
-                        let totalScore = titleScore * titleWeight + abstractScore * abstractWeight + usernameScore * usernameWeight;
+                        // let titleWeight = 0.75, usernameWeight = 0.25;
+                        // let totalScore = titleScore * titleWeight + usernameScore * usernameWeight;
+                        let totalScore = Math.max(titleScore, usernameScore);
                         mapTextScore[vCourse.CourseId] = totalScore;
                     });
-                    let threshold = 0.25;
+                    let threshold = 0.0;
 
                     let sortedCourse = this.listCourse
                         .filter(function(vCourse){
@@ -82,11 +85,11 @@ export default {
                         });
                     this.listFilteredCourse = sortedCourse;
                     return;
-                }
+                } 
                 if (isLatest === true || isLatest === false) {
                     let sortedCourse = this.listCourse.sort(function(a, b){
-                        let bCreatedDate = new MyDate(b.CreatedDate);
-                        let aCreatedDate = new MyDate(a.CreatedDate);
+                        let bCreatedDate = new MyDate(b.CreatedTime);
+                        let aCreatedDate = new MyDate(a.CreatedTime);
                         if (isLatest) {
                             return bCreatedDate.getTime() - aCreatedDate.getTime();
                         }

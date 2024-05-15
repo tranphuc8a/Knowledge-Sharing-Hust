@@ -14,15 +14,16 @@
             </div>
             <div class="p-crctc-bottom">
                 <div class="p-crc-information">
-                    <div class="p-crc-title">
+                    <div class="p-crc-title" @:click="resolveViewCourseDetail">
                         {{ dCourse?.Title ?? "" }}
                     </div>
-                    <div class="p-crc-abstract">
+                    <div class="p-crc-abstract" v-if="dCourse?.Abstract != null">
                         {{ dCourse?.Abstract ?? "" }}
                     </div>
                 </div>
                 <div class="p-crc-button">
                     <!-- Course Relation Button -->
+                    <CourseRelationButton />
                 </div>
             </div>
         </div>
@@ -32,15 +33,17 @@
 
 
 <script>
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import Common from '@/js/utils/common';
-import { GetRequest } from '@/js/services/request';
+import { GetRequest, Request } from '@/js/services/request';
 import ResponseCourseModel from '@/js/models/api-response-models/response-course-model';
 import { useRouter } from 'vue-router';
-
+import CourseRelationButton from '../course-relation-button/CourseRelationButton.vue';
 
 export default {
     name: 'CourseRegisteredCardTooltip',
+    components: {
+        CourseRelationButton
+    },
     props: {
         course: {
             type: Object,
@@ -52,7 +55,7 @@ export default {
             courseThumbnail: null,
             defaultThumbnail: require('@/assets/default-thumbnail/course-image-icon.png'),
             dCourse: null,
-            isReloadCourse: true,
+            isReloadCourse: false,
             router: useRouter(),
         }
     },
@@ -68,7 +71,8 @@ export default {
                 this.dCourse = this.course;
                 let courseThumbnail = this.dCourse?.Thumbnail;
                 if (await Common.isValidImage(courseThumbnail)){
-                    this.courseThumbnail = courseThumbnail;
+                    console.log("thumbnail is valid");
+                    // this.courseThumbnail = courseThumbnail;
                 }
                 if (this.isReloadCourse){
                     let courseId = this.dCourse?.UserItemId;
@@ -110,6 +114,8 @@ export default {
 </script>
 
 <style scoped>
+
+@import url(@/css/pages/desktop/components/course-registered-card-tooltip.css);
 
 </style>
 

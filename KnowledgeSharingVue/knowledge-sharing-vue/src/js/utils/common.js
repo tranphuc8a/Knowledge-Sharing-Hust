@@ -117,6 +117,13 @@ class Common {
         }   
     }
 
+    /**
+     * Chuẩn hóa chuỗi markdown
+     * @param {*} markdownText - nội dung markdown cần chuẩn hóa
+     * @returns văn bản markdown sau khi chuẩn hóa
+     * @Created PhucTV (26/04/24)
+     * @Modified None
+     */
     static normalizeMarkdownText(markdownText) {
         try {
             if (markdownText == null) return null;
@@ -132,6 +139,31 @@ class Common {
             console.error(error);
             return null;
         }
+    }
+
+    /**
+     * Biểu diên số tiền theo định dạng tiền tệ Việt Nam
+     * @param {*} number - số tiền cần biểu diễn
+     * @returns chuỗi biểu diễn số tiền theo định dạng tiền tệ Việt Nam
+     * @Created PhucTV (15/5/24)
+     * @Modified None
+     */ 
+    static visualizeCurrency(number) {
+        // Kiểm tra xem giá trị đầu vào có phải là kiểu số không, nếu không cố gắng ép kiểu thành số
+        if (typeof number !== 'number') {
+            number = Number(number);
+        }
+
+        // Kiểm tra nếu giá trị không phải là số hoặc là NaN (bởi vì Number('abc') cho NaN)
+        if (isNaN(number)) {
+            return null;
+        }
+
+        // Làm tròn số nếu nó không phải là số nguyên và lấy giá trị tuyệt đối
+        number = Math.round(Math.abs(number));
+
+        // Chuyển số thành chuỗi và định dạng theo tiền tệ Việt Nam
+        return number.toFixed().replace(/(d)(?=(d{3})+(?!d))/g, '$1.') + ' VNĐ';
     }
 }
 

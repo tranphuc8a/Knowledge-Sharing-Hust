@@ -1,0 +1,92 @@
+
+
+.p-crc-tooltip{
+    width: 100%;
+    height: fit-content;
+}
+
+.p-crct-card{
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.p-crct-card > div{
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 50%;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.p-crctc-thumbnail{
+    background-size: cover;
+    background-position: center center;
+    width: 100%;
+    aspect-ratio: 2 / 1;
+}
+
+.p-crctc-bottom{
+    padding: 16px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.p-crc-information{
+    flex-grow: 1;
+    flex-basis: 50%;
+
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.p-crc-title{
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'ks-font-semibold';
+
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.p-crc-title:hover{
+    text-decoration: underline;
+
+}
+
+.p-crc-abstract{
+    width: 300px; /* Giới hạn chiều rộng */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; /* Giới hạn số dòng */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Thêm dấu ba chấm khi tràn */
+    word-wrap: break-word; /* Tự động xuống hàng */
+    word-break: break-all; /* Tự động xuống hàng nếu cần */
+}
+
+.p-crc-button{
+    width: 100%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: fit-content;
+    
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+

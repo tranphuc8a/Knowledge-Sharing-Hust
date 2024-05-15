@@ -13,7 +13,7 @@
 
 <script>
 
-import { GetRequest } from '@/js/services/request';
+// import { GetRequest, Request } from '@/js/services/request';
 import InvitedCoCrb from './InvitedCoCrb.vue';
 import MemberCoCrb from './MemberCoCrb.vue';
 import RequestedCoCrb from './RequestedCoCrb.vue';
@@ -33,7 +33,7 @@ export default {
     },
     data(){
         return {
-            isShow: false,
+            isShow: true,
             dCourse: null,
             dCourseRoleType: {
                 value: null
@@ -47,7 +47,8 @@ export default {
     async created(){
         try {
             this.dCourse = this.getCourse();
-            this.dCourseRoleType.value = dCourse.CourseRoleType;
+            this.dCourseRoleType.value = this.dCourse.CourseRoleType;
+            this.dCourseRelationId.value = this.dCourse.CourseRelationId;
             this.refresh();
         } catch (error) {
             console.error(error);
@@ -58,16 +59,17 @@ export default {
     methods: {
         async refresh(){
             try {
-                let courseId = this.getCourse?.()?.UserItemId;
+                // let courseId = this.getCourse?.()?.UserItemId;
+                console.log(".")
                 // get status between course and userid
-                let url = 'CourseRelations/user-status/' + courseId;
-                let res = await new GetRequest(url)
-                    .setParams({
-                        isFocusCourse: true
-                    }).execute();
-                let body = await Request.tryGetBody(res);
-                this.dCourseRoleType.value = body.CourseRoleType;
-                this.dCourseRelationId.value = body.CourseRelationId;
+                // let url = 'CourseRelations/course-status/' + courseId;
+                // let res = await new GetRequest(url)
+                //     .setParams({
+                //         isFocusCourse: true
+                //     }).execute();
+                // let body = await Request.tryGetBody(res);
+                // this.dCourseRoleType.value = body.CourseRoleType;
+                // this.dCourseRelationId.value = body.CourseRelationId;
             } catch (error) {
                 console.error(error);
             }

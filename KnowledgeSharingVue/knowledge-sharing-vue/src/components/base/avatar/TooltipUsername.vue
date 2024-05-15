@@ -1,15 +1,17 @@
 <template>
-    <TooltipFrame>
-        <template #tooltipMask>
-            <div class="p-tooltip-username" @:click="resolveClickUsername">
-                {{ user?.FullName ?? "User"}}
-            </div>
-        </template>
-
-        <template #tooltipContent>
-            <TooltipUser :user="user" />
-        </template>
-    </TooltipFrame>
+    <div class="p-tooltip-username-frame">
+        <TooltipFrame>
+            <template #tooltipMask>
+                <div class="p-tooltip-username" @:click="resolveClickUsername">
+                    {{ user?.FullName ?? "User"}}
+                </div>
+            </template>
+    
+            <template #tooltipContent>
+                <TooltipUser :user="user" />
+            </template>
+        </TooltipFrame>
+    </div>
 </template>
 
 
@@ -60,6 +62,9 @@ export default {
 </script>
 
 <style scoped>
+.p-tooltip-username-frame{
+    width: fit-content;
+}
 .p-tooltip-username{
     width: fit-content;
     font-weight: 600;

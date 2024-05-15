@@ -11,6 +11,8 @@ class ViewCourseRegister extends CourseRegister {
         this.Cover = null;
         this.Thumbnail = null;
         this.Title = null;
+        this.Fee = null;
+        this.IsFree = null;
         this.Abstract = null;
         this.CourseOwnerUserId = null;
         this.CourseOwnerUsername = null;
@@ -28,7 +30,9 @@ class ViewCourseRegister extends CourseRegister {
             UserItemId: this.CourseId,
             Title: this.Title,
             Abstract: this.Abstract,
-            Thumbnail: this.Thumbnail
+            Thumbnail: this.Thumbnail,
+            Fee: this.Fee,
+            IsFree: this.IsFree
         }
     }
 

@@ -21,6 +21,7 @@ import CurrentUser from '@/js/models/entities/current-user';
 import MMenuContextPopup from '@/components/base/popup/MMenuContextPopup.vue';
 import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue'
 import { useRouter } from 'vue-router';
+import { DeleteRequest, Request } from '@/js/services/request';
 
 export default {
     name: 'OwnerOrientedCrb',
@@ -66,7 +67,6 @@ export default {
         },
 
         getOptions(){
-            let that = this;
             return [
                 {
                     family: 'fas',

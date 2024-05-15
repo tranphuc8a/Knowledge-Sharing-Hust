@@ -144,7 +144,7 @@ export default {
 <style scoped>
 .p-tooltip-container {
     position: relative;
-    width: fit-content;
+    width: 100%;
 }
 
 .p-tooltip-mask {

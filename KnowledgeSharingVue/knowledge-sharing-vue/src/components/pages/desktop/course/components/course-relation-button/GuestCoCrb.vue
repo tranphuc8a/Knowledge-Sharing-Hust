@@ -143,7 +143,7 @@ export default {
         getCourse: {},
         getCourseRelationId: {},
         getCourseRoleType: {},
-        forceUpdateUserOrientedCrb: {},
+        forceUpdateCourseOrientedCrb: {},
         getToastManager: {},
         getPopupManager: {},
     }

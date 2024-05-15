@@ -17,10 +17,8 @@
 
 <script>
 import { PostRequest, Request } from '@/js/services/request';
-import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue'
-import CourseRelation from '@/js/models/entities/course-relation';
-import CourseRegister from '@/js/models/entities/course-register';
-import MMenuContextPopup from '@/components/base/tooltip/MMenuContextPopup.vue';
+import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue';
+import MMenuContextPopup from '@/components/base/popup/MMenuContextPopup.vue';
 import { useRouter } from 'vue-router';
 import { myEnum } from '@/js/resources/enum';
 
@@ -102,7 +100,7 @@ export default {
         getCourse: {},
         getCourseRelationId: {},
         getCourseRoleType: {},
-        forceUpdateUserOrientedCrb: {},
+        forceUpdateCourseOrientedCrb: {},
         getToastManager: {},
         getPopupManager: {},
     }

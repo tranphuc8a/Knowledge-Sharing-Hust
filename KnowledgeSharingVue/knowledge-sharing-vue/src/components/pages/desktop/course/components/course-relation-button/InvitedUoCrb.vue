@@ -15,11 +15,10 @@
 
 
 <script>
-import { DeleteRequest, PostRequest, Request } from '@/js/services/request';
-import MDeleteButton from './../../../../../base/buttons/MDeleteButton.vue'
-import CourseRelation from '@/js/models/entities/course-relation';
-import CourseRegister from '@/js/models/entities/course-register';
+import { DeleteRequest, Request } from '@/js/services/request';
+import MDeleteButton from './../../../../../base/buttons/MDeleteButton.vue';
 import { myEnum } from '@/js/resources/enum';
+
 
 
 export default {
@@ -39,8 +38,7 @@ export default {
             isWorking: false,
             dCourse: null,
             dUser: null,
-            dCourseRelationId: null,
-            router: useRouter(),
+            dCourseRelationId: null
         }
     },
     async created(){
@@ -68,7 +66,7 @@ export default {
                     .execute();
                 this.getCourseRoleType().value = myEnum.ECourseRoleType.NotInRelation;
             } catch (e) {
-                console.error(e);
+                Request.resolveAxiosError(e);
             } finally {
                 this.isWorking = false;
             }

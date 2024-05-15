@@ -18,10 +18,8 @@
 
 <script>
 import { PostRequest, Request } from '@/js/services/request';
-import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue'
-import CourseRelation from '@/js/models/entities/course-relation';
-import CourseRegister from '@/js/models/entities/course-register';
-import MMenuContextPopup from '@/components/base/tooltip/MMenuContextPopup.vue';
+import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue';
+import MMenuContextPopup from '@/components/base/popup/MMenuContextPopup.vue';
 import { useRouter } from 'vue-router';
 import { myEnum } from '@/js/resources/enum';
 
@@ -98,7 +96,7 @@ export default {
             try {
                 this.isWorking = true;
                 let inviteId = this.dCourseRelationId;
-                let res = await new PostRequest('CourseRelations/invite/confirm/' + inviteId + '/' + isAccept)
+                await new PostRequest('CourseRelations/invite/confirm/' + inviteId + '/' + isAccept)
                     .execute();
                 // success:
                 if (isAccept){
@@ -117,7 +115,7 @@ export default {
         getCourse: {},
         getCourseRelationId: {},
         getCourseRoleType: {},
-        forceUpdateUserOrientedCrb: {},
+        forceUpdateCourseOrientedCrb: {},
         getToastManager: {},
         getPopupManager: {},
     }

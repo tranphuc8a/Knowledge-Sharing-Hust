@@ -154,6 +154,10 @@ let selectOption = {
         **/
         async resolveOnBlur(){
             try {
+                if (this.inputFrame.state == myEnum.inputState.NORMAL){
+                    return;
+                }
+                await this.setState(myEnum.inputState.NORMAL);
                 // await new Promise(e => setTimeout(e, 250));
                 
                 // update chosen item when unfocus selectOption:
@@ -169,7 +173,6 @@ let selectOption = {
                     this.data.chosen.state = myEnum.comboboxItemState.CHOSEN;
                 } 
                 // do selectOption logic when change to new value                
-                await this.setState(myEnum.inputState.NORMAL);
                 await this.resolveOnChange?.();
             } catch (error){
                 console.error(error);

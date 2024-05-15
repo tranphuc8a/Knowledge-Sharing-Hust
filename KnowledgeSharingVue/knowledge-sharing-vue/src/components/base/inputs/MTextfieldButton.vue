@@ -12,7 +12,7 @@
                     :readonly="inputFrame.state==='read-only'"/>
 
             <div class="p-textfield-button">
-                <MIcon :fa="fa ?? 'magnifying-glass'" 
+                <MIcon :fa="fa ?? 'magnifying-glass'" :family="family ?? 'fas'"
                     :style="data.iconStyle" v-if="!data.isLoading" />
                 <MSpinner :style="data.iconStyle" v-if="data.isLoading" />
             </div>
@@ -118,6 +118,8 @@ let textfield = {
     },
     props: {
         ...input.props,
+        fa: {},
+        family: {},
         type: { default: "text" },
         placeholder: { default: "Placeholder" },
         autocomplete: { default: "email" },

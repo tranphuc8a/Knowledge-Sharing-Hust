@@ -3,8 +3,8 @@
 <template>
     <div class="p-course-relation-button" v-if="isShow">
         <OwnerOrientedCrb v-if="dCourseRoleType == eCourseRoleType.Owner" />
-        <CourseOrientedCrb v-else-if="dUser == null" />
         <UserOrientedCrb v-else-if="dUser != null" />
+        <CourseOrientedCrb v-else />
     </div>
 </template>
 
@@ -26,6 +26,10 @@ export default {
         UserOrientedCrb
     },
     props: {
+        user: {
+            type: Object,
+            default: null
+        }
     },
     data(){
         return {
@@ -41,7 +45,7 @@ export default {
         try {
             this.dCourse = this.getCourse();
             this.dCourseRoleType = this.dCourse.CourseRoleType;
-            this.dUser = this.getUserCourse?.();
+            this.dUser = this.user;
             this.currentUser = await CurrentUser.getInstance();
         } catch (e) {
             console.error(e);
@@ -61,12 +65,12 @@ export default {
     },
     provide(){
         return {
-            forceUpdateCourseRelationButton: this.forceRender
+            forceUpdateCourseRelationButton: this.forceRender,
+            getUserCourse: () => this.dUser,
         }
     },
     inject: {
         getCourse: {},
-        getUserCourse: {},
     }
 }
 
@@ -80,3 +84,9 @@ export default {
 
 </style>
 
+<style>
+.p-course-relation-button .p-popup-context-container,
+.p-course-relation-button .p-tooltip-container{
+    width: 100%;
+}
+</style>

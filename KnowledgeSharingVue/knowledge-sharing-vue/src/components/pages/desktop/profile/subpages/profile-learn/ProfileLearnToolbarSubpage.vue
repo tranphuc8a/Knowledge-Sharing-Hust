@@ -42,7 +42,7 @@
                         :listItemLoader="getOptions"
                         state="normal"
                         :onchange="resolveChangeOrder"
-                        red="option"
+                        ref="option"
                     /> 
                 </div>
             </div>
@@ -83,7 +83,7 @@ export default {
         async refresh(){
             try {
                 let numberCourse = this.listCourses?.length ?? 0;
-                if (this.numberCourse > 0){
+                if (numberCourse > 0){
                     this.description = `Bạn đang học ${numberCourse} khóa học. Bạn có thể khám phá các khóa học khác tại đây.`;
                 } else {
                     this.description = 'Bạn chưa học khóa học nào. Bạn có thể khám phá các khóa học khác tại đây.';
@@ -138,6 +138,10 @@ export default {
         },
 
         async resolveChangeOrder(){
+            return await this.resolveChangeConfig();
+        },
+
+        async resolveClickSearch(){
             return await this.resolveChangeConfig();
         }
     },
