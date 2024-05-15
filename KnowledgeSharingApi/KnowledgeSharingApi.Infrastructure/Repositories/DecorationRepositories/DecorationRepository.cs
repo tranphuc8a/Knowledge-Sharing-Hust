@@ -231,7 +231,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
                 return resCourse;
             }).ToList();
             await DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
-            
+
             // Decorate CourseRoleType
             if (myUid != null)
             {
@@ -299,19 +299,70 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             {
                 return (ResponseCourseRelationModel)new ResponseCourseRelationModel().Copy(relation);
             }).ToList();
+
+            Dictionary<Guid, ResponseUserCardModel?> dictUser = [];
+            Dictionary<Guid, ResponseCourseCardModel?> dictCourse = [];
+            if (isDecorateUser)
+            {
+                List<Guid> userIds = [];
+                if (relationType == ECourseRelationType.Invite)
+                {
+                    userIds = relations.Select(r => r.ReceiverId).ToList();
+                }
+                else
+                {
+                    userIds = relations.Select(r => r.SenderId).ToList();
+                }
+                dictUser = await GetMapUserCard(userIds);
+            }
+            if (isDecorateCourse)
+            {
+                List<Guid> courseIds = relations.Select(r => r.CourseId).ToList();
+                Dictionary<Guid, IResponseCourseModel?> dictViewCourse = await GetMapCourse(myUid, courseIds);
+                dictCourse = courseIds.ToDictionary(
+                    id => id,
+                    id =>
+                    {
+                        if (dictViewCourse.TryGetValue(id, out IResponseCourseModel? course))
+                        {
+                            if (course == null) return null;
+                            ResponseCourseCardModel resCourseCard = new();
+                            resCourseCard.Copy(course);
+                            return resCourseCard;
+                        }
+                        return null;
+                    }
+                );
+            }
+            foreach (ResponseCourseRelationModel item in res)
+            {
+                if (isDecorateUser)
+                {
+                    Guid userId = relationType == ECourseRelationType.Invite ? item.ReceiverId : item.SenderId;
+                    if (dictUser.TryGetValue(userId, out ResponseUserCardModel? userCardModel))
+                    {
+                        item.User = userCardModel;
+                    }
+                }
+                if (isDecorateCourse && dictCourse.TryGetValue(item.CourseId, out ResponseCourseCardModel? courseCardModel))
+                {
+                    item.Course = courseCardModel;
+                }
+            }
             return await Task.FromResult(res);
         }
 
-        protected virtual async Task<Dictionary<Guid, ResponseUserCardModel>> GetMapUserCard(List<Guid> userIds)
+        protected virtual async Task<Dictionary<Guid, ResponseUserCardModel?>> GetMapUserCard(List<Guid> userIds)
         {
-            Dictionary<Guid, ResponseUserCardModel> mapUsers = [];
+            Dictionary<Guid, ResponseUserCardModel?> mapUsers = [];
             Dictionary<Guid, ViewUser?> listUsers = await UserRepository
-                    .GetDetail(userIds.ToArray());
+                    .GetDetail([.. userIds]);
             mapUsers = listUsers.ToDictionary(
                 item => item.Key,
                 item =>
                 {
                     ViewUser? user = item.Value;
+                    if (user == null) return null;
                     ResponseUserCardModel resUser = new();
                     if (user != null) resUser.Copy(user);
                     return resUser;
@@ -321,9 +372,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
         }
         public virtual async Task<List<ResponseStarModel>> DecorateResponseStarModel(List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
         {
-            Dictionary<Guid, ResponseUserCardModel> mapUsers = [];
+            Dictionary<Guid, ResponseUserCardModel?> mapUsers = [];
             Dictionary<Guid, IResponseUserItemModel?> mapItems = [];
-            Task<Dictionary<Guid, ResponseUserCardModel>> mapUserPromise = Task.FromResult(mapUsers);
+            Task<Dictionary<Guid, ResponseUserCardModel?>> mapUserPromise = Task.FromResult(mapUsers);
             Task<Dictionary<Guid, IResponseUserItemModel?>> mapUserItemPromise = Task.FromResult(mapItems);
 
             if (isDecorateUser)

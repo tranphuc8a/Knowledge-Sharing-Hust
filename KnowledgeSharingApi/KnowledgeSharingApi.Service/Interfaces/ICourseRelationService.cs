@@ -111,10 +111,23 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUid"> id user thuc hien </param>
         /// <param name="courseId"> id course can lay </param>
+        /// <param name="isFocusCourse"> Quyet dinh gia tri tra ve focus course hay focus user </param>
         /// <returns></returns>
         /// CReated: PhucTV (15/5/24)
         /// Modified: None
-        Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid courseId);
+        Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid courseId, bool? isFocusCourse = true);
+
+        /// <summary>
+        /// Lay ve trang thai quan he giua user va course
+        /// </summary>
+        /// <param name="myUid"> id user thuc hien </param>
+        /// <param name="userId"> id cua user can lay </param>
+        /// <param name="courseId"> id course can lay </param>
+        /// <param name="isFocusCourse"> Quyet dinh gia tri tra ve focus course hay focus user </param>
+        /// <returns></returns>
+        /// CReated: PhucTV (15/5/24)
+        /// Modified: None
+        Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid userId, Guid courseId, bool? isFocusCourse = true);
 
         #endregion
 

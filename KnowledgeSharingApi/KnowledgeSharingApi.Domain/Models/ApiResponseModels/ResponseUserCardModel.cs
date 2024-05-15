@@ -28,6 +28,10 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
         public Guid? UserRelationId { get; set; }
 
+        public ECourseRoleType CourseRoleType { get; set; }
+
+        public Guid? CourseRelationId { get; set; }
+
         protected override ResponseUserCardModel Init()
         {
             return new ResponseUserCardModel();

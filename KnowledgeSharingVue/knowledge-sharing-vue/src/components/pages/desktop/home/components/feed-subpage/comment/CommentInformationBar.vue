@@ -4,12 +4,12 @@
             <div class="p-comment-time">
                 <VisualizedDatetime :datetime="getComment()?.CreatedTime" />
             </div>
-            <div class="p-comment-star" v-if="getComment()?.AverageStars != null">
-                <VisualizedStar :star="getComment()?.AverageStars ?? tempStar" />
+            <div class="p-comment-star" v-if="getComment()?.AverageStar != null">
+                <VisualizedStar :star="getComment()?.AverageStar ?? tempStar" />
             </div>
             <MIcon fa="circle" :style="dotIconStyle" 
-                v-if="getComment()?.AverageStars != null && getComment().TotalStars > 0" />
-            <div class="p-comment-numstar" v-if="getComment().TotalStars > 0">
+                v-if="getComment()?.AverageStar != null && getComment().TotalStar > 0" />
+            <div class="p-comment-numstar" v-if="getComment().TotalStar > 0">
                 {{ getNumStar() }}
             </div>
         </div>
@@ -75,7 +75,7 @@ export default {
 
         getNumStar(){
             try {
-                let numstar = Number(this.getComment()?.TotalStars ?? 0);
+                let numstar = Number(this.getComment()?.TotalStar ?? 0);
                 let beautyNumber = Common.formatNumber(numstar);
                 return this.getLabel()?.numberStar(beautyNumber);
             } catch (e) {

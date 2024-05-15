@@ -19,7 +19,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
         public int? TotalRequester { get; set; }
         public int? TotalRequestee { get; set; }
         public int? TotalFollower { get; set; }
-        public int? TotalFolowee { get; set; }
+        public int? TotalFollowee { get; set; }
         public int? TotalBlocker { get; set; }
         public int? TotalBlockee { get; set; }
 

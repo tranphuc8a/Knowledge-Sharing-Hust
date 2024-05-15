@@ -50,7 +50,7 @@ export default {
     name: 'PostCardStarButton',
     data() {
         return {
-            myStar: this.getPost()?.MyStars,
+            myStar: this.getPost()?.MyStar,
             currentUser: null,
             notStaredIconStyle: {
                 color: 'var(--grey-color)',
@@ -77,7 +77,7 @@ export default {
         try {
             this.tooltip = this.$refs?.tooltip;
             this.currentUser = await CurrentUser.getInstance();
-            this.myStar = this.getPost()?.MyStars;
+            this.myStar = this.getPost()?.MyStar;
         } catch (e) {
             console.error(e);
         }
@@ -188,7 +188,7 @@ export default {
                 }).execute();
                 
             } catch (e){
-                this.myStar = this.getPost()?.MyStars;
+                this.myStar = this.getPost()?.MyStar;
                 this.currentStar = this.myStar;
                 console.error(e);
             }
@@ -196,18 +196,18 @@ export default {
 
         async updateToolbar(star){
             try {
-                let numStars = this.getPost().TotalStars ?? 0;
-                let averageStars = this.getPost().AverageStars ?? 0;
-                if (this.getPost().MyStars == null){
+                let numStars = this.getPost().TotalStar ?? 0;
+                let averageStars = this.getPost().AverageStar ?? 0;
+                if (this.getPost().MyStar == null){
                     averageStars = (averageStars * numStars + star) / (numStars + 1);
                     numStars += 1;
-                    this.getPost().TotalStars = numStars;
-                    this.getPost().AverageStars = averageStars;
+                    this.getPost().TotalStar = numStars;
+                    this.getPost().AverageStar = averageStars;
                 } else if (numStars > 0) {
-                    averageStars = (averageStars * numStars + star - this.getPost().MyStars) / numStars;
-                    this.getPost().AverageStars = averageStars;
+                    averageStars = (averageStars * numStars + star - this.getPost().MyStar) / numStars;
+                    this.getPost().AverageStar = averageStars;
                 }  
-                this.getPost().MyStars = star;
+                this.getPost().MyStar = star;
                 this.forceUpdateToolbar();
             } catch (e){
                 console.error(e);

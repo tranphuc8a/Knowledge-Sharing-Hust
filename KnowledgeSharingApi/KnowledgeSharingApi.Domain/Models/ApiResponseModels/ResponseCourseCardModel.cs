@@ -18,9 +18,23 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
         public string? Thumbnail { get; set; }
 
+        public EPrivacy Privacy { get; set; }
+
+        public string Introduction { get; set; } = string.Empty;
+
+        public decimal Fee { get; set; }
+
+        public int EstimateTimeInMinutes { get; set; }
+
+        public bool IsFree { get; set; }
+
+
+
         public ECourseRoleType CourseRoleType { get; set; }
 
         public Guid? CourseRelationId { get; set; }
+
+
 
         public Guid UserId { get; set; }
 

@@ -7,9 +7,9 @@ import Category from "../entities/category";
 class ResponseLessonModel extends ViewLesson {
     constructor() {
         super();
-        this.AverageStars = null;
-        this.MyStars = null;
-        this.TotalStars = null;
+        this.AverageStar = null;
+        this.MyStar = null;
+        this.TotalStar = null;
         this.NumberComments = null;
         this.TopComments = null;
         this.IsMarked = null;

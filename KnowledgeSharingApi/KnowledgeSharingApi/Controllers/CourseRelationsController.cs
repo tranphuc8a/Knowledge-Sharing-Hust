@@ -174,15 +174,33 @@ namespace KnowledgeSharingApi.Controllers
         /// Yêu cầu user lay ve quan he voi mot khoa hoc
         /// User
         /// <paramref name="courseId"/> id cua khoa hoc can lay
+        /// <paramref name="isFocusCourse"/> focus vao course hay user
         /// </summary>
         /// <returns></returns>
         /// Created: PhucTV (15/5/24)
         /// Modified: None
         [HttpGet("course-status/{courseId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetCourseStatus(Guid courseId)
+        public async Task<IActionResult> UserGetCourseStatus(Guid courseId, bool? isFocusCourse)
         {
-            return StatusCode(await CourseRelationService.UserGetCourseRelationStatus(GetCurrentUserIdStrictly(), courseId));
+            return StatusCode(await CourseRelationService.UserGetCourseRelationStatus(GetCurrentUserIdStrictly(), courseId, isFocusCourse));
+        }
+
+        /// <summary>
+        /// Yêu cầu user lay ve quan he voi mot khoa hoc
+        /// User
+        /// <paramref name="courseId"/> id cua khoa hoc can lay
+        /// <paramref name="userId"/> id user can lay
+        /// <paramref name="isFocusCourse"/> focus vao course hay user
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (15/5/24)
+        /// Modified: None
+        [HttpGet("course-user-status/{courseId}/{userId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserGetUserCourseStatus(Guid courseId, Guid userId, bool? isFocusCourse)
+        {
+            return StatusCode(await CourseRelationService.UserGetCourseRelationStatus(GetCurrentUserIdStrictly(), userId, courseId, isFocusCourse));
         }
 
 

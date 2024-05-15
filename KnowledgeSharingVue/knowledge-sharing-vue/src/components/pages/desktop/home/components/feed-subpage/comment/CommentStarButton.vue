@@ -48,7 +48,7 @@ export default {
     name: 'CommentStarButton',
     data() {
         return {
-            myStar: this.getComment()?.MyStars,
+            myStar: this.getComment()?.MyStar,
             currentUser: null,
             selectStarIconStyle:{
                 fontSize: '28px'
@@ -65,7 +65,7 @@ export default {
     },
     async mounted() {
         this.tooltip = this.$refs?.tooltip;
-        this.myStar = this.getComment().MyStars;
+        this.myStar = this.getComment().MyStar;
         this.currentUser = await CurrentUser.getInstance();
     },
     components: {
@@ -163,19 +163,19 @@ export default {
                 }
                 let comment = this.getComment();
                 if (comment != null){
-                    let numStars = this.getComment().TotalStars ?? 0;
-                    let averageStars = this.getComment().AverageStars ?? 0;
-                    if (this.getComment().MyStars == null){
+                    let numStars = this.getComment().TotalStar ?? 0;
+                    let averageStars = this.getComment().AverageStar ?? 0;
+                    if (this.getComment().MyStar == null){
                         averageStars = (averageStars * numStars + star) / (numStars + 1);
                         numStars += 1;
-                        this.getComment().TotalStars = numStars;
-                        this.getComment().AverageStars = averageStars;
+                        this.getComment().TotalStar = numStars;
+                        this.getComment().AverageStar = averageStars;
                     } else if (numStars > 0) {
-                        averageStars = (averageStars * numStars + star - this.getComment().MyStars) / numStars;
-                        this.getComment().AverageStars = averageStars;
+                        averageStars = (averageStars * numStars + star - this.getComment().MyStar) / numStars;
+                        this.getComment().AverageStar = averageStars;
                     }  
                     this.forceUpdateInformationBar?.();
-                    this.getComment().MyStars = star;
+                    this.getComment().MyStar = star;
                 }
                 await new PutRequest('Stars')
                     .setBody({

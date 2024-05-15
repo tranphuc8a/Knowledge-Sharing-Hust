@@ -8,8 +8,15 @@ class ResponseCourseCardModel extends Entity{
         this.Title = null;
         this.Abstract = null;
         this.Thumbnail = null;
+        this.Fee = null;
+        this.IsFree = null;
+        this.Privacy = null;
+        this.Introduction = null;
+        this.EstimateTimeInMinutes = null;
+
         this.CourseRoleType = null;
         this.CourseRelationId = null;
+
         this.UserId = null;
         this.Username = null;
         this.FullName = null;
