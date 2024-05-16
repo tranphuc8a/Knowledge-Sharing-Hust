@@ -14,31 +14,18 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Services.Services
 {
-    public class ImageService : IImageService
+    public class ImageService(
+        IImageRepository imageRepository,
+        IResourceFactory resourceFactory,
+        IStorage storage
+        ) : IImageService
     {
-        public IImageRepository ImageRepository;
-        public IResourceFactory ResourceFactory;
-        public IResponseResource ResponseResource;
-        public IStorage Storage;
+        public IImageRepository ImageRepository = imageRepository;
+        public IResourceFactory ResourceFactory = resourceFactory;
+        public IResponseResource ResponseResource = resourceFactory.GetResponseResource();
+        public IStorage Storage = storage;
 
-        public string ImageResource;
-
-        public ImageService(
-            IImageRepository imageRepository,
-            IResourceFactory resourceFactory,
-            IStorage storage
-        )
-        {
-            ImageRepository = imageRepository;
-
-            ResourceFactory = resourceFactory;
-            ResponseResource = resourceFactory.GetResponseResource();
-
-            Storage = storage;
-
-            ImageResource = resourceFactory.GetEntityResource().Image();
-        }
-
+        public string ImageResource = resourceFactory.GetEntityResource().Image();
 
         public async Task<ServiceResult> DeleteImage(Guid myUid, Guid imageId)
         {
@@ -57,7 +44,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         public async Task<ServiceResult> GetListImage(Guid userId)
         {
-            IEnumerable<Image> res = await ImageRepository.GetByUserId(userId);
+            List<Image> res = await ImageRepository.GetByUserId(userId);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(ImageResource), string.Empty, res);
         }
 

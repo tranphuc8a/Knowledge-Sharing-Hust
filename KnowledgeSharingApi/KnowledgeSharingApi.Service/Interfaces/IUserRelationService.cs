@@ -16,12 +16,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Hàm thực hiện lấy về danh sách bạn bè của uid
         /// </summary>
         /// <param name="userid"> id của người dùng cần lấy </param>
-        /// <param name="limit"> Số lượng bản ghi </param>
-        /// <param name="offset"> Độ lệch bản ghi đầu tiên </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> GetFriends(Guid userid, int? limit, int? offset);
+        Task<ServiceResult> GetFriends(Guid userid, PaginationDto page);
 
         /// <summary>
         /// Hàm thực hiện lấy về danh sách một loại quan hệ của user
@@ -30,12 +29,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="userid"> id của người dùng cần lấy </param>
         /// <param name="relationType"> Loại quan hệ (Follow, Block, Request, Friend) </param>
         /// <param name="isActive"> true = Chủ động, false = bị động </param>
-        /// <param name="limit"> Số lượng bản ghi </param>
-        /// <param name="offset"> Độ lệch bản ghi đầu </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> GetRelations(Guid userid, EUserRelationType relationType, bool isActive, int? limit, int? offset);
+        Task<ServiceResult> GetRelations(Guid userid, EUserRelationType relationType, bool isActive, PaginationDto page);
 
         /// <summary>
         /// Lay ve tinh trang quan he hien tai giua hai user

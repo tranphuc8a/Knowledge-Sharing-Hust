@@ -72,7 +72,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (cat == null) return ServiceResult.BadRequest(CategoryNotExisted);
 
             // Check category chưa gắn với knowledge nào
-            IEnumerable<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catId);
+            List<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catId);
             if (listKnowledges.Any())
                 return ServiceResult.BadRequest("Không thể xóa do có knowledge khác đang sử dụng category này");
 
@@ -91,7 +91,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (cat == null) return ServiceResult.BadRequest(CategoryNotExisted);
 
             // Check category chưa gắn với knowledge nào
-            IEnumerable<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catName);
+            List<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catName);
             if (listKnowledges.Any())
                 return ServiceResult.BadRequest("Không thể xóa do có knowledge khác đang sử dụng category này");
 
@@ -123,10 +123,10 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CategoryResource), string.Empty, cat);
         }
 
-        public async Task<ServiceResult> GetListCategories(int? limit, int? offset)
+        public async Task<ServiceResult> GetListCategories(PaginationDto pagination)
         {
             // Get
-            PaginationResponseModel<Category> res = await CategoryRepository.Get(limit ?? DefaultLimit, offset ?? 0);
+            PaginationResponseModel<Category> res = await CategoryRepository.Get(pagination);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CategoryResource), string.Empty, res.Results);
@@ -138,7 +138,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Không nhất thiết, trường hợp knowledge không tồn tại, trả về rỗng
 
             // Get 
-            IEnumerable<Category> res = await CategoryRepository.GetByKnowledgeId(knowledgeId);
+            List<Category> res = await CategoryRepository.GetByKnowledgeId(knowledgeId);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CategoryResource), string.Empty, res);
@@ -151,7 +151,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (cat == null) return ServiceResult.BadRequest(CategoryNotExisted);
 
             // Check category chưa gắn với knowledge nào
-            IEnumerable<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catId);
+            List<ViewKnowledgeCategory> listKnowledges = await CategoryRepository.GetKnowledgesByCategory(catId);
             if (listKnowledges.Any())
                 return ServiceResult.BadRequest("Không thể cập nhật do có knowledge khác đang sử dụng category này");
 

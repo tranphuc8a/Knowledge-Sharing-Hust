@@ -112,7 +112,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpDelete("list-lessons")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserDeleteListLessonFromCourse([FromBody] IEnumerable<Guid> listParticipantIds)
+        public async Task<IActionResult> UserDeleteListLessonFromCourse([FromBody] List<Guid> listParticipantIds)
         {
             return StatusCode(await CourseLessonService.DeleteListLessonFromCourse(GetCurrentUserIdStrictly(), listParticipantIds));
         }
@@ -144,7 +144,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpPatch("list-lessons")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserUpdateListLessonInCourse([FromBody] IEnumerable<UpdateLessonInCourseModel> model)
+        public async Task<IActionResult> UserUpdateListLessonInCourse([FromBody] List<UpdateLessonInCourseModel> model)
         {
             return StatusCode(await CourseLessonService.UpdateListLessonInCourse(GetCurrentUserIdStrictly(), model));
         }

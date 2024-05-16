@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewUserConversation>> GetParticipants(Guid conversationId);
+        Task<List<ViewUserConversation>> GetParticipants(Guid conversationId);
 
 
         /// <summary>
@@ -44,14 +45,14 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
 
         /// <summary>
         /// Lấy về danh sách tin nhắn của một cuộc hội thoại
-        /// </summary>
+        /// </summary> 
+        /// <param name="userId"> id cua user muon lay </param>
         /// <param name="conversationId"> id của cuộc hội thoại muốn lấy </param>
-        /// <param name="limit"> Số lượng tin nhắn muốn lấy </param>
-        /// <param name="offset"> Độ lệch tin nhắn đầu </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewMessage>> GetMessages(Guid userId, Guid conversationId, int limit, int offset);
+        Task<List<ViewMessage>> GetMessages(Guid userId, Guid conversationId, PaginationDto pagination);
 
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<Conversation>> GetListConversationByUserId(Guid userId);
+        Task<List<Conversation>> GetListConversationByUserId(Guid userId);
 
         /// <summary>
         /// Lấy về cuộc trò chuyện của userId với user khác

@@ -15,7 +15,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class CoursePaymentMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<CoursePayment>(dbContext), ICoursePaymentRepository
     {
-        public async Task<IEnumerable<ViewCoursePayment>> GetByCourse(Guid courseId)
+        public async Task<List<ViewCoursePayment>> GetByCourse(Guid courseId)
         {
             return await DbContext.ViewCoursePayments
                 .Where(cp => cp.CourseId == courseId)
@@ -23,7 +23,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewCoursePayment>> GetByUser(Guid userId)
+        public async Task<List<ViewCoursePayment>> GetByUser(Guid userId)
         {
             return await DbContext.ViewCoursePayments
                 .Where(cp => cp.UserId == userId)
@@ -36,7 +36,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.ViewCoursePayments.FindAsync(paymentId);
         }
 
-        public async Task<IEnumerable<ViewCoursePayment>> GetCoursePayment(Guid userId, Guid courseId)
+        public async Task<List<ViewCoursePayment>> GetCoursePayment(Guid userId, Guid courseId)
         {
             return await DbContext.ViewCoursePayments
                 .Where(cp => cp.UserId == userId && cp.CourseId == courseId)

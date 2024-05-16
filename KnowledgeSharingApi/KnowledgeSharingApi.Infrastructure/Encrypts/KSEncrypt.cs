@@ -91,7 +91,7 @@ namespace KnowledgeSharingApi.Infrastructures.Encrypts
 
 
         #region En-De between string and ClaimPrincipal
-        public string? JwtEncrypt(IEnumerable<Claim> claims)
+        public string? JwtEncrypt(List<Claim> claims)
         {
             if (String.IsNullOrEmpty(_jwtSecret))
             {
@@ -113,10 +113,10 @@ namespace KnowledgeSharingApi.Infrastructures.Encrypts
             return null;
         }
 
-        public IEnumerable<Claim>? JwtDecryptToListClaims(string token, bool isValidateLifeTime)
+        public List<Claim>? JwtDecryptToListClaims(string token, bool isValidateLifeTime)
         {
             ClaimsPrincipal? principal = JwtDecryptToClaimsPrincipal(token, isValidateLifeTime);
-            return principal?.Claims;
+            return principal?.Claims.ToList();
         }
 
         public ClaimsPrincipal? JwtDecryptToClaimsPrincipal(string token, bool isValidateLifetime)

@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
@@ -19,16 +20,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class PostMySqlRepository(IDbContext dbContext)
         : BaseMySqlUserItemRepository<Post>(dbContext), IPostRepository
     {
-        public async Task<IEnumerable<ViewPost>> GetViewPost(int limit, int offset)
+        public async Task<List<ViewPost>> GetViewPost(PaginationDto pagination)
         {
-            List<ViewPost> posts = await
-                DbContext.ViewPosts
-                .Skip(offset).Take(limit)
+            List<ViewPost> posts = await ApplyPagination(
+                DbContext.ViewPosts, pagination)
                 .ToListAsync();
             return posts;
         }
 
-        public async Task<IEnumerable<ViewPost>> GetByUserId(Guid userId)
+        public async Task<List<ViewPost>> GetByUserId(Guid userId)
         {
             List<ViewPost> posts = await
                 DbContext.ViewPosts
@@ -38,18 +38,18 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<IEnumerable<ViewPost>> GetPublicPosts(int limit, int offset)
+        public async Task<List<ViewPost>> GetPublicPosts(PaginationDto pagination)
         {
-            List<ViewPost> posts = await
-                DbContext.ViewPosts
-                .Where(post => post.Privacy == EPrivacy.Public)
-                .OrderByDescending(post => post.CreatedTime)
-                .Skip(offset).Take(limit)
+            List<ViewPost> posts = await ApplyPagination(
+                    DbContext.ViewPosts
+                    .Where(post => post.Privacy == EPrivacy.Public)
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination)
                 .ToListAsync();
             return posts;
         }
 
-        public async Task<IEnumerable<ViewPost>> GetPublicPostsByUserId(Guid userId)
+        public async Task<List<ViewPost>> GetPublicPostsByUserId(Guid userId)
         {
             List<ViewPost> posts = await
                 DbContext.ViewPosts
@@ -59,41 +59,43 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<IEnumerable<ViewPost>> GetPublicPostsOfCategory(string catName, int limit, int offset)
+        public async Task<List<ViewPost>> GetPublicPostsOfCategory(string catName, PaginationDto pagination)
         {
             var postsId = DbContext.ViewKnowledgeCategories
                 .Where(k => k.CategoryName == catName)
                 .Select(k => k.KnowledgeId)
                 .Distinct();
-            var posts = await DbContext.ViewPosts
-                .Where(post => post.Privacy == EPrivacy.Public 
-                        && postsId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
-                .OrderByDescending(post => post.CreatedTime)
-                .Skip(offset).Take(limit)
+            var posts = await ApplyPagination(
+                    DbContext.ViewPosts
+                    .Where(post => post.Privacy == EPrivacy.Public 
+                            && postsId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination)
                 .ToListAsync();
             return posts;
         }
 
-        public async Task<IEnumerable<ViewPost>> GetPostsOfCategory(string catName, int limit, int offset)
+        public async Task<List<ViewPost>> GetPostsOfCategory(string catName, PaginationDto pagination)
         {
             var postsId = DbContext.ViewKnowledgeCategories
                 .Where(k => k.CategoryName == catName)
                 .Select(k => k.KnowledgeId)
                 .Distinct();
-            var posts = await DbContext.ViewPosts
-                .Where(post => postsId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
-                .OrderByDescending(post => post.CreatedTime)
-                .Skip(offset).Take(limit)
+            var posts = await ApplyPagination(
+                    DbContext.ViewPosts
+                    .Where(post => postsId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination)
                 .ToListAsync();
             return posts;
         }
 
-        public Task<IEnumerable<ViewPost>> GetPostsOfCategory(Guid myUId, string catName, int limit, int offset)
+        public Task<List<ViewPost>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination)
         {
-            return GetPublicPostsOfCategory(catName, limit, offset);
+            return GetPublicPostsOfCategory(catName, pagination);
         }
 
-        public async Task<IEnumerable<ViewPost>> GetMarkedPosts(Guid userId)
+        public async Task<List<ViewPost>> GetMarkedPosts(Guid userId)
         {
             IQueryable<ViewPost> query =
                 from post in DbContext.ViewPosts

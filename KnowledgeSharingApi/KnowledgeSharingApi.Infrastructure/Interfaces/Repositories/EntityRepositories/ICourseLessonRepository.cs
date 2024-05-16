@@ -29,7 +29,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<IEnumerable<CourseLesson>?> AddListLessonToCourse(AddListLessonToCourseModel model);
+        Task<List<CourseLesson>?> AddListLessonToCourse(AddListLessonToCourseModel model);
         #endregion
 
 
@@ -50,7 +50,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<int> DeleteListLessonFromCourse(IEnumerable<Guid> listParticipantIds);
+        Task<int> DeleteListLessonFromCourse(List<Guid> listParticipantIds);
         #endregion
 
         #region Get
@@ -62,7 +62,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (3/4/24)
         /// Modified: None
-        Task<IEnumerable<CourseLesson>> GetCourseParticipant(Guid courseId);
+        Task<List<CourseLesson>> GetCourseParticipant(Guid courseId);
         
         #endregion
 
@@ -83,7 +83,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<int> UpdateListLessonInCourse(IEnumerable<UpdateLessonInCourseModel> model);
+        Task<int> UpdateListLessonInCourse(List<UpdateLessonInCourseModel> model);
 
 
         /// <summary>

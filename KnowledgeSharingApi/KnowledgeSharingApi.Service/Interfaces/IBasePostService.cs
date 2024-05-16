@@ -39,13 +39,12 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// Admin lấy về danh sách bài đăng của một khóa học cụ thể
         /// </summary>
-        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
-        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, PaginationDto pagination);
 
         #endregion
 
@@ -75,26 +74,24 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// User lấy về danh sách bài đăng của một khóa học cụ thể
         /// </summary>
         /// <param name="myUid"> id user của chính mình </param>
-        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
-        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, PaginationDto pagination);
 
 
         /// <summary>
         /// User lấy về danh sách bài đăng của một khóa học cụ thể của mình
         /// </summary>
         /// <param name="myUid"> id user của chính mình </param>
-        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
-        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, PaginationDto pagination);
 
 
 

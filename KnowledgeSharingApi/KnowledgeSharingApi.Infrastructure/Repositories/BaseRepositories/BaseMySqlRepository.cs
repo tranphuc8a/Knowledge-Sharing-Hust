@@ -1,7 +1,9 @@
 ﻿using Dapper;
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
@@ -19,7 +21,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 {
-    public abstract class BaseMySqlRepository<T> : IRepository<T> where T : Entity
+    public abstract class BaseMySqlRepository<T> : BaseRepository<T>, IRepository<T> where T : Entity
     {
         public IDbContext DbContext;
         protected string TableName;
@@ -44,157 +46,21 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
         //protected abstract DbSet<T> GetDbContext();
 
-        #region Get Ordered Methods
-
-        public virtual IQueryable<T> GetOrderedQueryable(IQueryable<T> query, List<(string Field, bool Ascending)> orders)
-        {
-            if (orders == null || orders.Count == 0)
-            {
-                return query;
-            }
-
-            // Áp dụng sắp xếp đầu tiên
-            var parameter = Expression.Parameter(typeof(T), "x");
-            IOrderedQueryable<T>? orderedQuery = null;
-            bool isFirstOrder = true;
-
-            foreach (var (Field, Ascending) in orders)
-            {
-                var property = typeof(T).GetProperty(Field);
-                if (property == null)
-                {
-                    // Bỏ qua field không hợp lệ
-                    continue;
-                }
-
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
-                var orderByExpression = Expression.Lambda(propertyAccess, parameter);
-
-                if (isFirstOrder)
-                {
-                    orderedQuery = Ascending
-                        ? Queryable.OrderBy(query, (dynamic)orderByExpression)
-                        : Queryable.OrderByDescending(query, (dynamic)orderByExpression);
-                    isFirstOrder = false;
-                }
-                else
-                {
-                    orderedQuery = Ascending
-                        ? Queryable.ThenBy(orderedQuery, (dynamic)orderByExpression)
-                        : Queryable.ThenByDescending(orderedQuery, (dynamic)orderByExpression);
-                }
-            }
-
-            return orderedQuery ?? query;
-        }
-
-        public virtual List<T> GetOrderedList(List<T> beforeList, List<(string Field, bool Ascending)> orders)
-        {
-            if (orders == null || orders.Count == 0)
-            {
-                return beforeList;
-            }
-
-            // Chuyển List thành IQueryable để sử dụng Linq cho sắp xếp
-            IQueryable<T> query = beforeList.AsQueryable();
-
-            // Áp dụng sắp xếp đầu tiên
-            var parameter = Expression.Parameter(typeof(T), "x");
-            IOrderedQueryable<T>? orderedQuery = null;
-            bool isFirstOrder = true;
-
-            foreach (var (Field, Ascending) in orders)
-            {
-                var property = typeof(T).GetProperty(Field);
-                if (property == null)
-                {
-                    // Bỏ qua field không hợp lệ
-                    continue;
-                }
-
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
-                var orderByExpression = Expression.Lambda(propertyAccess, parameter);
-
-                if (isFirstOrder)
-                {
-                    orderedQuery = Ascending
-                        ? Queryable.OrderBy(query, (dynamic)orderByExpression)
-                        : Queryable.OrderByDescending(query, (dynamic)orderByExpression);
-                    isFirstOrder = false;
-                }
-                else
-                {
-                    orderedQuery = Ascending
-                        ? Queryable.ThenBy(orderedQuery, (dynamic)orderByExpression)
-                        : Queryable.ThenByDescending(orderedQuery, (dynamic)orderByExpression);
-                }
-            }
-
-            return orderedQuery?.ToList() ?? beforeList;
-        }
-
-        public virtual List<Q> GetOrderedList<Q>(List<Q> beforeList, List<(string Field, bool Ascending)> orders)
-        {
-            if (orders == null || orders.Count == 0)
-            {
-                return beforeList;
-            }
-
-            // Chuyển List thành IQueryable để sử dụng Linq cho sắp xếp
-            IQueryable<Q> query = beforeList.AsQueryable();
-
-            // Áp dụng sắp xếp đầu tiên
-            var parameter = Expression.Parameter(typeof(Q), "x");
-            IOrderedQueryable<Q>? orderedQuery = null;
-            bool isFirstOrder = true;
-
-            foreach (var (Field, Ascending) in orders)
-            {
-                var property = typeof(Q).GetProperty(Field);
-                if (property == null)
-                {
-                    // Bỏ qua field không hợp lệ
-                    continue;
-                }
-
-                var propertyAccess = Expression.MakeMemberAccess(parameter, property);
-                var orderByExpression = Expression.Lambda(propertyAccess, parameter);
-
-                if (isFirstOrder)
-                {
-                    orderedQuery = Ascending
-                        ? Queryable.OrderBy(query, (dynamic)orderByExpression)
-                        : Queryable.OrderByDescending(query, (dynamic)orderByExpression);
-                    isFirstOrder = false;
-                }
-                else
-                {
-                    orderedQuery = Ascending
-                        ? Queryable.ThenBy(orderedQuery, (dynamic)orderByExpression)
-                        : Queryable.ThenByDescending(orderedQuery, (dynamic)orderByExpression);
-                }
-            }
-
-            return orderedQuery?.ToList() ?? beforeList;
-        }
-
-
-        #endregion
-
         #region Get Records
-        public virtual async Task<IEnumerable<T>> Get()
+        public virtual async Task<List<T>> Get()
         {
             string sqlCommand = $"Select * from {TableName}";
-            return await Connection.QueryAsync<T>(sqlCommand, transaction: Transaction);
+            return (await Connection.QueryAsync<T>(sqlCommand, transaction: Transaction)).ToList();
         }
 
-        public virtual async Task<PaginationResponseModel<T>> Get(int limit, int offset)
+        public virtual async Task<PaginationResponseModel<T>> Get(PaginationDto page)
         {
             //DbSet<T> dbContext = GetDbContext();
             //int count = dbContext.Count();
             //List<T> listObjects = await dbContext.Skip(offset).Take(limit).ToListAsync();
             string sqlCommand = $"Select * from {TableName} ";
-            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, limit: limit, offset: offset);
+            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, pagination: page);
+
             return res;
         }
 
@@ -204,10 +70,24 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             return await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id });
         }
 
-        public virtual async Task<IEnumerable<T?>> Get(Guid[] ids)
+        public virtual async Task<List<T?>> Get(Guid[] ids)
         {
             string sqlCommand = $"Select * from {TableName} where {TableNameId} in @ids ";
-            return await Connection.QueryAsync<T>(sqlCommand, new { ids }, transaction: Transaction);
+            PropertyInfo? EntityId = typeof(T).GetProperty(TableNameId);
+            if (EntityId == null) return [];
+
+            Dictionary<Guid, T> dictRes =
+                (await Connection.QueryAsync<T>(sqlCommand, new { ids }, transaction: Transaction))
+                .ToDictionary(item => (Guid)EntityId.GetValue(item)!, item => item);
+            return ids.Select(id =>
+            {
+                if (dictRes.TryGetValue(id, out T? value))
+                {
+                    return value;
+                }
+                return null;
+            }).ToList();
+
         }
 
         #endregion
@@ -297,15 +177,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
 
         #region Filter Entities
-        public virtual async Task<IEnumerable<T>> Filter(string text)
+        public virtual async Task<List<T>> Filter(string text)
         {
             string templateText = $"%{text}%";
             string sqlCommand = $"Select * from {TableName} " +
                                 $"where {NameField} like @templateText or @text like CONCAT('%',{NameField},'%');";
-            return await Connection.QueryAsync<T>(sqlCommand, new { text, templateText });
+            return (await Connection.QueryAsync<T>(sqlCommand, new { text, templateText })).ToList();
         }
 
-        public virtual async Task<PaginationResponseModel<T>> Filter(string text, int limit, int offset, List<(string, bool)> order)
+        public virtual async Task<PaginationResponseModel<T>> Filter(string text, PaginationDto pagination)
         {
             // Tạo truy vấn:
             string templateText = $"%{text}%";
@@ -314,7 +194,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
             PaginationResponseModel<T> res = await GetPagination<T>(
                 subCommand: subCommand,
-                limit: limit, offset: offset, orders: order,
+                pagination: pagination,
                 subCommandParameters: new { templateText }
             );
             return res;
@@ -331,47 +211,35 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         }
         protected virtual async Task<PaginationResponseModel<Q>> GetPagination<Q>(
             string subCommand, 
-            int limit, int offset, 
-            List<(string Field, bool IsAscending)>? orders = null,
+            PaginationDto pagination,
             object? subCommandParameters = null) where Q : Entity
         {
-            var orderClause = string.Empty;
-            if (orders != null)
-            {
-                // Lọc ra những Orders hợp lệ với các props của lớp Q
-                var validFields = typeof(Q).GetProperties()
-                    .Select(prop => prop.Name).ToHashSet();
+            DynamicParameters subParams = new(subCommandParameters);
 
-                var validOrders = orders.Where(order => validFields.Contains(order.Field)).ToList();
+            string orderClause = GetOrderClause<Q>(pagination.Orders);
+            string limsetClause = GetLimitOffsetClause(pagination.Limit, pagination.Offset, out DynamicParameters limsetParams);
+            string whereClause = GetWhereClause<Q>(pagination.Filters, out DynamicParameters whereParams);
 
-                // Tạo câu lệnh ORDER BY
-                orderClause = validOrders.Count > 0
-                    ? "ORDER BY " + string.Join(", ", validOrders.Select(order => $"{order.Field} {(order.IsAscending ? "ASC" : "DESC")}"))
-                    : string.Empty;
-            }
+            DynamicParameters totalParams = CombineDynamicParameters(subParams, limsetParams, whereParams);
 
             // Tạo quy vấn
             string sqlCommand =
                 $"SET sql_require_primary_key=OFF; " +
                 $"CREATE TEMPORARY TABLE temp_selected_records AS {subCommand}; " +
                 $"SELECT COUNT(*) AS record_count FROM temp_selected_records; " +
-                $"SELECT * FROM temp_selected_records {orderClause} LIMIT @limit OFFSET @offset; " +
+                $"SELECT * FROM temp_selected_records {whereClause} {orderClause} {limsetClause}; " +
                 $"DROP TEMPORARY TABLE IF EXISTS temp_selected_records;";
 
-            // Tạo đối tượng dynamic để kết hợp subCommandParameters với limit và offset
-            var queryParameters = new DynamicParameters(subCommandParameters);
-            queryParameters.Add("limit", limit);
-            queryParameters.Add("offset", offset);
 
             // Thực hiện truy vấn
-            using var multipleResults = await Connection.QueryMultipleAsync(sqlCommand, queryParameters, Transaction);
+            using var multipleResults = await Connection.QueryMultipleAsync(sqlCommand, totalParams, Transaction);
 
             return new PaginationResponseModel<Q>
             {
                 Total = multipleResults.Read<int>().Single(),
-                Limit = limit,
-                Offset = offset,
-                Results = multipleResults.Read<Q>(),
+                Limit = pagination.Limit ?? 0,
+                Offset = pagination.Offset ?? 0,
+                Results = multipleResults.Read<Q>().ToList(),
             };
         }
 

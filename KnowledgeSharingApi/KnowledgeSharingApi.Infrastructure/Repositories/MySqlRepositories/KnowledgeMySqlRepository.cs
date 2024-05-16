@@ -3,6 +3,7 @@ using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
@@ -127,7 +128,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return averageStar;
         }
 
-        public virtual async Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset)
+        public virtual async Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, PaginationDto pagination)
         {
             List<ViewComment> listComment = await
                 DbContext.ViewComments
@@ -140,14 +141,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             PaginationResponseModel<ViewComment> res = new()
             {
                 Total = listComment.Count,
-                Limit = limit,
-                Offset = offset,
-                Results = listComment.Skip(offset).Take(limit)
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = ApplyPagination(listComment, pagination)
             };
             return res;
         }
 
-        public virtual async Task<IEnumerable<ViewComment>> GetListComments(Guid knowledgeId)
+        public virtual async Task<List<ViewComment>> GetListComments(Guid knowledgeId)
         {
             return await DbContext.ViewComments
                 .Where(comment => comment.KnowledgeId == knowledgeId)
@@ -155,21 +156,21 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public virtual async Task<PaginationResponseModel<ViewUser>> GetListUserMaredKnowledge(Guid knowledgeId, int limit, int offset)
+        public virtual async Task<PaginationResponseModel<ViewUser>> GetListUserMaredKnowledge(Guid knowledgeId, PaginationDto pagination)
         {
-            var listUserIds = DbContext.Marks.Where(mark => mark.KnowledgeId == knowledgeId)
-                .Select(mark => mark.UserId).Distinct();
-            int total = listUserIds.Count();
-            List<ViewUser> listUser = await DbContext.ViewUsers
-                .Where(user => listUserIds.Contains(user.UserId))
-                .Skip(offset).Take(limit)
-                .ToListAsync();
+            var listUserIds = await DbContext.Marks.Where(mark => mark.KnowledgeId == knowledgeId)
+                .Select(mark => mark.UserId).Distinct().ToListAsync();
+            int total = listUserIds.Count;
+            IQueryable<ViewUser> listUser = ApplyPagination(
+                DbContext.ViewUsers
+                .Where(user => listUserIds.Contains(user.UserId)),
+                pagination);
             return new PaginationResponseModel<ViewUser>
             {
                 Total = total,
-                Limit = limit,
-                Offset = offset,
-                Results = listUser
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = await listUser.ToListAsync()
             };
         }
 

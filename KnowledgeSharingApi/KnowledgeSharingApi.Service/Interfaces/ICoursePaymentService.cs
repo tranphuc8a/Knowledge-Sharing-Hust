@@ -18,24 +18,22 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetCoursePayments(Guid myUid, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetCoursePayments(Guid myUid, Guid courseId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu user lấy về danh sách các payment mà mình đã thanh toán
         /// Owner của payments
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyPayments(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyPayments(Guid myUid, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu user lấy về chi tiết một payment

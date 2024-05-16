@@ -18,6 +18,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks
 
         IUnitOfWork RegisterRepository<T>(IRepository<T> repository) where T : Entity;
 
-        IUnitOfWork RegisterRepository<T>(IEnumerable<IRepository<T>> repositories) where T : Entity;
+        IUnitOfWork RegisterRepository<T>(List<IRepository<T>> repositories) where T : Entity;
     }
 }

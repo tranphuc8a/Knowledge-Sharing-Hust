@@ -95,14 +95,17 @@ namespace KnowledgeSharingApi.Controllers
         /// </summary>
         /// <param name="limit"> Thuộc tính phân trang - số bản ghi muốn lấy </param>
         /// <param name="offset"> Thuộc tính phân trang - bản ghi ban đầu có độ lệch </param>
+        /// <param name="orders"> Thuộc tính phân trang - thứ tự sắp xếp các bản ghi </param>
+        /// <param name="filters"> Thuộc tính phân trang - bộ lọc </param>
         /// <returns></returns>
         /// Created: PhucTV (8/1/24)
         /// Modified: None
         //[CustomAuthorization(Roles: UserRoles.User)]
         [HttpGet]
-        public virtual async Task<IActionResult> Get(int? limit, int? offset)
+        public virtual async Task<IActionResult> Get(int? limit, int? offset, string? orders, string? filters)
         {
-            ServiceResult res = await GetService().GetService(limit, offset);
+            PaginationDto page = new(limit, offset, ParseOrder(orders), ParseFilter(filters));
+            ServiceResult res = await GetService().GetService(page);
             if (res.IsSuccess)
             {
                 return Ok(new ApiResponse(res));
@@ -142,14 +145,14 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         //[CustomAuthorization(Roles: UserRoles.User)]
         [HttpGet("Filter")]
-        public async Task<IActionResult> Filter(string search, int? limit = null, int? offset = null, string? orders = null)
+        public async Task<IActionResult> Filter(string search, int? limit = null, int? offset = null, string? orders = null, string? filters = null)
         {
+            PaginationDto pagination = new(limit, offset, ParseOrder(orders), ParseFilter(filters));
             if (String.IsNullOrEmpty(search))
             {
-                return await Get(limit, offset);
+                return await Get(limit, offset, orders, filters);
             }
-            List<(string, bool)> parsedOrders = ParseSortFields(orders);
-            ServiceResult res = await GetService().FilterService(search, limit, offset, parsedOrders);
+            ServiceResult res = await GetService().FilterService(search, pagination);
             if (res.IsSuccess)
             {
                 string msg = _ResponseResoucre.FilterSuccess(ResponseTableName);

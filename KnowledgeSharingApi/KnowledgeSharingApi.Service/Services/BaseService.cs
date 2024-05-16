@@ -5,6 +5,7 @@ using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
 using KnowledgeSharingApi.Services.Interfaces;
+using Mysqlx.Crud;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,27 +85,13 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.ServerError(msg);
         }
 
-        public virtual async Task<ServiceResult> GetService(int? limit, int? offset)
+        public virtual async Task<ServiceResult> GetService(PaginationDto pagination)
         {
             var repository = GetRepository();
-            PaginationResponseModel<T> paginationResponseModel;
-            if (limit != null)
-            {
-                paginationResponseModel = await repository.Get(limit ?? 0, offset ?? 0);
-            }
-            else
-            {
-                IEnumerable<T> entities = await repository.Get();
-                paginationResponseModel = new()
-                {
-                    Total = entities.Count(),
-                    Limit = entities.Count(),
-                    Offset = 0,
-                    Results = entities
-                };
-            }
+            PaginationResponseModel<T> paginationResponseModel = await repository.Get(pagination);
+
             // Success:
-            return new ServiceResult(paginationResponseModel.Count, paginationResponseModel);
+            return new ServiceResult(paginationResponseModel.Count ?? 0, paginationResponseModel);
         }
 
         public virtual async Task<ServiceResult> GetService(Guid id)
@@ -209,27 +196,13 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(msg);
         }
 
-        public virtual async Task<ServiceResult> FilterService(string search, int? limit = null, int? offset = null, List<(string Field, bool IsAscending)>? orders = null)
+        public virtual async Task<ServiceResult> FilterService(string search, PaginationDto pagination)
         {
             var repository = GetRepository();
-            PaginationResponseModel<T> paginationResponseModel;
-            if (limit != null)
-            {
-                paginationResponseModel = await repository.Filter(search, limit ?? 0, offset ?? 0, orders ?? []);
-            }
-            else
-            {
-                IEnumerable<T> entities = await repository.Filter(search);
-                paginationResponseModel = new()
-                {
-                    Total = entities.Count(),
-                    Limit = entities.Count(),
-                    Offset = 0,
-                    Results = entities
-                };
-            }
+            PaginationResponseModel<T> paginationResponseModel = await repository.Filter(search, pagination);
+            
             // Success
-            return new ServiceResult(paginationResponseModel.Count, paginationResponseModel);
+            return new ServiceResult(paginationResponseModel.Count ?? 0, paginationResponseModel);
 
         }
         #endregion

@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -33,18 +34,17 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns>Danh sách bản ghi được lấy</returns>
         /// Created: PhucTV (26/12/23)
         /// Modified: None
-        Task<IEnumerable<T>> Get();
+        Task<List<T>> Get();
 
 
         /// <summary>
         /// Hàm thực hiện lấy tất cả bản ghi của bảng trong CSDL có phân trang
         /// </summary>
-        /// <param name="limit"> Số lượng bản ghi cần lấy </param>
-        /// <param name="offset"> Độ lệch bản ghi đầu tiên </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns> Danh sách bản ghi </returns>
         /// Created: PhucTV (26/12/23)
         /// Modified: None
-        Task<PaginationResponseModel<T>> Get(int limit, int offset);
+        Task<PaginationResponseModel<T>> Get(PaginationDto pagination);
 
 
 
@@ -65,7 +65,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Bản ghi cần lấy </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: None
-        Task<IEnumerable<T?>> Get(Guid[] ids);
+        Task<List<T?>> Get(Guid[] ids);
 
         /// <summary>
         /// Hàm thực hiện thêm mới một bản ghi
@@ -128,7 +128,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Danh sách thực thể lọc được </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: PhucTV (10/1/24) move up to IBaseRepo
-        Task<IEnumerable<T>> Filter(string text);
+        Task<List<T>> Filter(string text);
 
 
         /// <summary>
@@ -136,12 +136,11 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Có phân trang
         /// </summary>
         /// <param name="text"> Từ khóa cần lọc </param>
-        /// <param name="limit"> Thuộc tính phân trang - số bản ghi cần lấy </param>
-        /// <param name="offset"> Thuộc tính phân trang - độ lệch bản ghi ban đấu </param>
+        /// <param name="pagination"> Thuộc tính phân trang </param>
         /// <returns> Danh sách bản ghi </returns>
         /// Created: PhucTV (5/1/24)
         /// Modified: PhucTV (10/1/24) move up to IBaseRepo
-        Task<PaginationResponseModel<T>> Filter(string text, int limit, int offset, List<(string Field, bool IsAscending)> order);
+        Task<PaginationResponseModel<T>> Filter(string text, PaginationDto pagination);
 
 
         /// <summary>
@@ -160,8 +159,32 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns></returns>
         /// Created: PhucTV (14/5/24)
         /// Modified: None
-        List<T> GetOrderedList(List<T> beforeList, List<(string Field, bool Ascending)> orders);
-        List<Q> GetOrderedList<Q>(List<Q> beforeList, List<(string Field, bool Ascending)> orders);
+        List<T> ApplyOrder(List<T> beforeList, List<OrderDto> orders);
+        List<Q> ApplyOrder<Q>(List<Q> beforeList, List<OrderDto> orders);
+
+        /// <summary>
+        /// Ap dung filter cho mot list
+        /// </summary>
+        /// <param name="beforeList"> list truoc khi filter </param>
+        /// <param name="filters"> list cac filter </param>
+        /// <returns></returns>
+        /// Created: PhucTV (16/5/24)
+        /// Modified: None
+        List<T> ApplyFilter(List<T> beforeList, List<FilterDto> filters);
+        List<T> ApplyFilter(List<T> beforeList, FilterDto filters);
+        List<Q> ApplyFilter<Q>(List<Q> beforeList, List<FilterDto> filter);
+        List<Q> ApplyFilter<Q>(List<Q> beforeList, FilterDto filter);
+
+        /// <summary>
+        /// Ap dung pagination
+        /// </summary>
+        /// <param name="beforeList"> Danh sach truoc khi ap dung</param>
+        /// <param name="pagination"> Doi tuong pagination</param>
+        /// <returns></returns>
+        /// Created: PhucTV (16/5/24)
+        /// Modified: None
+        List<T> ApplyPagination(List<T> beforeList, PaginationDto? pagination);
+        List<Q> ApplyPagination<Q>(List<Q> beforeList, PaginationDto? pagination);
     }
 
 }

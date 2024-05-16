@@ -26,9 +26,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             {
                 // model: LessonId, CourseId, LessonTitle
                 // Get total lesson of course
-                int totalLesson = DbContext.CourseLessons
+                int totalLesson = await DbContext.CourseLessons
                     .Where(cl => cl.CourseId == model.CourseId)
-                    .Count();
+                    .CountAsync();
 
                 // Create CourseLesson
                 CourseLesson cl = new()
@@ -57,21 +57,21 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         }
 
-        public async Task<IEnumerable<CourseLesson>?> AddListLessonToCourse(AddListLessonToCourseModel model)
+        public async Task<List<CourseLesson>?> AddListLessonToCourse(AddListLessonToCourseModel model)
         {
             using var transaction = await DbContext.BeginTransaction();
             try
             {
                 // Get total lesson of course
-                int totalLesson = DbContext.CourseLessons
+                int totalLesson = await DbContext.CourseLessons
                     .Where(cl => cl.CourseId == model.CourseId)
-                    .Count();
+                    .CountAsync();
 
                 // Create list CourseLesson
                 Guid courseId = model.CourseId!.Value;
                 DateTime now = DateTime.Now;
                 string createdBy = "Knowledge Sharing Admin";
-                IEnumerable<CourseLesson> courseLessons = model.ListLessonModel!
+                List<CourseLesson> courseLessons = model.ListLessonModel!
                     .Select(lesson => new CourseLesson
                     {
                         // Entity:
@@ -83,7 +83,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                         LessonId = lesson.LessonId!.Value,
                         Offset = ++totalLesson,
                         LessonTitle = lesson.LessonTitle!
-                    });
+                    }).ToList();
 
                 // Insert:
                 DbContext.CourseLessons.AddRange(courseLessons);
@@ -104,7 +104,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.SaveChangesAsync();
         }
 
-        public async Task<int> DeleteListLessonFromCourse(IEnumerable<Guid> listParticipantIds)
+        public async Task<int> DeleteListLessonFromCourse(List<Guid> listParticipantIds)
         {
             IQueryable<CourseLesson> courseLessons = DbContext.CourseLessons
                 .Where(cl => listParticipantIds.Contains(cl.CourseLessonId));
@@ -112,7 +112,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<CourseLesson>> GetCourseParticipant(Guid courseId)
+        public async Task<List<CourseLesson>> GetCourseParticipant(Guid courseId)
         {
             return await DbContext.CourseLessons.Where(cl => cl.CourseId == courseId)
                 .OrderBy(cl => cl.Offset)
@@ -134,10 +134,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.SaveChangesAsync();
         }
 
-        public async Task<int> UpdateListLessonInCourse(IEnumerable<UpdateLessonInCourseModel> model)
+        public async Task<int> UpdateListLessonInCourse(List<UpdateLessonInCourseModel> model)
         {
             // Get ve danh sachs courelesson can update
-            IEnumerable<Guid> participantIds = model.Select(p => p.ParticipantId!.Value);
+            List<Guid> participantIds = model.Select(p => p.ParticipantId!.Value).ToList();
             IQueryable<CourseLesson> courseLessons = DbContext.CourseLessons
                 .Where(cl => participantIds.Contains(cl.CourseLessonId));
 
@@ -166,10 +166,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             try
             {
                 // Check existed
-                IQueryable<CourseLesson> courseLessons = DbContext.CourseLessons
-                    .Where(cl => listParticipantIds.Contains(cl.CourseLessonId));
-                if (!courseLessons.Any()) throw new NotExistedEntityException("CourseLesson");
-                Guid courseId = courseLessons.First()!.CourseId;
+                List<CourseLesson> courseLessons = await DbContext.CourseLessons
+                    .Where(cl => listParticipantIds.Contains(cl.CourseLessonId))
+                    .ToListAsync();
+                if (courseLessons.Count == 0) throw new NotExistedEntityException("CourseLesson");
+                Guid courseId = courseLessons.First().CourseId;
 
                 // Prepare update
                 Dictionary<Guid, int> mapGuidToOffsets = [];
@@ -187,10 +188,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 if (rows <= 0) throw new Exception();
 
                 // Check permutation:
-                IEnumerable<int> listOffsets = await DbContext.CourseLessons
+                List<int> listOffsets = await DbContext.CourseLessons
                     .Where(cl => cl.CourseId == courseId).Select(cl => cl.Offset)
                     .ToListAsync();
-                IEnumerable<int> pattern = Enumerable.Range(1, listOffsets.Count());
+                List<int> pattern = Enumerable.Range(1, listOffsets.Count).ToList();
                 if (!Algorithm.IsPermutation(pattern, listOffsets))
                     throw new Exception();
 

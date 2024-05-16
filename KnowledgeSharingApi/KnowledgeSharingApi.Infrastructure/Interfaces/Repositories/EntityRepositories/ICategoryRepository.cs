@@ -27,8 +27,8 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> Danh sách view knowledge cate </returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewKnowledgeCategory>> GetKnowledgesByCategory(Guid catId);
-        Task<IEnumerable<ViewKnowledgeCategory>> GetKnowledgesByCategory(string catName);
+        Task<List<ViewKnowledgeCategory>> GetKnowledgesByCategory(Guid catId);
+        Task<List<ViewKnowledgeCategory>> GetKnowledgesByCategory(string catName);
 
         /// <summary>
         /// Lấy về danh sách categories của một knowledge
@@ -37,7 +37,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> Danh sách cate </returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<IEnumerable<Category>> GetByKnowledgeId(Guid knowledgeId);
+        Task<List<Category>> GetByKnowledgeId(Guid knowledgeId);
 
         /// <summary>
         /// Lấy về danh sách categories của một danh sách knowledge
@@ -46,7 +46,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> Danh sách cate </returns>
         /// Created: PhucTV (4/5/24)
         /// Modified: None
-        Task<Dictionary<Guid, IEnumerable<Category>?>> GetByKnowledgeId(IEnumerable<Guid> knowledgeIds);
+        Task<Dictionary<Guid, List<Category>?>> GetByKnowledgeId(List<Guid> knowledgeIds);
 
         /// <summary>
         /// Cập nhật danh sách category của một knowledge

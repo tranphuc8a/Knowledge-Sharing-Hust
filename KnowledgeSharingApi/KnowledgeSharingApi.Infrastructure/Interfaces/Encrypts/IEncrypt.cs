@@ -36,7 +36,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts
         /// <returns> jwt cần lấy </returns>
         /// Created: PhucTV (21/2/24)
         /// Modified: None
-        string? JwtEncrypt(IEnumerable<Claim> claims);
+        string? JwtEncrypt(List<Claim> claims);
 
         /// <summary>
         /// Giải mã token về Danh sách claim
@@ -45,7 +45,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts
         /// <returns> Mảng claim cần lấy </returns>
         /// Created: PhucTV (21/2/24)
         /// Modified: None
-        IEnumerable<Claim>? JwtDecryptToListClaims(string token, bool isValidateLifeTime);
+        List<Claim>? JwtDecryptToListClaims(string token, bool isValidateLifeTime);
 
 
         /// <summary>

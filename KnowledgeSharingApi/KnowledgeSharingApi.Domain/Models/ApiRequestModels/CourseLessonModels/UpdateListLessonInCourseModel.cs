@@ -23,6 +23,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CourseLessonModels
         public Guid? CourseId { get; set; }
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.CONTENT_EMPTY)]
-        public IEnumerable<UpdateListLessonInCourseItemModel>? ListLessonModel { get; set; }
+        public List<UpdateListLessonInCourseItemModel>? ListLessonModel { get; set; }
     }
 }

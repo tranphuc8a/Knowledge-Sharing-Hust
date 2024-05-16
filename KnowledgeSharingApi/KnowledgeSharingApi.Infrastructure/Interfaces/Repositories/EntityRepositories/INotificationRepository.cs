@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,16 +36,17 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<Notification>> GetAllNotificationsByUserId(Guid userId);
+        Task<List<Notification>> GetAllNotificationsByUserId(Guid userId);
 
         /// <summary>
         /// Lấy về danh sách thông báo của một user
         /// </summary>
         /// <param name="userId"> id của người dùng muốn lấy </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<IEnumerable<Notification>> GetNotificationsByUserId(Guid userId, int limit, int offset);
+        Task<List<Notification>> GetNotificationsByUserId(Guid userId, PaginationDto pagination);
 
         /// <summary>
         /// Cập nhật đã đọc danh sách thông báo

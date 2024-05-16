@@ -29,12 +29,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="myuid"> id của bản thân </param>
         /// <param name="searchKey"> TỪ khóa tìm kiếm</param>
         /// Tiêu chí tìm kiếm: FullName, Username, Phonenumber nếu có
-        /// <param name="limit"> Giới hạn số bản ghi </param>
-        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="page"> phan trang </param>
         /// <returns> Danh sách User tìm được </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset, List<(string Field, bool IsAscending)>? orders = null);
+        Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto page);
 
         /// <summary>
         /// Lấy về chi tiết Profile của chính user
@@ -81,19 +80,25 @@ namespace KnowledgeSharingApi.Services.Interfaces
 
         #region For Admin
 
-        Task<ServiceResult> AdminGetListUser(int? limit, int? offset);
+        /// <summary>
+        /// Admin lay ve danh sach user
+        /// </summary>
+        /// <param name="page"> phan trang </param>
+        /// <returns> Danh sách Profile </returns>
+        /// Created: PhucTV (15/3/24)
+        /// Modified: None
+        Task<ServiceResult> AdminGetListUser(PaginationDto page);
 
         /// <summary>
         /// Tìm kiếm danh sách user theo từ khóa bởi admin
         /// </summary>
         /// <param name="searchKey"> Từ khóa tìm kiếm </param>
         /// Tiêu chí tìm kiếm: FullName, Username, Phonenumber nếu có
-        /// <param name="limit"> Giới hạn số bản ghi </param>
-        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="page"> phan trang </param>
         /// <returns> Danh sách Profile </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminSearchUser(string searchKey, int? limit, int? offset, List<(string Field, bool IsAscending)>? orders = null);
+        Task<ServiceResult> AdminSearchUser(string searchKey, PaginationDto page);
 
         /// <summary>
         /// Admin Lấy về chi tiết Profile của user khác

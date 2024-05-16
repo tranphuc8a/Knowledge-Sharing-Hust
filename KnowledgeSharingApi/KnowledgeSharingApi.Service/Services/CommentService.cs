@@ -40,7 +40,7 @@ namespace KnowledgeSharingApi.Services.Services
             IResourceFactory resourceFactory,
             ICommentRepository commentRepository,
             IKnowledgeRepository knowledgeRepository,
-            IStarRepository starRepository,
+            //IStarRepository starRepository,
             IDecorationRepository decorationRepository
         )
         {
@@ -165,20 +165,20 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(CommentResource));
         }
 
-        public virtual async Task<ServiceResult> AdminGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetListKnowledgeComments(Guid knowledgeId, PaginationDto pagination)
         {
             // Check knowledge existed
             _ = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
 
             // Get list comments
             PaginationResponseModel<ViewComment> comments =
-                await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+                await KnowledgeRepository.GetListComments(knowledgeId, pagination);
 
             // Return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, comments);
         }
 
-        public virtual async Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, PaginationDto pagination)
         {
             // Kiểm tra knowledge tồn tại
             Knowledge knowledge = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
@@ -189,7 +189,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Lấy về ds bình luận
             PaginationResponseModel<ViewComment> listComments =
-                await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+                await KnowledgeRepository.GetListComments(knowledgeId, pagination);
 
             // Trả về thành công
             PaginationResponseModel<IResponseCommentModel> res = new()
@@ -198,7 +198,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Limit = listComments.Limit,
                 Offset = listComments.Offset,
                 Results = (await DecorationRepository
-                    .DecorateResponseCommentModel(null, listComments.Results.ToList()))
+                    .DecorateResponseCommentModel(null, listComments.Results))
                     .OfType<IResponseCommentModel>().ToList()
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
@@ -219,14 +219,14 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CommentResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> GetListCommentReplies(Guid? myUid, Guid commentId, int? limit, int? offset)
+        public async Task<ServiceResult> GetListCommentReplies(Guid? myUid, Guid commentId, PaginationDto pagination)
         {
             // Check comment existed
             _ = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
 
             // Get list replies
             PaginationResponseModel<ViewComment> comments =
-                await CommentRepository.GetRepliesOfComment(commentId, limit ?? DefaultLimit, offset ?? 0);
+                await CommentRepository.GetRepliesOfComment(commentId, pagination);
 
             // DecorateResponseLessonModel
             PaginationResponseModel<IResponseCommentModel> res = new()
@@ -235,7 +235,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Limit = comments.Limit,
                 Offset = comments.Offset,
                 Results = (await DecorationRepository
-                    .DecorateResponseCommentModel(myUid, comments.Results.ToList(), isDecorateReplies: false))
+                    .DecorateResponseCommentModel(myUid, comments.Results, isDecorateReplies: false))
                     .OfType<IResponseCommentModel>().ToList()
             };
 
@@ -307,7 +307,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(CommentResource));
         }
 
-        public async Task<ServiceResult> UserGetListKnowledgeComments(Guid myUid, Guid knowledgeId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListKnowledgeComments(Guid myUid, Guid knowledgeId, PaginationDto pagination)
         {
             // Kiểm tra user có quyền truy cập tài nguyên knowledge
             _ = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
@@ -317,7 +317,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Lấy về danh sách comment
             PaginationResponseModel<ViewComment> comments =
-                await KnowledgeRepository.GetListComments(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+                await KnowledgeRepository.GetListComments(knowledgeId, pagination);
 
             // DecorateResponseLessonModel comments
             PaginationResponseModel<IResponseCommentModel> res = new()
@@ -326,19 +326,19 @@ namespace KnowledgeSharingApi.Services.Services
                 Limit = comments.Limit,
                 Offset = comments.Offset,
                 Results = await DecorationRepository
-                    .DecorateResponseCommentModel(myUid, comments.Results.ToList(), isDecorateReplies: true)
+                    .DecorateResponseCommentModel(myUid, comments.Results, isDecorateReplies: true)
             };
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);
         }
 
-        public Task<ServiceResult> UserGetMyCommentsOfKnowledge(Guid myUid, Guid knowledgeId, int? limit, int? offset)
+        public Task<ServiceResult> UserGetMyCommentsOfKnowledge(Guid myUid, Guid knowledgeId, PaginationDto pagination)
         {
-            return UserGetUserCommentsOfKnowledge(myUid, myUid, knowledgeId, limit, offset);
+            return UserGetUserCommentsOfKnowledge(myUid, myUid, knowledgeId, pagination);
         }
 
-        public async Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myUid, Guid userId, Guid knowledgeId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myUid, Guid userId, Guid knowledgeId, PaginationDto pagination)
         {
             // Kiểm tra myUid có truy cập được knowledgeId hay không
             _ = await KnowledgeRepository.CheckExisted(knowledgeId, NotExistKnowledge);
@@ -348,7 +348,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Lấy về danh sách bình luận
             PaginationResponseModel<ViewComment> comments =
-                await CommentRepository.GetCommentsOfUserInKnowledge(userId, knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+                await CommentRepository.GetCommentsOfUserInKnowledge(userId, knowledgeId, pagination);
 
             // DecorateResponseLessonModel bình luận
             PaginationResponseModel<IResponseCommentModel> res = new()
@@ -357,7 +357,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Limit = comments.Limit,
                 Offset = comments.Offset,
                 Results = await DecorationRepository
-                    .DecorateResponseCommentModel(myUid, comments.Results.ToList(), isDecorateReplies: true)
+                    .DecorateResponseCommentModel(myUid, comments.Results, isDecorateReplies: true)
             };
 
             // Trả về thành công
@@ -393,7 +393,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         }
 
-        public async Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myUid, Guid knowledgeId, string search, int? limit, int? offset, List<(string, bool)>? order)
+        public async Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myUid, Guid knowledgeId, string search, PaginationDto pagination)
         {
             // Check từ khóa khác rỗng
             if (String.IsNullOrEmpty(search))
@@ -407,18 +407,17 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Search
             // Lấy về toàn bộ
-            List<ViewComment> listComments = (await KnowledgeRepository.GetListComments(knowledgeId)).ToList();
-            listComments = CommentRepository.GetOrderedList(listComments, order ?? []);
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
+            List<ViewComment> listComments = (await KnowledgeRepository.GetListComments(knowledgeId));
 
             // Lọc theo từ khóa
             listComments = listComments
                 .Where(comment => IsSimiliar(comment.Content, search))
-                .Skip(offsetValue).Take(limitValue).ToList();
+                .ToList();
+            listComments = KnowledgeRepository.ApplyPagination(listComments, pagination);
 
             // DecorateResponseLessonModel
-            IEnumerable<IResponseCommentModel> res = await DecorationRepository
-                .DecorateResponseCommentModel(myUid, listComments.ToList(), isDecorateReplies: true);
+            List<IResponseCommentModel> res = await DecorationRepository
+                .DecorateResponseCommentModel(myUid, listComments, isDecorateReplies: true);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CommentResource), string.Empty, res);

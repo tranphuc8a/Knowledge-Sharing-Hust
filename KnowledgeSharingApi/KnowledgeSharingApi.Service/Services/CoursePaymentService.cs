@@ -126,7 +126,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region User get payments
 
-        public async Task<ServiceResult> UserGetCoursePayments(Guid myUid, Guid courseId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetCoursePayments(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course is existed
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -136,30 +136,28 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Bạn không phải là chủ của khóa học này");
 
             // Get list payment
-            IEnumerable<ViewCoursePayment> listPayments = await CoursePaymentRepository.GetByCourse(courseId);
+            List<ViewCoursePayment> listPayments = (await CoursePaymentRepository.GetByCourse(courseId)).ToList();
 
             // pagination
-            int total = listPayments.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listPayments = listPayments.Skip(offsetValue).Take(limitValue);
+            int total = listPayments.Count;
+            listPayments = CoursePaymentRepository.ApplyPagination(listPayments, pagination);
 
             // return success
-            PaginationResponseModel<ViewCoursePayment> res = new(total, limitValue, offsetValue, listPayments);
+            PaginationResponseModel<ViewCoursePayment> res = new(total, pagination.Limit, pagination.Offset, listPayments);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyPayments(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyPayments(Guid myUid, PaginationDto pagination)
         {
             // Get list payment
-            IEnumerable<ViewCoursePayment> listPayments = await CoursePaymentRepository.GetByUser(myUid);
+            List<ViewCoursePayment> listPayments = (await CoursePaymentRepository.GetByUser(myUid)).ToList();
 
             // pagination
-            int total = listPayments.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listPayments = listPayments.Skip(offsetValue).Take(limitValue);
+            int total = listPayments.Count;
+            listPayments = CoursePaymentRepository.ApplyPagination(listPayments, pagination);
 
             // return success
-            PaginationResponseModel<ViewCoursePayment> res = new(total, limitValue, offsetValue, listPayments);
+            PaginationResponseModel<ViewCoursePayment> res = new(total, pagination.Limit, pagination.Offset, listPayments);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
         

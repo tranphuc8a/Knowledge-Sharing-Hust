@@ -72,19 +72,19 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return result;
         }
 
-        public async Task<IEnumerable<Star>> GetListStarOfUser(Guid userId)
+        public async Task<List<Star>> GetListStarOfUser(Guid userId)
         {
             return await DbContext.Stars.Where(star => star.UserId == userId)
                 .OrderByDescending(star => star.Stars)
                 .ThenByDescending(star => star.CreatedTime).ToListAsync();
         }
 
-        public async Task<IEnumerable<Star>> GetListStarOfUserItem(Guid userItemId)
+        public async Task<List<Star>> GetListStarOfUserItem(Guid userItemId)
         {
             return await DbContext.Stars.Where(star => star.UserItemId == userItemId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Tuple<ViewComment, Star>>> GetStaredComments(Guid userId)
+        public async Task<List<Tuple<ViewComment, Star>>> GetStaredComments(Guid userId)
         {
             var userStars =
                 from star in DbContext.Stars
@@ -98,7 +98,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res.Select(item => Tuple.Create(item.Comment, item.Star)).ToList();
         }
 
-        public async Task<IEnumerable<Tuple<ViewCourse, Star>>> GetStaredCourses(Guid userId)
+        public async Task<List<Tuple<ViewCourse, Star>>> GetStaredCourses(Guid userId)
         {
             var userStars =
                 from star in DbContext.Stars
@@ -112,7 +112,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res.Select(item => Tuple.Create(item.Course, item.Star)).ToList();
         }
 
-        public async Task<IEnumerable<Tuple<ViewLesson, Star>>> GetStaredLessons(Guid userId)
+        public async Task<List<Tuple<ViewLesson, Star>>> GetStaredLessons(Guid userId)
         {
             var userStars =
                 from star in DbContext.Stars
@@ -126,7 +126,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res.Select(item => Tuple.Create(item.Lesson, item.Star)).ToList();
         }
 
-        public async Task<IEnumerable<Tuple<ViewPost, Star>>> GetStaredPosts(Guid userId)
+        public async Task<List<Tuple<ViewPost, Star>>> GetStaredPosts(Guid userId)
         {
             var userStars =
                 from star in DbContext.Stars
@@ -140,7 +140,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res.Select(item => Tuple.Create(item.Post, item.Star)).ToList();
         }
 
-        public async Task<IEnumerable<Tuple<ViewQuestion, Star>>> GetStaredQuestions(Guid userId)
+        public async Task<List<Tuple<ViewQuestion, Star>>> GetStaredQuestions(Guid userId)
         {
             var userStars =
                 from star in DbContext.Stars

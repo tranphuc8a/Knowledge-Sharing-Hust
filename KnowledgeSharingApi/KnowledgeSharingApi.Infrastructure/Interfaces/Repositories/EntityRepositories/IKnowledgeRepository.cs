@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
@@ -26,12 +27,11 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Lấy về danh sách bình luận của một Phần tử kiển thức
         /// </summary>
         /// <param name="knowledgeId"> id của phần tử kiến thức </param>
-        /// <param name="limit"> Số lượng bình luận muốn lấy </param>
-        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, int limit, int offset);
+        Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về danh sách bình luận của một Phần tử kiển thức
@@ -41,19 +41,18 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (26/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewComment>> GetListComments(Guid knowledgeId);
+        Task<List<ViewComment>> GetListComments(Guid knowledgeId);
 
 
         /// <summary>
         /// Lấy về danh sách user đã đánh dấu knowledge
         /// </summary>
         /// <param name="knowledgeId"> id của phần tử kiến thức </param>
-        /// <param name="limit"> Số lượng bình luận muốn lấy </param>
-        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<PaginationResponseModel<ViewUser>> GetListUserMaredKnowledge(Guid knowledgeId, int limit, int offset);
+        Task<PaginationResponseModel<ViewUser>> GetListUserMaredKnowledge(Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về phiên mark của user và knowledgeId nếu tồn tại

@@ -24,25 +24,23 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Vấy về danh sách khóa học gắn với thẻ catName --> Nhóm API Category
         /// </summary>
         /// <param name="catName"> tên thẻ </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> AnonymousGetListCourseOfCategory(string catName, int? limit, int? offset);
-        Task<ServiceResult> UserGetListCourseOfCategory(Guid myUid, string catName, int? limit, int? offset);
-        Task<ServiceResult> AdminListCourseOfCategory(string catName, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetListCourseOfCategory(string catName, PaginationDto page);
+        Task<ServiceResult> UserGetListCourseOfCategory(Guid myUid, string catName, PaginationDto page);
+        Task<ServiceResult> AdminListCourseOfCategory(string catName, PaginationDto page);
 
         /// <summary>
         /// User lấy về danh sách khóa học mà mình đã đánh dấu --> Nhóm API Mark
         /// </summary>
         /// <param name="myUid"> id của người lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMarkedCourses(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMarkedCourses(Guid myUid, PaginationDto page);
         #endregion
 
 
@@ -51,23 +49,21 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// Yêu cầu anonymous lấy về danh sách khóa học
         /// </summary>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: Nones
-        Task<ServiceResult> AnonymousGetCourses(int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetCourses(PaginationDto page);
 
         /// <summary>
         /// Yêu cầu anonymous lấy về danh sách khóa học của một người dùng
         /// </summary>
         /// <param name="userId"> id của user cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> AnonymousGetUserCourses(Guid userId, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetUserCourses(Guid userId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu anonymous lấy về chi tiết khóa học
@@ -86,24 +82,22 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// Yêu cầu admin lấy về danh sách khóa học
         /// </summary>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetCourses(int? limit, int? offset);
+        Task<ServiceResult> AdminGetCourses(PaginationDto page);
 
 
         /// <summary>
         /// Yêu cầu admin lấy về danh sách khóa học của một user
         /// </summary>
         /// <param name="userId"> id của người cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetUserCourses(Guid userId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetUserCourses(Guid userId, PaginationDto page);
 
 
         /// <summary>
@@ -119,12 +113,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Yêu cầu admin lấy về danh sách khóa học đã mà một user đã đăng ký
         /// </summary>
         /// <param name="userId"> Id của user cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetUserRegisteredCourses(Guid userId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetUserRegisteredCourses(Guid userId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu admin xóa một khóa học cụ thể
@@ -145,35 +138,32 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Yêu cầu user get về danh sách khóa học
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListCourses(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetListCourses(Guid myUid, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu user get về danh sách khóa học của user khác
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <param name="userId"> id của user cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetUserCourses(Guid myUid, Guid userId, int? limit, int?  offset);
+        Task<ServiceResult> UserGetUserCourses(Guid myUid, Guid userId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu user get về danh sách khóa học của chính mình
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyCourses(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyCourses(Guid myUid, PaginationDto page);
 
 
         /// <summary>
@@ -200,12 +190,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Yêu cầu user get về danh sách khóa học mà mình đã đăng ký
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyRegisteredCourses(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyRegisteredCourses(Guid myUid, PaginationDto page);
 
 
         #endregion

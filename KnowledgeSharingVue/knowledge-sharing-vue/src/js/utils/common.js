@@ -163,7 +163,7 @@ class Common {
         number = Math.round(Math.abs(number));
 
         // Chuyển số thành chuỗi và định dạng theo tiền tệ Việt Nam
-        return number.toFixed().replace(/(d)(?=(d{3})+(?!d))/g, '$1.') + ' VNĐ';
+        return number.toFixed().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VNĐ';
     }
 }
 

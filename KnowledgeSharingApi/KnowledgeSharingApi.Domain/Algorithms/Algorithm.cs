@@ -8,13 +8,13 @@ namespace KnowledgeSharingApi.Domains.Algorithms
 {
     public static class Algorithm
     {
-        public static bool IsPermutation<T>(IEnumerable<T> A, IEnumerable<T> B)
+        public static bool IsPermutation<T>(List<T> A, List<T> B)
         {
-            // Kiểm tra xem hai IEnumerable có cùng độ dài không
+            // Kiểm tra xem hai List có cùng độ dài không
             if (A.Count() != B.Count())
                 return false;
 
-            // Tạo một Dictionary để đếm số lần xuất hiện của từng phần tử trong IEnumerable B
+            // Tạo một Dictionary để đếm số lần xuất hiện của từng phần tử trong List B
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             Dictionary<T, int> count = [];
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                     count[item] = 1;
             }
 
-            // Kiểm tra từng phần tử trong IEnumerable A
+            // Kiểm tra từng phần tử trong List A
             foreach (T item in A)
             {
                 // Nếu phần tử không tồn tại trong Dictionary hoặc đã xuất hiện quá số lần trong Dictionary, trả về false

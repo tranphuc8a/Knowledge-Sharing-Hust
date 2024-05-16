@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories;
@@ -16,7 +17,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     {
         public async Task<int> DeleteAllNotification(Guid userId)
         {
-            IEnumerable<Notification> notifications = 
+            List<Notification> notifications = 
                 await DbContext.Notifications
                 .Where(notification => notification.UserId == userId)
                 .ToListAsync();
@@ -26,7 +27,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<int> DeleteMultiNotificationByUserId(Guid userId, Guid[] ids)
         {
-            IEnumerable<Notification> notifications =
+            List<Notification> notifications =
                 await DbContext.Notifications
                 .Where(noti => noti.UserId == userId && ids.Contains(noti.NotificationId))
                 .ToListAsync();
@@ -34,7 +35,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Notification>> GetAllNotificationsByUserId(Guid userId)
+        public async Task<List<Notification>> GetAllNotificationsByUserId(Guid userId)
         {
             var notifications =
                 DbContext.Notifications
@@ -43,13 +44,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await notifications.ToListAsync();
         }
 
-        public async Task<IEnumerable<Notification>> GetNotificationsByUserId(Guid userId, int limit, int offset)
+        public async Task<List<Notification>> GetNotificationsByUserId(Guid userId, PaginationDto pagination)
         {
-            var notifications =
+            var notifications = ApplyPagination(
                 DbContext.Notifications
                 .Where(noti => noti.UserId == userId)
-                .OrderByDescending(noti => noti.Time)
-                .Skip(offset).Take(limit);
+                .OrderByDescending(noti => noti.Time),
+                pagination);
             return await notifications.ToListAsync();
         }
 

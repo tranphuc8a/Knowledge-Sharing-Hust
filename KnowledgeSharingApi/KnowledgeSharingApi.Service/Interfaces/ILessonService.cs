@@ -28,12 +28,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUId"> id của người cần lấy </param>
         /// <param name="lessonId"> id của bài giảng cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> Phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListCourseOfLesson(Guid myUId, Guid lessonId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListCourseOfLesson(Guid myUId, Guid lessonId, PaginationDto page);
     }
 
 }

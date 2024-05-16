@@ -18,6 +18,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemMode
 
         public IFormFile? Thumbnail { get; set; }
 
-        public IEnumerable<string>? Categories { get; set; }
+        public List<string>? Categories { get; set; }
     }
 }

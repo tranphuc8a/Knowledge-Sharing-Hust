@@ -112,17 +112,14 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminSearchUser(string searchKey, int? limit, int? offset, List<(string, bool)>? orders)
+        public async Task<ServiceResult> AdminSearchUser(string searchKey, PaginationDto pagination)
         {
-            // Format limit và offset
-            int offsetValue = offset ??= 0;
-            int limitValue = limit ??= DefaultLimit;
+            // Format search key
             searchKey = searchKey.ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
-            List<ViewUser> lsUser = (await UserRepository.GetDetail()).ToList();
-            lsUser = UserRepository.GetOrderedList(lsUser, orders ?? []);
-            IEnumerable<ViewUser> filteredUser = lsUser
+            List<ViewUser> lsUser = await UserRepository.GetDetail();
+            List<ViewUser> filteredUser = lsUser
                 .Select(user => new
                 {
                     User = user,
@@ -135,10 +132,10 @@ namespace KnowledgeSharingApi.Services.Services
             // Trả về thành công
             PaginationResponseModel<ViewUser> res = new()
             {
-                Total = filteredUser.Count(),
-                Limit = limitValue,
-                Offset = offsetValue,
-                Results = filteredUser.Skip(offsetValue).Take(limitValue)
+                Total = filteredUser.Count,
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = UserRepository.ApplyPagination(lsUser, pagination)
             };
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
@@ -206,19 +203,16 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminGetListUser(int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetListUser(PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit;
-            int offsetValue = offset ?? 0;
-
-            IEnumerable<ViewUser> listed = await UserRepository.GetDetail();
+            List<ViewUser> listed = await UserRepository.GetDetail();
 
             PaginationResponseModel<ViewUser> res = new()
             {
-                Total = listed.Count(),
-                Limit = limitValue,
-                Offset = offsetValue,
-                Results = listed.Skip(offsetValue).Take(limitValue)
+                Total = listed.Count,
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = UserRepository.ApplyPagination(listed, pagination)
             };
 
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(ResponseTableName), string.Empty, res);
@@ -276,17 +270,14 @@ namespace KnowledgeSharingApi.Services.Services
             return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
         }
 
-        public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset, List<(string, bool)>? order)
+        public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto pagination)
         {
-            // Format limit và offset
-            int offsetValue = offset ??= 0;
-            int limitValue = limit ??= DefaultLimit;
+            // Format search key
             searchKey = searchKey.ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
-            List<ViewUser> lsUser = (await UserRepository.GetDetail()).ToList();
-            lsUser = UserRepository.GetOrderedList(lsUser, order ?? []);
-            IEnumerable<ViewUser> filteredUser = lsUser
+            List<ViewUser> lsUser = (await UserRepository.GetDetail());
+            List<ViewUser> filteredUser = lsUser
                 .Where(lsUser => lsUser.Role != UserRoles.Banned)
                 .Select(user => new
                 {
@@ -302,10 +293,10 @@ namespace KnowledgeSharingApi.Services.Services
             // Trả về thành công
             PaginationResponseModel<ViewUser> res = new()
             {
-                Total = filteredUser.Count(),
-                Limit = limitValue,
-                Offset = offsetValue,
-                Results = filteredUser.Skip(offsetValue).Take(limitValue)
+                Total = filteredUser.Count,
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = UserRepository.ApplyPagination(lsUser, pagination)
             };
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }

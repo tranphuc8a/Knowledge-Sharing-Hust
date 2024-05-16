@@ -14,26 +14,24 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Nhóm API lấy về danh sách bài posts trên feed
         /// </summary>
         /// <param name="myUid"> Id của chính mình </param>
-        /// <param name="limit"> Số lượng bài post cần lấy </param>
-        /// <param name="offset"> Độ lệch bản ghi đầu </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset);
-        Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset);
-        Task<ServiceResult> AdminGetPosts(int? limit, int? offset);
+        Task<ServiceResult> UserGetPosts(Guid myUid, PaginationDto page);
+        Task<ServiceResult> AnonymousGetPosts(PaginationDto page);
+        Task<ServiceResult> AdminGetPosts(PaginationDto page);
 
 
         /// <summary>
         /// Lấy về danh sách các bài post của mình
         /// </summary>
         /// <param name="myUid"> Id của chính mình </param>
-        /// <param name="limit"> Số lượng bài post cần lấy </param>
-        /// <param name="offset"> Độ lệch bản ghi đầu </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyPosts(Guid myUid, PaginationDto page);
 
 
         /// <summary>
@@ -41,40 +39,37 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUid"> Id của chính mình </param>
         /// <param name="userId"> Id của user muốn lấy post </param>
-        /// <param name="limit"> Số lượng bài post cần lấy </param>
-        /// <param name="offset"> Độ lệch bản ghi đầu </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset);
-        Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset);
-        Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset);
+        Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, PaginationDto page);
+        Task<ServiceResult> AnonymousGetUserPosts(Guid userId, PaginationDto page);
+        Task<ServiceResult> AdminGetUserPosts(Guid userId, PaginationDto page);
 
 
         /// <summary>
         /// Nhóm API lấy về danh sách bài đăng công khai có gắn thẻ theo một category name
         /// </summary>
-        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
-        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="page"> phan trang </param>
         /// <param name="catName"> Tên của category cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset);
-        Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset);
-        Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, PaginationDto page);
+        Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, PaginationDto page);
+        Task<ServiceResult> AdminGetListPostsOfCategory(string catName, PaginationDto page);
 
 
         /// <summary>
         /// User lấy về danh sách bài đăng mà mình đã đánh dấu
         /// </summary>
         /// <param name="myUid">id của người lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, PaginationDto page);
 
         #endregion
 

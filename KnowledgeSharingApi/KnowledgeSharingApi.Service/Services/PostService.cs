@@ -86,33 +86,28 @@ namespace KnowledgeSharingApi.Services.Services
             return await basePostService.AdminDeletePost(postId);
         }
 
-        public async Task<ServiceResult> AdminGetPosts(int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetPosts(PaginationDto pagination)
         {
-            int offsetValue = offset ?? 0;
-            int limitValue = limit ?? DefaultLimit;
-            IEnumerable<ViewPost> posts = await PostRepository.GetViewPost(limitValue, offsetValue);
+            List<ViewPost> posts = await PostRepository.GetViewPost(pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetSuccess(PostResource),
                 string.Empty,
-                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
+                await DecorationRepository.DecorateResponsePostModel(null, posts)
             );
         }
 
-        public async Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserPosts(Guid userId, PaginationDto pagination)
         {
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-
-            IEnumerable<ViewPost> posts = 
-                (await PostRepository.GetByUserId(userId))
-                .Skip(offsetValue).Take(limitValue);
+            List<ViewPost> posts = await PostRepository.GetByUserId(userId);
+            posts = PostRepository.ApplyPagination(posts, pagination);
             
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
+                await DecorationRepository.DecorateResponsePostModel(null, posts)
             );
         }
 
@@ -122,32 +117,29 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Anonymous APIes
 
-        public async Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetPosts(PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewPost> posts = await PostRepository.GetPublicPosts(limitValue, offsetValue);
+            List<ViewPost> posts = await PostRepository.GetPublicPosts(pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                (await DecorationRepository.DecorateResponsePostModel(null, posts.ToList()))
-                     //.OfType<IResponseUserItemModel>().ToList()
+                (await DecorationRepository.DecorateResponsePostModel(null, posts))
+                     //.OfType<IResponseUserItemModel>()
             );
         }
 
-        public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, PaginationDto pagination)
         {
             ViewUser user = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewPost> posts = 
-                (await PostRepository.GetPublicPostsByUserId(user.UserId))
-                .Skip(offsetValue).Take(limitValue);
+            List<ViewPost> posts = await PostRepository.GetPublicPostsByUserId(user.UserId);
+            posts = PostRepository.ApplyPagination(posts, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
+                await DecorationRepository.DecorateResponsePostModel(null, posts)
             );
         }
 
@@ -166,30 +158,27 @@ namespace KnowledgeSharingApi.Services.Services
             return await basePostService.UserDeletePost(myUid, postId);
         }
 
-        public async Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyPosts(Guid myUid, PaginationDto pagination)
         {
-            int offsetValue = offset ?? 0, limitValue = limit ?? DefaultLimit;
             //ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
-            IEnumerable<ViewPost> listPosts = 
-                (await PostRepository.GetByUserId(myUid))
-                .Skip(offsetValue).Take(limitValue);
+            List<ViewPost> listPosts = await PostRepository.GetByUserId(myUid);
+            listPosts = PostRepository.ApplyPagination(listPosts, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecorationRepository.DecorateResponsePostModel(myUid, listPosts.ToList())
+                await DecorationRepository.DecorateResponsePostModel(myUid, listPosts)
             );
         }
 
-        public async Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetPosts(Guid myUid, PaginationDto pagination)
         {
             // Tìm kiếm và lọc thông minh hơn cho myUid
 
             //_ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewPost> posts = await PostRepository.GetPublicPosts(limitValue, offsetValue);
+            List<ViewPost> posts = await PostRepository.GetPublicPosts(pagination);
             // Tương tự anonymous chỉ lấy những post public
             // Tuy nhiên cần cải tiến để lấy thông minh hơn với những infor của myUid
 
@@ -197,24 +186,22 @@ namespace KnowledgeSharingApi.Services.Services
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
                 await DecorationRepository
-                    .DecorateResponsePostModel(myUid, posts.ToList())
+                    .DecorateResponsePostModel(myUid, posts)
             );
         }
 
-        public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, PaginationDto pagination)
         {
             //_ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
             _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewPost> posts =
-                (await PostRepository.GetPublicPostsByUserId(userId))
-                .Skip(offsetValue).Take(limitValue);
+            List<ViewPost> posts = await PostRepository.GetPublicPostsByUserId(userId);
+            posts = PostRepository.ApplyPagination(posts, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
-                await DecorationRepository.DecorateResponsePostModel(myUid, posts.ToList())
+                await DecorationRepository.DecorateResponsePostModel(myUid, posts)
             );
         }
         #endregion
@@ -224,52 +211,51 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Get list posts of a category
 
-        public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, PaginationDto pagination)
         {
-            IEnumerable<ViewPost> posts = await PostRepository
-                .GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewPost> posts = await PostRepository
+                .GetPublicPostsOfCategory(catName, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
+                await DecorationRepository.DecorateResponsePostModel(null, posts)
             );
         }
 
-        public async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, PaginationDto pagination)
         {
-            IEnumerable<ViewPost> posts = await PostRepository.GetPostsOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewPost> posts = await PostRepository.GetPostsOfCategory(myUid, catName, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecorationRepository.DecorateResponsePostModel(myUid, posts.ToList())
+                await DecorationRepository.DecorateResponsePostModel(myUid, posts)
             );
         }
 
-        public async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, PaginationDto pagination)
         {
-            IEnumerable<ViewPost> posts = await PostRepository.GetPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewPost> posts = await PostRepository.GetPostsOfCategory(catName, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecorationRepository.DecorateResponsePostModel(null, posts.ToList())
+                await DecorationRepository.DecorateResponsePostModel(null, posts)
             );
         }
 
-        public async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewPost> listed = await PostRepository.GetMarkedPosts(myUid);
-            int total = listed.Count();
-            listed = listed.Skip(offsetValue).Take(limitValue);
+            List<ViewPost> listed = await PostRepository.GetMarkedPosts(myUid);
+            int total = listed.Count;
+            listed = PostRepository.ApplyPagination(listed, pagination);
             PaginationResponseModel<IResponsePostModel> res = new()
             {
                 Total = total,
-                Limit = limitValue,
-                Offset = offsetValue,
-                Results = await DecorationRepository.DecorateResponsePostModel(myUid, listed.ToList())
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = await DecorationRepository.DecorateResponsePostModel(myUid, listed)
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(PostResource), string.Empty, res);
         }

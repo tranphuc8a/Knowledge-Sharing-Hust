@@ -19,6 +19,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemMode
 
         public IFormFile? Thumbnail { get; set; }
 
-        public IEnumerable<string>? Categories { get; set; }
+        public List<string>? Categories { get; set; }
     }
 }

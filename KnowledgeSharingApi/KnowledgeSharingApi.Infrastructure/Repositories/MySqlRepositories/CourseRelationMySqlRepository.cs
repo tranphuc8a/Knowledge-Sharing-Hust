@@ -81,7 +81,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.CourseRelations.FindAsync(courseRelationId);
         }
 
-        public virtual async Task<IEnumerable<CourseRelation>> GetRelationsOfCourse(Guid courseId, ECourseRelationType relationType)
+        public virtual async Task<List<CourseRelation>> GetRelationsOfCourse(Guid courseId, ECourseRelationType relationType)
         {
             return await DbContext.CourseRelations
                 .Where(cr => cr.CourseId == courseId && cr.CourseRelationType == relationType)
@@ -89,7 +89,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public virtual async Task<IEnumerable<CourseRelation>> GetRelationsOfUser(Guid userId, ECourseRelationType relationType)
+        public virtual async Task<List<CourseRelation>> GetRelationsOfUser(Guid userId, ECourseRelationType relationType)
         {
             IQueryable<CourseRelation> query = DbContext.CourseRelations
                 .Where(cr => cr.CourseRelationType == relationType)

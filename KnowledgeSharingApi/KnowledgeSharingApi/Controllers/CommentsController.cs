@@ -212,7 +212,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserSearchListComments(Guid knowledgeId, string search, int? limit, int? offset, string? order)
         {
-            List<(string, bool)> orders = ParseSortFields(order);
+            List<OrderDto> orders = ParseOrder(order);
             ServiceResult res = await CommentService.UserSearchCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, search, limit, offset, orders);
             return StatusCode(res);
         }

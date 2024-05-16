@@ -17,24 +17,22 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Anonymous Lấy về danh sách comment của một một knowledge
         /// </summary>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về danh sách comment đã reply một comment khác
         /// </summary>
         /// <param name="myUid"> id cua user can lay</param>
         /// <param name="commentId"> id của comment </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> TT phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: PhucTV (13/5/24)
-        Task<ServiceResult> GetListCommentReplies(Guid? myUid, Guid commentId, int? limit, int? offset);
+        Task<ServiceResult> GetListCommentReplies(Guid? myUid, Guid commentId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về chi tiết một comment
@@ -55,12 +53,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Admin Lấy về danh sách comment của một một knowledge
         /// </summary>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination">
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetListKnowledgeComments(Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// Admin xóa một comment
@@ -93,24 +90,22 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination">
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListKnowledgeComments(Guid myuid, Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListKnowledgeComments(Guid myuid, Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// User lấy về danh sách bình luận của mình trong một knowledge
         /// </summary>
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination">
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyCommentsOfKnowledge(Guid myuid, Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyCommentsOfKnowledge(Guid myuid, Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// User lấy về danh sách bình luận của một user khác trong một knowledge
@@ -118,12 +113,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="myuid"> id của người đi lấy </param>
         /// <param name="myuid"> id của người được lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination">
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myuid, Guid userId, Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myuid, Guid userId, Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// User tìm kiếm bình luận của một knowledge theo từ khóa 
@@ -131,12 +125,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
         /// <param name="search"> Từ khóa tìm kiếm </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination">
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string search, int? limit, int? offset, List<(string Field, bool IsAscending)>? orders);
+        Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string search, PaginationDto pagination);
         #endregion
 
 

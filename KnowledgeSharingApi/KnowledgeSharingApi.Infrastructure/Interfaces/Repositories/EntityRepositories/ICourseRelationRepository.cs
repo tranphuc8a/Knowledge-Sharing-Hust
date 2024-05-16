@@ -32,7 +32,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/3/24)
         /// Modified: None
-        Task<IEnumerable<CourseRelation>> GetRelationsOfCourse(Guid courseId, ECourseRelationType relationType);
+        Task<List<CourseRelation>> GetRelationsOfCourse(Guid courseId, ECourseRelationType relationType);
 
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/3/24)
         /// Modified: None
-        Task<IEnumerable<CourseRelation>> GetRelationsOfUser(Guid userId, ECourseRelationType relationType);
+        Task<List<CourseRelation>> GetRelationsOfUser(Guid userId, ECourseRelationType relationType);
 
 
         /// <summary>

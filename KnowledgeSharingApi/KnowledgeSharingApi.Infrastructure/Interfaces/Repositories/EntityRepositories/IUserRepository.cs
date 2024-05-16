@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
@@ -38,17 +39,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> ViewUser </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewUser>> GetDetail();
+        Task<List<ViewUser>> GetDetail();
 
         /// <summary>
         /// Lấy về danh sách chi tiết user có phân trang
         /// </summary>
-        /// <param name="limit"> thuộc tính phân trang - số bản ghi cần lấy </param>
-        /// <param name="offset"> thuộc tính phân trang - độ lệch bản ghi </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns> ViewUser </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewUser>> GetDetail(int limit, int offset);
+        Task<List<ViewUser>> GetDetail(PaginationDto pagination);
 
         /// <summary>
         /// Lấy về danh sách chi tiết user theo danh sách id

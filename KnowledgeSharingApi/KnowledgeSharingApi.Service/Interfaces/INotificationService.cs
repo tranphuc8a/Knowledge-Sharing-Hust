@@ -20,7 +20,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         Task<ServiceResult> GetNotification(Guid userId, Guid notificationId);
-        Task<ServiceResult> GetNotifications(Guid userId, int? limit, int? offset);
+        Task<ServiceResult> GetNotifications(Guid userId, PaginationDto page);
         Task<ServiceResult> GetNotifications(Guid userId, Guid[] notiIds);
 
 

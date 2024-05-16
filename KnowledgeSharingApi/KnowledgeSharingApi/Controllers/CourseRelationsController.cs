@@ -334,7 +334,7 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpPost("invite-list/{courseId}/{userId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserInviteListUserToCourse(Guid courseId, [FromBody] IEnumerable<Guid> listUserIds)
+        public async Task<IActionResult> UserInviteListUserToCourse(Guid courseId, [FromBody] List<Guid> listUserIds)
         {
             return StatusCode(await CourseRelationService.UserInviteListUserToCourse(GetCurrentUserIdStrictly(), courseId, listUserIds));
         }

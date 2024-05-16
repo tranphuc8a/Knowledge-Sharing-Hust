@@ -58,13 +58,13 @@ namespace KnowledgeSharingApi.Infrastructures.WebSockets
             userSockets.Remove(username);
         }
 
-        public virtual IEnumerable<KSSocket> GetSockets(string username)
+        public virtual List<KSSocket> GetSockets(string username)
         {
             if (userSockets.TryGetValue(username, out List<KSSocket>? value))
             {
                 return value;
             }
-            return Enumerable.Empty<KSSocket>();
+            return Enumerable.Empty<KSSocket>().ToList();
         }
 
         public virtual void RemoveAllSocket()
@@ -72,14 +72,14 @@ namespace KnowledgeSharingApi.Infrastructures.WebSockets
             userSockets.Clear();
         }
 
-        public virtual IEnumerable<KSSocket> GetAllSockets()
+        public virtual List<KSSocket> GetAllSockets()
         {
-            return userSockets.Values.SelectMany(list => list);
+            return userSockets.Values.SelectMany(list => list).ToList();
         }
 
-        public virtual IEnumerable<string> GetUsernames()
+        public virtual List<string> GetUsernames()
         {
-            return userSockets.Keys;
+            return [.. userSockets.Keys];
         }
     }
 }

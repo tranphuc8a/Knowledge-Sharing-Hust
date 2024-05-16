@@ -18,8 +18,8 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewCoursePayment>> GetByCourse(Guid courseId);
-        Task<IEnumerable<ViewCoursePayment>> GetByUser(Guid userId);
+        Task<List<ViewCoursePayment>> GetByCourse(Guid courseId);
+        Task<List<ViewCoursePayment>> GetByUser(Guid userId);
 
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/3/24)
         /// Modfied: None
-        Task<IEnumerable<ViewCoursePayment>> GetCoursePayment(Guid userId, Guid courseId);
+        Task<List<ViewCoursePayment>> GetCoursePayment(Guid userId, Guid courseId);
 
         /// <summary>
         /// Thực hiện thanh toán userId cho khóa học courseId

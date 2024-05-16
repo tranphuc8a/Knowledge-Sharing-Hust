@@ -24,7 +24,7 @@
 
 //        public virtual Task<ServiceResult> GetUserLessons(string userId, int? limit, int? offset)
 //        {
-//            IEnumerable<Lesson> lessons = DbContext.Lessons
+//            List<Lesson> lessons = DbContext.Lessons
 //                .Where(lesson => lesson.UserId.ToString() == userId)
 //                .OrderBy(lesson => lesson.CreatedTime);
 ////                .ToList(); // Kết thúc truy vấn và lấy kết quả dưới dạng danh sách
@@ -69,7 +69,7 @@
 
 //        public Task<ServiceResult> GetUserRegisteredCourses(string userId, int? limit, int? offset)
 //        {
-//            IEnumerable<Member> registeresCourses =
+//            List<Member> registeresCourses =
 //                from course in DbContext.Courses
 //                join courseRegister in DbContext.CourseRegisters
 //                on course.UserItemId equals courseRegister.UserItemId

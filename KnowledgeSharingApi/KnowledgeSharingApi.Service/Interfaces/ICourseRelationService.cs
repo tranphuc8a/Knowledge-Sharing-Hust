@@ -21,12 +21,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Yêu cầu admin lấy về danh sách người dùng đã đăng ký học trong một khóa học
         /// </summary>
         /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetCourseRegisters(Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetCourseRegisters(Guid courseId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu admin xóa một user ra khỏi một course bất kỳ
@@ -49,12 +48,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUId"> id của user muốn lấy </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetRegisters(Guid myUId, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetRegisters(Guid myUId, Guid courseId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu chủ khóa học lấy về danh sách invite của một khóa học
@@ -62,12 +60,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetCourseInvites(Guid myUid, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetCourseInvites(Guid myUid, Guid courseId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu chủ khóa học lấy về danh sách request của một khóa học
@@ -75,36 +72,33 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu chủ khóa học lấy về danh sách invite của một khóa học
         /// Owner
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyCourseInvites(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyCourseInvites(Guid myUid, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu user học lấy về danh sách request của mình
         /// Owner
         /// </summary>
         /// <param name="myUId"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng phần tử trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyCourseRequests(Guid myUId, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyCourseRequests(Guid myUId, PaginationDto page);
 
         /// <summary>
         /// Lay ve trang thai quan he giua user va course
@@ -227,7 +221,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserInviteListUserToCourse(Guid myUid, Guid courseId, IEnumerable<Guid> listUserIds);
+        Task<ServiceResult> UserInviteListUserToCourse(Guid myUid, Guid courseId, List<Guid> listUserIds);
 
         /// <summary>
         /// Yêu cầu user xác nhận lời mời tham gia khóa học
