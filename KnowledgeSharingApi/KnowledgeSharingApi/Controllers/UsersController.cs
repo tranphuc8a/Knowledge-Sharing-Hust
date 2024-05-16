@@ -149,11 +149,12 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("search")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> SearchMe(string searchKey, int? limit, int? offset)
+        public virtual async Task<IActionResult> SearchMe(string searchKey, int? limit, int? offset, string? order, string? filter)
         {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
             string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
             if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.SearchUser(Guid.Parse(userId), searchKey, limit, offset);
+            ServiceResult service = await UserService.SearchUser(Guid.Parse(userId), searchKey, pagination);
             return StatusCode(service);
         }
 
@@ -241,9 +242,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/search-user")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminSearchUser(string searchKey, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminSearchUser(string searchKey, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult service = await UserService.AdminSearchUser(searchKey, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult service = await UserService.AdminSearchUser(searchKey, pagination);
             return StatusCode(service);
         }
 
@@ -286,9 +288,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/list-user")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminGetListUser(int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetListUser(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult service = await UserService.AdminGetListUser(limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult service = await UserService.AdminGetListUser(pagination);
             return StatusCode(service);
         }
 

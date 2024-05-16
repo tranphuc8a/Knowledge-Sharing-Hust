@@ -59,9 +59,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpPost("users/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> GetUserMarkedKnowledge(Guid knowledgeId, int? limit, int? offset)
+        public async Task<IActionResult> GetUserMarkedKnowledge(Guid knowledgeId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await KnowledgeService.GetListUserMarkKnowledge(GetCurrentUserIdStrictly(), knowledgeId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await KnowledgeService.GetListUserMarkKnowledge(GetCurrentUserIdStrictly(), knowledgeId, pagination);
             return StatusCode(res);
         }
 

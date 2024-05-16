@@ -34,9 +34,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("anonymous/{knowledgeId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetCommentsOfKnowledge(Guid knowledgeId, int? limit, int? offset)
+        public async Task<IActionResult> AnonymousGetCommentsOfKnowledge(Guid knowledgeId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CommentService.AnonymousGetListKnowledgeComments(knowledgeId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CommentService.AnonymousGetListKnowledgeComments(knowledgeId, pagination);
             return StatusCode(res);
         }
 
@@ -51,10 +52,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("replies/{commentId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetCommentReplies(Guid commentId, int? limit, int? offset)
-        { 
+        public async Task<IActionResult> GetCommentReplies(Guid commentId, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
             ServiceResult res = await CommentService.GetListCommentReplies(
-                GetCurrentUserId(), commentId, limit, offset);
+                GetCurrentUserId(), commentId, pagination);
             return StatusCode(res);
         }
 
@@ -88,9 +90,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/{knowledgeId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListComments(Guid knowledgeId, int? limit, int? offset)
+        public async Task<IActionResult> AdminGetListComments(Guid knowledgeId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CommentService.AdminGetListKnowledgeComments(knowledgeId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CommentService.AdminGetListKnowledgeComments(knowledgeId, pagination);
             return StatusCode(res);
         }
 
@@ -157,9 +160,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListComments(Guid knowledgeId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListComments(Guid knowledgeId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CommentService.UserGetListKnowledgeComments(GetCurrentUserIdStrictly(), knowledgeId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CommentService.UserGetListKnowledgeComments(GetCurrentUserIdStrictly(), knowledgeId, pagination);
             return StatusCode(res);
         }
 
@@ -174,9 +178,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListMyComments(Guid knowledgeId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMyComments(Guid knowledgeId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CommentService.UserGetMyCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CommentService.UserGetMyCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, pagination);
             return StatusCode(res);
         }
 
@@ -192,9 +197,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("user/{userId}/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListUserComments(Guid userId, Guid knowledgeId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListUserComments(Guid userId, Guid knowledgeId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CommentService.UserGetUserCommentsOfKnowledge(GetCurrentUserIdStrictly(), userId, knowledgeId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CommentService.UserGetUserCommentsOfKnowledge(GetCurrentUserIdStrictly(), userId, knowledgeId, pagination);
             return StatusCode(res);
         }
 
@@ -210,10 +216,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("search/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserSearchListComments(Guid knowledgeId, string search, int? limit, int? offset, string? order)
+        public async Task<IActionResult> UserSearchListComments(Guid knowledgeId, string search, int? limit, int? offset, string? order, string? filter)
         {
-            List<OrderDto> orders = ParseOrder(order);
-            ServiceResult res = await CommentService.UserSearchCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, search, limit, offset, orders);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CommentService.UserSearchCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, search, pagination);
             return StatusCode(res);
         }
 

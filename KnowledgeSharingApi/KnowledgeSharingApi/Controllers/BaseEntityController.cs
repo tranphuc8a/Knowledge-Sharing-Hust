@@ -102,9 +102,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         //[CustomAuthorization(Roles: UserRoles.User)]
         [HttpGet]
-        public virtual async Task<IActionResult> Get(int? limit, int? offset, string? orders, string? filters)
+        public virtual async Task<IActionResult> Get(int? limit, int? offset, string? order, string? filter)
         {
-            PaginationDto page = new(limit, offset, ParseOrder(orders), ParseFilter(filters));
+            PaginationDto page = new(limit, offset, ParseOrder(order), ParseFilter(filter));
             ServiceResult res = await GetService().GetService(page);
             if (res.IsSuccess)
             {
@@ -145,12 +145,12 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         //[CustomAuthorization(Roles: UserRoles.User)]
         [HttpGet("Filter")]
-        public async Task<IActionResult> Filter(string search, int? limit = null, int? offset = null, string? orders = null, string? filters = null)
+        public async Task<IActionResult> Filter(string search, int? limit = null, int? offset = null, string? order = null, string? filter = null)
         {
-            PaginationDto pagination = new(limit, offset, ParseOrder(orders), ParseFilter(filters));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
             if (String.IsNullOrEmpty(search))
             {
-                return await Get(limit, offset, orders, filters);
+                return await Get(limit, offset, order, filter);
             }
             ServiceResult res = await GetService().FilterService(search, pagination);
             if (res.IsSuccess)

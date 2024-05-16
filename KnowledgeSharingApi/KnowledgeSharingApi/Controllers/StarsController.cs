@@ -33,9 +33,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("anonymous/{itemId}")]
         [AllowAnonymous]
-        public virtual async Task<IActionResult> AnonymousGetUserItemStars(Guid itemId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AnonymousGetUserItemStars(Guid itemId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.AnonymousGetUserItemStars(itemId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.AnonymousGetUserItemStars(itemId, pagination);
             return StatusCode(res);
         }
 
@@ -50,9 +51,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("{itemId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> UserGetUserItemStars(Guid itemId, int? limit, int? offset)
+        public virtual async Task<IActionResult> UserGetUserItemStars(Guid itemId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.UserGetUserItemStars(GetCurrentUserIdStrictly(), itemId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetUserItemStars(GetCurrentUserIdStrictly(), itemId, pagination);
             return StatusCode(res);
         }
 
@@ -67,9 +69,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/{itemId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminGetUserItemStars(Guid itemId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetUserItemStars(Guid itemId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.AdminGetUserItemStars(itemId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.AdminGetUserItemStars(itemId, pagination);
             return StatusCode(res);
         }
 
@@ -88,9 +91,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("useritems")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredUserItems(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredUserItems(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.UserGetMyScoredUserItems(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredUserItems(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -105,9 +109,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("comments")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredComments(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredComments(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.UserGetMyScoredComments(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredComments(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -121,9 +126,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("courses")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredCourse(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredCourse(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.UserGetMyScoredCourses(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredCourses(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -138,9 +144,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("posts")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredPosts(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredPosts(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.UserGetMyScoredPosts(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredPosts(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -155,9 +162,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("questions")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredQuestions(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredQuestions(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.UserGetMyScoredQuestions(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredQuestions(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -172,9 +180,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("lessons")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredLessons(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredLessons(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.UserGetMyScoredLessons(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredLessons(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 

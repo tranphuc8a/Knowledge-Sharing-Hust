@@ -47,9 +47,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("friends/{userId}")]
         [AllowAnonymous]
-        public virtual async Task<IActionResult> GetUserFriends(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> GetUserFriends(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetFriends(userId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetFriends(userId, pagination);
             return StatusCode(res);
         }
 
@@ -64,9 +65,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("followers/{userId}")]
         [AllowAnonymous]
-        public virtual async Task<IActionResult> GetUserFollowers(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> GetUserFollowers(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: true, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: true, pagination);
             return StatusCode(res);
         }
 
@@ -81,9 +83,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("followees/{userId}")]
         [AllowAnonymous]
-        public virtual async Task<IActionResult> GetUserFollowees(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> GetUserFollowees(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: false, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: false, pagination);
             return StatusCode(res);
         }
         #endregion
@@ -99,9 +102,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/friends")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyFriends(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyFriends(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetFriends(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetFriends(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -115,9 +119,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/followers")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyFollowers(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyFollowers(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Follow, isActive: true, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Follow, isActive: true, pagination);
             return StatusCode(res);
         }
 
@@ -131,9 +136,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/followees")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyFollowees(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyFollowees(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Follow, isActive: false, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Follow, isActive: false, pagination);
             return StatusCode(res);
         }
 
@@ -147,9 +153,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/requesters")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyRequesters(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyRequesters(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.FriendRequest, isActive: true, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.FriendRequest, isActive: true, pagination);
             return StatusCode(res);
         }
 
@@ -163,9 +170,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/requestees")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyRequestees(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyRequestees(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.FriendRequest, isActive: false, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.FriendRequest, isActive: false, pagination);
             return StatusCode(res);
         }
 
@@ -179,9 +187,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/blockers")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyBlockers(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyBlockers(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Block, isActive: true, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Block, isActive: true, pagination);
             return StatusCode(res);
         }
 
@@ -195,9 +204,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/blockees")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyBlockees(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyBlockees(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Block, isActive: false, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Block, isActive: false, pagination);
             return StatusCode(res);
         }
         #endregion
@@ -214,9 +224,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/friends/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminGetFriends(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetFriends(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetFriends(userId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetFriends(userId, pagination);
             return StatusCode(res);
         }
 
@@ -231,9 +242,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/followers/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminGetFollowers(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetFollowers(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: true, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: true, pagination);
             return StatusCode(res);
         }
 
@@ -248,9 +260,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/followees/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminGetFollowees(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetFollowees(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: false, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: false, pagination);
             return StatusCode(res);
         }
 
@@ -265,9 +278,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/requesters/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminGetRequesters(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetRequesters(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.FriendRequest, isActive: true, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.FriendRequest, isActive: true, pagination);
             return StatusCode(res);
         }
 
@@ -282,9 +296,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/requestees/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminGetRequestees(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetRequestees(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.FriendRequest, isActive: false, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.FriendRequest, isActive: false, pagination);
             return StatusCode(res);
         }
 
@@ -299,9 +314,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet("admin/blockers/{userId}")]
-        public virtual async Task<IActionResult> AdminGetBlockers(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetBlockers(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Block, isActive: true, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Block, isActive: true, pagination);
             return StatusCode(res);
         }
 
@@ -316,9 +332,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         [HttpGet("admin/blockees/{userId}")]
-        public virtual async Task<IActionResult> AdminGetBlockees(Guid userId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetBlockees(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Block, isActive: false, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Block, isActive: false, pagination);
             return StatusCode(res);
         }
         #endregion

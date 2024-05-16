@@ -59,9 +59,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("course/{courseId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetCoursePayments(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetCoursePayments(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            return StatusCode(await CoursePaymentService.UserGetCoursePayments(GetCurrentUserIdStrictly(), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CoursePaymentService.UserGetCoursePayments(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
         /// <summary>
@@ -75,9 +76,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetMyPayments(int? limit, int? offset)
+        public async Task<IActionResult> UserGetMyPayments(int? limit, int? offset, string? order, string? filter)
         {
-            return StatusCode(await CoursePaymentService.UserGetMyPayments(GetCurrentUserIdStrictly(), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CoursePaymentService.UserGetMyPayments(GetCurrentUserIdStrictly(), pagination));
         }
 
         /// <summary>

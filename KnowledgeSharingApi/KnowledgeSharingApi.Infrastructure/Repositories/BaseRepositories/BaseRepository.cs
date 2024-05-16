@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using KnowledgeSharingApi.Domains.Common;
 using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
@@ -204,42 +205,37 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         {
             return typeof(Type).GetProperty(fieldName) != null;
         }
+
         private static bool TryParseValue(string value, Type targetType, out object? result)
         {
-            // Xử lý cho DateTime và Guid
-            if (targetType == typeof(DateTime))
-            {
-                bool success = DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTimeResult);
-                result = dateTimeResult;
-                return success;
-            }
-            else if (targetType == typeof(Guid))
-            {
-                bool success = Guid.TryParse(value, out Guid guidResult);
-                result = guidResult;
-                return success;
-            }
+            return KSTypeConverter.TryParseValue(value, targetType, out result);
+        }
 
-            TypeConverter converter = TypeDescriptor.GetConverter(targetType);
-            try
+        private static ConstantExpression GetNullableExpression(object? value, Type targetType)
+        {
+            if (value == null)
             {
-                if (converter != null && converter.IsValid(value))
+                return Expression.Constant(null, targetType);
+            }
+            else
+            {
+                if (targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
-#pragma warning disable CS8601 // Possible null reference assignment.
-                    result = converter.ConvertFromInvariantString(value);
-#pragma warning restore CS8601 // Possible null reference assignment.
-                    return true;
+                    var underlyingType = Nullable.GetUnderlyingType(targetType);
+
+                    // Kiểm tra nếu value không phải là kiểu underlyingType, tránh việc chuyển đổi không hợp lệ
+                    if (value != null && value.GetType() != underlyingType)
+                    {
+                        throw new InvalidCastException($"Cannot convert value of type '{value.GetType()}' to Nullable<{underlyingType}>.");
+                    }
+
+                    // Chuyển đổi giá trị thành kiểu Nullable
+                    return Expression.Constant(value, targetType);
                 }
                 else
                 {
-                    result = null;
-                    return false;
+                    return Expression.Constant(value);
                 }
-            }
-            catch
-            {
-                result = null;
-                return false;
             }
         }
 
@@ -267,63 +263,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         }
         public virtual IQueryable<T> ApplyFilter(IQueryable<T> query, FilterDto filter)
         {
-            var parameter = Expression.Parameter(typeof(Type), "x");
-            var property = Expression.Property(parameter, filter.Field);
-            var propertyType = property.Type;
-
-
-            if (! TryParseValue(filter.Value, propertyType, out object? value))
-                return query;
-
-            // Tạo biểu thức lọc dựa trên giá trị đã chuyển đổi
-            Expression? filterExpression = null;
-            MethodInfo? method;
-            switch (filter.Operation)
-            {
-                case FilterOperations.Equal:
-                    filterExpression = Expression.Equal(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.GreaterThan:
-                    filterExpression = Expression.GreaterThan(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.GreaterThanOrEqual:
-                    filterExpression = Expression.GreaterThanOrEqual(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.LessThan:
-                    filterExpression = Expression.LessThan(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.LessThanOrEqual:
-                    filterExpression = Expression.LessThanOrEqual(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.NotEqual:
-                    filterExpression = Expression.NotEqual(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.Contain:
-                    method = typeof(string).GetMethod("Contains", [typeof(string)]);
-                    if (method != null)
-                    {
-                        filterExpression = Expression.Call(property, method, Expression.Constant(filter.Value));
-                    }
-                    break;
-                case FilterOperations.Like:
-                    method = typeof(string).GetMethod("Contains", [typeof(string)]);
-                    if (method != null)
-                    {
-                        filterExpression = Expression.Call(property, method, Expression.Constant(filter.Value));
-                    }
-                    break;
-                // Thêm các trường hợp khác nếu cần thiết
-                default:
-                    break;
-            }
-
-            // Nếu filterExpression đã được thiết lập, tạo Lambda Expression và áp dụng lọc
-            if (filterExpression != null)
-            {
-                var lambda = Expression.Lambda<Func<T, bool>>(filterExpression, parameter);
-                return query.Where(lambda);
-            }
-            return query;
+            return ApplyFilter<T>(query, filter);
         }
         public virtual IQueryable<Type> ApplyFilter<Type>(IQueryable<Type> beforeQuery, List<FilterDto> listFilters)
         {
@@ -342,63 +282,113 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         }
         public virtual IQueryable<Type> ApplyFilter<Type>(IQueryable<Type> query, FilterDto filter)
         {
-            var parameter = Expression.Parameter(typeof(Type), "x");
-            var property = Expression.Property(parameter, filter.Field);
-            var propertyType = property.Type;
+            try
+            {
+                var parameter = Expression.Parameter(typeof(Type), "x");
+                var property = Expression.Property(parameter, filter.Field);
+                var propertyType = property.Type;
 
 
-            if (!TryParseValue(filter.Value, propertyType, out object? value))
+                if (!TryParseValue(filter.Value, propertyType, out object? value))
+                    return query;
+
+                // Tạo biểu thức lọc dựa trên giá trị đã chuyển đổi
+                Expression? filterExpression = null;
+                MethodInfo? method;
+                switch (filter.Operation)
+                {
+                    case FilterOperations.Equal:
+                        if (property.Type.IsGenericType && property.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            filterExpression = Expression.Equal(property, GetNullableExpression(value, property.Type));
+                        }
+                        else
+                        {
+                            filterExpression = Expression.Equal(property, Expression.Constant(value));
+                        }
+                        break;
+                    case FilterOperations.GreaterThan:
+                        if (property.Type.IsGenericType && property.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            filterExpression = Expression.GreaterThan(property, GetNullableExpression(value, property.Type));
+                        }
+                        else
+                        {
+                            filterExpression = Expression.GreaterThan(property, Expression.Constant(value));
+                        }
+                        break;
+                    case FilterOperations.GreaterThanOrEqual:
+                        if (property.Type.IsGenericType && property.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            filterExpression = Expression.GreaterThanOrEqual(property, GetNullableExpression(value, property.Type));
+                        }
+                        else
+                        {
+                            filterExpression = Expression.GreaterThanOrEqual(property, Expression.Constant(value));
+                        }
+                        break;
+                    case FilterOperations.LessThan:
+                        if (property.Type.IsGenericType && property.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            filterExpression = Expression.LessThan(property, GetNullableExpression(value, property.Type));
+                        }
+                        else
+                        {
+                            filterExpression = Expression.LessThan(property, Expression.Constant(value));
+                        }
+                        break;
+                    case FilterOperations.LessThanOrEqual:
+                        if (property.Type.IsGenericType && property.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            filterExpression = Expression.LessThanOrEqual(property, GetNullableExpression(value, property.Type));
+                        }
+                        else
+                        {
+                            filterExpression = Expression.LessThanOrEqual(property, Expression.Constant(value));
+                        }
+                        break;
+                    case FilterOperations.NotEqual:
+                        if (property.Type.IsGenericType && property.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            filterExpression = Expression.NotEqual(property, GetNullableExpression(value, property.Type));
+                        }
+                        else
+                        {
+                            filterExpression = Expression.NotEqual(property, Expression.Constant(value));
+                        }
+                        break;
+                    case FilterOperations.Contain:
+                        method = typeof(string).GetMethod("Contains", [typeof(string)]);
+                        if (method != null)
+                        {
+                            filterExpression = Expression.Call(property, method, Expression.Constant(filter.Value));
+                        }
+                        break;
+                    case FilterOperations.Like:
+                        method = typeof(string).GetMethod("Contains", [typeof(string)]);
+                        if (method != null)
+                        {
+                            filterExpression = Expression.Call(property, method, Expression.Constant(filter.Value));
+                        }
+                        break;
+                    // Thêm các trường hợp khác nếu cần thiết
+                    default:
+                        break;
+                }
+
+                // Nếu filterExpression đã được thiết lập, tạo Lambda Expression và áp dụng lọc
+                if (filterExpression != null)
+                {
+                    var lambda = Expression.Lambda<Func<Type, bool>>(filterExpression, parameter);
+                    return query.Where(lambda);
+                }
                 return query;
-
-            // Tạo biểu thức lọc dựa trên giá trị đã chuyển đổi
-            Expression? filterExpression = null;
-            MethodInfo? method;
-            switch (filter.Operation)
-            {
-                case FilterOperations.Equal:
-                    filterExpression = Expression.Equal(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.GreaterThan:
-                    filterExpression = Expression.GreaterThan(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.GreaterThanOrEqual:
-                    filterExpression = Expression.GreaterThanOrEqual(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.LessThan:
-                    filterExpression = Expression.LessThan(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.LessThanOrEqual:
-                    filterExpression = Expression.LessThanOrEqual(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.NotEqual:
-                    filterExpression = Expression.NotEqual(property, Expression.Constant(value));
-                    break;
-                case FilterOperations.Contain:
-                    method = typeof(string).GetMethod("Contains", [typeof(string)]);
-                    if (method != null)
-                    {
-                        filterExpression = Expression.Call(property, method, Expression.Constant(filter.Value));
-                    }
-                    break;
-                case FilterOperations.Like:
-                    method = typeof(string).GetMethod("Contains", [typeof(string)]);
-                    if (method != null)
-                    {
-                        filterExpression = Expression.Call(property, method, Expression.Constant(filter.Value));
-                    }
-                    break;
-                // Thêm các trường hợp khác nếu cần thiết
-                default:
-                    break;
             }
-
-            // Nếu filterExpression đã được thiết lập, tạo Lambda Expression và áp dụng lọc
-            if (filterExpression != null)
+            catch (Exception error)
             {
-                var lambda = Expression.Lambda<Func<Type, bool>>(filterExpression, parameter);
-                return query.Where(lambda);
+                Console.WriteLine(error.Message);
+                return query;
             }
-            return query;
         }
 
         public virtual List<T> ApplyFilter(List<T> beforeList, List<FilterDto> filters)
@@ -426,7 +416,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             var property = Expression.Property(parameter, filter.Field);
             var propertyType = property.Type;
 
-            if (! TryParseValue(filter.Value, propertyType, out object? value))
+            if (!TryParseValue(filter.Value, propertyType, out object? value))
                 return beforeList;
 
             // Tạo biểu thức lọc dựa trên giá trị đã chuyển đổi
@@ -729,7 +719,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
         public virtual string GetLimitOffsetClause(int? limit, int? offset, out DynamicParameters parameters)
         {
-            DynamicParameters newParams = new DynamicParameters();
+            DynamicParameters newParams = new();
             string res = string.Empty;
             if (limit > 0)
             {

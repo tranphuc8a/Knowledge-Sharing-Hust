@@ -34,9 +34,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll(int? limit, int? offset)
+        public async Task<IActionResult> GetAll(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CategoryService.GetListCategories(limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CategoryService.GetListCategories(pagination);
             return StatusCode(res);
         }
 

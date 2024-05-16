@@ -26,9 +26,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> Get(int? limit, int? offset)
+        public async Task<IActionResult> Get(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await NotificationService.GetNotifications(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await NotificationService.GetNotifications(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 

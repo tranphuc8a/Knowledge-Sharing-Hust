@@ -31,8 +31,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("anonymous")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetList(int? limit, int? offset)
-            => StatusCode(await CourseService.AnonymousGetCourses(limit, offset));
+        public async Task<IActionResult> AnonymousGetList(int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await CourseService.AnonymousGetCourses(
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu lấy về danh sách khóa học của một người dùng
@@ -45,8 +46,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/anonymous/courses/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetUserList(Guid userId, int? limit, int? offset)
-            => StatusCode(await CourseService.AnonymousGetUserCourses(userId, limit, offset));
+        public async Task<IActionResult> AnonymousGetUserList(Guid userId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await CourseService.AnonymousGetUserCourses(userId, 
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu lấy về chi tiết khóa học
@@ -73,8 +75,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListCourses(int? limit, int? offset)
-            => StatusCode(await CourseService.AdminGetCourses(limit, offset));
+        public async Task<IActionResult> AdminGetListCourses(int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await CourseService.AdminGetCourses(
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin lấy về danh sách khóa học của một user
@@ -87,8 +90,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/admin/courses/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListUserCourses(Guid userId, int? limit, int? offset)
-            => StatusCode(await CourseService.AdminGetUserCourses(userId, limit, offset));
+        public async Task<IActionResult> AdminGetListUserCourses(Guid userId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await CourseService.AdminGetUserCourses(userId, 
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin lấy về chi tiết khóa học
@@ -113,8 +117,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/admin/registered-courses/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetUserRegisteredCourses(Guid userId, int? limit, int? offset)
-            => StatusCode(await CourseService.AdminGetUserRegisteredCourses(userId, limit, offset));
+        public async Task<IActionResult> AdminGetUserRegisteredCourses(Guid userId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await CourseService.AdminGetUserRegisteredCourses(userId, 
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin xóa một khóa học cụ thể
@@ -144,9 +149,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/anonymous/courses/{category}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetListCoursesOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> AnonymousGetListCoursesOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CourseService.AnonymousGetListCourseOfCategory(category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CourseService.AnonymousGetListCourseOfCategory(category, pagination);
             return StatusCode(res);
         }
 
@@ -161,9 +167,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/admin/courses/{category}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListCoursesOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> AdminGetListCoursesOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CourseService.AdminListCourseOfCategory(category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CourseService.AdminListCourseOfCategory(category, pagination);
             return StatusCode(res);
         }
 
@@ -179,9 +186,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/courses/{category}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListCoursesOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListCoursesOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CourseService.UserGetListCourseOfCategory(GetCurrentUserIdStrictly(), category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CourseService.UserGetListCourseOfCategory(GetCurrentUserIdStrictly(), category, pagination);
             return StatusCode(res);
         }
 
@@ -195,9 +203,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Marks/my/courses")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListMarkedCourses(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMarkedCourses(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await CourseService.UserGetMarkedCourses(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CourseService.UserGetMarkedCourses(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -216,9 +225,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListCourse(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListCourse(int? limit, int? offset, string? order, string? filter)
         {
-            return StatusCode(await CourseService.UserGetListCourses(GetCurrentUserIdStrictly(), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseService.UserGetListCourses(GetCurrentUserIdStrictly(), pagination));
         }
 
         /// <summary>
@@ -232,9 +242,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/courses/{userId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListUserCourse(Guid userId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListUserCourse(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            return StatusCode(await CourseService.UserGetUserCourses(GetCurrentUserIdStrictly(), userId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseService.UserGetUserCourses(GetCurrentUserIdStrictly(), userId, pagination));
         }
 
         /// <summary>
@@ -247,9 +258,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListMyCourse(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMyCourse(int? limit, int? offset, string? order, string? filter)
         {
-            return StatusCode(await CourseService.UserGetMyCourses(GetCurrentUserIdStrictly(), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseService.UserGetMyCourses(GetCurrentUserIdStrictly(), pagination));
         }
 
         /// <summary>
@@ -291,9 +303,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/registered-courses")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetMyRegisteredCourse(int? limit, int? offset)
+        public async Task<IActionResult> UserGetMyRegisteredCourse(int? limit, int? offset, string? order, string? filter)
         {
-            return StatusCode(await CourseService.UserGetMyRegisteredCourses(GetCurrentUserIdStrictly(), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseService.UserGetMyRegisteredCourses(GetCurrentUserIdStrictly(), pagination));
         }
 
         #endregion

@@ -5,6 +5,7 @@ using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Mysqlx.Crud;
 using System.Security.Claims;
 
 namespace KnowledgeSharingApi.Controllers
@@ -30,9 +31,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("{courseId}")]
         [CustomAuthorization("Roles: Admin, User")]
-        public async Task<IActionResult> UserGetListCourseParticipants(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListCourseParticipants(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            return StatusCode(await CourseLessonService.UserGetListCourseParticipants(GetCurrentUserIdStrictly(), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseLessonService.UserGetListCourseParticipants(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
         /// <summary>
@@ -47,9 +49,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/{courseId}")]
         [CustomAuthorization("Roles: Admin")]
-        public async Task<IActionResult> AdminGetListCourseParticipants(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> AdminGetListCourseParticipants(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            return StatusCode(await CourseLessonService.AdminGetListCourseParticipants(courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseLessonService.AdminGetListCourseParticipants(courseId, pagination));
         }
 
         #endregion

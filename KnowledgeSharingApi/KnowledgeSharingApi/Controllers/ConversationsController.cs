@@ -43,9 +43,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> GetListConversations(int? limit, int? offset)
+        public async Task<IActionResult> GetListConversations(int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await ConversationService.GetConversations(GetCurrentUserIdStrictly(), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await ConversationService.GetConversations(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -152,9 +153,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("messages/{conversationId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> GetMessages(Guid conversationId, int? limit, int? offset)
+        public async Task<IActionResult> GetMessages(Guid conversationId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await ConversationService.GetMessages(GetCurrentUserIdStrictly(), conversationId, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await ConversationService.GetMessages(GetCurrentUserIdStrictly(), conversationId, pagination);
             return StatusCode(res);
         }
 
