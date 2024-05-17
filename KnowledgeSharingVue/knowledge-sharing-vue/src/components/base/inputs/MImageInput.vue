@@ -26,6 +26,7 @@
 <script>
 import InputFrame from './MInputFrame.vue';
 import { input } from '@/js/components/base/input';
+import Common from '@/js/utils/common';
 
 export default {
     name: 'ImageInput',
@@ -45,6 +46,7 @@ export default {
                 isShowError: this.isShowError
             },
             data: {
+                defaultImgSrc: require('@/assets/default-thumbnail/lesson-image-icon.png'),
                 imgSrc: require('@/assets/default-thumbnail/lesson-image-icon.png'),
                 value: this.value,
                 isDynamicValidate: this.isDynamicValidate,
@@ -104,7 +106,10 @@ export default {
 
         async setValue(value){
             try {
-                this.data.imgSrc = value;
+                this.data.imgSrc = this.defaultImgSrc;
+                if (await Common.isValidImage(value)){
+                    this.data.imgSrc = value;
+                }
                 // this.components.input.files = null;
             }
             catch (error){

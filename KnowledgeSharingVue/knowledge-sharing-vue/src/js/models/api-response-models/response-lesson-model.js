@@ -8,7 +8,7 @@ class ResponseLessonModel extends ViewLesson {
     constructor() {
         super();
         this.AverageStar = null;
-        this.MyStar = null;
+        this.MyStars = null;
         this.TotalStar = null;
         this.NumberComments = null;
         this.TopComments = null;

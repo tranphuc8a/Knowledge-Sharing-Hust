@@ -1,7 +1,17 @@
 
-import Criteria from "./criteria";
+// import Criteria from "./criteria";
+import { Validator } from "./validator";
+import { Unicode } from "./unicode";
 
 class StringAlgorithm{
+    /**
+     * Calculate the longest common subsequence between two strings
+     * @param {*} text1 
+     * @param {*} text2 
+     * @returns integer - length of longest subsequence
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
     static longestCommonSubsequence(text1, text2) {
         let dp = new Array(text1.length + 1).fill(0).map(() => new Array(text2.length + 1).fill(0));
         for (let i = 0; i < text1.length; i++) {
@@ -15,6 +25,14 @@ class StringAlgorithm{
         }
         return dp[text1.length][text2.length];
     }
+    /**
+     * Calculates the similarity between two strings using the longest common subsequence algorithm
+     * @param {*} text1 
+     * @param {*} text2 
+     * @returns double in [0, 1]
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
     static calculateLCSimilarity(text1, text2) {
         let lcsLength = this.longestCommonSubsequence(text1, text2);
         let maxLength = this.conditionalAverage(text1.length, text2.length);
@@ -25,7 +43,15 @@ class StringAlgorithm{
     
         return lcsLength / maxLength;
     }
-
+    
+    /**
+     * Calculate the longest common subsequence continuous between two strings
+     * @param {*} str1 
+     * @param {*} str2 
+     * @returns integer - length of longest subsequence
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
     static longestCommonSubsequenceContinuous(str1, str2) {
         let lengths = new Array(str1.length + 1).fill(0).map(() => new Array(str2.length + 1).fill(0));
     
@@ -44,7 +70,14 @@ class StringAlgorithm{
         // Return the length of longest common subsequence
         return lengths[str1.length][str2.length];
     }
-    
+    /**
+     * Calculates the similarity between two strings using the longest common subsequence continuous algorithm
+     * @param {*} str1 
+     * @param {*} str2 
+     * @returns double in [0, 1]
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
     static calculateLCSCimilarity(str1, str2) {
         let lcscLength = this.longestCommonSubsequenceContinuous(str1, str2);
         let maxLength = this.conditionalAverage(str1.length, str2.length);
@@ -56,7 +89,14 @@ class StringAlgorithm{
         return (lcscLength / maxLength);
     }
 
-
+    /**
+     * Calculate the levenshtein distance between two strings
+     * @param {*} a 
+     * @param {*} b 
+     * @returns integer - number of steps to change the string a to string b
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
     static calculateLevenshteinDistance(a, b) {
         const n = a.length;
         const m = b.length;
@@ -92,6 +132,14 @@ class StringAlgorithm{
         return d[n][m];
     }
 
+    /**
+     * Calculate the similarity between two strings using the levenshtein distance algorithm
+     * @param {*} a 
+     * @param {*} b 
+     * @returns double in [0, 1]
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
     static calculateLevenshteinSimilarity = (a, b) => {
         if (!a || !b) {
             return 0.0;
@@ -109,6 +157,14 @@ class StringAlgorithm{
         return similarity;
     }
 
+    /**
+     * Calculate the similarity between two strings using the jaccard similarity algorithm
+     * @param {*} a 
+     * @param {*} b 
+     * @returns double in [0, 1]
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
     static jaccardSimilarity(a, b) {
         const setA = new Set(a);
         const setB = new Set(b);
@@ -117,30 +173,151 @@ class StringAlgorithm{
         return intersection.size / union.size;
     }
 
-    static averageLength(a, b){
+    /**
+     * Calculates the similarity between two strings using the n-gram similarity algorithm
+     * @param {*} a 
+     * @param {*} b 
+     * @returns double in [0, 1]
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
+    static ngramSimilarity(a, b) {
+        try {
+            if (Validator.isEmpty(a) || Validator.isEmpty(b)) 
+                return 0;
+
+            let mapGramOfStringA = this.getMapGram(a);
+            let mapGramOfStringB = this.getMapGram(b);
+
+            let score = 0;
+            for (let gram in mapGramOfStringA) {
+                if (mapGramOfStringB[gram]!== undefined) {
+                    let countInA = mapGramOfStringA[gram];
+                    let countInB = mapGramOfStringB[gram];
+                    let gramLength = gram.length;
+                    let addScore = countInA * countInB * gramLength * gramLength;
+                    score += addScore;
+                }
+            }
+
+            return score;
+        } catch (e){
+            console.error(e);
+            return 0;
+        }
+    }
+
+    static getMapGram(text){
+        if (Validator.isEmpty(text)) return {};
+        let mapGram = {};
+        let words = text.split(" ").filter(word => word.length > 0);
+        for (let word of words) {
+            let wordLength = word.length;
+            for (let l = 1; l <= wordLength; l++) {
+                for (let startIndex = 0; startIndex <= wordLength - l; startIndex++) {
+                    let gram = word.substring(startIndex, startIndex + l);
+                    if (mapGram[gram] === undefined) {
+                        mapGram[gram] = 1;
+                    } else {
+                        mapGram[gram]++;
+                    }
+                }
+            }
+        }
+        return mapGram;
+    }
+
+    static ngramSimilarityList(search, listText){
+        try {
+            let mapScore = {};
+            if (Validator.isEmpty(listText)) return mapScore;
+            for (let text in listText){
+                mapScore[text] = 0;
+            }
+            // calculate n-gram of search string
+            let mapGramOfStringA = this.getMapGram(Unicode.unicodeToAscii(search).toLowerCase());
+
+            // calculate n-gram of each text in listText
+            for (let text of listText){
+                let mapGramOfStringB = this.getMapGram(Unicode.unicodeToAscii(text).toLowerCase());
+                let score = 0;
+                for (let gram in mapGramOfStringA) {
+                    if (mapGramOfStringB[gram] !== undefined) {
+                        let countInA = mapGramOfStringA[gram];
+                        let countInB = mapGramOfStringB[gram];
+                        let gramLength = gram.length;
+                        let addScore = countInA * countInB * gramLength * gramLength;
+                        score += addScore;
+                    }
+                }
+                mapScore[text] = score;
+            }
+            return mapScore;
+        } catch (e) {
+            console.error(e);
+            return {};
+        }
+    }
+
+    /**
+     * Calculate the harmonic mean of the lengths of two strings
+     * @param {*} a 
+     * @param {*} b 
+     * @returns double - the harmonic mean of the lengths of the two strings
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
+    static harmonicMeanLength(a, b){
         if (a.length <= 0 || b.length <= 0) return 1;
         return 2 / (1/a.length + 1/b.length);
     }
-    static conditionalAverage(a, b){
+    /**
+     * Calculates the harmonic mean of two numbers
+     * @param {*} a 
+     * @param {*} b 
+     * @returns double - the harmonic mean of the two numbers
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
+    static harmonicMean(a, b){
         if (a <= 0 || b <= 0) return 1;
         return 2 / (1/a + 1/b);
     }
 
+    /**
+     * Calculate the similarity between two strings using the jaccard similarity algorithm
+     * @param {*} a 
+     * @param {*} b 
+     * @returns double in [0, 1]
+     * @Created PhucTV (17/5/24)
+     * @Modified None
+     */
     static similiar(a, b) {
         if (a.length <= 0 || b.length <= 0) return 0;
+        a = Unicode.unicodeToAscii(a).toLowerCase(); 
+        b = Unicode.unicodeToAscii(b).toLowerCase();
+        // let jacScore = this.jaccardSimilarity(a, b);
+        // let levScore = this.calculateLevenshteinSimilarity(a, b);
+        // let lcsScore = this.calculateLCSimilarity(a, b);
+        // let lcscScore = this.calculateLCSCimilarity(a, b);
 
-        let jacScore = this.jaccardSimilarity(a, b);
-        let levScore = this.calculateLevenshteinSimilarity(a, b);
-        let lcsScore = this.calculateLCSimilarity(a, b);
-        let lcscScore = this.calculateLCSCimilarity(a, b);
+        // let jacWeight = 1;
+        // let lcsWeight = 3;
+        // let levWeight = 3;
+        // let lcscWeight = 10;
 
-        let jacWeight = 1;
-        let lcsWeight = 3;
-        let levWeight = 3;
-        let lcscWeight = 10;
+        // let res = Criteria.aggregateUsingAverage(jacScore*jacWeight, lcsScore*lcsWeight, levScore*levWeight, lcscScore*lcscWeight);
+        // return res;
 
-        let res = Criteria.aggregateUsingAverage(jacScore*jacWeight, lcsScore*lcsWeight, levScore*levWeight, lcscScore*lcscWeight);
-        return res;
+        return this.ngramSimilarity(a, b);
+    }
+
+    static similiarityList(search, listText){
+        // search = Unicode.unicodeToAscii(search).toLowerCase();
+        // listText = listText.map(text => {
+        //     return Unicode.unicodeToAscii(text).toLowerCase();
+        // });
+        return this.ngramSimilarityList(search, listText);
     }
 }
 

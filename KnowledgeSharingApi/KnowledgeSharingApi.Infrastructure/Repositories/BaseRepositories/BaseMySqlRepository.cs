@@ -67,7 +67,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public virtual async Task<T?> Get(Guid id)
         {
             string sqlCommand = $"Select * from {TableName} where {TableNameId} = @id";
-            return await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id });
+            return (T?) (await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id }))?.Clone();
         }
 
         public virtual async Task<List<T?>> Get(Guid[] ids)

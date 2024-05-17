@@ -64,24 +64,32 @@ export default {
                     return;
                 }
                 if (Validator.isNotEmpty(text)){
-                    let mapTextScore = {};
+                    let mapCourseScore = {};
+                    let listTitle = this.listCourse.map(function(vCourse){
+                        return vCourse.Title;
+                    });
+                    let listFullName = this.listCourse.map(function(vCourse){
+                        return vCourse.CourseOwnerFullName;
+                    });
+                    let mapTitleScore = StringAlgorithm.similiarityList(text, listTitle);
+                    let mapFullNameScore = StringAlgorithm.similiarityList(text, listFullName);
                     this.listCourse.forEach(function(vCourse){
-                        let titleScore = StringAlgorithm.similiar(text, vCourse.Title);
+                        let titleScore = mapTitleScore[vCourse.Title];
                         // let abstractScore = vCourse.Abstract != null ? StringAlgorithm.similiar(text, vCourse.Abstract) : 0;
-                        let usernameScore = StringAlgorithm.similiar(text, vCourse.CourseOwnerFullName);
+                        let fullnameScore = mapFullNameScore[vCourse.CourseOwnerFullName];
                         // let titleWeight = 0.75, usernameWeight = 0.25;
                         // let totalScore = titleScore * titleWeight + usernameScore * usernameWeight;
-                        let totalScore = Math.max(titleScore, usernameScore);
-                        mapTextScore[vCourse.CourseId] = totalScore;
+                        let totalScore = titleScore + fullnameScore;
+                        mapCourseScore[vCourse.CourseId] = totalScore;
                     });
                     let threshold = 0.0;
 
                     let sortedCourse = this.listCourse
                         .filter(function(vCourse){
-                            return mapTextScore[vCourse.CourseId] >= threshold;
+                            return mapCourseScore[vCourse.CourseId] >= threshold;
                         })
                         .sort(function(a, b){
-                            return mapTextScore[b.CourseId] - mapTextScore[a.CourseId];
+                            return mapCourseScore[b.CourseId] - mapCourseScore[a.CourseId];
                         });
                     this.listFilteredCourse = sortedCourse;
                     return;

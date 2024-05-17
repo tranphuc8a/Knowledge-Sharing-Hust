@@ -11,10 +11,12 @@
                     @:keyup.enter.prevent.stop="resolveOnPressEnter"
                     :readonly="inputFrame.state==='read-only'"/>
 
-            <div class="p-textfield-button">
+            <div class="p-textfield-button"
+                @:click="resolveOnclickIcon"
+            >
                 <MIcon :fa="fa ?? 'magnifying-glass'" :family="family ?? 'fas'"
-                    :style="data.iconStyle" v-if="!data.isLoading" />
-                <MSpinner :style="data.iconStyle" v-if="data.isLoading" />
+                    :style="data.iconStyle" v-show="!data.isLoading" />
+                <MSpinner :style="data.iconStyle" v-show="data.isLoading" />
             </div>
         </div>
     </InputFrame>
@@ -101,18 +103,15 @@ let textfield = {
          * @Created PhucTV (25/1/24)
          * @Modified None
         */
-        resolveOnclickIcon(){
-            let that = this;
-            return async function(){
-                if (that.data.isLoading) return;
-                try {
-                    that.data.isLoading = true;
-                    await that.onclickIcon(that.data.value);
-                } catch (e) {
-                    console.error(e);
-                } finally {
-                    that.data.isLoading = false;
-                }
+        async resolveOnclickIcon(){
+            if (this.data.isLoading) return;
+            try {
+                this.data.isLoading = true;
+                await this.onclickIcon(this.data.value);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.data.isLoading = false;
             }
         }
     },

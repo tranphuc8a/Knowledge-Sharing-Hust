@@ -71,8 +71,8 @@ export default {
                 this.dCourse = this.course;
                 let courseThumbnail = this.dCourse?.Thumbnail;
                 if (await Common.isValidImage(courseThumbnail)){
-                    console.log("thumbnail is valid");
-                    // this.courseThumbnail = courseThumbnail;
+                    // console.log("thumbnail is valid");
+                    this.courseThumbnail = courseThumbnail;
                 }
                 if (this.isReloadCourse){
                     let courseId = this.dCourse?.UserItemId;

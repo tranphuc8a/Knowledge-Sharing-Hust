@@ -21,7 +21,7 @@ class Unicode{
             str = String(str);
             let from = Unicode.acents, to = Unicode.ascii;
             for (let i = 0; i < from.length; i++) {
-               str = str.replace(RegExp(from[i], "gi"), to[i]);
+                str = str.replace(RegExp(from[i], "gi"), to[i]);
             }
 
             str = str.toLowerCase()

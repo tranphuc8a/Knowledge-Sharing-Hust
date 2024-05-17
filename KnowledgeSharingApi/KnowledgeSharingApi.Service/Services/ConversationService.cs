@@ -90,8 +90,8 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<ViewUser> CheckExistedUser(Guid userId)
         {
-            return await UserRepository.GetDetail(userId)
-                ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().User()));
+            return (ViewUser) ((await UserRepository.GetDetail(userId))?.Clone()
+                ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().User())));
         }
 
         /// <summary>
@@ -103,8 +103,8 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<Conversation> CheckExistedConversation(Guid id)
         {
-            return await ConversationRepository.Get(id)
-                ?? throw new ValidatorException(ResponseResource.NotFound(ConversationResource));
+            return (Conversation) ((await ConversationRepository.Get(id))?.Clone()
+                ?? throw new ValidatorException(ResponseResource.NotFound(ConversationResource)));
         }
 
         /// <summary>
@@ -116,8 +116,8 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<ViewMessage> CheckExistedMessage(Guid id)
         {
-            return await MessageRepository.GetDetail(id)
-                ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().Message()));
+            return (ViewMessage) ((await MessageRepository.GetDetail(id))?.Clone()
+                ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().Message())));
         }
 
         /// <summary>

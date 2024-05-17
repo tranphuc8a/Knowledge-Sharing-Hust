@@ -1,8 +1,10 @@
 
 
 import DesktopHomePage from '@/components/pages/desktop/home/DesktopHomePage.vue';
-import FeedSubPage from '@/components/pages/desktop/home/sub-pages/FeedSubPage.vue';
-
+import HomeFeedSubpage from '@/components/pages/desktop/home/sub-pages/HomeFeedSubpage.vue';
+import HomeLessonSubpage from '@/components/pages/desktop/home/sub-pages/HomeLessonSubpage.vue';
+import HomeQuestionSubpage from '@/components/pages/desktop/home/sub-pages/HomeQuestionSubpage.vue';
+import HomeCourseSubpage from '@/components/pages/desktop/home/sub-pages/HomeCourseSubpage.vue';
 
 const homepageRouter = [
     {
@@ -13,25 +15,25 @@ const homepageRouter = [
             requiredAuth: true
         },
         children: [ { // when /
-            path: '/',
+            path: '',
             name: 'feed',
-            component: FeedSubPage
+            component: HomeFeedSubpage
         }, { // when /feed
-            path: '/feed',
+            path: 'feed',
             name: 'feed-page',
-            component: FeedSubPage
+            component: HomeFeedSubpage
         }, { // when /lessons
             path: 'lessons',
             name: 'lessons-page',
-            component: null
+            component: HomeLessonSubpage
         }, { // when /courses
             path: 'courses',
             name: 'courses-page',
-            component: null
+            component: HomeCourseSubpage
         }, { // when /questions
             path: 'questions',
             name: 'questions-page',
-            component: null
+            component: HomeQuestionSubpage
         }],
     },
 ];

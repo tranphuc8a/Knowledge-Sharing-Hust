@@ -9,14 +9,14 @@
                 visible = value;
             }
         }"
-        :src="src"
+        :src="dSrc"
     />
 </template>
 
 
 
 <script>
-
+import Common from '@/js/utils/common';
 
 export default {
     name: 'PreviewImage',
@@ -27,14 +27,32 @@ export default {
     },
     data(){
         return {
-            visible: false
+            visible: false,
+            dSrc: null
         }
     },
     mounted(){
+        this.refresh();
     },
     methods: {
         async show(){
             this.visible = true;
+        },
+        async refresh(){
+            try {
+                this.dSrc = null;
+                if (await Common.isValidImage(this.src)) {
+                    this.dSrc = this.src;
+                    return;
+                }
+            } catch (e){
+                console.error(e);
+            }
+        }
+    },
+    watch: {
+        src(){
+            this.refresh();
         }
     }
 }

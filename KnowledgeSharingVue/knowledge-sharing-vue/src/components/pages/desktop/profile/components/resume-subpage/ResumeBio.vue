@@ -107,14 +107,14 @@ export default {
         async refreshBio(){
             try {
                 this.isWaiting = true;
-                let bio = await this.getUser()?.Bio;
-                if (Validator.isEmpty(bio)){
-                    this.isShowBio = false;
-                    return;
-                }
                 this.currentUser = await CurrentUser.getInstance();
                 if (this.currentUser != null){
                     this.isMySelf = this.currentUser.UserId === this.getUser()?.UserId;
+                }
+                let bio = this.getUser()?.Bio;
+                if (Validator.isEmpty(bio)){
+                    this.isShowBio = false;
+                    return;
                 }
                 this.dBio = bio;
                 this.isShowBio = true;

@@ -22,10 +22,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     {
         public async Task<ViewQuestion> CheckExistedQuestion(Guid questionId, string errorMessage)
         {
-            return await DbContext.ViewQuestions
+            return (ViewQuestion) ((await DbContext.ViewQuestions
                 .Where(question => question.UserItemId == questionId)
-                .FirstOrDefaultAsync()
-                ?? throw new NotExistedEntityException(errorMessage);
+                .FirstOrDefaultAsync())?.Clone()
+                ?? throw new NotExistedEntityException(errorMessage));
         }
 
         public override async Task<int> Delete(Guid questionId)

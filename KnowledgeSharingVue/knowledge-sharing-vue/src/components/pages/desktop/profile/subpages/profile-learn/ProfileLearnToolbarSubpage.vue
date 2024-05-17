@@ -56,6 +56,7 @@
 import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue'
 import MTextfieldButton from './../../../../../base/inputs/MTextfieldButton.vue'
 import MSelectOption from './../../../../../base/inputs/MSelectOption.vue'
+import Debounce from '@/js/utils/debounce'
 
 export default {
     name: 'ProfileLearnToolbarSubpage',
@@ -73,13 +74,15 @@ export default {
             buttonStyle: {
 
             },
-            description: 'Bạn đang học 2 khóa học. Bạn có thể khám phá các khóa học khác tại đây.'
+            description: 'Bạn đang học 2 khóa học. Bạn có thể khám phá các khóa học khác tại đây.',
+            debouncedFunction: null
         }
     },
     mounted(){
         this.refresh();
     },
     methods: {
+
         async refresh(){
             try {
                 let numberCourse = this.listCourses?.length ?? 0;
@@ -88,6 +91,8 @@ export default {
                 } else {
                     this.description = 'Bạn chưa học khóa học nào. Bạn có thể khám phá các khóa học khác tại đây.';
                 }
+                this.debouncedFunction = Debounce.throttle(this.resolveChangeConfig.bind(this), 1000);
+                
             } catch (error){
                 console.error(error);
             }
@@ -134,15 +139,15 @@ export default {
         },
 
         async resolveInputSearch(){
-            return await this.resolveChangeConfig();
+            return this.debouncedFunction?.();
         },
 
         async resolveChangeOrder(){
-            return await this.resolveChangeConfig();
+            return this.debouncedFunction?.();
         },
 
         async resolveClickSearch(){
-            return await this.resolveChangeConfig();
+            return this.debouncedFunction?.();
         }
     },
     watch: {

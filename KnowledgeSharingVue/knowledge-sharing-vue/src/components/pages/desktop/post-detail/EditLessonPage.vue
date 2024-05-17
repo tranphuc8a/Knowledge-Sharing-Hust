@@ -121,6 +121,7 @@ export default {
     },
     async created(){
         try {
+            this.getLoadingPanel().show();
             this.lessonId = this.route.params.lessonId;
             this.currentUser = await CurrentUser.getInstance();
             if (this.currentUser == null) {
@@ -144,6 +145,8 @@ export default {
             } catch (e){
                 console.error(e);
             }
+        } finally {
+            this.getLoadingPanel().hide();
         }
     },
     methods: {
@@ -297,7 +300,8 @@ export default {
     },
     inject: {
         getToastManager: {},
-        getPopupManager: {}
+        getPopupManager: {},
+        getLoadingPanel: {}
     },
     mounted(){
         this.update();

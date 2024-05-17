@@ -22,8 +22,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     {
         public async Task<ViewCourse> CheckExistedCourse(Guid courseId, string errorMessage)
         {
-            return await DbContext.ViewCourses.FindAsync(courseId)
-                ?? throw new NotExistedEntityException(errorMessage);
+            return (ViewCourse) ((await DbContext.ViewCourses.FindAsync(courseId))?.Clone()
+                ?? throw new NotExistedEntityException(errorMessage));
         }
 
         // Override Delete Member

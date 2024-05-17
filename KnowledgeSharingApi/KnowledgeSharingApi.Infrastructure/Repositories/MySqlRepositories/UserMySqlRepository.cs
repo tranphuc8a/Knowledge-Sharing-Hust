@@ -125,8 +125,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage)
         {
-            return await DbContext.ViewUsers.Where(user => user.UserId == userId).FirstOrDefaultAsync()
-                ?? throw new NotExistedEntityException(errorMessage);
+            return (ViewUser) ((await DbContext.ViewUsers.Where(user => user.UserId == userId).FirstOrDefaultAsync())?.Clone()
+                ?? throw new NotExistedEntityException(errorMessage));
         }
 
         public virtual async Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds)

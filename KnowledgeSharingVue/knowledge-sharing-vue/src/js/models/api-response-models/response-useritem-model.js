@@ -5,7 +5,7 @@ class ResponseUserItemModel extends UserItem {
     constructor() {
         super();
         this.AverageStar = null;
-        this.MyStar = null;
+        this.MyStars = null;
         this.TotalStar = null;
     }
 

@@ -47,8 +47,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task<ViewLesson> CheckExistedLesson(Guid lessonId, string errorMessage)
         {
-            return await DbContext.ViewLessons.FindAsync(lessonId)
-                ?? throw new NotExistedEntityException(errorMessage);
+            return (ViewLesson) ((await DbContext.ViewLessons.FindAsync(lessonId))?.Clone()
+                ?? throw new NotExistedEntityException(errorMessage));
         }
 
         public virtual async Task<List<ViewLesson>> GetByUserId(Guid userId)

@@ -143,8 +143,8 @@ export default {
                 this.user = this.courseRegister?.getOwner?.();
                 // update thumbnail
                 if (await Common.isValidImage(courseCard?.Thumbnail)){
-                    console.log("image is valid");
-                    // this.courseThumbnail = courseCard.Thumbnail;
+                    // console.log("image is valid");
+                    this.courseThumbnail = courseCard.Thumbnail;
                 }
             } catch (error){
                 console.error(error);

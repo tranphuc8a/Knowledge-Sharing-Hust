@@ -4,7 +4,7 @@ class ResponseCommentModel extends ViewComment {
     constructor() {
         super();
         this.AverageStar = null;
-        this.MyStar = null;
+        this.MyStars = null;
         this.TotalStar = null;
         this.TotalReplies = null;
         this.Reply = null;

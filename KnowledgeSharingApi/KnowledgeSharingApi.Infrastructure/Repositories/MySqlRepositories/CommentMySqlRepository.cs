@@ -24,9 +24,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     {
         public virtual async Task<ViewComment> CheckExistedComment(Guid commentId, string errorMessage)
         {
-            return await DbContext.ViewComments.Where(com => com.UserItemId == commentId)
-                .FirstOrDefaultAsync()
-                ?? throw new NotExistedEntityException(errorMessage);
+            return (ViewComment) ((await DbContext.ViewComments.Where(com => com.UserItemId == commentId)
+                .FirstOrDefaultAsync())?.Clone()
+                ?? throw new NotExistedEntityException(errorMessage));
         }
 
         // Override lại hàm xóa comment

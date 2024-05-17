@@ -103,7 +103,7 @@ let selectOption = {
     watch: {
         ...input.watch,
         placeholder(newVal)     { this.data.placeholder = newVal; },
-        listItemLoader()        { this.refreshListItems(); },
+        listItemLoader()        { this.resolveRefreshItem(); },
     },
     methods: {
         ...input.methods,
@@ -194,7 +194,7 @@ let selectOption = {
                     return;
                 }
                 if (this.data.items.length <= 0){
-                    await this.refreshListItems();
+                    await this.resolveRefreshItem();
                 }
                 let item = this.data.items.find(function(it){
                     return String(it.value) === String(value);
