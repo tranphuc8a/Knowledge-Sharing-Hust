@@ -494,6 +494,26 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(QuestionResource), string.Empty, res);
         }
 
+        public Task<ServiceResult> UserSearchPost(Guid myUid, string? search, PaginationDto pagination)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> UserSearchMyPost(Guid myUid, string? search, PaginationDto pagination)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> UserSearchUserPost(Guid myUid, Guid userId, string? search, PaginationDto pagination)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> AdminSearchUserPost(Guid userId, string? search, PaginationDto pagination)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

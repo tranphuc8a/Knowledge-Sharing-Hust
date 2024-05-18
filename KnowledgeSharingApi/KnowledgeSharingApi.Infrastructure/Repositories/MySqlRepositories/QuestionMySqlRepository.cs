@@ -20,7 +20,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class QuestionMySqlRepository(IDbContext dbContext)
         : BaseMySqlUserItemRepository<Question>(dbContext), IQuestionRepository
     {
-        public async Task<ViewQuestion> CheckExistedQuestion(Guid questionId, string errorMessage)
+        public virtual async Task<ViewQuestion> CheckExistedQuestion(Guid questionId, string errorMessage)
         {
             return (ViewQuestion) ((await DbContext.ViewQuestions
                 .Where(question => question.UserItemId == questionId)
@@ -78,7 +78,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.SaveChangesAsync();
         }
 
-        public async Task<List<ViewQuestion>> GetByUserId(Guid userId)
+        public virtual async Task<List<ViewQuestion>> GetByUserId(Guid userId)
         {
             List<ViewQuestion> posts = await
                 DbContext.ViewQuestions
@@ -89,7 +89,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         }
 
 
-        public async Task<List<ViewQuestion>> GetByUserId(Guid userId, PaginationDto pagination)
+        public virtual async Task<List<ViewQuestion>> GetByUserId(Guid userId, PaginationDto pagination)
         {
             List<ViewQuestion> posts = await ApplyPagination(
                     DbContext.ViewQuestions
@@ -100,7 +100,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewQuestion>> GetPublicPosts(PaginationDto pagination)
+        public virtual async Task<List<ViewQuestion>> GetPublicPosts(PaginationDto pagination)
         {
             List<ViewQuestion> posts = await ApplyPagination(
                     DbContext.ViewQuestions
@@ -111,7 +111,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewQuestion>> GetPublicPostsByUserId(Guid userId)
+        public virtual async Task<List<ViewQuestion>> GetPublicPostsByUserId(Guid userId)
         {
             List<ViewQuestion> posts = await
                 DbContext.ViewQuestions
@@ -121,7 +121,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewQuestion>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
+        public virtual async Task<List<ViewQuestion>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
         {
             List<ViewQuestion> posts = await ApplyPagination(
                     DbContext.ViewQuestions
@@ -132,7 +132,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewQuestion>> GetQuestionInCourse(Guid courseid)
+        public virtual async Task<List<ViewQuestion>> GetQuestionInCourse(Guid courseid)
         {
             List<ViewQuestion> posts = await
                 DbContext.ViewQuestions
@@ -143,14 +143,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         }
 
 
-        public async Task<ViewQuestion?> GetQuestionDetail(Guid questionId)
+        public virtual async Task<ViewQuestion?> GetQuestionDetail(Guid questionId)
         {
             return await DbContext.ViewQuestions
                 .Where(ques => ques.UserItemId == questionId)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<List<ViewQuestion>> GetViewPost(PaginationDto pagination)
+        public virtual async Task<List<ViewQuestion>> GetViewPost(PaginationDto pagination)
         {
             return await ApplyPagination(
                     DbContext.ViewQuestions
@@ -159,7 +159,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewQuestion>> GetPublicPostsOfCategory(string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewQuestion>> GetPublicPostsOfCategory(string catName, PaginationDto pagination)
         {
             var knowledgesId = DbContext.ViewKnowledgeCategories
                 .Where(k => k.CategoryName == catName)
@@ -175,7 +175,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewQuestion>> GetPostsOfCategory(string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewQuestion>> GetPostsOfCategory(string catName, PaginationDto pagination)
         {
             var knowledgesId = DbContext.ViewKnowledgeCategories
                 .Where(k => k.CategoryName == catName)
@@ -192,14 +192,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewQuestion>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewQuestion>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination)
         {
+            // Danh sach cac knowledge co cateName
             var knowledgesId = DbContext.ViewKnowledgeCategories
                 .Where(k => k.CategoryName == catName)
                 .Select(k => k.KnowledgeId)
                 .Distinct();
 
-            // Lấy danh sách UserItemId mà User đã đăng ký
+            // Lấy danh sách CourseId mà User đã đăng ký
             var registeredCourseIds = DbContext.CourseRegisters
                 .Where(c => c.UserId == myUId)
                 .Select(c => c.CourseId)
@@ -225,7 +226,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewQuestion>> GetMarkedPosts(Guid userId)
+        public virtual async Task<List<ViewQuestion>> GetMarkedPosts(Guid userId)
         {
             // Lấy danh sách UserItemId mà User đã đăng ký
             var registeredCourseIds = new HashSet<Guid>(
@@ -252,7 +253,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await query.ToListAsync();
         }
 
-        public async Task<List<ViewQuestion>> GetMarkedPosts(Guid userId, PaginationDto pagination)
+        public virtual async Task<List<ViewQuestion>> GetMarkedPosts(Guid userId, PaginationDto pagination)
         {
             // Lấy danh sách UserItemId mà User đã đăng ký
             var registeredCourseIds = new HashSet<Guid>(
@@ -285,6 +286,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         protected override DbSet<Question> GetDbSet()
         {
             return DbContext.Questions;
+        }
+
+        public virtual async Task<List<ViewQuestion>> GetPublicPosts()
+        {
+            return await DbContext.ViewQuestions.Where(q => q.Privacy == EPrivacy.Public).ToListAsync();
         }
     }
 }

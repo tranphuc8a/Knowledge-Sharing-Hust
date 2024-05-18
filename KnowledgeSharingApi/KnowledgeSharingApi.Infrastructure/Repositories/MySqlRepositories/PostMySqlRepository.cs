@@ -21,7 +21,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class PostMySqlRepository(IDbContext dbContext)
         : BaseMySqlUserItemRepository<Post>(dbContext), IPostRepository
     {
-        public async Task<List<ViewPost>> GetViewPost(PaginationDto pagination)
+        public virtual async Task<List<ViewPost>> GetViewPost(PaginationDto pagination)
         {
             List<ViewPost> posts = await ApplyPagination(
                 DbContext.ViewPosts, pagination)
@@ -29,7 +29,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewPost>> GetByUserId(Guid userId)
+        public virtual async Task<List<ViewPost>> GetByUserId(Guid userId)
         {
             List<ViewPost> posts = await
                 DbContext.ViewPosts
@@ -39,7 +39,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewPost>> GetByUserId(Guid userId, PaginationDto pagination)
+        public virtual async Task<List<ViewPost>> GetByUserId(Guid userId, PaginationDto pagination)
         {
             List<ViewPost> posts = await ApplyPagination(
                     DbContext.ViewPosts
@@ -51,7 +51,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         }
 
 
-        public async Task<List<ViewPost>> GetPublicPosts(PaginationDto pagination)
+        public virtual async Task<List<ViewPost>> GetPublicPosts()
+        {
+            return await DbContext.ViewPosts.Where(p => p.Privacy == EPrivacy.Public).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewPost>> GetPublicPosts(PaginationDto pagination)
         {
             List<ViewPost> posts = await ApplyPagination(
                     DbContext.ViewPosts
@@ -75,7 +80,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             //return posts;
         }
 
-        public async Task<List<ViewPost>> GetPublicPostsByUserId(Guid userId)
+        public virtual async Task<List<ViewPost>> GetPublicPostsByUserId(Guid userId)
         {
             List<ViewPost> posts = await
                 DbContext.ViewPosts
@@ -85,7 +90,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewPost>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
+        public virtual async Task<List<ViewPost>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
         {
             List<ViewPost> posts = await ApplyPagination(
                     DbContext.ViewPosts
@@ -96,7 +101,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewPost>> GetPublicPostsOfCategory(string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewPost>> GetPublicPostsOfCategory(string catName, PaginationDto pagination)
         {
             var postsId = DbContext.ViewKnowledgeCategories
                 .Where(k => k.CategoryName == catName)
@@ -112,7 +117,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public async Task<List<ViewPost>> GetPostsOfCategory(string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewPost>> GetPostsOfCategory(string catName, PaginationDto pagination)
         {
             var postsId = DbContext.ViewKnowledgeCategories
                 .Where(k => k.CategoryName == catName)
@@ -132,7 +137,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return GetPublicPostsOfCategory(catName, pagination);
         }
 
-        public async Task<List<ViewPost>> GetMarkedPosts(Guid userId)
+        public virtual async Task<List<ViewPost>> GetMarkedPosts(Guid userId)
         {
             IQueryable<ViewPost> query =
                 from post in DbContext.ViewPosts
@@ -150,7 +155,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await query.ToListAsync();
         }
 
-        public async Task<List<ViewPost>> GetMarkedPosts(Guid userId, PaginationDto pagination)
+        public virtual async Task<List<ViewPost>> GetMarkedPosts(Guid userId, PaginationDto pagination)
         {
             IQueryable<ViewPost> query =
                 from post in DbContext.ViewPosts

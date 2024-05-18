@@ -245,5 +245,14 @@ namespace KnowledgeSharingApi.Services.Interfaces
 
         #endregion
 
+
+        #region Search APIS
+
+
+
+
+
+        #endregion
+
     }
 }

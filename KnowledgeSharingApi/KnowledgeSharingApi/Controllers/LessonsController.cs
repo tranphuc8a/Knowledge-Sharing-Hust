@@ -408,5 +408,95 @@ namespace KnowledgeSharingApi.Controllers
         }
 
         #endregion
+
+
+
+        #region Search Apies
+
+
+        /// <summary>
+        /// Xử lý yêu cầu user tim kiem danh sach bai giang
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (28/3/24)
+        /// Modified: None
+        [HttpGet("search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchLessons(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.UserSearchPost(GetCurrentUserIdStrictly(), search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user tim kiem danh sach bai giang
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/my")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchMyLessons(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.UserSearchMyPost(GetCurrentUserIdStrictly(), search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài giảng mà mình đã mark
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="userId"> id user can lay </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/user/{userId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchUserLessons(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.UserSearchUserPost(GetCurrentUserIdStrictly(), userId, search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài giảng mà mình đã mark
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="userId"> id user can lay </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/admin/user/{userId}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public async Task<IActionResult> AdminSearchUserLessons(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.AdminSearchUserPost(userId, search, pagination);
+            return StatusCode(res);
+        }
+
+
+        #endregion
     }
 }

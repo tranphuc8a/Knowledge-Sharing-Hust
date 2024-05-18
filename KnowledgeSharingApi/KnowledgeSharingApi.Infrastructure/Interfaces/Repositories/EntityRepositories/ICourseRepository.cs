@@ -23,6 +23,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         Task<List<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId);
 
         /// <summary>
+        /// Lấy về danh sách user đã đăng ký tham gia khóa học
+        /// </summary>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (24/3/24)
+        /// Modified: None
+        Task<List<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId, PaginationDto pagination);
+
+        /// <summary>
         /// Lấy về danh sách khóa học đã đăng ký của một user
         /// </summary>
         /// <param name="userId"> id của user </param>
@@ -30,6 +39,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (24/3/24)
         /// Modified: None
         Task<List<ViewCourseRegister>> GetRegistersOfUser(Guid userId);
+
+        /// <summary>
+        /// Lấy về danh sách khóa học đã đăng ký của một user
+        /// </summary>
+        /// <param name="userId"> id của user </param>
+        /// <returns></returns>
+        /// Created: PhucTV (24/3/24)
+        /// Modified: None
+        Task<List<ViewCourseRegister>> GetRegistersOfUser(Guid userId, PaginationDto pagination);
 
         /// <summary>
         /// Kiểm tra một user có tham gia khóa học không
@@ -43,6 +61,8 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Modified: None
         Task<ViewCourseRegister?> GetViewCourseRegister(Guid userId, Guid courseId); 
         #endregion
+
+
 
         #region Get View Courses
 
@@ -92,6 +112,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (30/03/24)
         /// Modified: None
         Task<List<ViewCourse>> GetViewCourse(Guid myUid, PaginationDto pagination);
+
+        /// <summary>
+        /// Lấy về Danh sách view course công khai
+        /// Lay toan bo khong phan trang
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<ViewCourse>> GetPublicViewCourse();
 
         /// <summary>
         /// Lấy về Danh sách view course công khai

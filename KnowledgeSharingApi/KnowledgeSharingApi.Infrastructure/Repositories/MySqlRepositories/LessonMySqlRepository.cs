@@ -102,7 +102,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 ).ToListAsync();
         }
 
-        public async Task<List<ViewLesson>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewLesson>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination)
         {
             // Lấy danh sách id các khóa học mà myUid đang học
             IQueryable<Guid> listCoursesId = DbContext.CourseRegisters
@@ -133,6 +133,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     .OrderByDescending(les => les.CreatedTime),
                     pagination                                
                 ).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewLesson>> GetPublicPosts()
+        {
+            return await DbContext.ViewLessons.Where(vl => vl.Privacy == EPrivacy.Public).ToListAsync();
         }
 
         public async Task<List<ViewLesson>> GetPublicPosts(PaginationDto pagination)
@@ -219,5 +224,6 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         {
             return DbContext.Lessons;
         }
+
     }
 }

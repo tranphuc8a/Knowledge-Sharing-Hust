@@ -185,6 +185,7 @@ builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
 builder.Services.AddScoped<ICourseLessonService, CourseLessonService>();
 builder.Services.AddScoped<IOAuth2Service, OAuth2Service>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddSingleton<ICalculateKnowledgeSearchScore, CalculateKnowledgeSearchScore>();
 
 
 

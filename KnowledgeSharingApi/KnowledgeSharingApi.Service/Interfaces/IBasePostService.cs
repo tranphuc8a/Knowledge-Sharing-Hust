@@ -118,5 +118,55 @@ namespace KnowledgeSharingApi.Services.Interfaces
         Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model);
 
         #endregion
+
+
+        #region Search APIes
+
+        /// <summary>
+        /// User tim kiem bai dang feed
+        /// </summary>
+        /// <param name="myUid"> id user thuc hien </param>
+        /// <param name="search"> tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tin phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (19/5/24)
+        /// Modified None
+        Task<ServiceResult> UserSearchPost(Guid myUid, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// User tim kiem bai dang cua chinh minh
+        /// </summary>
+        /// <param name="myUid"> id user thuc hien </param>
+        /// <param name="search"> tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tin phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (19/5/24)
+        /// Modified None
+        Task<ServiceResult> UserSearchMyPost(Guid myUid, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// User tim kiem bai dang cua user khac
+        /// </summary>
+        /// <param name="myUid"> id user thuc hien </param>
+        /// <param name="userId"> id user can lay </param>
+        /// <param name="search"> tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tin phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (19/5/24)
+        /// Modified None
+        Task<ServiceResult> UserSearchUserPost(Guid myUid, Guid userId, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// Admin tim kiem bai dang cua user khac
+        /// </summary>
+        /// <param name="userId"> id user can lay </param>
+        /// <param name="search"> tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tin phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (19/5/24)
+        /// Modified None
+        Task<ServiceResult> AdminSearchUserPost(Guid userId, string? search, PaginationDto pagination);
+
+        #endregion
     }
 }

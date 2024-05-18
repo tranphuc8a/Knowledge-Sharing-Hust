@@ -46,6 +46,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<List<ReturnType>> GetPublicPosts(PaginationDto pagination);
+        Task<List<ReturnType>> GetPublicPosts();  // Get All - Not pagination
 
         /// <summary>
         /// Lấy về danh sách bài đăng public của một user
@@ -69,6 +70,9 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
 
         /// <summary>
         /// Lấy về danh sách bài đăng của một category
+        /// Bai dang public - chi lay nhung post public
+        /// Bai dang binh thuong - lay moi bai dang (cho admin)
+        /// Bai dang filtered - Lay bai dang public va bai dang xem duoc (cho user)
         /// </summary>
         /// <param name="catName"> Tên category </param>
         /// <param name="pagination"> Thuoc tinh phan trang </param>

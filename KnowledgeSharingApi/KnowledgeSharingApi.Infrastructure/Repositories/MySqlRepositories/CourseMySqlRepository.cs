@@ -20,7 +20,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class CourseMySqlRepository(IDbContext dbContext)
         : BaseMySqlUserItemRepository<Course>(dbContext), ICourseRepository
     {
-        public async Task<ViewCourse> CheckExistedCourse(Guid courseId, string errorMessage)
+        public virtual async Task<ViewCourse> CheckExistedCourse(Guid courseId, string errorMessage)
         {
             return (ViewCourse) ((await DbContext.ViewCourses.FindAsync(courseId))?.Clone()
                 ?? throw new NotExistedEntityException(errorMessage));
@@ -45,7 +45,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             }
         } 
 
-        public async Task<List<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId)
+        public virtual async Task<List<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId)
         {
             return await DbContext.ViewCourseRegisters
                 .Where(cr => cr.CourseId == courseId)
@@ -53,7 +53,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourseRegister>> GetRegistersOfUser(Guid userId)
+        public virtual async Task<List<ViewCourseRegister>> GetRegistersOfUser(Guid userId)
         {
             return await DbContext.ViewCourseRegisters
                 .Where(cr => cr.UserId == userId)
@@ -61,7 +61,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetMarkedCoursesOfUse(Guid userId, PaginationDto pagination)
+        public virtual async Task<List<ViewCourse>> GetMarkedCoursesOfUse(Guid userId, PaginationDto pagination)
         {
             IQueryable<Guid> listMarkedKnowledgeIds = DbContext.Marks
                 .Where(m => m.UserId == userId).Select(m => m.KnowledgeId);
@@ -73,7 +73,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetPublicViewCourse(PaginationDto pagination)
+        public virtual async Task<List<ViewCourse>> GetPublicViewCourse(PaginationDto pagination)
         {
             return await ApplyPagination(
                     DbContext.ViewCourses
@@ -83,7 +83,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetPublicViewCourseOfCategory(string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewCourse>> GetPublicViewCourseOfCategory(string catName, PaginationDto pagination)
         {
             IQueryable<Guid> listKnowledgeIds = DbContext.ViewKnowledgeCategories
                 .Where(cat => cat.CategoryName == catName)
@@ -96,7 +96,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetPublicViewCourseOfUser(Guid userId)
+        public virtual async Task<List<ViewCourse>> GetPublicViewCourseOfUser(Guid userId)
         {
             return await DbContext.ViewCourses
                 .Where(c => c.UserId == userId)
@@ -104,12 +104,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<ViewCourse?> GetViewCourse(Guid courseId)
+        public virtual async Task<ViewCourse?> GetViewCourse(Guid courseId)
         {
             return await DbContext.ViewCourses.FindAsync(courseId);
         }
 
-        public async Task<List<ViewCourse?>> GetViewCourse(Guid[] courseIds)
+        public virtual async Task<List<ViewCourse?>> GetViewCourse(Guid[] courseIds)
         {
             Dictionary<Guid, ViewCourse> vCourse = await DbContext.ViewCourses
                 .Where(c => courseIds.Contains(c.UserItemId))
@@ -130,7 +130,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             ).ToList();
         }
 
-        public async Task<List<ViewCourse>> GetViewCourse(PaginationDto pagination)
+        public virtual async Task<List<ViewCourse>> GetViewCourse(PaginationDto pagination)
         {
             return await ApplyPagination(
                     DbContext.ViewCourses
@@ -139,7 +139,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetViewCourse(Guid myUid, PaginationDto pagination)
+        public virtual async Task<List<ViewCourse>> GetViewCourse(Guid myUid, PaginationDto pagination)
         {
             IQueryable<Guid> listRegisteredCourseIds = DbContext.ViewCourseRegisters
                 .Where(cr => cr.UserId == myUid)
@@ -162,7 +162,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetViewCourseOfCategory(string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewCourse>> GetViewCourseOfCategory(string catName, PaginationDto pagination)
         {
             IQueryable<Guid> listKnowledgeIds = DbContext.ViewKnowledgeCategories
                 .Where(cat => cat.CategoryName == catName).Select(cat => cat.KnowledgeId);
@@ -174,7 +174,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetViewCourseOfCategory(Guid myUid, string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewCourse>> GetViewCourseOfCategory(Guid myUid, string catName, PaginationDto pagination)
         {
             // Lấy danh sách course mà myUid có tham gia
             IQueryable<Guid> listRegisteresCourseIds = DbContext.ViewCourseRegisters
@@ -208,7 +208,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetViewCourseOfUser(Guid userId)
+        public virtual async Task<List<ViewCourse>> GetViewCourseOfUser(Guid userId)
         {
             return await DbContext.ViewCourses
                 .Where(c => c.UserId == userId)
@@ -216,7 +216,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<List<ViewCourse>> GetViewCourseOfUser(Guid myUid, Guid userId)
+        public virtual async Task<List<ViewCourse>> GetViewCourseOfUser(Guid myUid, Guid userId)
         {
             // Lấy danh sách course mà myUid có tham gia
             IQueryable<Guid> listRegisteresCourseIds = DbContext.ViewCourseRegisters
@@ -243,7 +243,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<ViewCourseRegister?> GetViewCourseRegister(Guid myUid, Guid courseId)
+        public virtual async Task<ViewCourseRegister?> GetViewCourseRegister(Guid myUid, Guid courseId)
         {
             return await DbContext.ViewCourseRegisters
                 .Where(cr => cr.UserId == myUid && cr.CourseId == courseId)
@@ -253,6 +253,26 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         protected override DbSet<Course> GetDbSet()
         {
             return DbContext.Courses;
+        }
+
+        public virtual async Task<List<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId, PaginationDto pagination)
+        {
+            return await ApplyPagination(DbContext.ViewCourseRegisters.Where(vcr => vcr.CourseId == courseId)
+                .OrderByDescending(c => c.CreatedTime), pagination).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewCourseRegister>> GetRegistersOfUser(Guid userId, PaginationDto pagination)
+        {
+            return await ApplyPagination(
+                    DbContext.ViewCourseRegisters.Where(c => c.UserId == userId)
+                    .OrderByDescending(c => c.CreatedTime),
+                    pagination
+                ).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewCourse>> GetPublicViewCourse()
+        {
+            return await DbContext.ViewCourses.Where(c => c.Privacy == EPrivacy.Public).ToListAsync();
         }
     }
 }
