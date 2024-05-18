@@ -7,8 +7,10 @@ using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
+using KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -23,6 +25,7 @@ namespace KnowledgeSharingApi.Services.Services
         IResourceFactory resourceFactory,
         IUserRepository userRepository,
         IProfileRepository profileRepository,
+        IDecorationRepository decorationRepository,
         IImageRepository imageRepository,
         IStorage storage,
         IUserRelationRepository userRelationRepository
@@ -33,6 +36,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IProfileRepository ProfileRepository = profileRepository;
         protected readonly IResourceFactory ResourceFactory = resourceFactory;
         protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
+        protected readonly IDecorationRepository DecorationRepository = decorationRepository;
         protected readonly IUserRelationRepository UserRelationRepository = userRelationRepository;
         protected readonly IImageRepository ImageRepository = imageRepository;
         protected readonly string ResponseTableName = resourceFactory.GetEntityResource().User();
@@ -116,28 +120,50 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminSearchUser(string searchKey, PaginationDto pagination)
         {
             // Format search key
-            searchKey = searchKey.ToLower();
+            searchKey = Unicode.RemoveVietnameseTone(searchKey).ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
             List<ViewUser> lsUser = await UserRepository.GetDetail();
-            List<ViewUser> filteredUser = lsUser
-                .Select(user => new
+
+            // Tinh toan similiarity Score
+            List<string> listFullname = lsUser.Select(fu => fu.FullName).ToList();
+            List<string> listUsername = lsUser.Select(fu => fu.Username).ToList();
+            List<string> listEmail = lsUser.Select(fu => fu.Email).ToList();
+            List<string> listPhone = lsUser.Select(fu => fu.PhoneNumber ?? "").ToList();
+
+            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(searchKey, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(searchKey, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(searchKey, listEmail);
+            Dictionary<string, double> scorePhone = Algorithm.NgramSimilarityList(searchKey, listPhone);
+
+            double fullnameWeight = 0.4, usernameWeight = 0.3, emailWeight = 0.2, phoneWeight = 0.1;
+
+            Dictionary<Guid, double> scored = lsUser.ToDictionary(
+                u => u.UserId,
+                u => fullnameWeight * scoreFullName[u.FullName] +
+                        usernameWeight * scoreUsername[u.Username] +
+                        emailWeight * scoreEmail[u.Email] +
+                        phoneWeight * scorePhone[u.PhoneNumber ?? ""]
+            );
+
+            // Sap xep theo scored:
+            lsUser = [.. lsUser.OrderByDescending(u => scored[u.UserId])];
+
+            // ap dung filter, pagination (khong ap dung order)
+            if (pagination.Filters != null)
+                lsUser = UserRepository.ApplyFilter(lsUser, pagination.Filters);
+            lsUser = lsUser.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 20).ToList();
+
+            // Decoration:
+            List<ResponseUserCardModel> res = await DecorationRepository.DecorateResponseUserCardModel(null,
+                lsUser.Select(u =>
                 {
-                    User = user,
-                    similarityScore = SimilaritySearch(searchKey, user)
-                })
-                .OrderByDescending(user => user.similarityScore)
-                .Select(user => user.User)
-                .ToList();
+                    ResponseUserCardModel rUCM = new();
+                    rUCM.Copy(u);
+                    return rUCM;
+                }).ToList());
 
             // Trả về thành công
-            PaginationResponseModel<ViewUser> res = new()
-            {
-                Total = filteredUser.Count,
-                Limit = pagination.Limit,
-                Offset = pagination.Offset,
-                Results = UserRepository.ApplyPagination(lsUser, pagination)
-            };
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
 
@@ -266,10 +292,10 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        private static double SimilaritySearch(string searchKey, ViewUser user)
-        {
-            return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
-        }
+        //private static double SimilaritySearch(string searchKey, ViewUser user)
+        //{
+        //    return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
+        //}
 
         public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto pagination)
         {
@@ -311,15 +337,24 @@ namespace KnowledgeSharingApi.Services.Services
             );
 
             // Sap xep theo scored:
-            filteredUser = filteredUser.OrderByDescending(u => scored[u.UserId]).ToList();
+            filteredUser = [.. filteredUser.OrderByDescending(u => scored[u.UserId])];
 
             // ap dung filter, pagination (khong ap dung order)
             if (pagination.Filters != null)
                 filteredUser = UserRepository.ApplyFilter(filteredUser, pagination.Filters);
             filteredUser = filteredUser.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 20).ToList();
 
+            // Decoration:
+            List<ResponseUserCardModel> res = await DecorationRepository.DecorateResponseUserCardModel(myuid,
+                filteredUser.Select(u =>
+                {
+                    ResponseUserCardModel rUCM = new();
+                    rUCM.Copy(u);
+                    return rUCM;
+                }).ToList());
+
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.Success(), string.Empty, filteredUser);
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
 
         public async Task<ServiceResult> UpdateMyAvatarImage(Guid uid, IFormFile avatar)

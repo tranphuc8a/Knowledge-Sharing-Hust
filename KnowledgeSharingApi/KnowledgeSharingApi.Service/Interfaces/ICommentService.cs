@@ -53,7 +53,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Admin Lấy về danh sách comment của một một knowledge
         /// </summary>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="pagination">
+        /// <param name="pagination"> phan trang <param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
@@ -90,7 +90,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="pagination">
+        /// <param name="pagination"> phan trang <param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
@@ -101,7 +101,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="pagination">
+        /// <param name="pagination"> phan trang <param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
@@ -113,7 +113,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="myuid"> id của người đi lấy </param>
         /// <param name="myuid"> id của người được lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="pagination">
+        /// <param name="pagination"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
@@ -125,11 +125,34 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
         /// <param name="search"> Từ khóa tìm kiếm </param>
-        /// <param name="pagination">
+        /// <param name="pagination"> phan trang <param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string search, PaginationDto pagination);
+        Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// User tìm kiếm bình luận của minh trong cac binh luan da binh luan
+        /// </summary>
+        /// <param name="myuid"> id của người lấy </param>
+        /// <param name="search"> Từ khóa tìm kiếm </param>
+        /// <param name="pagination"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchMyComments(Guid myuid, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// User tìm kiếm bình luận của minh trong một knowledge cho truoc theo từ khóa 
+        /// </summary>
+        /// <param name="myuid"> id của người lấy </param>
+        /// <param name="knowledgeId"> id của knowledge </param>
+        /// <param name="search"> Từ khóa tìm kiếm </param>
+        /// <param name="pagination"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchMyCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string? search, PaginationDto pagination);
         #endregion
 
 
@@ -176,7 +199,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (25/3/24)
         /// Modified: None
         Task<ServiceResult> UserDeleteComment(Guid myuid, Guid commentId);
-
 
         /// <summary>
         /// User bật/tắt chức năng khóa bình luận cho knowledge của mình (đang phát triển...)

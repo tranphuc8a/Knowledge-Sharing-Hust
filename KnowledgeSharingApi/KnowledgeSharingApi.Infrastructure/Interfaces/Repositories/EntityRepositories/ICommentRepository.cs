@@ -34,6 +34,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         Task<PaginationResponseModel<ViewComment>> GetRepliesOfComment(Guid commentId, PaginationDto pagination);
 
         /// <summary>
+        /// Lấy về tổng số phản hồi của danh sách comment
+        /// </summary>
+        /// <param name="commentsId"> danh sách id của các comment cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        Task<Dictionary<Guid, int>> GetTotalReplies(List<Guid> commentsId);
+
+        /// <summary>
         /// Lấy về danh sách top phản hồi của một danh sách comment
         /// </summary>
         /// <param name="commentId"> id của danh sách comment cần lấy </param>
@@ -64,16 +73,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetListCommentsOfKnowledge(List<Guid> knowledgeId, PaginationDto pagination);
 
         /// <summary>
-        /// Lấy về tổng số phản hồi của danh sách comment
-        /// </summary>
-        /// <param name="commentsId"> danh sách id của các comment cần lấy </param>
-        /// <returns></returns>
-        /// Created: PhucTV (26/3/24)
-        /// Modified: None
-        Task<Dictionary<Guid, int>> GetTotalReplies(List<Guid> commentsId);
-
-
-        /// <summary>
         /// Lấy về danh sách bình luận của user trong một knowledge
         /// </summary>
         /// <param name="userId"> id của user cần lấy </param>
@@ -84,6 +83,34 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Modified: None
         Task<PaginationResponseModel<ViewComment>> GetCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId, PaginationDto pagination);
 
-       
+        /// <summary>
+        /// Lấy về danh sách bình luận của một Phần tử kiển thức
+        /// Lấy toàn bộ, không phân trang
+        /// </summary>
+        /// <param name="knowledgeId"> id của phần tử kiến thức </param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        Task<List<ViewComment>> GetListCommentsOfKnowledge(Guid knowledgeId);
+
+        /// <summary>
+        /// Lấy về danh sách bình luận của một user
+        /// Lấy toàn bộ, không phân trang
+        /// </summary>
+        /// <param name="userId"> id của user can lay </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        Task<List<ViewComment>> GetListCommentsOfUser(Guid userId);
+
+        /// <summary>
+        /// Lấy về danh sách bình luận của một user trong mot knowledge
+        /// Lấy toàn bộ, không phân trang
+        /// </summary>
+        /// <param name="userId"> id của user can lay </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        Task<List<ViewComment>> GetListCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId);
     }
 }

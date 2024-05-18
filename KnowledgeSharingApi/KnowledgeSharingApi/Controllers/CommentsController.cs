@@ -147,6 +147,7 @@ namespace KnowledgeSharingApi.Controllers
         #endregion
 
 
+
         #region User Get Comments Apies
 
         /// <summary>
@@ -204,6 +205,14 @@ namespace KnowledgeSharingApi.Controllers
             return StatusCode(res);
         }
 
+
+
+        #endregion
+
+
+
+        #region User search comments
+
         /// <summary>
         /// Yêu cầu User tìm kiếm danh sách comment trong một knowledge
         /// </summary>
@@ -211,19 +220,64 @@ namespace KnowledgeSharingApi.Controllers
         /// <param name="search"> Từ khóa tìm kiếm </param>
         /// <param name="limit"> Số lượng </param>
         /// <param name="offset"> Độ lệch </param>
+        /// <param name="filter"> bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
         /// <returns></returns>
         /// Created: PhucTV (26/3/24)
         /// Modified: None
         [HttpGet("search/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserSearchListComments(Guid knowledgeId, string search, int? limit, int? offset, string? order, string? filter)
+        public async Task<IActionResult> UserSearchListComments(Guid knowledgeId, string? search, int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
             ServiceResult res = await CommentService.UserSearchCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, search, pagination);
             return StatusCode(res);
         }
 
+        /// <summary>
+        /// Yêu cầu User tìm kiếm danh sách comment cua minh
+        /// </summary>
+        /// <param name="search"> Từ khóa tìm kiếm </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <param name="filter"> bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        [HttpGet("search/my")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchListMyComments(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CommentService.UserSearchMyComments(GetCurrentUserIdStrictly(), search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Yêu cầu User tìm kiếm danh sách comment trong một knowledge
+        /// </summary>
+        /// <param name="knowledgeId"> id của knowledge cần lấy </param>
+        /// <param name="search"> Từ khóa tìm kiếm </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <param name="filter"> bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <returns></returns>
+        /// Created: PhucTV (26/3/24)
+        /// Modified: None
+        [HttpGet("search/my/knowledge/{knowledgeId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchListMyCommentsInKnowledge(Guid knowledgeId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await CommentService.UserSearchMyCommentsOfKnowledge(GetCurrentUserIdStrictly(), knowledgeId, search, pagination);
+            return StatusCode(res);
+        }
+
         #endregion
+
+
 
 
         #region User Apies do operations

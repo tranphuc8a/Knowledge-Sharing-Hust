@@ -6,6 +6,8 @@ class ResponseUserCardModel extends Entity {
         super();
         this.UserId = null;
         this.Username = null;
+        this.Email = null;
+        this.PhoneNumber = null;
         this.Avatar = null;
         this.Cover = null;
         this.FullName = null;

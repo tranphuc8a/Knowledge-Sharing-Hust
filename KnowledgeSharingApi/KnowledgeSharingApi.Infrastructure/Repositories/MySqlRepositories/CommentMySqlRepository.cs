@@ -126,6 +126,24 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return result;
         }
 
+        public virtual async Task<List<ViewComment>> GetListCommentsOfKnowledge(Guid knowledgeId)
+        {
+            return await DbContext.ViewComments.Where(com => com.KnowledgeId == knowledgeId)
+                .OrderByDescending(comment => comment.CreatedTime).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewComment>> GetListCommentsOfUser(Guid userId)
+        {
+            return await DbContext.ViewComments.Where(com => com.UserId == userId)
+                .OrderByDescending(comment => comment.CreatedTime).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewComment>> GetListCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId)
+        {
+            return await DbContext.ViewComments.Where(com => com.UserId == userId && com.KnowledgeId == knowledgeId)
+                .OrderByDescending(comment => comment.CreatedTime).ToListAsync();
+        }
+
         public virtual async Task<PaginationResponseModel<ViewComment>> GetRepliesOfComment(Guid commentId, PaginationDto pagination)
         {
             List<ViewComment> comments = await DbContext.ViewComments
