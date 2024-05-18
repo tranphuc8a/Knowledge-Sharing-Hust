@@ -67,14 +67,14 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AddLessonToCourse(Guid myUid, AddLessonToCourseModel model)
         {
             // Kiem tra khoa hoc ton tai
-            ViewCourse course = await CourseRepository.CheckExistedCourse(model.CourseId ?? Guid.Empty, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(model.CourseId ?? Guid.Empty, NotExistedCourse);
 
             // Kiem tra la chu khoa hoc
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOwner);
 
             // Kiem tra bai giang ton tai
-            ViewLesson lesson = await LessonRepository.CheckExistedLesson(model.LessonId ?? Guid.Empty,
+            Lesson lesson = await LessonRepository.CheckExisted(model.LessonId ?? Guid.Empty,
                 ResponseResource.NotExist(EntityResource.Lesson()));
 
             // Kiem tra la chu bai giang
@@ -96,7 +96,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AddListLessonToCourse(Guid myUid, AddListLessonToCourseModel model)
         {
             // Kiem tra khoa hoc ton tai va la chu khoa hoc
-            ViewCourse course = await CourseRepository.CheckExistedCourse(model.CourseId ?? Guid.Empty, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(model.CourseId ?? Guid.Empty, NotExistedCourse);
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOwner);
 

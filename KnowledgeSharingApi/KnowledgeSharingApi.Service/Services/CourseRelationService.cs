@@ -116,7 +116,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> AdminGetCourseRegisters(Guid courseId, PaginationDto pagination)
         {
             // CHeck course Existed
-            _ = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Get lisst register
             List<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
@@ -137,7 +137,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> UserGetCourseInvites(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course exist
-            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Check role is owner
             if (course.UserId != myUid)
@@ -158,7 +158,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course is existed
-            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Check owner
             if (course.UserId != myUid)
@@ -204,7 +204,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> UserGetRegisters(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course existed
-            _ = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Check role is owner or member
             ECourseRoleType roleType = await CourseRelationRepository.GetRole(myUid, courseId);
@@ -413,7 +413,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden(NotBeCourseOnwner);
 
             // CHeck userId is existed
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // CHeck not invite yet
             CourseRelation? beforeInvite = await CourseRelationRepository.GetInvite(userId, courseId);

@@ -91,7 +91,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> Mark(Guid myUid, Guid knowledgeId, bool isMark)
         {
             // Kiểm tra myUid và knowledgeId tồn tại
-            _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(myUid, ResponseResource.NotExistUser());
             _ = await KnowledgeRepository.CheckExisted(knowledgeId, ResponseResource.NotExist(KnowledgeResource));
 
             // Cho phép mark/unmark cả những knowledgeId mà không truy cập tới, chỉ không hiển thị được khi get ra mà thôi

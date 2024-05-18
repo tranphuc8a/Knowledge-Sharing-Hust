@@ -113,7 +113,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> AdminDeletePost(Guid postId)
         {
             // Kiểm tra lesson tồn tại
-            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+            Lesson lesson = await LessonRepository.CheckExisted(postId, NotExistedLesson);
 
             // OK xóa
             // Override xóa trong repo để xóa cả những course lesson tương ứng
@@ -180,8 +180,8 @@ namespace KnowledgeSharingApi.Services.Services
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Get all paginated
-            List<ViewLesson> lessons = await LessonRepository.GetByUserId(userId);
-            lessons = LessonRepository.ApplyPagination(lessons, pagination);
+            List<ViewLesson> lessons = await LessonRepository.GetByUserId(userId, pagination);
+            // lessons = LessonRepository.ApplyPagination(lessons, pagination);
 
             // DecorateResponseLessonModel
             List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
@@ -237,8 +237,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Get public lessons and Pagination
             List<ViewLesson> lessons =
-                await LessonRepository.GetPublicPostsByUserId(userId);
-            lessons = LessonRepository.ApplyPagination(lessons, pagination);
+                await LessonRepository.GetPublicPostsByUserId(userId, pagination);
+            //lessons = LessonRepository.ApplyPagination(lessons, pagination);
 
             // DecorateResponseLessonModel
             List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
@@ -302,7 +302,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
         {
             // Check lesson exist and owner
-            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+            Lesson lesson = await LessonRepository.CheckExisted(postId, NotExistedLesson);
             if (lesson.UserId != myUid) return ServiceResult.Forbidden("Bài giảng không phải của bạn");
 
             // Check lesson not in any course
@@ -441,8 +441,8 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetMyPosts(Guid myUid, PaginationDto pagination)
         {
             // Get all paginated
-            List<ViewLesson> lessons = await LessonRepository.GetByUserId(myUid);
-            lessons = LessonRepository.ApplyPagination(lessons, pagination);
+            List<ViewLesson> lessons = await LessonRepository.GetByUserId(myUid, pagination);
+            // lessons = LessonRepository.ApplyPagination(lessons, pagination);
 
             // DecorateResponseLessonModel
             List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons);
@@ -488,8 +488,8 @@ namespace KnowledgeSharingApi.Services.Services
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Get all paginated
-            List<ViewLesson> lessons = await LessonRepository.GetPublicPostsByUserId(userId);
-            lessons = LessonRepository.ApplyPagination(lessons, pagination);
+            List<ViewLesson> lessons = await LessonRepository.GetPublicPostsByUserId(userId, pagination);
+            //lessons = LessonRepository.ApplyPagination(lessons, pagination);
 
             // DecorateResponseLessonModel
             List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons);

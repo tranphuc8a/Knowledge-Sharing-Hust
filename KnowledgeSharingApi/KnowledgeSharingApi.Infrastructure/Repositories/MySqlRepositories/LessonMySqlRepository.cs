@@ -59,6 +59,16 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
+        public virtual async Task<List<ViewLesson>> GetByUserId(Guid userId, PaginationDto pagination)
+        {
+            return await ApplyPagination( 
+                    DbContext.ViewLessons
+                    .Where(les => les.UserId == userId)
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination)
+                .ToListAsync();
+        }
+
         public virtual async Task<List<ViewLesson>> GetMarkedPosts(Guid userId)
         {
             IQueryable<Guid> listMarkedItemId = DbContext.Marks
@@ -66,6 +76,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.ViewLessons
                 .Where(les => listMarkedItemId.Contains(les.UserItemId))
                 .OrderByDescending(les => les.CreatedTime)
+                .ToListAsync();
+        }
+
+        public virtual async Task<List<ViewLesson>> GetMarkedPosts(Guid userId, PaginationDto pagination)
+        {
+            IQueryable<Guid> listMarkedItemId = DbContext.Marks
+                .Where(mark => mark.UserId == userId).Select(mark => mark.KnowledgeId);
+            return await ApplyPagination(
+                DbContext.ViewLessons
+                .Where(les => listMarkedItemId.Contains(les.UserItemId))
+                .OrderByDescending(les => les.CreatedTime), pagination)
                 .ToListAsync();
         }
 
@@ -127,6 +148,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         {
             return await DbContext.ViewLessons.Where(les => les.UserId == userId)
                 .OrderByDescending(les => les.CreatedTime).ToListAsync();
+        }
+
+        public async Task<List<ViewLesson>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
+        {
+            return await ApplyPagination(
+                DbContext.ViewLessons.Where(les => les.UserId == userId)
+                .OrderByDescending(les => les.CreatedTime), pagination).ToListAsync();
         }
 
         public async Task<List<ViewLesson>> GetPublicPostsOfCategory(string catName, PaginationDto pagination)

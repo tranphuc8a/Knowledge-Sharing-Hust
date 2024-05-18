@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Enums;
+﻿using Dapper;
+using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
@@ -38,6 +39,18 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
+        public async Task<List<ViewPost>> GetByUserId(Guid userId, PaginationDto pagination)
+        {
+            List<ViewPost> posts = await ApplyPagination(
+                    DbContext.ViewPosts
+                    .Where(post => post.UserId == userId)
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination)
+                .ToListAsync();
+            return posts;
+        }
+
+
         public async Task<List<ViewPost>> GetPublicPosts(PaginationDto pagination)
         {
             List<ViewPost> posts = await ApplyPagination(
@@ -47,6 +60,19 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     pagination)
                 .ToListAsync();
             return posts;
+
+            //List<ViewPost> posts = (await
+            //        DbContext.UserItems
+            //        .OrderByDescending(post => post.CreatedTime)
+            //        .Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 20)
+            //    .ToListAsync())
+            //    .Select(ui =>
+            //    {
+            //        ViewPost vp = new();
+            //        vp.Copy(ui);
+            //        return vp;
+            //    }).ToList();
+            //return posts;
         }
 
         public async Task<List<ViewPost>> GetPublicPostsByUserId(Guid userId)
@@ -55,6 +81,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 DbContext.ViewPosts
                 .Where(post => post.Privacy == EPrivacy.Public && post.UserId == userId)
                 .OrderByDescending(post => post.CreatedTime)
+                .ToListAsync();
+            return posts;
+        }
+
+        public async Task<List<ViewPost>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
+        {
+            List<ViewPost> posts = await ApplyPagination(
+                    DbContext.ViewPosts
+                    .Where(post => post.Privacy == EPrivacy.Public && post.UserId == userId)
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination)
                 .ToListAsync();
             return posts;
         }
@@ -113,6 +150,25 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await query.ToListAsync();
         }
 
+        public async Task<List<ViewPost>> GetMarkedPosts(Guid userId, PaginationDto pagination)
+        {
+            IQueryable<ViewPost> query =
+                from post in DbContext.ViewPosts
+                join mark in DbContext.Marks
+                    on post.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId && (
+                    // userId có thể xem được post này:
+                    // post là công khai
+                    post.Privacy == EPrivacy.Public ||
+                    // post là của chính user
+                    post.UserId == userId
+                )
+                orderby mark.CreatedTime descending
+                select post;
+            query = ApplyPagination(query, pagination);
+            return await query.ToListAsync();
+        }
+
         protected override DbSet<Post> GetDbSet()
         {
             return DbContext.Posts;
@@ -154,7 +210,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
             var vLessons = await DbContext.ViewLessons.Where(lesson => lessonIds.Contains(lesson.UserItemId)).ToListAsync();
             var vQuestions = await DbContext.ViewQuestions.Where(question => questionIds.Contains(question.UserItemId)).ToListAsync();
-
+             
             // Return result:
             foreach (ViewLesson vLes in vLessons)
             {

@@ -88,6 +88,18 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
+
+        public async Task<List<ViewQuestion>> GetByUserId(Guid userId, PaginationDto pagination)
+        {
+            List<ViewQuestion> posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post => post.UserId == userId)
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination)
+                .ToListAsync();
+            return posts;
+        }
+
         public async Task<List<ViewQuestion>> GetPublicPosts(PaginationDto pagination)
         {
             List<ViewQuestion> posts = await ApplyPagination(
@@ -105,6 +117,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 DbContext.ViewQuestions
                 .Where(post => post.Privacy == EPrivacy.Public && post.UserId == userId)
                 .OrderByDescending(post => post.CreatedTime)
+                .ToListAsync();
+            return posts;
+        }
+
+        public async Task<List<ViewQuestion>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
+        {
+            List<ViewQuestion> posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post => post.Privacy == EPrivacy.Public && post.UserId == userId)
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination)
                 .ToListAsync();
             return posts;
         }
@@ -224,6 +247,36 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 )
                 orderby mark.CreatedTime descending
                 select post;
+
+            // Thực thi truy vấn và trả về kết quả
+            return await query.ToListAsync();
+        }
+
+        public async Task<List<ViewQuestion>> GetMarkedPosts(Guid userId, PaginationDto pagination)
+        {
+            // Lấy danh sách UserItemId mà User đã đăng ký
+            var registeredCourseIds = new HashSet<Guid>(
+                DbContext.CourseRegisters
+                    .Where(c => c.UserId == userId)
+                    .Select(c => c.CourseId)
+                    .Distinct()
+            );
+
+            // Định nghĩa truy vấn để lấy danh sách các ViewQuestion
+            var query =
+                from post in DbContext.ViewQuestions
+                join mark in DbContext.Marks
+                    on post.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId && (
+                    post.Privacy == EPrivacy.Public || // Question là public
+                    post.UserId == userId || // Hoặc question là của user
+                    (post.CourseId.HasValue && registeredCourseIds.Contains(post.CourseId.Value)) // Hoặc trong course đã đăng ký
+                )
+                orderby mark.CreatedTime descending
+                select post;
+
+            // Apply Pagination
+            query = ApplyPagination(query, pagination);
 
             // Thực thi truy vấn và trả về kết quả
             return await query.ToListAsync();

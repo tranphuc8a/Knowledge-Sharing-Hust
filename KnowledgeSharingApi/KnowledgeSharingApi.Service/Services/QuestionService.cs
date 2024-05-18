@@ -109,7 +109,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminDeletePost(Guid postId)
         {
             // Kiểm tra câu hỏi tồn tại
-            _ = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            _ = await QuestionRepository.CheckExisted(postId, NotExistedQuestion);
 
             int res = await QuestionRepository.Delete(postId);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(QuestionResource));
@@ -161,10 +161,10 @@ namespace KnowledgeSharingApi.Services.Services
 
         public async Task<ServiceResult> AdminGetUserPosts(Guid userId, PaginationDto pagination)
         {
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
-            List<ViewQuestion> questions = await QuestionRepository.GetByUserId(userId);
-            questions = QuestionRepository.ApplyPagination(questions, pagination);
+            List<ViewQuestion> questions = await QuestionRepository.GetByUserId(userId, pagination);
+            //questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             List<IResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions);
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
@@ -193,10 +193,10 @@ namespace KnowledgeSharingApi.Services.Services
 
         public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, PaginationDto pagination)
         {
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
-            List<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId);
-            questions = QuestionRepository.ApplyPagination(questions, pagination);
+            List<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId, pagination);
+            //questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
                 await DecorationRepository.DecorateResponseQuestionModel(null, questions));
@@ -206,7 +206,7 @@ namespace KnowledgeSharingApi.Services.Services
         #region User APIes
         public async Task<ServiceResult> ConfirmQuestion(Guid myUid, Guid questionId, bool isConfirm)
         {
-            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(questionId, NotExistedQuestion);
+            Question question = await QuestionRepository.CheckExisted(questionId, NotExistedQuestion);
             if (question.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải bài thảo luận của bạn");
             question.IsAccept = isConfirm;
@@ -269,7 +269,7 @@ namespace KnowledgeSharingApi.Services.Services
                 throw new NotMatchTypeException();
 
             // Kiểm tra postId tồn tại, và chủ nhân là myUid
-            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            Question question = await QuestionRepository.CheckExisted(postId, NotExistedQuestion);
             if (question.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải là bài thảo luận của bạn");
 
@@ -303,7 +303,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Không nhất thiết
 
             // Kiểm tra post tồn tại
-            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            Question question = await QuestionRepository.CheckExisted(postId, NotExistedQuestion);
 
             // Kiểm tra user là chủ post
             if (question.UserId != myUid)
@@ -374,11 +374,11 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetMyPosts(Guid myUid, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
-            _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(myUid, ResponseResource.NotExistUser());
 
             // Lấy về và trả về thành công
-            List<ViewQuestion> questions = await QuestionRepository.GetByUserId(myUid);
-            questions = QuestionRepository.ApplyPagination(questions, pagination);
+            List<ViewQuestion> questions = await QuestionRepository.GetByUserId(myUid, pagination);
+            //questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
                 await DecorationRepository.DecorateResponseQuestionModel(myUid, questions));
@@ -428,12 +428,12 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, PaginationDto pagination)
         {
             // Kiểm tra myUid tồn tại (không nhất thiết) và userId tồn tại
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Lấy về danh sách userId question? (có lấy trong private question không?)
             // Để đơn giản, hiện chỉ lấy public question
-            List<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId);
-            questions = QuestionRepository.ApplyPagination(questions, pagination);
+            List<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId, pagination);
+            //questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             // Trả về thành công
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty,

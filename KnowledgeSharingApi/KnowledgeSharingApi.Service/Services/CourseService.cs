@@ -137,7 +137,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminDeleteCourse(Guid courseId)
         {
             // Kiểm tra course tồn tại
-            _ = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Thực hiện xóa course (ghi đè repo)
             int deleted = await CourseRepository.Delete(courseId);
@@ -174,7 +174,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminGetUserCourses(Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Lấy về danh sách course của user
             List<ViewCourse> listCourses = await CourseRepository.GetViewCourseOfUser(userId);
@@ -195,7 +195,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminGetUserRegisteredCourses(Guid userId, PaginationDto pagination)
         {
             // Check user existed
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Lấy về
             List<ViewCourseRegister> listCourses = await CourseRepository.GetRegistersOfUser(userId);
@@ -266,7 +266,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AnonymousGetUserCourses(Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Lấy về public
             List<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourseOfUser(userId);
@@ -487,7 +487,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetUserCourses(Guid myUid, Guid userId, PaginationDto pagination)
         {
             // Check user existed
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Get 
             List<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourseOfUser(userId);

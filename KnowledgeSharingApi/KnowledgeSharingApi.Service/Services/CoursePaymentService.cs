@@ -59,7 +59,7 @@ namespace KnowledgeSharingApi.Services.Services
             await base.CheckEmailIsValid(email);
 
             // Lấy về user phải tồn tại
-            User? user = await UserRepository.GetByEmail(email!)
+            _ = await UserRepository.GetByEmail(email!)
                 ?? throw new ValidatorException(ResponseResource.NotExistUser());
         }
 
@@ -129,14 +129,14 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetCoursePayments(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course is existed
-            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Check owner
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden("Bạn không phải là chủ của khóa học này");
 
             // Get list payment
-            List<ViewCoursePayment> listPayments = (await CoursePaymentRepository.GetByCourse(courseId)).ToList();
+            List<ViewCoursePayment> listPayments = (await CoursePaymentRepository.GetByCourse(courseId));
 
             // pagination
             int total = listPayments.Count;
@@ -150,7 +150,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetMyPayments(Guid myUid, PaginationDto pagination)
         {
             // Get list payment
-            List<ViewCoursePayment> listPayments = (await CoursePaymentRepository.GetByUser(myUid)).ToList();
+            List<ViewCoursePayment> listPayments = (await CoursePaymentRepository.GetByUser(myUid));
 
             // pagination
             int total = listPayments.Count;

@@ -28,9 +28,9 @@ namespace KnowledgeSharingApi.Services.Services
         ILessonService lessonService
     ) : IPostService
     {
+        protected readonly IResourceFactory ResourceFactory = resourceFactory;
         protected readonly IPostRepository PostRepository = postRepository;
         protected readonly IUserRepository UserRepository = userRepository;
-        protected readonly IResourceFactory ResourceFactory = resourceFactory;
         protected readonly IDecorationRepository DecorationRepository = decorationRepository;
         protected readonly IQuestionService QuestionService = questionService;
         protected readonly ILessonService LessonService = lessonService;
@@ -99,10 +99,10 @@ namespace KnowledgeSharingApi.Services.Services
 
         public async Task<ServiceResult> AdminGetUserPosts(Guid userId, PaginationDto pagination)
         {
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
-            List<ViewPost> posts = await PostRepository.GetByUserId(userId);
-            posts = PostRepository.ApplyPagination(posts, pagination);
+            List<ViewPost> posts = await PostRepository.GetByUserId(userId, pagination);
+            //posts = PostRepository.ApplyPagination(posts, pagination);
             
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
@@ -125,16 +125,17 @@ namespace KnowledgeSharingApi.Services.Services
                 ResponseResource.GetMultiSuccess(PostResource),
                 string.Empty,
                 (await DecorationRepository.DecorateResponsePostModel(null, posts))
-                     //.OfType<IResponseUserItemModel>()
+                //posts
+            //.OfType<IResponseUserItemModel>()
             );
         }
 
         public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, PaginationDto pagination)
         {
-            ViewUser user = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            User user = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
-            List<ViewPost> posts = await PostRepository.GetPublicPostsByUserId(user.UserId);
-            posts = PostRepository.ApplyPagination(posts, pagination);
+            List<ViewPost> posts = await PostRepository.GetPublicPostsByUserId(user.UserId, pagination);
+            //posts = PostRepository.ApplyPagination(posts, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
@@ -162,8 +163,8 @@ namespace KnowledgeSharingApi.Services.Services
         {
             //ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
 
-            List<ViewPost> listPosts = await PostRepository.GetByUserId(myUid);
-            listPosts = PostRepository.ApplyPagination(listPosts, pagination);
+            List<ViewPost> listPosts = await PostRepository.GetByUserId(myUid, pagination);
+            //listPosts = PostRepository.ApplyPagination(listPosts, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),
@@ -193,10 +194,10 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, PaginationDto pagination)
         {
             //_ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
-            List<ViewPost> posts = await PostRepository.GetPublicPostsByUserId(userId);
-            posts = PostRepository.ApplyPagination(posts, pagination);
+            List<ViewPost> posts = await PostRepository.GetPublicPostsByUserId(userId, pagination);
+            //posts = PostRepository.ApplyPagination(posts, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(PostResource),

@@ -22,7 +22,7 @@ namespace KnowledgeSharingApi.Controllers
 
         #region Get Others list relations
         /// <summary>
-        /// Xử lý yêu cầu lấy về quan he hien tai voi mot user
+        /// Xử lý yêu cầu lay ve trang thai quan he hien tai voi mot user
         /// </summary>
         /// <param name="userId"> id của người dùng cần lấy </param>
         /// <returns></returns>
@@ -55,6 +55,24 @@ namespace KnowledgeSharingApi.Controllers
         }
 
         /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách bạn bè của một người dùng
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("friends/search/{userId}")]
+        [AllowAnonymous]
+        public virtual async Task<IActionResult> SearchUserFriends(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchFriends(userId, search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
         /// Xử lý yêu cầu lấy về danh sách một người dùng đang theo dõi
         /// </summary>
         /// <param name="userId"> id của người dùng cần lấy </param>
@@ -69,6 +87,27 @@ namespace KnowledgeSharingApi.Controllers
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: true, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách một người dùng đang theo dõi
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("followers/search/{userId}")]
+        [AllowAnonymous]
+        public virtual async Task<IActionResult> SearchUserFollowers(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(userId, search, EUserRelationType.Follow, isActive: true, pagination);
             return StatusCode(res);
         }
 
@@ -89,7 +128,32 @@ namespace KnowledgeSharingApi.Controllers
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Follow, isActive: false, pagination);
             return StatusCode(res);
         }
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách người dùng đang theo dõi một người dùng khác
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("followees/search/{userId}")]
+        [AllowAnonymous]
+        public virtual async Task<IActionResult> GetUserFollowees(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(userId, search, EUserRelationType.Follow, isActive: false, pagination);
+            return StatusCode(res);
+        }
         #endregion
+
+
+
+
 
         #region Get My List Relations
         /// <summary>
@@ -210,7 +274,139 @@ namespace KnowledgeSharingApi.Controllers
             ServiceResult res = await UserRelationService.GetRelations(GetCurrentUserIdStrictly(), EUserRelationType.Block, isActive: false, pagination);
             return StatusCode(res);
         }
+
+
         #endregion
+
+
+
+
+        #region Search my Friends, Relations 
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách bạn bè của chính mình
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("my/friends/search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> SearchMyFriends(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchFriends(GetCurrentUserIdStrictly(), search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách người mà mình đang theo dõi
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("my/followers/search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> SearchMyFollowers(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(GetCurrentUserIdStrictly(), search, EUserRelationType.Follow, isActive: true, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách người đang theo dõi chính mình
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("my/followees/search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> SearchMyFollowees(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(GetCurrentUserIdStrictly(), search, EUserRelationType.Follow, isActive: false, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách lời mời kết bạn mà mình đã gửi đi
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("my/requesters/search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> SearchMyRequesters(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(GetCurrentUserIdStrictly(), search, EUserRelationType.FriendRequest, isActive: true, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách lời mời kết bạn gửi tới mình
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("my/requestees/search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> SearchMyRequestees(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(GetCurrentUserIdStrictly(), search, EUserRelationType.FriendRequest, isActive: false, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách người dùng mà mình đang chặn
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("my/blockers/search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> SearchMyBlockers(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(GetCurrentUserIdStrictly(), search, EUserRelationType.Block, isActive: true, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu tim kiem trong danh sách người đang chặn mình
+        /// </summary>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("my/blockees/search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> SearchMyBlockees(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(GetCurrentUserIdStrictly(), search, EUserRelationType.Block, isActive: false, pagination);
+            return StatusCode(res);
+        }
+
+        #endregion
+
+
+
+
 
         #region Admin Get user relations
         /// <summary>
@@ -303,7 +499,6 @@ namespace KnowledgeSharingApi.Controllers
             return StatusCode(res);
         }
 
-
         /// <summary>
         /// Xử lý yêu cầu admin lấy về danh sách người dùng mà mình đă chặn của một người dùng
         /// </summary>
@@ -320,7 +515,6 @@ namespace KnowledgeSharingApi.Controllers
             ServiceResult res = await UserRelationService.GetRelations(userId, EUserRelationType.Block, isActive: true, pagination);
             return StatusCode(res);
         }
-
 
         /// <summary>
         /// Xử lý yêu cầu admin lấy về danh sách ngừi dùng đã chặn mình của một người dùng
@@ -339,6 +533,159 @@ namespace KnowledgeSharingApi.Controllers
             return StatusCode(res);
         }
         #endregion
+
+
+
+
+        #region Admin Search user relations
+        /// <summary>
+        /// Xử lý yêu cầu admin tim kiem trong danh sách bạn bè của một người dùng
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("admin/friends/search/{userId}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminSearchFriends(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchFriends(userId, search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu admin tim kiem trong danh sách người mình đang theo dõi của một người dùng
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("admin/followers/search/{userId}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminSearchFollowers(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(userId, search, EUserRelationType.Follow, isActive: true, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu admin tim kiem trong danh sách người đang theo dõi mình của một người dùng
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("admin/followees/search/{userId}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminSearchFollowees(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(userId, search, EUserRelationType.Follow, isActive: false, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu admin tim kiem trong danh sách yêu cầu kết bạn mình gửi đi của một người dùng
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("admin/requesters/search/{userId}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminSearchRequesters(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(userId, search, EUserRelationType.FriendRequest, isActive: true, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu admin tim kiem trong danh sách yêu cầu kết bạn mình được nhận của một người dùng
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("admin/requestees/search/{userId}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminSearchRequestees(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(userId, search, EUserRelationType.FriendRequest, isActive: false, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu admin tim kiem trong danh sách người dùng mà mình đă chặn của một người dùng
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("admin/blockers/search/{userId}")]
+        public virtual async Task<IActionResult> AdminSearchBlockers(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(userId, search, EUserRelationType.Block, isActive: true, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu admin tim kiem trong danh sách ngừi dùng đã chặn mình của một người dùng
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="limit"> Số lượng bản ghi </param>
+        /// <param name="offset"> Độ lệch bản ghi </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        [HttpGet("admin/blockees/search/{userId}")]
+        public virtual async Task<IActionResult> AdminSearchBlockees(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await UserRelationService.SearchRelations(userId, search, EUserRelationType.Block, isActive: false, pagination);
+            return StatusCode(res);
+        }
+        #endregion
+
+
+
 
         #region Follow and Unfollow
         /// <summary>
@@ -373,7 +720,10 @@ namespace KnowledgeSharingApi.Controllers
         #endregion
 
 
-        #region Friends
+
+
+
+        #region Friends Operations
         /// <summary>
         /// Xử lý yêu cầu gửi lời mời kết bạn
         /// </summary>
@@ -436,6 +786,9 @@ namespace KnowledgeSharingApi.Controllers
         }
 
         #endregion
+
+
+
 
         #region Block and Unblock
 

@@ -18,6 +18,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 {
     public abstract class BaseRepository<T> where T : Entity
     {
+        protected int DefaultLimit = 15;
+        protected int DefaultOffset = 0;
 
         #region Apply Order
 
@@ -506,15 +508,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
                 beforeList = ApplyOrder(beforeList, pagination.Orders);
             }
             // Apply Offset:
-            if (pagination.Offset > 0)
-            {
-                beforeList = beforeList.Skip(pagination.Offset.Value).ToList();
-            }
+            beforeList = beforeList.Skip(pagination.Offset ?? DefaultOffset).ToList();
             // Apply Limit:
-            if (pagination.Limit > 0)
-            {
-                beforeList = beforeList.Take(pagination.Limit.Value).ToList();
-            }
+            beforeList = beforeList.Take(pagination.Limit ?? DefaultLimit).ToList();
             return beforeList;
         }
         public virtual IQueryable<T> ApplyPagination(IQueryable<T> beforeQuery, PaginationDto? pagination)
@@ -532,15 +528,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
                 beforeQuery = ApplyOrder(beforeQuery, pagination.Orders);
             }
             // Apply Offset:
-            if (pagination.Offset > 0)
-            {
-                beforeQuery = beforeQuery.Skip(pagination.Offset.Value);
-            }
+            beforeQuery = beforeQuery.Skip(pagination.Offset ?? DefaultOffset);
             // Apply Limit:
-            if (pagination.Limit > 0)
-            {
-                beforeQuery = beforeQuery.Take(pagination.Limit.Value);
-            }
+            beforeQuery = beforeQuery.Take(pagination.Limit ?? DefaultLimit);
             return beforeQuery;
         }
         public virtual List<Q> ApplyPagination<Q>(List<Q> beforeList, PaginationDto? pagination)
@@ -558,15 +548,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
                 beforeList = ApplyOrder(beforeList, pagination.Orders);
             }
             // Apply Offset:
-            if (pagination.Offset > 0)
-            {
-                beforeList = beforeList.Skip(pagination.Offset.Value).ToList();
-            }
+            beforeList = beforeList.Skip(pagination.Offset ?? DefaultOffset).ToList();
             // Apply Limit:
-            if (pagination.Limit > 0)
-            {
-                beforeList = beforeList.Take(pagination.Limit.Value).ToList();
-            }
+            beforeList = beforeList.Take(pagination.Limit ?? DefaultLimit).ToList();
             return beforeList;
         }
         public virtual IQueryable<Q> ApplyPagination<Q>(IQueryable<Q> beforeQuery, PaginationDto? pagination)
@@ -584,15 +568,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
                 beforeQuery = ApplyOrder(beforeQuery, pagination.Orders);
             }
             // Apply Offset:
-            if (pagination.Offset > 0)
-            {
-                beforeQuery = beforeQuery.Skip(pagination.Offset.Value);
-            }
+            beforeQuery = beforeQuery.Skip(pagination.Offset ?? DefaultOffset);
             // Apply Limit:
-            if (pagination.Limit > 0)
-            {
-                beforeQuery = beforeQuery.Take(pagination.Limit.Value);
-            }
+            beforeQuery = beforeQuery.Take(pagination.Limit ?? DefaultLimit);
             return beforeQuery;
         }
 
@@ -721,16 +699,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         {
             DynamicParameters newParams = new();
             string res = string.Empty;
-            if (limit > 0)
-            {
-                res += " LIMIT @limit ";
-                newParams.Add("limit", limit);
-            }
-            if (offset > 0)
-            {
-                res += " OFFSET @offset ";
-                newParams.Add("offset", offset);
-            }
+
+            limit ??= DefaultLimit;
+            offset ??= DefaultOffset;
+
+            res += " LIMIT @limit ";
+            newParams.Add("limit", limit);
+            res += " OFFSET @offset ";
+            newParams.Add("offset", offset);
+            
             parameters = newParams;
             return res;
         }

@@ -15,25 +15,49 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// Hàm thực hiện lấy về danh sách bạn bè của uid
         /// </summary>
-        /// <param name="userid"> id của người dùng cần lấy </param>
+        /// <param name="myUid"> id của người dùng cần lấy </param>
         /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> GetFriends(Guid userid, PaginationDto page);
+        Task<ServiceResult> GetFriends(Guid userId, PaginationDto page);
+
+        /// <summary>
+        /// Hàm thực hiện tim kiem trong danh sách bạn bè của uid
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="page"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (18/5/24)
+        /// Modified: None
+        Task<ServiceResult> SearchFriends(Guid userId, string? search, PaginationDto page);
 
         /// <summary>
         /// Hàm thực hiện lấy về danh sách một loại quan hệ của user
         /// Follow, Block, Request | Passive, Active
         /// </summary>
-        /// <param name="userid"> id của người dùng cần lấy </param>
+        /// <param name="userId"> id của người dùng cần lấy </param>
         /// <param name="relationType"> Loại quan hệ (Follow, Block, Request, Friend) </param>
         /// <param name="isActive"> true = Chủ động, false = bị động </param>
         /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<ServiceResult> GetRelations(Guid userid, EUserRelationType relationType, bool isActive, PaginationDto page);
+        Task<ServiceResult> GetRelations(Guid userId, EUserRelationType relationType, bool isActive, PaginationDto page);
+
+        /// <summary>
+        /// Hàm thực hiện tim kiem trong danh sách user relation của uid
+        /// </summary>
+        /// <param name="userId"> id của người dùng cần lấy </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="isActive"> User co chu dong khong (true - co, false - khong)  </param>
+        /// <param name="relationType"> Loai quan he la gi (friend, follow, request, block) </param>
+        /// <param name="page"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (18/5/24)
+        /// Modified: None
+        Task<ServiceResult> SearchRelations(Guid userId, string? search, EUserRelationType relationType, bool isActive, PaginationDto page);
 
         /// <summary>
         /// Lay ve tinh trang quan he hien tai giua hai user

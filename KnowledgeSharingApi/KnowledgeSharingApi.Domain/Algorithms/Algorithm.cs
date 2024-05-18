@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KnowledgeSharingApi.Domains.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,12 @@ namespace KnowledgeSharingApi.Domains.Algorithms
 {
     public static class Algorithm
     {
+        private static readonly string[] separator = [" ", ",", ".", ";", "!", ":", "?"];
+
         public static bool IsPermutation<T>(List<T> A, List<T> B)
         {
             // Kiểm tra xem hai List có cùng độ dài không
-            if (A.Count() != B.Count())
+            if (A.Count != B.Count)
                 return false;
 
             // Tạo một Dictionary để đếm số lần xuất hiện của từng phần tử trong List B
@@ -40,7 +43,6 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             // Nếu đã kiểm tra tất cả các phần tử trong A và chúng đều xuất hiện trong B với số lần phù hợp, trả về true
             return true;
         }
-
 
         public static int LongestCommonSubsequence(string text1, string text2)
         {
@@ -190,6 +192,127 @@ namespace KnowledgeSharingApi.Domains.Algorithms
         }
 
 
+        private static Dictionary<string, int> GetMapGram(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return [];
+
+            var mapGram = new Dictionary<string, int>();
+            var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var word in words)
+            {
+                // If word is longer than 100 characters, trim it
+                var processedWord = word.Length > 100 ? word[..100] : word;
+
+                int wordLength = processedWord.Length;
+                for (int l = 1; l <= wordLength; l++)
+                {
+                    for (int startIndex = 0; startIndex <= wordLength - l; startIndex++)
+                    {
+                        string gram = processedWord.Substring(startIndex, l);
+                        if (!mapGram.TryGetValue(gram, out int value))
+                        {
+                            mapGram[gram] = 1;
+                        }
+                        else
+                        {
+                            mapGram[gram] = value + 1;
+                        }
+                    }
+                }
+            }
+
+            return mapGram;
+        }
+
+        /**
+         * Calculates the similarity between two strings using the n-gram similarity algorithm
+         * @param a 
+         * @param b 
+         * @returns double in [0, 1]
+         * @Created PhucTV (17/5/24)
+         * @Modified None
+         */
+        public static double NgramSimilarity(string a, string b)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b))
+                    return 0;
+
+                Dictionary<string, int> mapGramOfStringA = GetMapGram(a);
+                Dictionary<string, int> mapGramOfStringB = GetMapGram(b);
+
+                double score = 0;
+                foreach (var gram in mapGramOfStringA)
+                {
+                    if (mapGramOfStringB.TryGetValue(gram.Key, out int value))
+                    {
+                        int countInA = gram.Value;
+                        int countInB = value;
+                        int gramLength = gram.Key.Length;
+                        double addScore = countInA * countInB * gramLength * gramLength;
+                        score += addScore;
+                    }
+                }
+
+                return score;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                return 0;
+            }
+        }
+
+        public static Dictionary<string, double> NgramSimilarityList(string search, List<string> listText)
+        {
+            try
+            {
+                Dictionary<string, double> mapScore = [];
+                if (string.IsNullOrEmpty(string.Join("", listText)))
+                    return mapScore;
+                foreach (var text in listText)
+                {
+                    mapScore[text] = 0;
+                }
+                // calculate n-gram of search string
+                Dictionary<string, int> mapGramOfStringA = GetMapGram(Unicode.RemoveVietnameseTone(search).ToLower());
+
+                // calculate n-gram of each text in listText
+                foreach (var text in listText)
+                {
+                    Dictionary<string, int> mapGramOfStringB = GetMapGram(Unicode.RemoveVietnameseTone(text).ToLower());
+                    double score = 0;
+                    foreach (var gram in mapGramOfStringA)
+                    {
+                        if (mapGramOfStringB.TryGetValue(gram.Key, out int value))
+                        {
+                            int countInA = gram.Value;
+                            int countInB = value;
+                            int gramLength = gram.Key.Length;
+                            double addScore = countInA * countInB * gramLength * gramLength / 1e3;
+                            score += addScore;
+                        }
+                    }
+                    mapScore[text] = score;
+                }
+                return mapScore;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                return [];
+            }
+        }
+
+
+
+        public static Dictionary<string, double> SimilarityList(string search, List<string> listText)
+        {
+            return NgramSimilarityList(search, listText);
+        }
+
         public static double CalculateCompositeSimilarity(string a, string b)
         {
             double levenshteinSimilarity = CalculateLevenshteinSimilarity(a, b);
@@ -203,10 +326,14 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             return compositeSimilarity;
         }
 
+
+
+
         public static double AggregateUsingMax(params double[] criteria)
         {
             return criteria.Max();
         }
+        
         public static double AggregateWithWeight(params double[] criteria)
         {
             double product = 1.0;
@@ -216,6 +343,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             }
             return product;
         }
+        
         public static double AggregateWithBoost(params double[] criteria)
         {
             double sum = 0.0;

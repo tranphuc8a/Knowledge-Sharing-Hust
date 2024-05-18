@@ -222,7 +222,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> GetListCommentReplies(Guid? myUid, Guid commentId, PaginationDto pagination)
         {
             // Check comment existed
-            _ = await CommentRepository.CheckExistedComment(commentId, NotExistedComment);
+            _ = await CommentRepository.CheckExisted(commentId, NotExistedComment);
 
             // Get list replies
             PaginationResponseModel<ViewComment> comments =

@@ -10,6 +10,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Captcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Emails;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Markdown;
 using KnowledgeSharingApi.Infrastructures.Interfaces.OAuth2;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
@@ -17,6 +18,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Request;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets;
+using KnowledgeSharingApi.Infrastructures.Markdown;
 using KnowledgeSharingApi.Infrastructures.OAuth2;
 using KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories;
@@ -124,6 +126,7 @@ builder.Services.AddSingleton<INotificationSocketSessionManager, NotificationSoc
 builder.Services.AddSingleton<ILiveChatSocketSessionManager, LiveChatSocketSessionManager>();
 builder.Services.AddSingleton<INewMessageNotificationSocketSessionManager, NewMessageNotificationSocketSessionManager>();
 builder.Services.AddSingleton<IGoogleOAuth2, GoogleOAuth2>();
+builder.Services.AddSingleton<IMarkdownConverter, MarkdownConverter>();
 
 //
 //
@@ -150,7 +153,7 @@ builder.Services.AddScoped<ILessonRepository, LessonMySqlRepository>();
 builder.Services.AddScoped<ICourseRegisterRepository, CourseRegisterMySqlRepository>();
 builder.Services.AddScoped<ICourseRelationRepository, CourseRelationMySqlRepository>();
 builder.Services.AddScoped<ICoursePaymentRepository, CoursePaymentMySqlRepository>();
-builder.Services.AddScoped<IDecorationRepository, DecorationRepository>();
+builder.Services.AddScoped<IDecorationRepository, SingletonDecorationRepository>();
 builder.Services.AddScoped<ICourseLessonRepository, CourseLessonMySqlRepository>();
 builder.Services.AddScoped<IImageRepository, ImageMySqlRepository>();
 

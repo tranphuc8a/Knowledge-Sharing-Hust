@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Algorithms;
+using KnowledgeSharingApi.Domains.Common;
 using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
@@ -19,11 +20,11 @@ using System.Threading.Tasks;
 namespace KnowledgeSharingApi.Services.Services
 {
     public class UserService(
-        IResourceFactory resourceFactory, 
-        IUserRepository userRepository, 
-        IProfileRepository profileRepository, 
+        IResourceFactory resourceFactory,
+        IUserRepository userRepository,
+        IProfileRepository profileRepository,
         IImageRepository imageRepository,
-        IStorage storage, 
+        IStorage storage,
         IUserRelationRepository userRelationRepository
         ) : IUserService
     {
@@ -273,32 +274,52 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto pagination)
         {
             // Format search key
-            searchKey = searchKey.ToLower();
+            searchKey = Unicode.RemoveVietnameseTone(searchKey).ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
-            List<ViewUser> lsUser = (await UserRepository.GetDetail());
+            List<ViewUser> lsUser = await UserRepository.GetDetail();
+
+            // Loc khong chan, khong bi banned...
+            List<ViewUserRelation> myBlockee = await UserRelationRepository.GetByUserIdAndType(myuid, isActive: false, EUserRelationType.Block);
+            List<ViewUserRelation> myBlocker = await UserRelationRepository.GetByUserIdAndType(myuid, isActive: true, EUserRelationType.Block);
+            List<Guid> myBlockeeId = myBlockee.Select(mb => mb.SenderId).ToList();
+            List<Guid> myBlockerId = myBlocker.Select(mb => mb.ReceiverId).ToList();
+            List<Guid> exceptId = myBlockeeId.Union(myBlockerId).Distinct().ToList();
             List<ViewUser> filteredUser = lsUser
-                .Where(lsUser => lsUser.Role != UserRoles.Banned)
-                .Select(user => new
-                {
-                    User = user,
-                    similarityScore = SimilaritySearch(searchKey, user)
-                })
-                .OrderByDescending(user => user.similarityScore)
-                .Select(user => user.User)
+                .Where(lsUser => lsUser.Role != UserRoles.Banned && !exceptId.Contains(lsUser.UserId))
                 .ToList();
 
-            // Lọc không chặn, làm sau
+            // Tinh toan similiarity Score
+            List<string> listFullname = filteredUser.Select(fu => fu.FullName).ToList();
+            List<string> listUsername = filteredUser.Select(fu => fu.Username).ToList();
+            List<string> listEmail = filteredUser.Select(fu => fu.Email).ToList();
+            List<string> listPhone = filteredUser.Select(fu => fu.PhoneNumber ?? "").ToList();
+
+            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(searchKey, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(searchKey, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(searchKey, listEmail);
+            Dictionary<string, double> scorePhone = Algorithm.NgramSimilarityList(searchKey, listPhone);
+
+            double fullnameWeight = 0.4, usernameWeight = 0.3, emailWeight = 0.2, phoneWeight = 0.1;
+
+            Dictionary<Guid, double> scored = filteredUser.ToDictionary(
+                u => u.UserId,
+                u =>    fullnameWeight * scoreFullName[u.FullName] + 
+                        usernameWeight * scoreUsername[u.Username] + 
+                        emailWeight * scoreEmail[u.Email] + 
+                        phoneWeight * scorePhone[u.PhoneNumber ?? ""]
+            );
+
+            // Sap xep theo scored:
+            filteredUser = filteredUser.OrderByDescending(u => scored[u.UserId]).ToList();
+
+            // ap dung filter, pagination (khong ap dung order)
+            if (pagination.Filters != null)
+                filteredUser = UserRepository.ApplyFilter(filteredUser, pagination.Filters);
+            filteredUser = filteredUser.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 20).ToList();
 
             // Trả về thành công
-            PaginationResponseModel<ViewUser> res = new()
-            {
-                Total = filteredUser.Count,
-                Limit = pagination.Limit,
-                Offset = pagination.Offset,
-                Results = UserRepository.ApplyPagination(lsUser, pagination)
-            };
-            return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, filteredUser);
         }
 
         public async Task<ServiceResult> UpdateMyAvatarImage(Guid uid, IFormFile avatar)
