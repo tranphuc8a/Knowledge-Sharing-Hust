@@ -75,6 +75,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await query.ToListAsync();
         }
 
+        public virtual async Task<List<ViewUserRelation>> GetFriendsByUserId(Guid userId)
+        {
+            return await DbContext.ViewUserRelations.Where(
+                    rel => rel.UserRelationType == EUserRelationType.Friend
+                    && (rel.SenderId == userId || rel.ReceiverId == userId)
+            ).ToListAsync();
+        }
+
         public virtual async Task<List<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type)
         {
             // Sử dụng biến 'userIdProperty' để đại diện cho SenderId hay ReceiverId dựa trên 'isActive'

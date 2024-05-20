@@ -44,8 +44,8 @@ export default {
         }
     },
     async created(){
-        this.refresh();
-        this.initItems();
+        await this.initItems();
+        await this.refresh();
     },
     async mounted(){
     },

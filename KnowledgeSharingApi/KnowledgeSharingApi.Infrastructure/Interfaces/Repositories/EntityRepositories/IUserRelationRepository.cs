@@ -52,6 +52,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         Task<List<ViewUserRelation>> GetByUserId(Guid userId, bool isActive);
 
         /// <summary>
+        /// Lấy về danh sách ban be cua user 
+        /// </summary>
+        /// <param name="userId"> Id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/5/24)
+        /// Modified: None
+        Task<List<ViewUserRelation>> GetFriendsByUserId(Guid userId);
+
+        /// <summary>
         /// Lấy về danh sách quan hệ theo UserId và loại quan hệ
         /// </summary>
         /// <param name="userId"> Id của user cần lấy </param>

@@ -50,6 +50,22 @@ class CurrentUser extends ViewUser {
         }
     }
 
+    /**
+     * Xóa đối tượng người dùng hiện tại (Singleton) khỏi local storage
+     * @param none
+     * @returns none
+     * @Created PhucTV (20/5/24)
+     * @Modified None
+     */
+    static async deleteInstance(){
+        try {
+            await localStorage.removeItem('currentUser');
+            this._instance = null;
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     init() {
         return new CurrentUser();
     }

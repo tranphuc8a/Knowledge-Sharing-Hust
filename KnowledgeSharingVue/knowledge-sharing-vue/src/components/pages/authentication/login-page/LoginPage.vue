@@ -95,14 +95,14 @@ export default {
     },
     async mounted(){
         // Check if loged in
-        let isLogedIn = await new GetRequest().checkLogedIn();
-        if (isLogedIn === true){
-            let lastUrl = localStorage.getItem("redirect-to");
-            if (Validator.isEmpty(lastUrl)){
-                lastUrl = '/'; // to home page
-            }
-            this.$router.push(lastUrl);
-        }
+        // let isLogedIn = await new GetRequest().checkLogedIn();
+        // if (isLogedIn === true){
+        //     let lastUrl = localStorage.getItem("redirect-to");
+        //     if (Validator.isEmpty(lastUrl)){
+        //         lastUrl = '/'; // to home page
+        //     }
+        //     this.$router.push(lastUrl);
+        // }
 
         // prepare data
         this.getLabel();

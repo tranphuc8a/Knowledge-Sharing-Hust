@@ -18,7 +18,9 @@ import ProfileBlockeeContent from '@/components/pages/desktop/profile/subpages/p
 
 import ProfileImageSubpage from '@/components/pages/desktop/profile/subpages/profile-image/ProfileImageSubpage.vue';
 
-
+import ProfileAccountSubpage from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountSubpage.vue';
+import ProfileAccountChangePasswordContent from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountChangePasswordContent.vue';
+import ProfileAccountLogoutContent from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountLogoutContent.vue';
 
 const profileRouter = [
     {
@@ -142,7 +144,22 @@ const profileRouter = [
             }, { // when /profile.../account
                 path: 'account',
                 name: 'profile-account-page',
-                component: null, 
+                component: ProfileAccountSubpage,
+                children: [
+                    {
+                        path: '',
+                        name: 'profile-account-home',
+                        component: ProfileAccountChangePasswordContent,
+                    }, {
+                        path: 'change-password',
+                        name: 'profile-account-change-password',
+                        component: ProfileAccountChangePasswordContent,
+                    }, {
+                        path: 'logout',
+                        name: 'profile-account-logout',
+                        component: ProfileAccountLogoutContent,
+                    }
+                ]
             }
         ],
     }
