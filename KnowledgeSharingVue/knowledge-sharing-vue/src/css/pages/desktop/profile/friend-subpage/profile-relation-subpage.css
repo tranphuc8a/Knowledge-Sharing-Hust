@@ -1,0 +1,42 @@
+
+
+.p-profile-friend-subpage{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 32px;
+}
+
+
+.p-profile-friend-subpage .p-profile-friend-card{
+    width: 100%;
+    padding: 16px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 32px;
+}
+
+.p-profile-friend-subpage .p-profile-friend-card > * {
+    width: 100%;
+}
+
+
+.p-profile-friend-subpage .p-profile-friend-header{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.p-profile-friend-subpage .p-pfh-heading{
+    font-family: 'ks-font-semibold';
+    font-size: 24px;
+}
+
+
+

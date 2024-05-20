@@ -151,14 +151,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<List<ViewLesson>> GetPublicPostsByUserId(Guid userId)
         {
-            return await DbContext.ViewLessons.Where(les => les.UserId == userId)
+            return await DbContext.ViewLessons.Where(les => les.UserId == userId && les.Privacy == EPrivacy.Public)
                 .OrderByDescending(les => les.CreatedTime).ToListAsync();
         }
 
         public async Task<List<ViewLesson>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
         {
             return await ApplyPagination(
-                DbContext.ViewLessons.Where(les => les.UserId == userId)
+                DbContext.ViewLessons.Where(les => les.UserId == userId && les.Privacy == EPrivacy.Public)
                 .OrderByDescending(les => les.CreatedTime), pagination).ToListAsync();
         }
 
@@ -169,7 +169,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Select(ct => ct.KnowledgeCategoryId);
             return await ApplyPagination(
                     DbContext.ViewLessons
-                    .Where(les => listKnIds.Contains(les.UserItemId))
+                    .Where(les => listKnIds.Contains(les.UserItemId) && les.Privacy == EPrivacy.Public)
                     .OrderByDescending(les => les.CreatedTime),
                     pagination
                 ).ToListAsync();

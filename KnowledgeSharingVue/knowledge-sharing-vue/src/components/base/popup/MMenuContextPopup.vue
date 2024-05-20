@@ -7,7 +7,7 @@
         <template #popupContextContent>
             <div class="p-popup-menu-context-content">
                 <template v-for="(option, index) in listOptions" :key="option.key ?? index">
-                    <div class="p-popup-menu-context-option" @:click="resolveClickItem(option.onclick)">
+                    <div class="p-popup-menu-context-option" @:click.stop="resolveClickItem(option.onclick)">
                         <MIcon :style="iconStyle" :fa="option.fa" :family="option.family" />
                         <span> {{ option.label }} </span>
                     </div>

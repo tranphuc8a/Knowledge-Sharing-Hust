@@ -31,7 +31,7 @@ let icon = {
             if (this.dState != 'normal') return;
             try {
                 this.dState = 'loading';
-                await this.onclick();
+                await this.onclick?.();
             } catch (e) {
                 console.error(e);
             }

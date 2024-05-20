@@ -181,13 +181,13 @@ class StringAlgorithm{
      * @Created PhucTV (17/5/24)
      * @Modified None
      */
-    static ngramSimilarity(a, b) {
+    static ngramCharacterSimilarity(a, b) {
         try {
             if (Validator.isEmpty(a) || Validator.isEmpty(b)) 
                 return 0;
 
-            let mapGramOfStringA = this.getMapGram(a);
-            let mapGramOfStringB = this.getMapGram(b);
+            let mapGramOfStringA = this.getMapGramCharacter(a);
+            let mapGramOfStringB = this.getMapGramCharacter(b);
 
             let score = 0;
             for (let gram in mapGramOfStringA) {
@@ -195,7 +195,7 @@ class StringAlgorithm{
                     let countInA = mapGramOfStringA[gram];
                     let countInB = mapGramOfStringB[gram];
                     let gramLength = gram.length;
-                    let addScore = countInA * countInB * gramLength * gramLength;
+                    let addScore = countInA * countInB * gramLength * gramLength / 1000;
                     score += addScore;
                 }
             }
@@ -207,7 +207,39 @@ class StringAlgorithm{
         }
     }
 
-    static getMapGram(text){
+    static ngramCharacterSimilarityList(search, listText){
+        try {
+            let mapScore = {};
+            if (Validator.isEmpty(listText)) return mapScore;
+            for (let text in listText){
+                mapScore[text] = 0;
+            }
+            // calculate n-gram of search string
+            let mapGramOfStringA = this.getMapGramCharacter(Unicode.unicodeToAscii(search).toLowerCase());
+
+            // calculate n-gram of each text in listText
+            for (let text of listText){
+                let mapGramOfStringB = this.getMapGramCharacter(Unicode.unicodeToAscii(text).toLowerCase());
+                let score = 0;
+                for (let gram in mapGramOfStringA) {
+                    if (mapGramOfStringB[gram] !== undefined) {
+                        let countInA = mapGramOfStringA[gram];
+                        let countInB = mapGramOfStringB[gram];
+                        let gramLength = gram.length;
+                        let addScore = countInA * countInB * gramLength * gramLength / 1000;
+                        score += addScore;
+                    }
+                }
+                mapScore[text] = score;
+            }
+            return mapScore;
+        } catch (e) {
+            console.error(e);
+            return {};
+        }
+    }
+
+    static getMapGramCharacter(text){
         if (Validator.isEmpty(text)) return {};
         let mapGram = {};
         let words = text.split(" ").filter(word => word.length > 0);
@@ -227,26 +259,78 @@ class StringAlgorithm{
         return mapGram;
     }
 
-    static ngramSimilarityList(search, listText){
+    static getMapGramWord(text) {
+        if (!text || text.trim() === '') {
+            return {};
+        }
+        
+        const mapGram = {};
+        const words = text.split(/\s+/).filter(word => word !== '');
+        
+        const maxWords = 100; // only focus first 100 words of text
+        if (words.length > maxWords) {
+            words.splice(maxWords);
+        }
+        
+        const sentenceLength = words.length;
+        
+        for (let l = 1; l <= sentenceLength; l++) {
+            for (let startIndex = 0; startIndex <= sentenceLength - l; startIndex++) {
+                const gram = words.slice(startIndex, startIndex + l).join(' ');
+                if (!gram.trim()) continue;
+                    mapGram[gram] = (mapGram[gram] || 0) + 1;
+            }
+        }
+        
+        return mapGram;
+    }
+    
+    static getNgramWordSimilarity(a, b) {
         try {
-            let mapScore = {};
-            if (Validator.isEmpty(listText)) return mapScore;
-            for (let text in listText){
+            if (a == null || a.trim() === '' || b == null || b.trim() === '') {
+            return 0;
+            }
+        
+            const mapGramOfStringA = this.getMapGramWord(Unicode.unicodeToAscii(a).ToLowerCase());
+            const mapGramOfStringB = this.getMapGramWord(Unicode.unicodeToAscii(b).ToLowerCase());
+        
+            let score = 0;
+            for (const [gram, countInA] of Object.entries(mapGramOfStringA)) {
+                if (mapGramOfStringB[gram]) {
+                    const countInB = mapGramOfStringB[gram];
+                    const gramLength = gram.length;
+                    const addScore = countInA * countInB * gramLength * gramLength / 100;
+                    score += addScore;
+                }
+            }
+        
+            return score;
+        } catch (e) {
+            console.error(e);
+            return 0;
+        }
+    }
+
+    static ngramWordSimilarityList(search, listText) {
+        try {
+            const mapScore = {};
+            if (!listText || listText.length === 0) {
+                return mapScore;
+            }
+            for (const text of listText) {
                 mapScore[text] = 0;
             }
-            // calculate n-gram of search string
-            let mapGramOfStringA = this.getMapGram(Unicode.unicodeToAscii(search).toLowerCase());
-
-            // calculate n-gram of each text in listText
-            for (let text of listText){
-                let mapGramOfStringB = this.getMapGram(Unicode.unicodeToAscii(text).toLowerCase());
+        
+            const mapGramOfStringA = this.getMapGramWord(Unicode.unicodeToAscii(search).ToLowerCase());
+        
+            for (const text of listText) {
+                const mapGramOfStringB = this.getMapGramWord(Unicode.unicodeToAscii(text).ToLowerCase());
                 let score = 0;
-                for (let gram in mapGramOfStringA) {
-                    if (mapGramOfStringB[gram] !== undefined) {
-                        let countInA = mapGramOfStringA[gram];
-                        let countInB = mapGramOfStringB[gram];
-                        let gramLength = gram.length;
-                        let addScore = countInA * countInB * gramLength * gramLength;
+                for (const [gram, countInA] of Object.entries(mapGramOfStringA)) {
+                    if (mapGramOfStringB[gram]) {
+                        const countInB = mapGramOfStringB[gram];
+                        const gramLength = gram.length;
+                        const addScore = countInA * countInB * gramLength * gramLength / 100;
                         score += addScore;
                     }
                 }
@@ -258,6 +342,7 @@ class StringAlgorithm{
             return {};
         }
     }
+    
 
     /**
      * Calculate the harmonic mean of the lengths of two strings
@@ -309,15 +394,20 @@ class StringAlgorithm{
         // let res = Criteria.aggregateUsingAverage(jacScore*jacWeight, lcsScore*lcsWeight, levScore*levWeight, lcscScore*lcscWeight);
         // return res;
 
-        return this.ngramSimilarity(a, b);
+        return this.ngramCharacterSimilarity(a, b);
     }
 
     static similiarityList(search, listText){
-        // search = Unicode.unicodeToAscii(search).toLowerCase();
-        // listText = listText.map(text => {
-        //     return Unicode.unicodeToAscii(text).toLowerCase();
-        // });
-        return this.ngramSimilarityList(search, listText);
+        const characterLevels = this.ngramCharacterSimilarityList(search, listText);
+        const wordLevels = this.ngramWordSimilarityList(search, listText);
+
+        return [...new Set(listText)].reduce((result, text) => {
+            const characterScore = characterLevels[text] || 0;
+            const wordScore = wordLevels[text] || 0;
+            result[text] = characterScore + wordScore;
+            return result;
+        }, {});
+        // return this.ngramCharacterSimilarityList(search, listText);
     }
 }
 

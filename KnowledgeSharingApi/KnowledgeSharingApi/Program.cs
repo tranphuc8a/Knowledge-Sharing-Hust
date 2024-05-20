@@ -12,6 +12,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Emails;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Markdown;
 using KnowledgeSharingApi.Infrastructures.Interfaces.OAuth2;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Request;
@@ -156,6 +157,7 @@ builder.Services.AddScoped<ICoursePaymentRepository, CoursePaymentMySqlRepositor
 builder.Services.AddScoped<IDecorationRepository, SingletonDecorationRepository>();
 builder.Services.AddScoped<ICourseLessonRepository, CourseLessonMySqlRepository>();
 builder.Services.AddScoped<IImageRepository, ImageMySqlRepository>();
+builder.Services.AddScoped<IAdministrationRepository, AdministrationRepository>();
 
 
 //

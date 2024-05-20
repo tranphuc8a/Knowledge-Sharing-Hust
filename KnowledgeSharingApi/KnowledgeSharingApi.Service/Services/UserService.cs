@@ -131,10 +131,10 @@ namespace KnowledgeSharingApi.Services.Services
             List<string> listEmail = lsUser.Select(fu => fu.Email).ToList();
             List<string> listPhone = lsUser.Select(fu => fu.PhoneNumber ?? "").ToList();
 
-            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(searchKey, listFullname);
-            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(searchKey, listUsername);
-            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(searchKey, listEmail);
-            Dictionary<string, double> scorePhone = Algorithm.NgramSimilarityList(searchKey, listPhone);
+            Dictionary<string, double> scoreFullName = Algorithm.SimilarityList(searchKey, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.SimilarityList(searchKey, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.SimilarityList(searchKey, listEmail);
+            Dictionary<string, double> scorePhone = Algorithm.SimilarityList(searchKey, listPhone);
 
             double fullnameWeight = 0.4, usernameWeight = 0.3, emailWeight = 0.2, phoneWeight = 0.1;
 
@@ -321,10 +321,10 @@ namespace KnowledgeSharingApi.Services.Services
             List<string> listEmail = filteredUser.Select(fu => fu.Email).ToList();
             List<string> listPhone = filteredUser.Select(fu => fu.PhoneNumber ?? "").ToList();
 
-            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(searchKey, listFullname);
-            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(searchKey, listUsername);
-            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(searchKey, listEmail);
-            Dictionary<string, double> scorePhone = Algorithm.NgramSimilarityList(searchKey, listPhone);
+            Dictionary<string, double> scoreFullName = Algorithm.SimilarityList(searchKey, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.SimilarityList(searchKey, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.SimilarityList(searchKey, listEmail);
+            Dictionary<string, double> scorePhone = Algorithm.SimilarityList(searchKey, listPhone);
 
             double fullnameWeight = 0.4, usernameWeight = 0.3, emailWeight = 0.2, phoneWeight = 0.1;
 

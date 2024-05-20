@@ -90,7 +90,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Select(cat => cat.KnowledgeId);
             return await ApplyPagination(
                     DbContext.ViewCourses
-                    .Where(c => listKnowledgeIds.Contains(c.UserItemId))
+                    .Where(c => listKnowledgeIds.Contains(c.UserItemId) && c.Privacy == EPrivacy.Public)
                     .OrderByDescending(c => c.CreatedTime),
                     pagination)
                 .ToListAsync();
@@ -99,7 +99,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public virtual async Task<List<ViewCourse>> GetPublicViewCourseOfUser(Guid userId)
         {
             return await DbContext.ViewCourses
-                .Where(c => c.UserId == userId)
+                .Where(c => c.UserId == userId && c.Privacy == EPrivacy.Public)
                 .OrderByDescending(c => c.CreatedTime)
                 .ToListAsync();
         }

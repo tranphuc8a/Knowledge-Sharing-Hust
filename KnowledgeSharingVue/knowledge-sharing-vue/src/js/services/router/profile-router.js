@@ -6,6 +6,21 @@ import ProfileLearnSubpage from '@/components/pages/desktop/profile/subpages/pro
 import ProfileLessonSubpage from '@/components/pages/desktop/profile/subpages/profile-lesson/ProfileLessonSubpage.vue';
 import ProfileQuestionSubpage from '@/components/pages/desktop/profile/subpages/profile-question/ProfileQuestionSubpage.vue';
 
+import ProfileRelationSubpage from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileRelationSubpage.vue';
+import ProfileFriendContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileFriendContent.vue';
+import ProfileFollowerContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileFollowerContent.vue';
+import ProfileFolloweeContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileFolloweeContent.vue';
+import ProfileRequesterContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileRequesterContent.vue';
+import ProfileRequesteeContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileRequesteeContent.vue';
+import ProfileBlockerContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileBlockerContent.vue';
+import ProfileBlockeeContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileBlockeeContent.vue';
+
+
+import ProfileImageSubpage from '@/components/pages/desktop/profile/subpages/profile-image/ProfileImageSubpage.vue';
+
+import ProfileAccountSubpage from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountSubpage.vue';
+import ProfileAccountChangePasswordContent from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountChangePasswordContent.vue';
+import ProfileAccountLogoutContent from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountLogoutContent.vue';
 
 const profileRouter = [
     {
@@ -47,7 +62,49 @@ const profileRouter = [
             }, { // when /profile.../friend
                 path: 'friend',
                 name: 'profile-friend-page',
-                component: null, 
+                component: ProfileRelationSubpage, 
+                children: [
+                    { // when /profile/.../friend/
+                        path: '',
+                        name: 'profile-friend-home',
+                        component: ProfileFriendContent,
+                    },
+                    { // when /profile/.../friend/friend
+                        path: 'friend',
+                        name: 'profile-friend-friend',
+                        component: ProfileFriendContent,
+                    },
+                    { // when /profile/.../friend/follower
+                        path: 'follower',
+                        name: 'profile-friend-follower',
+                        component: ProfileFollowerContent,
+                    },
+                    { // when /profile/.../friend/followee
+                        path: 'followee',
+                        name: 'profile-friend-followee',
+                        component: ProfileFolloweeContent,
+                    },
+                    { // when /profile/.../friend/requester
+                        path: 'requester',
+                        name: 'profile-friend-requester',
+                        component: ProfileRequesterContent,
+                    },
+                    { // when /profile/.../friend/requestee
+                        path: 'requestee',
+                        name: 'profile-friend-requestee',
+                        component: ProfileRequesteeContent,
+                    },
+                    { // when /profile/.../friend/blocker
+                        path: 'blocker',
+                        name: 'profile-friend-blocker',
+                        component: ProfileBlockerContent,
+                    },
+                    { // when /profile/.../friend/blockee
+                        path: 'blockee',
+                        name: 'profile-friend-blockee',
+                        component: ProfileBlockeeContent,
+                    },
+                ]
             }, { // when /profile.../star
                 path: 'star',
                 name: 'profile-star-page',
@@ -63,7 +120,7 @@ const profileRouter = [
             }, { // when /profile.../image
                 path: 'image',
                 name: 'profile-image-page',
-                component: null, 
+                component: ProfileImageSubpage, 
             }, { // when /profile.../message
                 path: 'message',
                 name: 'profile-message-page',
@@ -87,7 +144,22 @@ const profileRouter = [
             }, { // when /profile.../account
                 path: 'account',
                 name: 'profile-account-page',
-                component: null, 
+                component: ProfileAccountSubpage,
+                children: [
+                    {
+                        path: '',
+                        name: 'profile-account-home',
+                        component: ProfileAccountChangePasswordContent,
+                    }, {
+                        path: 'change-password',
+                        name: 'profile-account-change-password',
+                        component: ProfileAccountChangePasswordContent,
+                    }, {
+                        path: 'logout',
+                        name: 'profile-account-logout',
+                        component: ProfileAccountLogoutContent,
+                    }
+                ]
             }
         ],
     }

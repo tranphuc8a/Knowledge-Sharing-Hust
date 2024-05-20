@@ -23,6 +23,7 @@ namespace KnowledgeSharingApi.Services.Services
         IUserRepository userRepository,
         IResourceFactory resourceFactory,
         IQuestionService questionService,
+        ICalculateKnowledgeSearchScore calculateKnowledgeSearchScore,
         IDecorationRepository decorationRepository,
         IKnowledgeRepository knowledgeRepository,
         ILessonService lessonService
@@ -35,6 +36,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IQuestionService QuestionService = questionService;
         protected readonly ILessonService LessonService = lessonService;
         protected readonly IKnowledgeRepository KnowledgeRepository = knowledgeRepository;
+        protected readonly ICalculateKnowledgeSearchScore CalculateKnowledgeSearchScore = calculateKnowledgeSearchScore;
 
         protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
         protected readonly IEntityResource EntityResource = resourceFactory.GetEntityResource();
@@ -260,6 +262,139 @@ namespace KnowledgeSharingApi.Services.Services
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(PostResource), string.Empty, res);
         }
+        #endregion
+
+
+        #region Search APIes
+
+        public async Task<ServiceResult> UserSearchPost(Guid myUid, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewPost> listPost = await PostRepository.GetPublicPosts();
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listPost = PostRepository.ApplyFilter(listPost, pagination.Filters);
+            }
+            listPost = listPost.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponsePostModel> res = await DecorationRepository.DecorateResponsePostModel(myUid, listPost);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public async Task<ServiceResult> UserSearchMyPost(Guid myUid, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewPost> listPost = await PostRepository.GetByUserId(myUid);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listPost = PostRepository.ApplyFilter(listPost, pagination.Filters);
+            }
+            listPost = listPost.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponsePostModel> res = await DecorationRepository.DecorateResponsePostModel(myUid, listPost);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public async Task<ServiceResult> UserSearchUserPost(Guid myUid, Guid userId, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewPost> listPost = await PostRepository.GetPublicPostsByUserId(userId);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listPost = PostRepository.ApplyFilter(listPost, pagination.Filters);
+            }
+            listPost = listPost.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponsePostModel> res = await DecorationRepository.DecorateResponsePostModel(myUid, listPost);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public async Task<ServiceResult> AdminSearchUserPost(Guid userId, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewPost> listPost = await PostRepository.GetByUserId(userId);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listPost = PostRepository.ApplyFilter(listPost, pagination.Filters);
+            }
+            listPost = listPost.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponsePostModel> res = await DecorationRepository.DecorateResponsePostModel(null, listPost);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
         #endregion
     }
 }

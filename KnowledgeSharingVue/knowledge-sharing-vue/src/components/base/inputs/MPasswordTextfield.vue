@@ -1,6 +1,7 @@
 <template>
     <MTextField :placeholder="placeholder" :type="passwordType" ref="input"
-        :autocomplete="autocomplete" :validator="validator" :errorMessage="errorMessage">
+        :autocomplete="autocomplete" :validator="validator" :errorMessage="errorMessage"
+        :oninput="oninput">
         <div class="p-password-icon" @:click="resolveClickPasswordIcon">
             <MIcon fa="eye-slash" :style="iconStyle" v-show="passwordType !== 'password'"/>
             <MIcon fa="eye" :style="iconStyle" v-show="passwordType === 'password'"/>
@@ -81,6 +82,7 @@ export default{
     props: {
         validator: input.props.validator,
         errorMessage: input.props.errorMessage,
+        oninput: {},
         placeholder: {},
         autocomplete: {}
     }

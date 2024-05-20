@@ -449,7 +449,7 @@ namespace KnowledgeSharingApi.Services.Services
                     com => MarkdownConverter.GetPureText(com.Content)
             );
             List<string> contents = listComments.Select(com => normalizedContents[com.UserItemId]).ToList();
-            Dictionary<string, double> scoreContent = Algorithm.NgramSimilarityList(search, contents);
+            Dictionary<string, double> scoreContent = Algorithm.SimilarityList(search, contents);
             Dictionary<Guid, double> scored = listComments.ToDictionary(
                 com => com.UserItemId,
                 com => scoreContent[normalizedContents[com.UserItemId]]
@@ -489,7 +489,7 @@ namespace KnowledgeSharingApi.Services.Services
                     com => MarkdownConverter.GetPureText(com.Content)
             );
             List<string> contents = listComments.Select(com => normalizedContents[com.UserItemId]).ToList();
-            Dictionary<string, double> scoreContent = Algorithm.NgramSimilarityList(search, contents);
+            Dictionary<string, double> scoreContent = Algorithm.SimilarityList(search, contents);
             Dictionary<Guid, double> scored = listComments.ToDictionary(
                 com => com.UserItemId,
                 com => scoreContent[normalizedContents[com.UserItemId]]
@@ -529,7 +529,7 @@ namespace KnowledgeSharingApi.Services.Services
                     com => MarkdownConverter.GetPureText(com.Content)
             );
             List<string> contents = listComments.Select(com => normalizedContents[com.UserItemId]).ToList();
-            Dictionary<string, double> scoreContent = Algorithm.NgramSimilarityList(search, contents);
+            Dictionary<string, double> scoreContent = Algorithm.SimilarityList(search, contents);
             Dictionary<Guid, double> scored = listComments.ToDictionary(
                 com => com.UserItemId,
                 com => scoreContent[normalizedContents[com.UserItemId]]

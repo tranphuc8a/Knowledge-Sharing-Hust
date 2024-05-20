@@ -56,72 +56,99 @@ namespace KnowledgeSharingApi.Services.Services
 
         /// <summary>
         /// Lấy danh sách toàn bộ bạn bè của userId
-        /// Đảm bảo rằng userid phải đã tồn tại rồi
+        /// Đảm bảo rằng userId phải đã tồn tại rồi
         /// </summary>
-        /// <param name="userid"> id của user cần lấy </param>
+        /// <param name="userId"> id của user cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (19/3/24)
         /// Modified: None
-        protected virtual async Task<List<ResponseFriendCardModel>> GetAllFriends(Guid userid)
+        //protected virtual async Task<List<ResponseFriendCardModel>> GetAllFriends(Guid userId)
+        //{
+        //    // Danh sách bạn bè mà mình là người gửi lời mời
+        //    List<ViewUserRelation> ls1 =
+        //        (await UserRelationRepository.GetByUserIdAndType(userId, isActive: true, EUserRelationType.Friend));
+        //    List<ResponseFriendCardModel> lsFriend1 = ls1.Select(
+        //        relation => new ResponseFriendCardModel()
+        //        {
+        //            FriendId = relation.UserRelationId,
+        //            UserId = relation.ReceiverId,
+        //            Email = relation.ReceiverEmail,
+        //            Username = relation.ReceiverUsername,
+        //            FullName = relation.ReceiverName,
+        //            Avatar = relation.ReceiverAvatar,
+        //            Time = relation.Time,
+        //            IsActive = true,
+        //            CreatedBy = relation.CreatedBy,
+        //            CreatedTime = relation.CreatedTime,
+        //            ModifiedBy = relation.ModifiedBy,
+        //            ModifiedTime = relation.ModifiedTime
+        //        }).ToList();
+
+        //    // Danh sách bạn bè mà mình là người nhận lời mời
+        //    List<ViewUserRelation> ls2 =
+        //        (await UserRelationRepository.GetByUserIdAndType(userId, isActive: false, EUserRelationType.Friend));
+        //    List<ResponseFriendCardModel> lsFriend2 = ls2.Select(
+        //        relation => new ResponseFriendCardModel()
+        //        {
+        //            FriendId = relation.UserRelationId,
+        //            UserId = relation.SenderId,
+        //            Email = relation.SenderEmail,
+        //            Username = relation.SenderUsername,
+        //            FullName = relation.SenderName,
+        //            Avatar = relation.SenderAvatar,
+        //            Time = relation.Time,
+        //            IsActive = false,
+        //            CreatedBy = relation.CreatedBy,
+        //            CreatedTime = relation.CreatedTime,
+        //            ModifiedBy = relation.ModifiedBy,
+        //            ModifiedTime = relation.ModifiedTime
+        //        }).ToList();
+
+        //    // Combine and return
+        //    List<ResponseFriendCardModel> listed = [.. lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time)];
+        //    return listed;
+        //}
+        protected virtual async Task<List<ResponseFriendCardModel>> GetAllFriends(Guid userId)
         {
-            // Danh sách bạn bè mà mình là người gửi lời mời
-            List<ViewUserRelation> ls1 =
-                (await UserRelationRepository.GetByUserIdAndType(userid, isActive: true, EUserRelationType.Friend));
-            List<ResponseFriendCardModel> lsFriend1 = ls1.Select(
-                relation => new ResponseFriendCardModel()
+            List<ViewUserRelation> friends = await UserRelationRepository.GetFriendsByUserId(userId);
+            List<ResponseFriendCardModel> listFriends = friends.Select(fri =>
+            {
+                bool isActive = fri.SenderId == userId;
+                ResponseFriendCardModel res = new()
                 {
-                    FriendId = relation.UserRelationId,
-                    UserId = relation.ReceiverId,
-                    Email = relation.ReceiverEmail,
-                    Username = relation.ReceiverUsername,
-                    FullName = relation.ReceiverName,
-                    Avatar = relation.ReceiverAvatar,
-                    Time = relation.Time,
-                    IsActive = true,
-                    CreatedBy = relation.CreatedBy,
-                    CreatedTime = relation.CreatedTime,
-                    ModifiedBy = relation.ModifiedBy,
-                    ModifiedTime = relation.ModifiedTime
-                }).ToList();
+                    CreatedBy = fri.CreatedBy,
+                    CreatedTime = fri.CreatedTime,
+                    ModifiedBy = fri.ModifiedBy,
+                    ModifiedTime = fri.ModifiedTime,
 
-            // Danh sách bạn bè mà mình là người nhận lời mời
-            List<ViewUserRelation> ls2 =
-                (await UserRelationRepository.GetByUserIdAndType(userid, isActive: false, EUserRelationType.Friend));
-            List<ResponseFriendCardModel> lsFriend2 = ls2.Select(
-                relation => new ResponseFriendCardModel()
-                {
-                    FriendId = relation.UserRelationId,
-                    UserId = relation.SenderId,
-                    Email = relation.SenderEmail,
-                    Username = relation.SenderUsername,
-                    FullName = relation.SenderName,
-                    Avatar = relation.SenderAvatar,
-                    Time = relation.Time,
-                    IsActive = false,
-                    CreatedBy = relation.CreatedBy,
-                    CreatedTime = relation.CreatedTime,
-                    ModifiedBy = relation.ModifiedBy,
-                    ModifiedTime = relation.ModifiedTime
-                }).ToList();
+                    FriendId = fri.UserRelationId,
+                    UserId = isActive ? fri.ReceiverId : fri.SenderId,
+                    Email = isActive ? fri.ReceiverEmail : fri.SenderEmail,
+                    Username = isActive ? fri.ReceiverUsername : fri.SenderUsername,
+                    FullName = isActive ? fri.ReceiverName : fri.SenderName,
+                    Avatar = isActive ? fri.ReceiverAvatar : fri.SenderAvatar,
+                    Time = fri.Time,
+                    IsActive = isActive
+                };
+                return res;
+            }).ToList();
 
-            // Combine and return
-            List<ResponseFriendCardModel> listed = [.. lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time)];
-            return listed;
+            return listFriends;
         }
         /// <summary>
         /// Lấy danh sách toàn bộ quan he cua user
-        /// Đảm bảo rằng userid phải đã tồn tại rồi
+        /// Đảm bảo rằng userId phải đã tồn tại rồi
         /// </summary>
-        /// <param name="userid"> id của user cần lấy </param>
+        /// <param name="userId"> id của user cần lấy </param>
         /// <param name="isActive"> user co chu dong thuc hien quan he khong </param>
         /// <param name="relationType"> Loai quan he </param>
         /// <returns></returns>
         /// Created: PhucTV (19/3/24)
         /// Modified: None
-        protected virtual async Task<List<ResponseFriendCardModel>> GetAllRelations(Guid userid, EUserRelationType relationType, bool isActive)
+        protected virtual async Task<List<ResponseFriendCardModel>> GetAllRelations(Guid userId, EUserRelationType relationType, bool isActive)
         {
             // Lấy danh sách quan hệ relationType của uid
-            List<ViewUserRelation> ls1 = await UserRelationRepository.GetByUserIdAndType(userid, isActive: isActive, relationType);
+            List<ViewUserRelation> ls1 = await UserRelationRepository.GetByUserIdAndType(userId, isActive: isActive, relationType);
             List<ResponseFriendCardModel> lsRelation = [.. ls1.Select(
                 relation => new ResponseFriendCardModel()
                 {
@@ -145,14 +172,14 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
         
         
-        public virtual async Task<ServiceResult> GetFriends(Guid userid, PaginationDto pagination)
+        public virtual async Task<ServiceResult> GetFriends(Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user id tồn tại
-            User? user = await UserRepository.Get(userid);
+            User? user = await UserRepository.Get(userId);
             if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
 
             // Lấy danh sách friends của uid
-            List<ResponseFriendCardModel> listed = await GetAllFriends(userid);
+            List<ResponseFriendCardModel> listed = await GetAllFriends(userId);
 
             // Phân trang và trả về thành công
             PaginationResponseModel<ResponseFriendCardModel> res = new()
@@ -164,13 +191,13 @@ namespace KnowledgeSharingApi.Services.Services
             };
             return ServiceResult.Success(ResponseResource.GetSuccess(), string.Empty, res);
         }
-        public virtual async Task<ServiceResult> GetRelations(Guid userid, EUserRelationType relationType, bool isActive, PaginationDto pagination)
+        public virtual async Task<ServiceResult> GetRelations(Guid userId, EUserRelationType relationType, bool isActive, PaginationDto pagination)
         {
             // Kiểm tra user id tồn tại
-            User? user = await UserRepository.Get(userid);
+            User? user = await UserRepository.Get(userId);
             if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
 
-            List<ResponseFriendCardModel> lsRelation = await GetAllRelations(userid, relationType, isActive);
+            List<ResponseFriendCardModel> lsRelation = await GetAllRelations(userId, relationType, isActive);
 
             // Phân trang và trả về thành công
             PaginationResponseModel<ResponseFriendCardModel> res = new()
@@ -197,9 +224,9 @@ namespace KnowledgeSharingApi.Services.Services
             List<string> listUsername = allFriends.Select(fu => fu.Username).ToList();
             List<string> listEmail = allFriends.Select(fu => fu.Email).ToList();
 
-            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(search, listFullname);
-            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(search, listUsername);
-            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(search, listEmail);
+            Dictionary<string, double> scoreFullName = Algorithm.SimilarityList(search, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.SimilarityList(search, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.SimilarityList(search, listEmail);
 
             double fullnameWeight = 0.5, usernameWeight = 0.3, emailWeight = 0.2;
 
@@ -237,9 +264,9 @@ namespace KnowledgeSharingApi.Services.Services
             List<string> listUsername = listRelations.Select(usRelation => usRelation.Username).ToList();
             List<string> listEmail = listRelations.Select(usRelation => usRelation.Email).ToList();
 
-            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(search, listFullname);
-            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(search, listUsername);
-            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(search, listEmail);
+            Dictionary<string, double> scoreFullName = Algorithm.SimilarityList(search, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.SimilarityList(search, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.SimilarityList(search, listEmail);
 
             double fullnameWeight = 0.5, usernameWeight = 0.3, emailWeight = 0.2;
 

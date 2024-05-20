@@ -70,5 +70,6 @@ export default {
     cursor: pointer;
     background-size: cover;
     background-position: center center;
+    box-shadow: 0px 0px 2px rgba(var(--primary-color-rgb), 0.76);
 }
 </style>

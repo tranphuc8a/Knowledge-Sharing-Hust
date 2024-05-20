@@ -26,6 +26,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly ICourseRepository CourseRepository;
         protected readonly IStarRepository StarRepository;
         protected readonly IUserRepository UserRepository;
+        protected readonly ICalculateKnowledgeSearchScore CalculateKnowledgeSearchScore;
         protected readonly IKnowledgeRepository KnowledgeRepository;
         protected readonly IDecorationRepository DecorationRepository;
         protected readonly ICategoryRepository CategoryRepository;
@@ -44,6 +45,7 @@ namespace KnowledgeSharingApi.Services.Services
             ICourseRepository courseRepository,
             IResourceFactory resourceFactory,
             IStarRepository starRepository,
+            ICalculateKnowledgeSearchScore calculateKnowledgeSearchScore,
             IUserRepository userRepository,
             IKnowledgeRepository knowledgeRepository,
             IDecorationRepository decorationRepository,
@@ -59,6 +61,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             CourseRepository = courseRepository;
             StarRepository = starRepository;
+            CalculateKnowledgeSearchScore = calculateKnowledgeSearchScore;
             CategoryRepository = categoryRepository;
             ImageRepository = imageRepository;
             UserRepository = userRepository;
@@ -134,7 +137,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region Admin Apies
-        public async Task<ServiceResult> AdminDeleteCourse(Guid courseId)
+        public virtual async Task<ServiceResult> AdminDeleteCourse(Guid courseId)
         {
             // Kiểm tra course tồn tại
             _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -147,7 +150,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(CourseResource));
         }
 
-        public async Task<ServiceResult> AdminGetCourseDetail(Guid courseId)
+        public virtual async Task<ServiceResult> AdminGetCourseDetail(Guid courseId)
         {
             // Kiểm tra tồn tại
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -157,7 +160,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetCourses(PaginationDto pagination)
+        public virtual async Task<ServiceResult> AdminGetCourses(PaginationDto pagination)
         {
             // Get
             List<ViewCourse> listCourses = 
@@ -171,7 +174,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetUserCourses(Guid userId, PaginationDto pagination)
+        public virtual async Task<ServiceResult> AdminGetUserCourses(Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
@@ -192,7 +195,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetUserRegisteredCourses(Guid userId, PaginationDto pagination)
+        public virtual async Task<ServiceResult> AdminGetUserRegisteredCourses(Guid userId, PaginationDto pagination)
         {
             // Check user existed
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
@@ -210,7 +213,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminListCourseOfCategory(string catName, PaginationDto pagination)
+        public virtual async Task<ServiceResult> AdminListCourseOfCategory(string catName, PaginationDto pagination)
         {
             // Get về
             List<ViewCourse> listCourses = 
@@ -226,7 +229,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Anonymous Apies
 
-        public async Task<ServiceResult> AnonymousGetCourseDetail(Guid courseId)
+        public virtual async Task<ServiceResult> AnonymousGetCourseDetail(Guid courseId)
         {
             // Kiểm tra course tồn tại và public
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -238,7 +241,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetCourses(PaginationDto pagination)
+        public virtual async Task<ServiceResult> AnonymousGetCourses(PaginationDto pagination)
         {
             // Get public courses
             List<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourse(pagination);
@@ -250,7 +253,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetListCourseOfCategory(string catName, PaginationDto pagination)
+        public virtual async Task<ServiceResult> AnonymousGetListCourseOfCategory(string catName, PaginationDto pagination)
         {
             // Get list public course by category
             List<ViewCourse> lsCourses = 
@@ -263,7 +266,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetUserCourses(Guid userId, PaginationDto pagination)
+        public virtual async Task<ServiceResult> AnonymousGetUserCourses(Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
@@ -288,7 +291,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region User operation
 
-        public async Task<ServiceResult> ChangePrivacy(Guid myUid, ChangeKnowledgePrivacyModel model)
+        public virtual async Task<ServiceResult> ChangePrivacy(Guid myUid, ChangeKnowledgePrivacyModel model)
         {
             // Kiểm tra course tồn tại và owner
             Course course = await CourseRepository.CheckExisted(model.KnowledgeId ?? Guid.Empty, NotExistedCourse);
@@ -303,7 +306,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.UpdateSuccess(CourseResource));
         }
 
-        public async Task<ServiceResult> UserCreateCourse(Guid myUid, CreateCourseModel model)
+        public virtual async Task<ServiceResult> UserCreateCourse(Guid myUid, CreateCourseModel model)
         {
             // Kiểm tra myUid tồn tại
             ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
@@ -330,7 +333,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.InsertSuccess(CourseResource), string.Empty, course);
         }
 
-        public async Task<ServiceResult> UserDeleteCourse(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserDeleteCourse(Guid myUid, Guid courseId)
         {
             // Check course existed and owner
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -352,7 +355,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(CourseResource));
         }
 
-        public async Task<ServiceResult> UserUpdateCourse(Guid myUid, Guid courseId, UpdateCourseModel model)
+        public virtual async Task<ServiceResult> UserUpdateCourse(Guid myUid, Guid courseId, UpdateCourseModel model)
         {
             // Check course existed and owner
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -385,7 +388,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
         
         #region User get apies
-        public async Task<ServiceResult> UserGetCourseDetail(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserGetCourseDetail(Guid myUid, Guid courseId)
         {
             // Kiểm tra course tồn tại
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -401,7 +404,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetListCourseOfCategory(Guid myUid, string catName, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserGetListCourseOfCategory(Guid myUid, string catName, PaginationDto pagination)
         {
             // Get về
             List<ViewCourse> listCourses =
@@ -414,7 +417,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetListCourses(Guid myUid, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserGetListCourses(Guid myUid, PaginationDto pagination)
         {
             // Get
             List<ViewCourse> listCourses =
@@ -428,7 +431,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMarkedCourses(Guid myUid, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserGetMarkedCourses(Guid myUid, PaginationDto pagination)
         {
             List<ViewCourse> lsCourses = 
                 await CourseRepository.GetMarkedCoursesOfUse(myUid, pagination);
@@ -438,7 +441,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyCourseDetail(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserGetMyCourseDetail(Guid myUid, Guid courseId)
         {
             // Check course existed and owner
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -452,7 +455,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyCourses(Guid myUid, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserGetMyCourses(Guid myUid, PaginationDto pagination)
         {
             // Lấy về
             List<ViewCourse> lsCourses = await CourseRepository.GetViewCourseOfUser(myUid);
@@ -470,7 +473,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyRegisteredCourses(Guid myUid, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserGetMyRegisteredCourses(Guid myUid, PaginationDto pagination)
         {
             // Lấy về 
             List<ViewCourseRegister> lsCourses = await CourseRepository.GetRegistersOfUser(myUid);
@@ -484,7 +487,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetUserCourses(Guid myUid, Guid userId, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserGetUserCourses(Guid myUid, Guid userId, PaginationDto pagination)
         {
             // Check user existed
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
@@ -502,6 +505,141 @@ namespace KnowledgeSharingApi.Services.Services
 
             // return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
+        }
+
+        #endregion
+
+
+
+        #region Search APIs
+
+
+        public virtual async Task<ServiceResult> UserSearchCourse(Guid myUid, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewCourse> listCourse = await CourseRepository.GetPublicViewCourse();
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listCourse
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Introduction, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listCourse = [.. listCourse.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listCourse = CourseRepository.ApplyFilter(listCourse, pagination.Filters);
+            }
+            listCourse = listCourse.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, listCourse);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public virtual async Task<ServiceResult> UserSearchMyCourse(Guid myUid, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewCourse> listCourse = await CourseRepository.GetViewCourseOfUser(myUid);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listCourse
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Introduction, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listCourse = [.. listCourse.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listCourse = CourseRepository.ApplyFilter(listCourse, pagination.Filters);
+            }
+            listCourse = listCourse.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, listCourse);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public virtual async Task<ServiceResult> UserSearchUserCourse(Guid myUid, Guid userId, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewCourse> listCourse = await CourseRepository.GetPublicViewCourseOfUser(userId);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listCourse
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Introduction, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listCourse = [.. listCourse.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listCourse = CourseRepository.ApplyFilter(listCourse, pagination.Filters);
+            }
+            listCourse = listCourse.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, listCourse);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public virtual async Task<ServiceResult> AdminSearchUserCourse(Guid userId, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewCourse> listCourse = await CourseRepository.GetViewCourseOfUser(userId);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listCourse
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Introduction, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listCourse = [.. listCourse.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listCourse = CourseRepository.ApplyFilter(listCourse, pagination.Filters);
+            }
+            listCourse = listCourse.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, listCourse);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
         #endregion
