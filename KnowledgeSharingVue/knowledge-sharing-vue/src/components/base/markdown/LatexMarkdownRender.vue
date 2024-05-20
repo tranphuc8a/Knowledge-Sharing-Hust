@@ -120,6 +120,7 @@ export default {
 
 <style scoped>
 .markdown-container{
+    max-width: 100%;
     font-size: inherit;
 }
 .katex svg {

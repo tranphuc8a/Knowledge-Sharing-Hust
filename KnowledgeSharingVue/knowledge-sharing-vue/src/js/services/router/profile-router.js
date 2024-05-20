@@ -15,6 +15,11 @@ import ProfileRequesteeContent from '@/components/pages/desktop/profile/subpages
 import ProfileBlockerContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileBlockerContent.vue';
 import ProfileBlockeeContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileBlockeeContent.vue';
 
+
+import ProfileImageSubpage from '@/components/pages/desktop/profile/subpages/profile-image/ProfileImageSubpage.vue';
+
+
+
 const profileRouter = [
     {
         path: '/profile/:username',
@@ -113,7 +118,7 @@ const profileRouter = [
             }, { // when /profile.../image
                 path: 'image',
                 name: 'profile-image-page',
-                component: null, 
+                component: ProfileImageSubpage, 
             }, { // when /profile.../message
                 path: 'message',
                 name: 'profile-message-page',

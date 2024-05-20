@@ -49,7 +49,7 @@ export default {
                     let url = "UserRelations/my/followees/search";
                     this.isMySelf = await this.getIsMySelf();
                     if (!this.isMySelf) {
-                        let userId = this.getUserId()?.UserId;
+                        let userId = this.getUser()?.UserId;
                         url = "UserRelations/followees/search/" + userId;
                     }
 
@@ -60,7 +60,7 @@ export default {
                     let url = "UserRelations/my/followees/";
                     this.isMySelf = await this.getIsMySelf();
                     if (!this.isMySelf) {
-                        let userId = this.getUserId()?.UserId;
+                        let userId = this.getUser()?.UserId;
                         url = "UserRelations/followees/" + userId;
                     }
 
@@ -82,7 +82,7 @@ export default {
                 let url = "UserRelations/my/followees/";
                 this.isMySelf = await this.getIsMySelf();
                 if (!this.isMySelf) {
-                    let userId = this.getUserId()?.UserId;
+                    let userId = this.getUser()?.UserId;
                     url = "UserRelations/followees/" + userId;
                 }
 

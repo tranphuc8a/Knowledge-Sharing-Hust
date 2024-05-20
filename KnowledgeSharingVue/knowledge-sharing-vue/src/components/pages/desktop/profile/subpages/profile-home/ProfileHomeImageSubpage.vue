@@ -86,14 +86,14 @@ export default {
             try {
                 let res = await new GetRequest('Images').execute();
                 let body = await Request.tryGetBody(res);
-                let listImages = body.slice(0, 9)
+                let listImages = body
                     .map(function(image){
                         return new Image().copy(image);
                     }).sort(function(a, b){
                         let createdTimeA = a.CreatedTime != null ? new MyDate(a.CreatedTime) : 0;
                         let createdTimeB = b.CreatedTime != null ? new MyDate(b.CreatedTime) : 0;
                         return createdTimeB - createdTimeA;
-                    });
+                    }).slice(0, 9);
                 this.filteredImages = listImages;
             } catch (e){
                 Request.resolveAxiosError(e);
