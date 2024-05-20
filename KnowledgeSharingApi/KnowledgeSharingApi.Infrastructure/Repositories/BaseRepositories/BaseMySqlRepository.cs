@@ -1,15 +1,19 @@
 ﻿using Dapper;
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Mysqlx.Crud;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +21,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 {
-    public abstract class BaseMySqlRepository<T> : IRepository<T> where T : Entity
+    public abstract class BaseMySqlRepository<T> : BaseRepository<T>, IRepository<T> where T : Entity
     {
         public IDbContext DbContext;
         protected string TableName;
@@ -40,32 +44,50 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             NameField = $"{TableName}Name";
         }
 
+        //protected abstract DbSet<T> GetDbContext();
+
         #region Get Records
-        public virtual async Task<IEnumerable<T>> Get()
+        public virtual async Task<List<T>> Get()
         {
             string sqlCommand = $"Select * from {TableName}";
-            return await Connection.QueryAsync<T>(sqlCommand, transaction: Transaction);
+            return (await Connection.QueryAsync<T>(sqlCommand, transaction: Transaction)).ToList();
         }
 
-        public virtual async Task<PaginationResponseModel<T>> Get(int limit, int offset)
+        public virtual async Task<PaginationResponseModel<T>> Get(PaginationDto page)
         {
+            //DbSet<T> dbContext = GetDbContext();
+            //int count = dbContext.Count();
+            //List<T> listObjects = await dbContext.Skip(offset).Take(limit).ToListAsync();
             string sqlCommand = $"Select * from {TableName} ";
-            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, new { limit, offset });
-            res.Limit = limit;
-            res.Offset = offset;
+            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, pagination: page);
+
             return res;
         }
 
         public virtual async Task<T?> Get(Guid id)
         {
             string sqlCommand = $"Select * from {TableName} where {TableNameId} = @id";
-            return await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id });
+            return (T?) (await Connection.QueryFirstOrDefaultAsync<T>(sqlCommand, new { id }))?.Clone();
         }
 
-        public virtual async Task<IEnumerable<T?>> Get(Guid[] ids)
+        public virtual async Task<List<T?>> Get(Guid[] ids)
         {
             string sqlCommand = $"Select * from {TableName} where {TableNameId} in @ids ";
-            return await Connection.QueryAsync<T>(sqlCommand, new { ids }, transaction: Transaction);
+            PropertyInfo? EntityId = typeof(T).GetProperty(TableNameId);
+            if (EntityId == null) return [];
+
+            Dictionary<Guid, T> dictRes =
+                (await Connection.QueryAsync<T>(sqlCommand, new { ids }, transaction: Transaction))
+                .ToDictionary(item => (Guid)EntityId.GetValue(item)!, item => item);
+            return ids.Select(id =>
+            {
+                if (dictRes.TryGetValue(id, out T? value))
+                {
+                    return value;
+                }
+                return null;
+            }).ToList();
+
         }
 
         #endregion
@@ -155,15 +177,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
 
         #region Filter Entities
-        public virtual async Task<IEnumerable<T>> Filter(string text)
+        public virtual async Task<List<T>> Filter(string text)
         {
             string templateText = $"%{text}%";
             string sqlCommand = $"Select * from {TableName} " +
                                 $"where {NameField} like @templateText or @text like CONCAT('%',{NameField},'%');";
-            return await Connection.QueryAsync<T>(sqlCommand, new { text, templateText });
+            return (await Connection.QueryAsync<T>(sqlCommand, new { text, templateText })).ToList();
         }
 
-        public virtual async Task<PaginationResponseModel<T>> Filter(string text, int limit, int offset)
+        public virtual async Task<PaginationResponseModel<T>> Filter(string text, PaginationDto pagination)
         {
             // Tạo truy vấn:
             string templateText = $"%{text}%";
@@ -172,10 +194,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
             PaginationResponseModel<T> res = await GetPagination<T>(
                 subCommand: subCommand,
-                parameters: new { templateText, limit, offset }
+                pagination: pagination,
+                subCommandParameters: new { templateText }
             );
-            res.Limit = limit;
-            res.Offset = offset;
             return res;
         }
 
@@ -188,21 +209,37 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         {
             this.Transaction = transaction;
         }
-        protected virtual async Task<PaginationResponseModel<Q>> GetPagination<Q>(string subCommand, object? parameters = null) where Q: Entity
+        protected virtual async Task<PaginationResponseModel<Q>> GetPagination<Q>(
+            string subCommand, 
+            PaginationDto pagination,
+            object? subCommandParameters = null) where Q : Entity
         {
+            DynamicParameters subParams = new(subCommandParameters);
+
+            string orderClause = GetOrderClause<Q>(pagination.Orders);
+            string limsetClause = GetLimitOffsetClause(pagination.Limit, pagination.Offset, out DynamicParameters limsetParams);
+            string whereClause = GetWhereClause<Q>(pagination.Filters, out DynamicParameters whereParams);
+
+            DynamicParameters totalParams = CombineDynamicParameters(subParams, limsetParams, whereParams);
+
+            // Tạo quy vấn
             string sqlCommand =
+                $"SET sql_require_primary_key=OFF; " +
                 $"CREATE TEMPORARY TABLE temp_selected_records AS {subCommand}; " +
                 $"SELECT COUNT(*) AS record_count FROM temp_selected_records; " +
-                $"SELECT * FROM temp_selected_records LIMIT @limit OFFSET @offset; " +
-                $"DROP TEMPORARY TABLE IF EXISTS temp_selected_records; ";
+                $"SELECT * FROM temp_selected_records {whereClause} {orderClause} {limsetClause}; " +
+                $"DROP TEMPORARY TABLE IF EXISTS temp_selected_records;";
+
 
             // Thực hiện truy vấn
-            using var multipleResults = await Connection.QueryMultipleAsync(sqlCommand, parameters, Transaction);
+            using var multipleResults = await Connection.QueryMultipleAsync(sqlCommand, totalParams, Transaction);
 
             return new PaginationResponseModel<Q>
             {
                 Total = multipleResults.Read<int>().Single(),
-                Results = multipleResults.Read<Q>()
+                Limit = pagination.Limit ?? 0,
+                Offset = pagination.Offset ?? 0,
+                Results = multipleResults.Read<Q>().ToList(),
             };
         }
 

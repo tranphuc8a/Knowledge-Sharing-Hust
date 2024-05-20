@@ -125,14 +125,18 @@ export default {
     height: fit-content;
     margin: 0;
     padding: 0;
+    max-width: 100%;
 }
 
+.p-limit-text-content{
+    max-width: 100%;
+}
 
 .p-collapse-button{
     font-family: 'ks-font-semibold';
     cursor: pointer;
     color: var(--primary-color);
-    font-size: 13.5px;
+    font-size: 13.5px
 }
 
 .p-collapse-button:hover{

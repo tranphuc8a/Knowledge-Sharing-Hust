@@ -18,7 +18,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourseRegister>> GetCourseRegisters(Guid courseId);
+        Task<List<ViewCourseRegister>> GetCourseRegisters(Guid courseId);
 
 
         /// <summary>

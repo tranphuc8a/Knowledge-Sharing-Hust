@@ -11,6 +11,8 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
     [Table("ViewCoursePayment")]
     public class ViewCoursePayment : CoursePayment
     {
+        public string Username { get; set; } = string.Empty;
+
         public string FullName { get; set; } = string.Empty;
 
         public string? Avatar { get; set; }

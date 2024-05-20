@@ -72,9 +72,9 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Functionality Methods
 
-        //protected virtual async Task<List<IResponseCourseModel>> DecorationRepository.DecorateResponseCourseModel(Guid? myUid, IEnumerable<ViewCourse> courses)
+        //protected virtual async Task<List<IResponseCourseModel>> DecorationRepository.DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses)
         //{
-        //    List<Guid> courseIds = courses.Select(course => course.UserItemId).ToList();
+        //    List<Guid> courseIds = courses.Select(course => course.UserItemId);
         //    Dictionary<Guid, int?>? myStars = null;
         //    if (myUid != null)
         //    {
@@ -126,7 +126,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Introduction = model.Introduction!,
                 EstimateTimeInMinutes = model.EstimateTimeInMinutes!.Value,
                 Fee = fee > 0 ? fee : 0,
-                IsFree = fee > 0 ? false : true
+                IsFree = fee <= 0
             };
             return course;
         }
@@ -137,7 +137,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminDeleteCourse(Guid courseId)
         {
             // Kiểm tra course tồn tại
-            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Thực hiện xóa course (ghi đè repo)
             int deleted = await CourseRepository.Delete(courseId);
@@ -157,69 +157,67 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetCourses(int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetCourses(PaginationDto pagination)
         {
             // Get
-            IEnumerable<ViewCourse> listCourses = 
-                await CourseRepository.GetViewCourse(limit ?? DefaultLimit, offset ?? 0);
+            List<ViewCourse> listCourses = 
+                await CourseRepository.GetViewCourse(pagination);
 
             // decorate:
             List<IResponseCourseModel> res =
-                await DecorationRepository.DecorateResponseCourseModel(null, listCourses.ToList());
+                await DecorationRepository.DecorateResponseCourseModel(null, listCourses);
 
             // Return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetUserCourses(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserCourses(Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Lấy về danh sách course của user
-            IEnumerable<ViewCourse> listCourses = await CourseRepository.GetViewCourseOfUser(userId);
+            List<ViewCourse> listCourses = await CourseRepository.GetViewCourseOfUser(userId);
 
             // Phân trang
-            int total = listCourses.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listCourses = listCourses.Skip(offsetValue).Take(limitValue);
+            int total = listCourses.Count;
+            listCourses = CourseRepository.ApplyPagination(listCourses, pagination);
 
             // decorate
-            List<IResponseCourseModel> resLists = await DecorationRepository.DecorateResponseCourseModel(null, listCourses.ToList());
+            List<IResponseCourseModel> resLists = await DecorationRepository.DecorateResponseCourseModel(null, listCourses);
             PaginationResponseModel<IResponseCourseModel> res =
-                new(total, limitValue, offsetValue, resLists);
+                new(total, pagination.Limit, pagination.Offset, resLists);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetUserRegisteredCourses(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserRegisteredCourses(Guid userId, PaginationDto pagination)
         {
             // Check user existed
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Lấy về
-            IEnumerable<ViewCourseRegister> listCourses = await CourseRepository.GetRegistersOfUser(userId);
+            List<ViewCourseRegister> listCourses = await CourseRepository.GetRegistersOfUser(userId);
 
             // Phân trang
-            int total = listCourses.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listCourses = listCourses.Skip(offsetValue).Take(limitValue);
+            int total = listCourses.Count;
+            listCourses = CourseRepository.ApplyPagination(listCourses, pagination);
 
             // Trả về thành công
             PaginationResponseModel<ViewCourseRegister> res =
-                new(total, limitValue, offsetValue, listCourses);
+                new(total, pagination.Limit, pagination.Offset, listCourses);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminListCourseOfCategory(string catName, int? limit, int? offset)
+        public async Task<ServiceResult> AdminListCourseOfCategory(string catName, PaginationDto pagination)
         {
             // Get về
-            IEnumerable<ViewCourse> listCourses = 
-                await CourseRepository.GetViewCourseOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewCourse> listCourses = 
+                await CourseRepository.GetViewCourseOfCategory(catName, pagination);
 
             // decorate
-            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, listCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, listCourses);
 
             // Thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
@@ -240,48 +238,47 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetCourses(int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetCourses(PaginationDto pagination)
         {
             // Get public courses
-            IEnumerable<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourse(limit ?? DefaultLimit, offset ?? 0);
+            List<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourse(pagination);
 
             // decorate 
-            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses);
 
             // return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetListCourseOfCategory(string catName, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetListCourseOfCategory(string catName, PaginationDto pagination)
         {
             // Get list public course by category
-            IEnumerable<ViewCourse> lsCourses = 
-                await CourseRepository.GetPublicViewCourseOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewCourse> lsCourses = 
+                await CourseRepository.GetPublicViewCourseOfCategory(catName, pagination);
 
             // decorate
-            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses);
 
             // return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetUserCourses(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetUserCourses(Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Lấy về public
-            IEnumerable<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourseOfUser(userId);
+            List<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourseOfUser(userId);
 
             // Phân trang
-            int total = lsCourses.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            lsCourses = lsCourses.Skip(offsetValue).Take(limitValue);
+            int total = lsCourses.Count;
+            lsCourses = CourseRepository.ApplyPagination(lsCourses, pagination);
 
             // decorate
-            List<IResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses.ToList());
+            List<IResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(null, lsCourses);
             PaginationResponseModel<IResponseCourseModel> res =
-                new(total, limitValue, offsetValue, lsRes);
+                new(total, pagination.Limit, pagination.Offset, lsRes);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
@@ -324,9 +321,9 @@ namespace KnowledgeSharingApi.Services.Services
                 ResponseResource.InsertFailure(CourseResource));
 
             // Insert categories nếu có:
-            if (model.Categories != null && model.Categories.Any())
+            if (model.Categories != null && model.Categories.Count != 0)
             {
-                _ = await CategoryRepository.UpdateKnowledgeCategories(course.UserItemId, model.Categories.ToList());
+                _ = await CategoryRepository.UpdateKnowledgeCategories(course.UserItemId, model.Categories);
             }
 
             // Trả về thành công
@@ -341,9 +338,9 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Đây không phải khóa học của bạn");
 
             // Kiểm tra không có registers nào
-            IEnumerable<ViewCourseRegister> courseRegisters = await CourseRepository
+            List<ViewCourseRegister> courseRegisters = await CourseRepository
                 .GetRegistersOfCourse(courseId);
-            if (courseRegisters.Any())
+            if (courseRegisters.Count != 0)
                 return ServiceResult.Forbidden("Không thể xóa khóa học đang có người học");
 
             // Delete
@@ -375,9 +372,9 @@ namespace KnowledgeSharingApi.Services.Services
             int effects2 = 0;
 
             // Update categories nếu có:
-            if (model.Categories != null && model.Categories.Any())
+            if (model.Categories != null && model.Categories.Count != 0)
             {
-                effects2 = await CategoryRepository.UpdateKnowledgeCategories(courseId, model.Categories.ToList());
+                effects2 = await CategoryRepository.UpdateKnowledgeCategories(courseId, model.Categories);
             }
 
             if (effects1 + effects2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CourseResource));
@@ -404,39 +401,39 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetListCourseOfCategory(Guid myUid, string catName, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListCourseOfCategory(Guid myUid, string catName, PaginationDto pagination)
         {
             // Get về
-            IEnumerable<ViewCourse> listCourses =
-                await CourseRepository.GetViewCourseOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewCourse> listCourses =
+                await CourseRepository.GetViewCourseOfCategory(myUid, catName, pagination);
 
             // decorate
-            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, listCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, listCourses);
 
             // Thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetListCourses(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListCourses(Guid myUid, PaginationDto pagination)
         {
             // Get
-            IEnumerable<ViewCourse> listCourses =
-                await CourseRepository.GetViewCourse(myUid, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewCourse> listCourses =
+                await CourseRepository.GetViewCourse(myUid, pagination);
 
             // decorate
             List<IResponseCourseModel> res =
-                await DecorationRepository.DecorateResponseCourseModel(myUid, listCourses.ToList());
+                await DecorationRepository.DecorateResponseCourseModel(myUid, listCourses);
 
             // Return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMarkedCourses(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMarkedCourses(Guid myUid, PaginationDto pagination)
         {
-            IEnumerable<ViewCourse> lsCourses = 
-                await CourseRepository.GetMarkedCoursesOfUse(myUid, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewCourse> lsCourses = 
+                await CourseRepository.GetMarkedCoursesOfUse(myUid, pagination);
 
-            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
+            List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses);
 
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
@@ -455,56 +452,53 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyCourses(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyCourses(Guid myUid, PaginationDto pagination)
         {
             // Lấy về
-            IEnumerable<ViewCourse> lsCourses = await CourseRepository.GetViewCourseOfUser(myUid);
+            List<ViewCourse> lsCourses = await CourseRepository.GetViewCourseOfUser(myUid);
 
             // Pagination
-            int total = lsCourses.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            lsCourses = lsCourses.Skip(offsetValue).Take(limitValue);
+            int total = lsCourses.Count;
+            lsCourses = CourseRepository.ApplyPagination(lsCourses, pagination);
 
             // decorate
-            List<IResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
+            List<IResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses);
             PaginationResponseModel<IResponseCourseModel> res =
-                new(total, limitValue, offsetValue, lsRes);
+                new(total, pagination.Limit, pagination.Offset, lsRes);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyRegisteredCourses(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyRegisteredCourses(Guid myUid, PaginationDto pagination)
         {
             // Lấy về 
-            IEnumerable<ViewCourseRegister> lsCourses = await CourseRepository.GetRegistersOfUser(myUid);
+            List<ViewCourseRegister> lsCourses = await CourseRepository.GetRegistersOfUser(myUid);
 
             // Phân trang
-            int total = lsCourses.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            lsCourses = lsCourses.Skip(offsetValue).Take(limitValue);
-            PaginationResponseModel<ViewCourseRegister> res = new(total, limitValue, offsetValue, lsCourses);
+            int total = lsCourses.Count;
+            lsCourses = CourseRepository.ApplyPagination(lsCourses, pagination);
+            PaginationResponseModel<ViewCourseRegister> res = new(total, pagination.Limit, pagination.Offset, lsCourses);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetUserCourses(Guid myUid, Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetUserCourses(Guid myUid, Guid userId, PaginationDto pagination)
         {
             // Check user existed
-            ViewUser user = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Get 
-            IEnumerable<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourseOfUser(userId);
+            List<ViewCourse> lsCourses = await CourseRepository.GetPublicViewCourseOfUser(userId);
 
             // Pagination
-            int total = lsCourses.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            lsCourses = lsCourses.Skip(offsetValue).Take(limitValue);
+            int total = lsCourses.Count;
+            lsCourses = CourseRepository.ApplyPagination(lsCourses, pagination);
 
             // decorate
-            List<IResponseCourseModel> lsres = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses.ToList());
-            PaginationResponseModel<IResponseCourseModel> res = new(total, limitValue, offsetValue, lsres);
+            List<IResponseCourseModel> lsres = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses);
+            PaginationResponseModel<IResponseCourseModel> res = new(total, pagination.Limit, pagination.Offset, lsres);
 
             // return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CourseResource), string.Empty, res);

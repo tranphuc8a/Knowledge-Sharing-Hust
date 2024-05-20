@@ -20,7 +20,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await DbContext.ViewCourseRegisters.FindAsync(registerId);
         }
 
-        public async Task<IEnumerable<ViewCourseRegister>> GetCourseRegisters(Guid courseId)
+        public async Task<List<ViewCourseRegister>> GetCourseRegisters(Guid courseId)
         {
             return await DbContext.ViewCourseRegisters
                 .Where(cr => cr.CourseId == courseId)

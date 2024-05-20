@@ -16,14 +16,9 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class QuestionsController(
         IQuestionService questionService
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly IQuestionService QuestionService = questionService;
-
-        protected virtual IActionResult StatusCode(ServiceResult result)
-        {
-            return StatusCode((int)result.StatusCode, new ApiResponse(result));
-        }
 
         #region Anonymous Apies
 
@@ -37,8 +32,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("anonymous")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetList(int? limit, int? offset)
-            => StatusCode(await QuestionService.AnonymousGetPosts(limit, offset));
+        public async Task<IActionResult> AnonymousGetList(int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await QuestionService.AnonymousGetPosts(
+                    new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu lấy về danh sách cuộc thảo luận của một người dùng
@@ -51,8 +47,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/anonymous/questions/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetUserList(Guid userId, int? limit, int? offset)
-            => StatusCode(await QuestionService.AnonymousGetUserPosts(userId, limit, offset));
+        public async Task<IActionResult> AnonymousGetUserList(Guid userId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await QuestionService.AnonymousGetUserPosts(userId, 
+                    new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu lấy về chi tiết cuộc thảo luận
@@ -80,8 +77,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListQuestion(int? limit, int? offset)
-            => StatusCode(await QuestionService.AdminGetPosts(limit, offset));
+        public async Task<IActionResult> AdminGetListQuestion(int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await QuestionService.AdminGetPosts(
+                    new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin lấy về danh sách cuộc thảo luận của một user
@@ -94,8 +92,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/admin/questions/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListUserQuestion(Guid userId, int? limit, int? offset)
-            => StatusCode(await QuestionService.AdminGetUserPosts(userId, limit, offset));
+        public async Task<IActionResult> AdminGetListUserQuestion(Guid userId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await QuestionService.AdminGetUserPosts(userId, 
+                    new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin lấy về chi tiết cuộc thảo luận
@@ -120,8 +119,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Courses/admin/questions/{courseId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListCourseQuestion(Guid courseId, int? limit, int? offset)
-            => StatusCode(await QuestionService.AdminGetListPostsOfCourse(courseId, limit, offset));
+        public async Task<IActionResult> AdminGetListCourseQuestion(Guid courseId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await QuestionService.AdminGetListPostsOfCourse(courseId, 
+                    new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin xóa một cuộc thảo luận cụ thể
@@ -153,10 +153,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListQuestion(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListQuestion(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetPosts(Guid.Parse(myUid), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await QuestionService.UserGetPosts(GetCurrentUserIdStrictly(), pagination));
         }
 
         /// <summary>
@@ -170,10 +170,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/user/questions/{userId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListUserQuestion(Guid userId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListUserQuestion(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetUserPosts(Guid.Parse(myUid), userId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await QuestionService.UserGetUserPosts(GetCurrentUserIdStrictly(), userId, pagination));
         }
 
         /// <summary>
@@ -186,10 +186,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListMyQuestion(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMyQuestion(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetMyPosts(Guid.Parse(myUid), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await QuestionService.UserGetMyPosts(GetCurrentUserIdStrictly(), pagination));
         }
 
         /// <summary>
@@ -203,8 +203,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetDetailQuestion(Guid questionId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetPostDetail(Guid.Parse(myUid), questionId));
+            return StatusCode(await QuestionService.UserGetPostDetail(GetCurrentUserIdStrictly(), questionId));
         }
 
         /// <summary>
@@ -218,8 +217,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetDetailMyQuestion(Guid questionId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetMyPostDetail(Guid.Parse(myUid), questionId));
+            return StatusCode(await QuestionService.UserGetMyPostDetail(GetCurrentUserIdStrictly(), questionId));
         }
 
         /// <summary>
@@ -233,10 +231,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Courses/questions/{courseId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListCourseQuestion(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListCourseQuestion(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetListPostsOfCourse(Guid.Parse(myUid), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await QuestionService.UserGetListPostsOfCourse(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
         /// <summary>
@@ -250,10 +248,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Courses/my/questions/{courseId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListMyCourseQuestion(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMyCourseQuestion(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserGetListPostsOfMyCourse(Guid.Parse(myUid), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await QuestionService.UserGetListPostsOfMyCourse(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
 
@@ -271,8 +269,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserAddNewQuestion([FromForm] CreateQuestionModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserCreatePost(Guid.Parse(myUid), model));
+            return StatusCode(await QuestionService.UserCreatePost(GetCurrentUserIdStrictly(), model));
         }
 
 
@@ -288,8 +285,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserUpdateQuestion(Guid questionId, [FromForm] UpdateQuestionModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserUpdatePost(Guid.Parse(myUid), questionId, model));
+            return StatusCode(await QuestionService.UserUpdatePost(GetCurrentUserIdStrictly(), questionId, model));
         }
 
 
@@ -304,8 +300,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserDeleteQuestion(Guid questionId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.UserDeletePost(Guid.Parse(myUid), questionId));
+            return StatusCode(await QuestionService.UserDeletePost(GetCurrentUserIdStrictly(), questionId));
         }
 
 
@@ -321,8 +316,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserConfirmQuestion(Guid questionId, bool isConfirm)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await QuestionService.ConfirmQuestion(Guid.Parse(myUid), questionId, isConfirm));
+            return StatusCode(await QuestionService.ConfirmQuestion(GetCurrentUserIdStrictly(), questionId, isConfirm));
         }
 
         #endregion
@@ -341,9 +335,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/anonymous/questions/{category}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetListPostsOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> AnonymousGetListPostsOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await QuestionService.AnonymousGetListPostsOfCategory(category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await QuestionService.AnonymousGetListPostsOfCategory(category, pagination);
             return StatusCode(res);
         }
 
@@ -358,9 +353,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/admin/questions/{category}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListPostsOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> AdminGetListPostsOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await QuestionService.AdminGetListPostsOfCategory(category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await QuestionService.AdminGetListPostsOfCategory(category, pagination);
             return StatusCode(res);
         }
 
@@ -376,10 +372,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/questions/{category}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListPostsOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListPostsOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await QuestionService.UserGetListPostsOfCategory(Guid.Parse(myUid), category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await QuestionService.UserGetListPostsOfCategory(GetCurrentUserIdStrictly(), category, pagination);
             return StatusCode(res);
         }
 
@@ -393,10 +389,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Marks/my/questions")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListMarkedQuestions(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMarkedQuestions(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await QuestionService.UserGetMyMarkedPosts(Guid.Parse(myUid), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await QuestionService.UserGetMyMarkedPosts(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 

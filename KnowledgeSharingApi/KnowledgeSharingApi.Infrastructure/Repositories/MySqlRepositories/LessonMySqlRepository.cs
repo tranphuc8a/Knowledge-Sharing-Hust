@@ -1,6 +1,7 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
@@ -46,11 +47,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task<ViewLesson> CheckExistedLesson(Guid lessonId, string errorMessage)
         {
-            return await DbContext.ViewLessons.FindAsync(lessonId)
-                ?? throw new NotExistedEntityException(errorMessage);
+            return (ViewLesson) ((await DbContext.ViewLessons.FindAsync(lessonId))?.Clone()
+                ?? throw new NotExistedEntityException(errorMessage));
         }
 
-        public virtual async Task<IEnumerable<ViewLesson>> GetByUserId(Guid userId)
+        public virtual async Task<List<ViewLesson>> GetByUserId(Guid userId)
         {
             return await DbContext.ViewLessons
                 .Where(les => les.UserId == userId)
@@ -58,7 +59,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public virtual async Task<IEnumerable<ViewLesson>> GetMarkedPosts(Guid userId)
+        public virtual async Task<List<ViewLesson>> GetByUserId(Guid userId, PaginationDto pagination)
+        {
+            return await ApplyPagination( 
+                    DbContext.ViewLessons
+                    .Where(les => les.UserId == userId)
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination)
+                .ToListAsync();
+        }
+
+        public virtual async Task<List<ViewLesson>> GetMarkedPosts(Guid userId)
         {
             IQueryable<Guid> listMarkedItemId = DbContext.Marks
                 .Where(mark => mark.UserId == userId).Select(mark => mark.KnowledgeId);
@@ -68,18 +79,30 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public virtual async Task<IEnumerable<ViewLesson>> GetPostsOfCategory(string catName, int limit, int offset)
+        public virtual async Task<List<ViewLesson>> GetMarkedPosts(Guid userId, PaginationDto pagination)
         {
-            IQueryable<Guid> listKnowledgeId = DbContext.ViewKnowledgeCategories
-                .Where(cat => cat.CategoryName == catName).Select(cat => cat.KnowledgeId);
-            return await DbContext.ViewLessons
-                .Where(les => listKnowledgeId.Contains(les.UserItemId))
-                .OrderByDescending(les => les.CreatedTime)
-                .Skip(offset).Take(limit)
+            IQueryable<Guid> listMarkedItemId = DbContext.Marks
+                .Where(mark => mark.UserId == userId).Select(mark => mark.KnowledgeId);
+            return await ApplyPagination(
+                DbContext.ViewLessons
+                .Where(les => listMarkedItemId.Contains(les.UserItemId))
+                .OrderByDescending(les => les.CreatedTime), pagination)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewLesson>> GetPostsOfCategory(Guid myUId, string catName, int limit, int offset)
+        public virtual async Task<List<ViewLesson>> GetPostsOfCategory(string catName, PaginationDto pagination)
+        {
+            IQueryable<Guid> listKnowledgeId = DbContext.ViewKnowledgeCategories
+                .Where(cat => cat.CategoryName == catName).Select(cat => cat.KnowledgeId);
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les => listKnowledgeId.Contains(les.UserItemId))
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewLesson>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination)
         {
             // Lấy danh sách id các khóa học mà myUid đang học
             IQueryable<Guid> listCoursesId = DbContext.CourseRegisters
@@ -96,93 +119,111 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Select(kc => kc.KnowledgeId).Distinct();
 
             // Lấy danh sách các Lesson thỏa mãn:
-            return await DbContext.ViewLessons
-                .Where(les => listKnowledgesId.Contains(les.UserItemId) && (
-                    // myUId phải Xem được:
-                    // Là chủ
-                    (les.UserId == myUId) ||
-                    // public
-                    (les.Privacy == EPrivacy.Public) ||
-                    // Trong các khóa học đã đăng ký
-                    (listViewableLessonsId.Contains(les.UserItemId))
-                ))
-                .OrderByDescending(les => les.CreatedTime)
-                .Skip(offset).Take(limit)
-                .ToListAsync();
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les => listKnowledgesId.Contains(les.UserItemId) && (
+                        // myUId phải Xem được:
+                        // Là chủ
+                        (les.UserId == myUId) ||
+                        // public
+                        (les.Privacy == EPrivacy.Public) ||
+                        // Trong các khóa học đã đăng ký
+                        (listViewableLessonsId.Contains(les.UserItemId))
+                    ))
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination                                
+                ).ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewLesson>> GetPublicPosts(int limit, int offset)
+        public virtual async Task<List<ViewLesson>> GetPublicPosts()
         {
-            return await DbContext.ViewLessons.Where(les => les.Privacy == EPrivacy.Public)
-                .OrderByDescending(les => les.CreatedTime)
-                .Skip(offset).Take(limit).ToListAsync();
+            return await DbContext.ViewLessons.Where(vl => vl.Privacy == EPrivacy.Public).ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewLesson>> GetPublicPostsByUserId(Guid userId)
+        public async Task<List<ViewLesson>> GetPublicPosts(PaginationDto pagination)
+        {
+            return await ApplyPagination(
+                    DbContext.ViewLessons.Where(les => les.Privacy == EPrivacy.Public)
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).ToListAsync();
+        }
+
+        public async Task<List<ViewLesson>> GetPublicPostsByUserId(Guid userId)
         {
             return await DbContext.ViewLessons.Where(les => les.UserId == userId)
                 .OrderByDescending(les => les.CreatedTime).ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewLesson>> GetPublicPostsOfCategory(string catName, int limit, int offset)
+        public async Task<List<ViewLesson>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination)
+        {
+            return await ApplyPagination(
+                DbContext.ViewLessons.Where(les => les.UserId == userId)
+                .OrderByDescending(les => les.CreatedTime), pagination).ToListAsync();
+        }
+
+        public async Task<List<ViewLesson>> GetPublicPostsOfCategory(string catName, PaginationDto pagination)
         {
             IQueryable<Guid> listKnIds = DbContext.ViewKnowledgeCategories
                 .Where(ct => ct.CategoryName == catName)
                 .Select(ct => ct.KnowledgeCategoryId);
-            return await DbContext.ViewLessons
-                .Where(les => listKnIds.Contains(les.UserItemId))
-                .OrderByDescending(les => les.CreatedTime)
-                .Skip(offset).Take(limit)
-                .ToListAsync();
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les => listKnIds.Contains(les.UserItemId))
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).ToListAsync();
         }
 
-        public async Task<PaginationResponseModel<ViewLesson>> GetLessonsInCourse(Guid courseid, int limit, int offset)
+        public async Task<PaginationResponseModel<ViewLesson>> GetLessonsInCourse(Guid courseid, PaginationDto pagination)
         {
-            IQueryable<Guid> listIds = DbContext.CourseLessons
+            List<Guid> listIds = await DbContext.CourseLessons
                 .Where(cl => cl.CourseId == courseid)
-                .OrderBy(cl => cl.Offset)
-                .Select(cl => cl.LessonId);
-
-            int total = listIds.Count();
-            listIds = listIds.Skip(offset).Take(limit);
-
-            IEnumerable<ViewLesson> listlessons = await DbContext.ViewLessons
-                .Where(les => listIds.Contains(les.UserItemId))
+                .Select(cl => cl.LessonId).Distinct()
                 .ToListAsync();
+            int total = listIds.Count;
 
-            return new PaginationResponseModel<ViewLesson>(total, limit, offset, listlessons);
+            IQueryable<ViewLesson> listlessons = ApplyPagination(
+                DbContext.ViewLessons
+                .Where(les => listIds.Contains(les.UserItemId)),
+                pagination
+            );
+
+            return new PaginationResponseModel<ViewLesson>(total, pagination.Limit, pagination.Offset, await listlessons.ToListAsync());
         }
 
-        public async Task<IEnumerable<ViewLesson>> GetViewPost(int limit, int offset)
+        public async Task<List<ViewLesson>> GetViewPost(PaginationDto pagination)
         {
-            return await DbContext.ViewLessons
-                .OrderByDescending(l => l.CreatedTime)
-                .Skip(offset).Take(limit)
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .OrderByDescending(l => l.CreatedTime),
+                    pagination)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Tuple<CourseLesson, ViewCourse>>> GetListCoursesOfLesson(Guid lessonId)
+        public async Task<List<Tuple<CourseLesson, ViewCourse>>> GetListCoursesOfLesson(Guid lessonId)
         {
-            IEnumerable<CourseLesson> courseLessons = await DbContext.CourseLessons
+            List<CourseLesson> courseLessons = await DbContext.CourseLessons
                 .Where(cl => cl.LessonId == lessonId).ToListAsync();
 
-            IEnumerable<Guid> listCoursesId = courseLessons.Select(cl => cl.CourseId).ToList();
+            List<Guid> listCoursesId = courseLessons.Select(cl => cl.CourseId).ToList();
             Dictionary<Guid, CourseLesson> mapCourseIdToCourseLesson 
                 = courseLessons.ToDictionary(cl => cl.CourseId, cl => cl);
 
-            IEnumerable<ViewCourse> listCourses = await DbContext.ViewCourses
+            List<ViewCourse> listCourses = await DbContext.ViewCourses
                 .Where(c => listCoursesId.Contains(c.UserItemId)).ToListAsync();
             Dictionary<Guid, ViewCourse> mapCourseIdToViewCourse
                 = listCourses.ToDictionary(c => c.UserItemId, c => c);
 
             return listCoursesId.Select(id => Tuple.Create(
                 mapCourseIdToCourseLesson[id], mapCourseIdToViewCourse[id]
-            ));
+            )).ToList();
         }
 
         protected override DbSet<Lesson> GetDbSet()
         {
             return DbContext.Lessons;
         }
+
     }
 }

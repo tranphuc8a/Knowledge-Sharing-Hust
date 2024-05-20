@@ -32,8 +32,8 @@ namespace KnowledgeSharingApi.Services.Services
         #region Send messages and Close Socket
         public virtual async Task<bool> CloseAllSocket()
         {
-            IEnumerable<KSSocket> lsSockets = socketManager.GetAllSockets();
-            IEnumerable<Task> lsTask = lsSockets.Select(socket => CloseSocket(socket));
+            List<KSSocket> lsSockets = socketManager.GetAllSockets();
+            List<Task<bool>> lsTask = lsSockets.Select(socket => CloseSocket(socket)).ToList();
             await Task.WhenAll(lsTask);
             socketManager.RemoveAllSocket();
             return true;
@@ -58,12 +58,12 @@ namespace KnowledgeSharingApi.Services.Services
         {
             try
             {
-                IEnumerable<KSSocket> lsSockets = socketManager.GetSockets(username);
-                IEnumerable<Task> closeTasks = lsSockets.Select(async socket =>
+                List<KSSocket> lsSockets = socketManager.GetSockets(username);
+                List<Task> closeTasks = lsSockets.Select(async socket =>
                 {
                     await socket.Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing socket", CancellationToken.None);
                     socketManager.RemoveSocket(socket);
-                });
+                }).ToList();
                 await Task.WhenAll(closeTasks);
                 return true;
             }
@@ -87,8 +87,8 @@ namespace KnowledgeSharingApi.Services.Services
         {
             try
             {
-                IEnumerable<KSSocket> lsSockets = socketManager.GetSockets(username);
-                IEnumerable<Task> lsTask = lsSockets.Select<KSSocket, Task>(socket => Send(data, socket));
+                List<KSSocket> lsSockets = socketManager.GetSockets(username);
+                List<Task> lsTask = lsSockets.Select<KSSocket, Task>(socket => Send(data, socket)).ToList();
                 await Task.WhenAll(lsTask);
                 return true;
             }
@@ -102,8 +102,8 @@ namespace KnowledgeSharingApi.Services.Services
         {
             try
             {
-                IEnumerable<KSSocket> lsSockets = socketManager.GetAllSockets();
-                IEnumerable<Task> lsTask = lsSockets.Select<KSSocket, Task>(socket => Send(data, socket));
+                List<KSSocket> lsSockets = socketManager.GetAllSockets();
+                List<Task> lsTask = lsSockets.Select<KSSocket, Task>(socket => Send(data, socket)).ToList();
                 await Task.WhenAll(lsTask);
                 return true;
             }

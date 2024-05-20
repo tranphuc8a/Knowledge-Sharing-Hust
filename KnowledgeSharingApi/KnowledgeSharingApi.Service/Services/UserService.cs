@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Algorithms;
+using KnowledgeSharingApi.Domains.Common;
 using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
@@ -6,8 +7,10 @@ using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
+using KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -19,11 +22,12 @@ using System.Threading.Tasks;
 namespace KnowledgeSharingApi.Services.Services
 {
     public class UserService(
-        IResourceFactory resourceFactory, 
-        IUserRepository userRepository, 
-        IProfileRepository profileRepository, 
+        IResourceFactory resourceFactory,
+        IUserRepository userRepository,
+        IProfileRepository profileRepository,
+        IDecorationRepository decorationRepository,
         IImageRepository imageRepository,
-        IStorage storage, 
+        IStorage storage,
         IUserRelationRepository userRelationRepository
         ) : IUserService
     {
@@ -32,6 +36,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IProfileRepository ProfileRepository = profileRepository;
         protected readonly IResourceFactory ResourceFactory = resourceFactory;
         protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
+        protected readonly IDecorationRepository DecorationRepository = decorationRepository;
         protected readonly IUserRelationRepository UserRelationRepository = userRelationRepository;
         protected readonly IImageRepository ImageRepository = imageRepository;
         protected readonly string ResponseTableName = resourceFactory.GetEntityResource().User();
@@ -112,33 +117,53 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminSearchUser(string searchKey, int? limit, int? offset)
+        public async Task<ServiceResult> AdminSearchUser(string searchKey, PaginationDto pagination)
         {
-            // Format limit và offset
-            int offsetValue = offset ??= 0;
-            int limitValue = limit ??= DefaultLimit;
-            searchKey = searchKey.ToLower();
+            // Format search key
+            searchKey = Unicode.RemoveVietnameseTone(searchKey).ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
-            IEnumerable<ViewUser> lsUser = await UserRepository.GetDetail();
-            IEnumerable<ViewUser> filteredUser = lsUser
-                .Select(user => new
+            List<ViewUser> lsUser = await UserRepository.GetDetail();
+
+            // Tinh toan similiarity Score
+            List<string> listFullname = lsUser.Select(fu => fu.FullName).ToList();
+            List<string> listUsername = lsUser.Select(fu => fu.Username).ToList();
+            List<string> listEmail = lsUser.Select(fu => fu.Email).ToList();
+            List<string> listPhone = lsUser.Select(fu => fu.PhoneNumber ?? "").ToList();
+
+            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(searchKey, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(searchKey, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(searchKey, listEmail);
+            Dictionary<string, double> scorePhone = Algorithm.NgramSimilarityList(searchKey, listPhone);
+
+            double fullnameWeight = 0.4, usernameWeight = 0.3, emailWeight = 0.2, phoneWeight = 0.1;
+
+            Dictionary<Guid, double> scored = lsUser.ToDictionary(
+                u => u.UserId,
+                u => fullnameWeight * scoreFullName[u.FullName] +
+                        usernameWeight * scoreUsername[u.Username] +
+                        emailWeight * scoreEmail[u.Email] +
+                        phoneWeight * scorePhone[u.PhoneNumber ?? ""]
+            );
+
+            // Sap xep theo scored:
+            lsUser = [.. lsUser.OrderByDescending(u => scored[u.UserId])];
+
+            // ap dung filter, pagination (khong ap dung order)
+            if (pagination.Filters != null)
+                lsUser = UserRepository.ApplyFilter(lsUser, pagination.Filters);
+            lsUser = lsUser.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 20).ToList();
+
+            // Decoration:
+            List<ResponseUserCardModel> res = await DecorationRepository.DecorateResponseUserCardModel(null,
+                lsUser.Select(u =>
                 {
-                    User = user,
-                    similarityScore = SimilaritySearch(searchKey, user)
-                })
-                .OrderByDescending(user => user.similarityScore)
-                .Select(user => user.User)
-                .ToList();
+                    ResponseUserCardModel rUCM = new();
+                    rUCM.Copy(u);
+                    return rUCM;
+                }).ToList());
 
             // Trả về thành công
-            PaginationResponseModel<ViewUser> res = new()
-            {
-                Total = filteredUser.Count(),
-                Limit = limitValue,
-                Offset = offsetValue,
-                Results = filteredUser.Skip(offsetValue).Take(limitValue)
-            };
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
 
@@ -205,19 +230,16 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminGetListUser(int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetListUser(PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit;
-            int offsetValue = offset ?? 0;
-
-            IEnumerable<ViewUser> listed = await UserRepository.GetDetail();
+            List<ViewUser> listed = await UserRepository.GetDetail();
 
             PaginationResponseModel<ViewUser> res = new()
             {
-                Total = listed.Count(),
-                Limit = limitValue,
-                Offset = offsetValue,
-                Results = listed.Skip(offsetValue).Take(limitValue)
+                Total = listed.Count,
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = UserRepository.ApplyPagination(listed, pagination)
             };
 
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(ResponseTableName), string.Empty, res);
@@ -270,41 +292,68 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        private static double SimilaritySearch(string searchKey, ViewUser user)
-        {
-            return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
-        }
+        //private static double SimilaritySearch(string searchKey, ViewUser user)
+        //{
+        //    return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
+        //}
 
-        public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, int? limit, int? offset)
+        public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto pagination)
         {
-            // Format limit và offset
-            int offsetValue = offset ??= 0;
-            int limitValue = limit ??= DefaultLimit;
-            searchKey = searchKey.ToLower();
+            // Format search key
+            searchKey = Unicode.RemoveVietnameseTone(searchKey).ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
-            IEnumerable<ViewUser> lsUser = await UserRepository.GetDetail();
-            IEnumerable<ViewUser> filteredUser = lsUser
-                .Where(lsUser => lsUser.Role != UserRoles.Banned)
-                .Select(user => new
-                {
-                    User = user,
-                    similarityScore = SimilaritySearch(searchKey, user)
-                })
-                .OrderByDescending(user => user.similarityScore)
-                .Select(user => user.User)
+            List<ViewUser> lsUser = await UserRepository.GetDetail();
+
+            // Loc khong chan, khong bi banned...
+            List<ViewUserRelation> myBlockee = await UserRelationRepository.GetByUserIdAndType(myuid, isActive: false, EUserRelationType.Block);
+            List<ViewUserRelation> myBlocker = await UserRelationRepository.GetByUserIdAndType(myuid, isActive: true, EUserRelationType.Block);
+            List<Guid> myBlockeeId = myBlockee.Select(mb => mb.SenderId).ToList();
+            List<Guid> myBlockerId = myBlocker.Select(mb => mb.ReceiverId).ToList();
+            List<Guid> exceptId = myBlockeeId.Union(myBlockerId).Distinct().ToList();
+            List<ViewUser> filteredUser = lsUser
+                .Where(lsUser => lsUser.Role != UserRoles.Banned && !exceptId.Contains(lsUser.UserId))
                 .ToList();
 
-            // Lọc không chặn, làm sau
+            // Tinh toan similiarity Score
+            List<string> listFullname = filteredUser.Select(fu => fu.FullName).ToList();
+            List<string> listUsername = filteredUser.Select(fu => fu.Username).ToList();
+            List<string> listEmail = filteredUser.Select(fu => fu.Email).ToList();
+            List<string> listPhone = filteredUser.Select(fu => fu.PhoneNumber ?? "").ToList();
+
+            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(searchKey, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(searchKey, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(searchKey, listEmail);
+            Dictionary<string, double> scorePhone = Algorithm.NgramSimilarityList(searchKey, listPhone);
+
+            double fullnameWeight = 0.4, usernameWeight = 0.3, emailWeight = 0.2, phoneWeight = 0.1;
+
+            Dictionary<Guid, double> scored = filteredUser.ToDictionary(
+                u => u.UserId,
+                u =>    fullnameWeight * scoreFullName[u.FullName] + 
+                        usernameWeight * scoreUsername[u.Username] + 
+                        emailWeight * scoreEmail[u.Email] + 
+                        phoneWeight * scorePhone[u.PhoneNumber ?? ""]
+            );
+
+            // Sap xep theo scored:
+            filteredUser = [.. filteredUser.OrderByDescending(u => scored[u.UserId])];
+
+            // ap dung filter, pagination (khong ap dung order)
+            if (pagination.Filters != null)
+                filteredUser = UserRepository.ApplyFilter(filteredUser, pagination.Filters);
+            filteredUser = filteredUser.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 20).ToList();
+
+            // Decoration:
+            List<ResponseUserCardModel> res = await DecorationRepository.DecorateResponseUserCardModel(myuid,
+                filteredUser.Select(u =>
+                {
+                    ResponseUserCardModel rUCM = new();
+                    rUCM.Copy(u);
+                    return rUCM;
+                }).ToList());
 
             // Trả về thành công
-            PaginationResponseModel<ViewUser> res = new()
-            {
-                Total = filteredUser.Count(),
-                Limit = limitValue,
-                Offset = offsetValue,
-                Results = filteredUser.Skip(offsetValue).Take(limitValue)
-            };
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
 

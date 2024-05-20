@@ -46,7 +46,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (27/3/24)
         /// Modified: None
-        Task<IEnumerable<Star>> GetListStarOfUserItem(Guid userItemId);
+        Task<List<Star>> GetListStarOfUserItem(Guid userItemId);
 
         
         /// <summary>
@@ -56,7 +56,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (27/3/24)
         /// Modified: None
-        Task<IEnumerable<Star>> GetListStarOfUser(Guid userId);
+        Task<List<Star>> GetListStarOfUser(Guid userId);
 
 
         /// <summary>
@@ -77,10 +77,10 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns> List of tuple: Item1: phần tử, Item2: star </returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<IEnumerable<Tuple<ViewComment, Star>>> GetStaredComments(Guid userId);
-        Task<IEnumerable<Tuple<ViewCourse, Star>>> GetStaredCourses(Guid userId);
-        Task<IEnumerable<Tuple<ViewPost, Star>>> GetStaredPosts(Guid userId);
-        Task<IEnumerable<Tuple<ViewQuestion, Star>>> GetStaredQuestions(Guid userId);
-        Task<IEnumerable<Tuple<ViewLesson, Star>>> GetStaredLessons(Guid userId);
+        Task<List<Tuple<ViewComment, Star>>> GetStaredComments(Guid userId);
+        Task<List<Tuple<ViewCourse, Star>>> GetStaredCourses(Guid userId);
+        Task<List<Tuple<ViewPost, Star>>> GetStaredPosts(Guid userId);
+        Task<List<Tuple<ViewQuestion, Star>>> GetStaredQuestions(Guid userId);
+        Task<List<Tuple<ViewLesson, Star>>> GetStaredLessons(Guid userId);
     }
 }

@@ -24,12 +24,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Lấy về danh sách cuộc trò chuyện
         /// </summary>
         /// <param name="myUId"> Id của người muốn lấy </param>
-        /// <param name="limit"> Thuộc tính phân trang - số lượng cuộc trò chuyện </param>
-        /// <param name="offset"> Thuộc tính phân trang - độ lệch bản ghi đầu tiên </param>
+        /// <param name="pagination"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<ServiceResult> GetConversations(Guid myUId, int? limit, int? offset);
+        Task<ServiceResult> GetConversations(Guid myUId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về chi tiết cuộc trò chuyện
@@ -96,12 +95,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUId"> Id của người muốn lấy </param>
         /// <param name="conversationId"> Id của cuộc trò chuyện muốn lấy </param>
-        /// <param name="limit"> Thuộc tính phân trang - số lượng cuộc trò chuyện </param>
-        /// <param name="offset"> Thuộc tính phân trang - độ lệch bản ghi đầu tiên </param>
+        /// <param name="pagination"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        Task<ServiceResult> GetMessages(Guid myUId, Guid conversationId, int? limit, int? offset);
+        Task<ServiceResult> GetMessages(Guid myUId, Guid conversationId, PaginationDto pagination);
 
         /// <summary>
         /// Gửi tin nhắn mới

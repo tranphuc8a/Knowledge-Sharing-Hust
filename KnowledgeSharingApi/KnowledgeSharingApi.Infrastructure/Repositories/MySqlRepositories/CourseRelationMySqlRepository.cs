@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
@@ -33,7 +34,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             };
         }
 
-        public async Task<int> ConfirmCourseRelation(Guid userRelationId)
+        public virtual async Task<int> ConfirmCourseRelation(Guid userRelationId)
         {
             CourseRelation? relation = await DbContext.CourseRelations.FindAsync(userRelationId);
             if (relation == null) return 0;
@@ -67,7 +68,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             }
         }
 
-        public async Task<CourseRelation?> GetInvite(Guid receiverId, Guid courseId)
+        public virtual async Task<CourseRelation?> GetInvite(Guid receiverId, Guid courseId)
         {
             return await DbContext.CourseRelations
                 .Where(cr => cr.CourseRelationType == ECourseRelationType.Invite &&
@@ -75,12 +76,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<CourseRelation?> GetRelation(Guid courseRelationId)
+        public virtual async Task<CourseRelation?> GetRelation(Guid courseRelationId)
         {
             return await DbContext.CourseRelations.FindAsync(courseRelationId);
         }
 
-        public async Task<IEnumerable<CourseRelation>> GetRelationsOfCourse(Guid courseId, ECourseRelationType relationType)
+        public virtual async Task<List<CourseRelation>> GetRelationsOfCourse(Guid courseId, ECourseRelationType relationType)
         {
             return await DbContext.CourseRelations
                 .Where(cr => cr.CourseId == courseId && cr.CourseRelationType == relationType)
@@ -88,7 +89,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<CourseRelation>> GetRelationsOfUser(Guid userId, ECourseRelationType relationType)
+        public virtual async Task<List<CourseRelation>> GetRelationsOfUser(Guid userId, ECourseRelationType relationType)
         {
             IQueryable<CourseRelation> query = DbContext.CourseRelations
                 .Where(cr => cr.CourseRelationType == relationType)
@@ -101,7 +102,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await query.ToListAsync();
         }
 
-        public async Task<CourseRelation?> GetRequest(Guid senderId, Guid courseId)
+        public virtual async Task<CourseRelation?> GetRequest(Guid senderId, Guid courseId)
         {
             return await DbContext.CourseRelations
                 .Where(cr => cr.CourseRelationType == ECourseRelationType.Request &&
@@ -109,7 +110,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<ECourseRoleType> GetRole(Guid userId, Guid courseId)
+        public virtual async Task<ECourseRoleType> GetRole(Guid userId, Guid courseId)
         {
             // Strategy: Check level from high (owner) to low (inAccessible)
             // Check owner:
@@ -131,6 +132,74 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
             // other cases: Not accessible
             return ECourseRoleType.NotAccessible;
+        }
+
+
+        public async Task<Dictionary<Guid, CourseRoleTypeDto>> GetCourseRoleType(Guid userId, List<Guid> courseIds)
+        {
+            Dictionary<Guid, CourseRoleTypeDto> result = courseIds.ToDictionary(
+                id => id,
+                id => new CourseRoleTypeDto()
+                {
+                    CourseRelationId = null,
+                    CourseRoleType = ECourseRoleType.NotInRelation
+                }
+            );
+            Dictionary<Guid, Course> courseDict = await DbContext.Courses
+                .Where(c => courseIds.Contains(c.UserItemId))
+                .ToDictionaryAsync(c => c.UserItemId, c => c);
+            Dictionary<Guid, CourseRegister> registerDict = await DbContext.CourseRegisters
+                .Where(cr => cr.UserId == userId && courseIds.Contains(cr.CourseId))
+                .GroupBy(cr => cr.CourseId)
+                .ToDictionaryAsync(group => group.Key, group => group.First());
+            List<CourseRelation> relationList = await DbContext.CourseRelations
+                .Where(crl => (crl.SenderId == userId || crl.ReceiverId == userId) && courseIds.Contains(crl.CourseId))
+                .ToListAsync();
+            Dictionary<Guid, CourseRelation> invitedDict = relationList
+                .Where(crl => crl.ReceiverId == userId)
+                .ToDictionary(crl => crl.CourseId, crl => crl);
+            Dictionary<Guid, CourseRelation> requestingDict = relationList
+                .Where(crl => crl.SenderId == userId)
+                .ToDictionary(crl => crl.CourseId, crl => crl);
+
+            foreach (Guid id in courseIds)
+            {
+                if (courseDict.TryGetValue(id, out Course? course))
+                {
+                    if (course.UserId == userId)
+                    {
+                        result[id].CourseRoleType = ECourseRoleType.Owner;
+                        result[id].CourseRelationId = course.UserItemId;
+                        continue;
+                    }
+                    if (registerDict.TryGetValue(id, out CourseRegister? value2))
+                    {
+                        result[id].CourseRoleType = ECourseRoleType.Member;
+                        result[id].CourseRelationId = value2.CourseRegisterId;
+                        continue;
+                    }
+                    if (course.Privacy == EPrivacy.Private)
+                    {
+                        result[id].CourseRoleType = ECourseRoleType.NotAccessible;
+                        result[id].CourseRelationId = null;
+                        continue;
+                    }
+                    if (invitedDict.TryGetValue(id, out CourseRelation? relation))
+                    {
+                        result[id].CourseRoleType = ECourseRoleType.Invited;
+                        result[id].CourseRelationId = relation.CourseRelationId;
+                        continue;
+                    }
+                    if (requestingDict.TryGetValue(id, out CourseRelation? relation2))
+                    {
+                        result[id].CourseRoleType = ECourseRoleType.Requesting;
+                        result[id].CourseRelationId = relation2.CourseRelationId;
+                        continue;
+                    }
+
+                }
+            }
+            return result;
         }
     }
 }

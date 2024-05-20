@@ -39,13 +39,12 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// Admin lấy về danh sách bài đăng của một khóa học cụ thể
         /// </summary>
-        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
-        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, PaginationDto pagination);
 
         #endregion
 
@@ -75,26 +74,24 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// User lấy về danh sách bài đăng của một khóa học cụ thể
         /// </summary>
         /// <param name="myUid"> id user của chính mình </param>
-        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
-        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, PaginationDto pagination);
 
 
         /// <summary>
         /// User lấy về danh sách bài đăng của một khóa học cụ thể của mình
         /// </summary>
         /// <param name="myUid"> id user của chính mình </param>
-        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
-        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, PaginationDto pagination);
 
 
 
@@ -119,6 +116,56 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model);
+
+        #endregion
+
+
+        #region Search APIes
+
+        /// <summary>
+        /// User tim kiem bai dang feed
+        /// </summary>
+        /// <param name="myUid"> id user thuc hien </param>
+        /// <param name="search"> tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tin phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (19/5/24)
+        /// Modified None
+        Task<ServiceResult> UserSearchPost(Guid myUid, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// User tim kiem bai dang cua chinh minh
+        /// </summary>
+        /// <param name="myUid"> id user thuc hien </param>
+        /// <param name="search"> tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tin phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (19/5/24)
+        /// Modified None
+        Task<ServiceResult> UserSearchMyPost(Guid myUid, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// User tim kiem bai dang cua user khac
+        /// </summary>
+        /// <param name="myUid"> id user thuc hien </param>
+        /// <param name="userId"> id user can lay </param>
+        /// <param name="search"> tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tin phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (19/5/24)
+        /// Modified None
+        Task<ServiceResult> UserSearchUserPost(Guid myUid, Guid userId, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// Admin tim kiem bai dang cua user khac
+        /// </summary>
+        /// <param name="userId"> id user can lay </param>
+        /// <param name="search"> tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tin phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (19/5/24)
+        /// Modified None
+        Task<ServiceResult> AdminSearchUserPost(Guid userId, string? search, PaginationDto pagination);
 
         #endregion
     }

@@ -13,12 +13,14 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
     public class ResponseCourseModel : ViewCourse, IResponseCourseModel
     {
         public int NumberComments { get; set; }
-        public IEnumerable<ResponseCommentModel> TopComments { get; set; } = [];
+        public List<ResponseCommentModel> TopComments { get; set; } = [];
         public bool IsMarked { get; set; }
         public double? AverageStars { get; set; }
         public double? MyStars { get; set; }
         public int TotalStars { get; set; }
         public ECourseRoleType Role { get; set; }
-        public IEnumerable<Category> Categories { get; set; } = [];
+        public List<Category> Categories { get; set; } = [];
+        public ECourseRoleType CourseRoleType { get; set; }
+        public Guid? CourseRelationId { get; set; }
     }
 }

@@ -88,6 +88,15 @@ export default {
             }
             return this.label;
         },
+
+        getCategories() {
+            if (this.question?.Categories != null
+                && this.question.Categories.length > 0){
+                return this.question.Categories
+                    .map(cate => cate.CategoryName);
+            }
+            return this.defaultCategoriesList;
+        },
         
     },
     inject: {

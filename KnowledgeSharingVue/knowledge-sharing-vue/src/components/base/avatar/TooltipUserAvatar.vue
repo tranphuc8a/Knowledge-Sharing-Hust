@@ -1,13 +1,15 @@
 <template>
-    <TooltipFrame>
-        <template #tooltipMask>
-            <UserAvatar :user="user" :size="size" />
-        </template>
-
-        <template #tooltipContent>
-            <TooltipUser :user="user" />
-        </template>
-    </TooltipFrame>
+    <div class="p-tooltip-user-avatar-frame">
+        <TooltipFrame>
+            <template #tooltipMask>
+                <UserAvatar :user="user" :size="size" />
+            </template>
+    
+            <template #tooltipContent>
+                <TooltipUser :user="user" />
+            </template>
+        </TooltipFrame>
+    </div>
 </template>
 
 
@@ -40,5 +42,8 @@ export default {
 </script>
 
 <style scoped>
+.p-tooltip-user-avatar-frame{
+    width: fit-content;
+}
 </style>
 

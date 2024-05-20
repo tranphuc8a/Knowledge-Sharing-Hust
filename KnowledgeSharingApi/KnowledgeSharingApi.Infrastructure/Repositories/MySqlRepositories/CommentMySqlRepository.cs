@@ -15,6 +15,7 @@ using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Exceptions;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
@@ -23,29 +24,32 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     {
         public virtual async Task<ViewComment> CheckExistedComment(Guid commentId, string errorMessage)
         {
-            return await DbContext.ViewComments.Where(com => com.UserItemId == commentId)
-                .FirstOrDefaultAsync()
-                ?? throw new NotExistedEntityException(errorMessage);
+            return (ViewComment) ((await DbContext.ViewComments.Where(com => com.UserItemId == commentId)
+                .FirstOrDefaultAsync())?.Clone()
+                ?? throw new NotExistedEntityException(errorMessage));
         }
 
         // Override lại hàm xóa comment
         public override async Task<int> Delete(Guid commentId)
         {
-            using IDbContextTransaction transaction = await DbContext.Database.BeginTransactionAsync();
+            using IDbContextTransaction transaction = await DbContext.BeginTransaction();
             try
             {
                 // Chuyển tất cả reply comment về reply null
-                string commandText = "UPDATE Comments SET ReplyId = NULL WHERE ReplyId = @p0";
-                SqlParameter[] parameters = [new SqlParameter("@p0", commentId)];
-                int affectedRows = await DbContext.Database.ExecuteSqlRawAsync(commandText, parameters);
+                var commentsToUpdate = DbContext.Comments.Where(c => c.ReplyId == commentId);
+                foreach (var comment in commentsToUpdate)
+                {
+                    comment.ReplyId = null;
+                }
 
                 // Xóa comment
                 var commentToDelete = await DbContext.Comments.FindAsync(commentId);
                 if (commentToDelete != null)
                 {
                     DbContext.Comments.Remove(commentToDelete);
-                    affectedRows += await DbContext.SaveChangesAsync();
                 }
+
+                int affectedRows = await DbContext.SaveChangesAsync();
 
                 // Commit and return affected rows
                 await transaction.CommitAsync();
@@ -58,33 +62,32 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             }
         }
 
-        public virtual async Task<PaginationResponseModel<ViewComment>> GetCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId, int limit, int offset)
+        public virtual async Task<PaginationResponseModel<ViewComment>> GetCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId, PaginationDto pagination)
         {
-            IQueryable<ViewComment> comments = DbContext.ViewComments
-                .Where(com => com.UserId == userId && com.KnowledgeId == knowledgeId);
-            int total = comments.Count();
+            List<ViewComment> comments = await DbContext.ViewComments
+                .Where(com => com.UserId == userId && com.KnowledgeId == knowledgeId)
+                .ToListAsync();
+            int total = comments.Count;
             return new PaginationResponseModel<ViewComment>()
             {
                 Total = total,
-                Limit = limit,
-                Offset = offset,
-                Results = await comments.Skip(offset).Take(limit).ToListAsync()
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = ApplyPagination(comments, pagination)
             };
         }
 
-        public virtual async Task<PaginationResponseModel<ViewComment>> GetListCommentsOfKnowledge(Guid knowledgeId, int limit, int offset)
+        public virtual async Task<PaginationResponseModel<ViewComment>> GetListCommentsOfKnowledge(Guid knowledgeId, PaginationDto pagination)
         {
-            IQueryable<ViewComment> listComments = DbContext.ViewComments
+            List<ViewComment> listComments = await DbContext.ViewComments
                 .Where(comment => comment.KnowledgeId == knowledgeId)
-                .OrderBy(comment => comment.CreatedBy);
-            int total = listComments.Count();
-            IEnumerable<ViewComment> lsComments = await listComments
-                .Skip(offset).Take(limit)
+                .OrderBy(comment => comment.CreatedBy)
                 .ToListAsync();
-            return new PaginationResponseModel<ViewComment>(total, limit, offset, lsComments);
+            int total = listComments.Count;
+            return new PaginationResponseModel<ViewComment>(total, pagination.Limit, pagination.Offset, ApplyPagination(listComments, pagination));
         }
 
-        public virtual async Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetListCommentsOfKnowledge(IEnumerable<Guid> knowledgeIds, int limit)
+        public virtual async Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetListCommentsOfKnowledge(List<Guid> knowledgeIds, PaginationDto pagination)
         {
             var comments = await DbContext.ViewComments
                 .Where(comment => knowledgeIds.Any(id => id == comment.KnowledgeId) && comment.ReplyId == null)
@@ -93,15 +96,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
             var groupedComments = comments
                 .GroupBy(comment => comment.KnowledgeId)
-                .ToDictionary(group => group.Key, group => group);
+                .ToDictionary(group => group.Key, group => group.ToList());
 
             var mapping = groupedComments.ToDictionary(
                 kvp => kvp.Key,
                 kvp => new PaginationResponseModel<ViewComment>(
-                    kvp.Value.Count(),
-                    limit,
-                    0,
-                    kvp.Value.Take(limit)
+                    kvp.Value.Count,
+                    pagination.Limit,
+                    pagination.Offset,
+                    ApplyPagination(kvp.Value, pagination)
                 )
             );
 
@@ -123,21 +126,40 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return result;
         }
 
-        public virtual async Task<PaginationResponseModel<ViewComment>> GetRepliesOfComment(Guid commentId, int limit, int offset)
+        public virtual async Task<List<ViewComment>> GetListCommentsOfKnowledge(Guid knowledgeId)
         {
-            IQueryable<ViewComment> comments = DbContext.ViewComments
-                .Where(com => com.ReplyId == commentId);
-            int total = comments.Count();
+            return await DbContext.ViewComments.Where(com => com.KnowledgeId == knowledgeId)
+                .OrderByDescending(comment => comment.CreatedTime).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewComment>> GetListCommentsOfUser(Guid userId)
+        {
+            return await DbContext.ViewComments.Where(com => com.UserId == userId)
+                .OrderByDescending(comment => comment.CreatedTime).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewComment>> GetListCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId)
+        {
+            return await DbContext.ViewComments.Where(com => com.UserId == userId && com.KnowledgeId == knowledgeId)
+                .OrderByDescending(comment => comment.CreatedTime).ToListAsync();
+        }
+
+        public virtual async Task<PaginationResponseModel<ViewComment>> GetRepliesOfComment(Guid commentId, PaginationDto pagination)
+        {
+            List<ViewComment> comments = await DbContext.ViewComments
+                .Where(com => com.ReplyId == commentId)
+                .ToListAsync();
+            int total = comments.Count;
             return new PaginationResponseModel<ViewComment>()
             {
                 Total = total,
-                Limit = limit,
-                Offset = offset,
-                Results = await comments.Skip(offset).Take(limit).ToListAsync()
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = ApplyPagination(comments, pagination)
             };
         }
 
-        public virtual async Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetRepliesOfComment(IEnumerable<Guid> commentIds, int limit)
+        public virtual async Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetRepliesOfComment(List<Guid> commentIds, PaginationDto pagination)
         {
             var comments = await DbContext.ViewComments
                 .Where(comment => comment.ReplyId != null && commentIds.Any(id => id == comment.ReplyId))
@@ -146,15 +168,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
             var groupedComments = comments
                 .GroupBy(comment => comment.ReplyId!.Value)
-                .ToDictionary(group => group.Key, group => group);
+                .ToDictionary(group => group.Key, group => group.ToList());
 
             var mapping = groupedComments.ToDictionary(
                 kvp => kvp.Key,
                 kvp => new PaginationResponseModel<ViewComment>(
-                    kvp.Value.Count(),
-                    limit,
-                    0,
-                    kvp.Value.Take(limit)
+                    kvp.Value.Count,
+                    pagination.Limit,
+                    pagination.Offset,
+                    ApplyPagination(kvp.Value, pagination)
                 )
             );
 

@@ -28,7 +28,7 @@
                     <MSpinner :style="{ fontSize: '24px' }" />
                 </div>
                 <div class="p-combobox-dropdown-empty">
-                    {{ label.noOptions }}
+                    {{ getLabel()?.noOptions }}
                 </div>
                 <div class="p-combobox-dropdown-items">
                     <!-- ITEMS STATE: normal, default, chosen, focus -->
@@ -84,7 +84,7 @@ let combobox = {
                 callFilter: 0,
                 isFiltering: false
             },
-            label: this.lang.components.input.combobox,
+            dlabel: this.lang.components.input.combobox,
             components: {
                 dropdownContent: null,
                 dropdownFrame: null,
@@ -106,6 +106,11 @@ let combobox = {
     },
     methods: {
         ...input.methods,
+
+        async getLabel(){
+            return this.lang?.components?.input?.combobox;
+        },
+
         /**
         * Override validate function
         * @param none
@@ -244,7 +249,7 @@ let combobox = {
 
 
         // OTHER METHODS:
-        /* *
+        /**
         * Xử lý logic khi click chuột vào một item của combobox
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -262,7 +267,7 @@ let combobox = {
                 console.error(error);
             }
         },  
-        /* *
+        /**
         * Hai hàm xử lý sự kiện click vào nút expand và collapse
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -284,7 +289,7 @@ let combobox = {
             // let clH = 
             this.components.dropdownFrame.style.height = `${this.components.dropdownContent.clientHeight}px`;
         },
-        /* *
+        /**
         * Xử lý sự kiện yêu cầu lọc item theo text
         * @param none
         * @Author TVPhuc (12/12/23)
@@ -321,7 +326,7 @@ let combobox = {
                 console.error(error);
             }
         },
-        /* *
+        /**
         * Xử lý yêu cầu làm mới danh sách items của combobox
         * @param none
         * @Author TVPhuc (12/12/23)

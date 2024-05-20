@@ -6,6 +6,8 @@ class ResponseUserCardModel extends Entity {
         super();
         this.UserId = null;
         this.Username = null;
+        this.Email = null;
+        this.PhoneNumber = null;
         this.Avatar = null;
         this.Cover = null;
         this.FullName = null;
@@ -13,6 +15,8 @@ class ResponseUserCardModel extends Entity {
         this.Bio = null;
         this.UserRelationType = null;
         this.UserRelationId = null;
+        this.CourseRoleType = null;
+        this.CourseRelationId = null;
     }
 
     init() {

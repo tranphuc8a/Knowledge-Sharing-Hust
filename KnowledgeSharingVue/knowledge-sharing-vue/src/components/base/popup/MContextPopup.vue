@@ -154,12 +154,12 @@
 <style scoped>
 .p-popup-context-container {
     position: relative;
-    width: fit-content;
+    width: 100%;
 }
 
 .p-popup-context-mask {
     cursor: pointer;
-    width: fit-content;
+    width: 100%;
 }
 
 .p-popup-context-content {

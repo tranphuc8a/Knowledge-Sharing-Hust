@@ -1,7 +1,10 @@
 <template>
     <DesktopHomeFrame>
         
-        <div class="d-content">
+        <div class="d-content"
+            @:scroll="throttleResolveOnScroll"
+            ref="page"
+        >
             <!-- <div class="d-content-subpage__left_mask">
             </div> -->
             <div class="d-content-subpage__left_content">
@@ -43,21 +46,38 @@
 import HomeNavigationSubpage from './sub-pages/HomeNavigationSubpage.vue';
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 import DesktopHomeFrame from './DesktopHomeFrame.vue';
+import Debounce from '@/js/utils/debounce';
 export default {
     name: "DesktopHomePage",
     data() {
         return {
-            title: "Desktop Home Page"
+            title: "Desktop Home Page",
+            handler: [],
+            throttleResolveOnScroll: Debounce.throttle(this.resolveOnScroll.bind(this), 1000),
         }
     },
     components: {
         DesktopHomeFrame, TooltipFrame, HomeNavigationSubpage
     },
     methods: {
-
+        registerScrollHandler(handler){
+            this.handler.push(handler);
+        },
+        async resolveOnScroll(){
+            try {
+                await Promise.all(this.handler.map(handler => handler(this.$refs.page)));
+            } catch (error) {
+                console.error(error);
+            }
+        }
     },
     props: {
 
+    },
+    provide(){
+        return {
+            registerScrollHandler: this.registerScrollHandler
+        }
     },
     inject: {
         getLanguage: {},

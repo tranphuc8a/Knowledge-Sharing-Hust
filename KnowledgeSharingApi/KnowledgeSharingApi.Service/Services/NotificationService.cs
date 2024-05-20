@@ -92,8 +92,8 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> DeleteNotifications(Guid userId, Guid[] notiIds)
         {
             ViewUser user = await CheckUserExisted(userId);
-            IEnumerable<Notification?> notifications = await NotificationRepository.Get(notiIds);
-            notifications = notifications.Where(noti => noti?.UserId == user.UserId);
+            List<Notification?> notifications = await NotificationRepository.Get(notiIds);
+            notifications = notifications.Where(noti => noti?.UserId == user.UserId).ToList();
             int rows = await NotificationRepository.Delete(
                 notifications.Select(noti => noti?.NotificationId ?? Guid.Empty).ToArray()
             );
@@ -113,22 +113,21 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(NotificationResource), string.Empty, noti);
         }
 
-        public virtual async Task<ServiceResult> GetNotifications(Guid userId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> GetNotifications(Guid userId, PaginationDto pagination)
         {
             ViewUser user = await CheckUserExisted(userId);
-            int limitValue = limit ?? LimitDefault;
-            int offsetValue = offset ?? 0;
-            IEnumerable<Notification> listNotification = 
-                await NotificationRepository.GetNotificationsByUserId(user.UserId, limitValue, offsetValue);
+            List<Notification> listNotification = 
+                await NotificationRepository.GetNotificationsByUserId(user.UserId, pagination);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(NotificationResource), string.Empty, listNotification);
         }
 
         public virtual async Task<ServiceResult> GetNotifications(Guid userId, Guid[] notiIds)
         {
             ViewUser user = await CheckUserExisted(userId);
-            IEnumerable<Notification?> listNotification =
+            List<Notification?> listNotification =
                 (await NotificationRepository.Get(notiIds))
-                .Where(noti => noti?.UserId == user.UserId);
+                .Where(noti => noti?.UserId == user.UserId)
+                .ToList();
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(NotificationResource), 
                 string.Empty, 

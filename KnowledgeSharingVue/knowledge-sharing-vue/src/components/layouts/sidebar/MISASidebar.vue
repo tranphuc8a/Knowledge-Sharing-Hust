@@ -90,7 +90,7 @@ export default {
             }
             return this.label;
         },
-        /* *
+        /**
         * Thay đổi trạng thái expand của sidebar
         * @param none
         * @Author TVPhuc (19/12/23)

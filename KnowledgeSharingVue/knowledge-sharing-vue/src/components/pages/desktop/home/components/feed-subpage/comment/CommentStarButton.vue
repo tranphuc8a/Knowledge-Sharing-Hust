@@ -163,16 +163,16 @@ export default {
                 }
                 let comment = this.getComment();
                 if (comment != null){
-                    let numStars = this.getComment().TotalStars ?? 0;
-                    let averageStars = this.getComment().AverageStars ?? 0;
+                    let numStars = this.getComment().TotalStar ?? 0;
+                    let averageStars = this.getComment().AverageStar ?? 0;
                     if (this.getComment().MyStars == null){
                         averageStars = (averageStars * numStars + star) / (numStars + 1);
                         numStars += 1;
-                        this.getComment().TotalStars = numStars;
-                        this.getComment().AverageStars = averageStars;
+                        this.getComment().TotalStar = numStars;
+                        this.getComment().AverageStar = averageStars;
                     } else if (numStars > 0) {
                         averageStars = (averageStars * numStars + star - this.getComment().MyStars) / numStars;
-                        this.getComment().AverageStars = averageStars;
+                        this.getComment().AverageStar = averageStars;
                     }  
                     this.forceUpdateInformationBar?.();
                     this.getComment().MyStars = star;

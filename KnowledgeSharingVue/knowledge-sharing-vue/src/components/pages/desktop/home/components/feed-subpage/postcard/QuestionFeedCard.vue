@@ -1,4 +1,4 @@
-/* eslint-disable */
+<!-- /* eslint-disable */ -->
 <template>
     <FeedCardFrame>
         <div class="p-feedcard-lestion">

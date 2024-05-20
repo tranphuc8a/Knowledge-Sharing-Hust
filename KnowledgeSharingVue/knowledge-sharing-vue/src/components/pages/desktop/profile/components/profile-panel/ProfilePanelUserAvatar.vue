@@ -47,7 +47,7 @@ export default {
     data(){
         return {
             visiblePreview: false,
-            imageSrc: '',
+            imageSrc: null,
             defaultImageSrc: require('@/assets/default-thumbnail/student-image-icon.png'),
             iconStyle: {
             },

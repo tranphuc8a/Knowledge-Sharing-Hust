@@ -13,7 +13,7 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class KnowledgesController(
         IKnowledgeService knowledgeService    
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly IKnowledgeService KnowledgeService = knowledgeService;
 
@@ -30,9 +30,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> Mark(Guid knowledgeId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await KnowledgeService.Mark(Guid.Parse(myUid), knowledgeId, isMark: true);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await KnowledgeService.Mark(GetCurrentUserIdStrictly(), knowledgeId, isMark: true);
+            return StatusCode(res);
         }
 
 
@@ -47,9 +46,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> Unmark(Guid knowledgeId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await KnowledgeService.Mark(Guid.Parse(myUid), knowledgeId, isMark: false);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await KnowledgeService.Mark(GetCurrentUserIdStrictly(), knowledgeId, isMark: false);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -61,11 +59,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpPost("users/{knowledgeId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> GetUserMarkedKnowledge(Guid knowledgeId, int? limit, int? offset)
+        public async Task<IActionResult> GetUserMarkedKnowledge(Guid knowledgeId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await KnowledgeService.GetListUserMarkKnowledge(Guid.Parse(myUid), knowledgeId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await KnowledgeService.GetListUserMarkKnowledge(GetCurrentUserIdStrictly(), knowledgeId, pagination);
+            return StatusCode(res);
         }
 
         #endregion

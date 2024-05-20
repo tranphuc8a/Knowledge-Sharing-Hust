@@ -23,24 +23,22 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Kích thước trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (3/4/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListCourseParticipants(Guid myUid, Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListCourseParticipants(Guid myUid, Guid courseId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu Admin lấy về danh sách các bài học đang có trong khóa học
         /// Owner, Member
         /// </summary>
         /// <param name="courseId"> id của khóa học cần lấy </param>
-        /// <param name="limit"> Kích thước trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (3/4/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetListCourseParticipants(Guid courseId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetListCourseParticipants(Guid courseId, PaginationDto page);
         #endregion
 
         #region Create apies
@@ -87,7 +85,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> DeleteListLessonFromCourse(Guid myUid, IEnumerable<Guid> listParticipantIds);
+        Task<ServiceResult> DeleteListLessonFromCourse(Guid myUid, List<Guid> listParticipantIds);
 
         #endregion
 
@@ -110,7 +108,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UpdateListLessonInCourse(Guid myUid, IEnumerable<UpdateLessonInCourseModel> model);
+        Task<ServiceResult> UpdateListLessonInCourse(Guid myUid, List<UpdateLessonInCourseModel> model);
 
 
         /// <summary>

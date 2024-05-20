@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
@@ -17,7 +18,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class ConversationMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Conversation>(dbContext), IConversationRepository
     {
-        public virtual async Task<IEnumerable<ViewUserConversation>> GetParticipants(Guid conversationId)
+        public virtual async Task<List<ViewUserConversation>> GetParticipants(Guid conversationId)
         {
             return await DbContext.ViewUserConversations
                 .Where(participant => participant.ConversationId == conversationId)
@@ -25,21 +26,23 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public virtual async Task<IEnumerable<ViewMessage>> GetMessages(Guid userId, Guid conversationId, int limit, int offset)
+        public virtual async Task<List<ViewMessage>> GetMessages(Guid userId, Guid conversationId, PaginationDto pagination)
         {
             ViewUserConversation userConversation =
-                DbContext.ViewUserConversations
-                .Where(user => user.UserId == userId)
-                .FirstOrDefault() ?? throw new Exception("user and conversation not match");
+                await DbContext.ViewUserConversations
+                .Where(user => user.UserId == userId && user.ConversationId == conversationId)
+                .FirstOrDefaultAsync() 
+                ?? throw new Exception("User and Conversation not match");
 
-            return await DbContext.ViewMessages
-                .Where(message => message.ConversationId == conversationId && message.Time >= userConversation.LastDeleteTime)
-                .OrderByDescending(message => message.Time)
-                .Skip(offset).Take(limit)
-                .ToListAsync();
+            return await ApplyPagination(
+                    DbContext.ViewMessages
+                    .Where(message => message.ConversationId == conversationId && message.Time >= userConversation.LastDeleteTime)
+                    .OrderByDescending(message => message.Time),
+                    pagination
+                ).ToListAsync();
         }
 
-        public virtual async Task<IEnumerable<Conversation>> GetListConversationByUserId(Guid userId)
+        public virtual async Task<List<Conversation>> GetListConversationByUserId(Guid userId)
         {
             IQueryable<Conversation> query =
                 from conversation in DbContext.Conversations
@@ -69,12 +72,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task DeleteExpiredMessages(Guid conversationId)
         {
-            IEnumerable<ViewUserConversation> participants = await GetParticipants(conversationId);
+            List<ViewUserConversation> participants = await GetParticipants(conversationId);
             DateTime minLastDelete = participants.Select(participant => participant.LastDeleteTime).Min();
-            IEnumerable<Message> expired_messages =
+            List<Message> expired_messages =
                 DbContext.Messages
                 .Where(message => message.Time <= minLastDelete)
-                .AsEnumerable();
+                .ToList();
 
             DbContext.Messages.RemoveRange(expired_messages);
 
@@ -116,7 +119,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         /// <returns></returns>
         /// Created: PhucTV (26/3/24)
         /// Modified: None
-        private static IEnumerable<UserConversation> CreateUserConversations(Conversation conversation, Profile user1, Profile user2)
+        private static List<UserConversation> CreateUserConversations(Conversation conversation, Profile user1, Profile user2)
         {
             DateTime currentTime = DateTime.Now;
             return [

@@ -6,6 +6,7 @@ import Message from './message';
 class ViewMessage extends Message {
     constructor() {
         super();
+        this.Username = null;
         this.UserId = null;
         this.ConversationId = null;
         this.Nickname = null;

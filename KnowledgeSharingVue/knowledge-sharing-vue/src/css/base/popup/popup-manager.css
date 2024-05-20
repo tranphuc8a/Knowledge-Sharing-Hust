@@ -1,0 +1,47 @@
+
+
+
+.p-popup-content{
+    display: flex;
+    justify-content: space-between;
+    flex-flow: row nowrap;
+    align-items: flex-start;
+    width: 100%;
+    margin: 0;
+    padding: 12px 12px 24px 12px;
+    gap: 8px;
+    box-sizing: border-box;
+}
+
+.p-popup-content .p-popup-content-text{
+    width: 100%;
+    text-align: start;
+    overflow-wrap: normal;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
+
+
+
+
+.popup-enter-from{
+    opacity: 0;
+    transform: translateY(100px);
+}
+.popup-leave-to {
+    opacity: 0;
+    transform: translateX(100px);
+}
+
+.popup-enter-active, .popup-leave-active {
+    transition: opacity 0.5s, transform 0.5s;
+}
+
+.popup-move{
+    transition: all 0.35s;
+}
+
+
+

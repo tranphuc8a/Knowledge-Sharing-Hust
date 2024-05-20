@@ -13,7 +13,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
     public class ImageMySqlRepository(IDbContext dbContext) : BaseMySqlRepository<Image>(dbContext), IImageRepository
     {
-        public virtual async Task<IEnumerable<Image>> GetByUserId(Guid userId)
+        public virtual async Task<List<Image>> GetByUserId(Guid userId)
         {
             return await DbContext.Images.Where(image => image.UserId == userId).ToListAsync();
         }

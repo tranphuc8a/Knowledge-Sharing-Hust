@@ -9,11 +9,13 @@ class ResponseCourseModel extends ViewCourse {
         this.NumberComments = null;
         this.TopComments = null;
         this.IsMarked = null;
-        this.AverageStars = null;
+        this.AverageStar = null;
         this.MyStars = null;
-        this.TotalStars = null;
+        this.TotalStar = null;
         this.Role = null;
         this.Categories = [];
+        this.CourseRoleType = null;
+        this.CourseRelationId = null;
     }
 
     init() {

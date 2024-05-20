@@ -1,24 +1,26 @@
 <template>
-    <m-context-popup :delay-hiding="0" :delay-showing="0">
-        <template #popupContextMask>
-            <div class="p-cfb-mask">
-                <span> {{ options[selected]?.label }} </span>
-                <MIcon :style="iconStyle" fa="chevron-down"> </MIcon>
-            </div>
-        </template>
-
-        <template #popupContextContent>
-            <div class="p-cfb-content">
-                <template v-for="(option, index) in listOptions" :key="index">
-                    <div class="p-cfb-option" @:click="options[option].onClick">
-                        <MIcon :style="iconStyle" :fa="options[option].fa"> </MIcon>
-                        <span> {{ options[option].label }} </span>
-                    </div>
-                </template>
-            </div>
-        </template>
-
-    </m-context-popup>
+    <div class="p-crb-frame">
+        <m-context-popup :delay-hiding="0" :delay-showing="0">
+            <template #popupContextMask>
+                <div class="p-cfb-mask">
+                    <span> {{ options[selected]?.label }} </span>
+                    <MIcon :style="iconStyle" fa="chevron-down"> </MIcon>
+                </div>
+            </template>
+    
+            <template #popupContextContent>
+                <div class="p-cfb-content">
+                    <template v-for="(option, index) in listOptions" :key="index">
+                        <div class="p-cfb-option" @:click="options[option].onClick">
+                            <MIcon :style="iconStyle" :fa="options[option].fa"> </MIcon>
+                            <span> {{ options[option].label }} </span>
+                        </div>
+                    </template>
+                </div>
+            </template>
+    
+        </m-context-popup>
+    </div>
 </template>
 
 <script>
@@ -96,6 +98,10 @@ export default{
 </script>
 
 <style scoped>
+.p-crb-frame{
+    width: fit-content;
+}
+
 .p-cfb-mask{
     display: flex;
     flex-flow: row nowrap;

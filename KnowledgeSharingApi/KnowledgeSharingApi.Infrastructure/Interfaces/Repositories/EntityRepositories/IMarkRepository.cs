@@ -17,6 +17,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (03/05/24)
         /// Modified: None
-        Task<Dictionary<Guid, bool>> GetUserMarkListKnowledge(Guid userId, IEnumerable<Guid> knowledgeId);
+        Task<Dictionary<Guid, bool>> GetUserMarkListKnowledge(Guid userId, List<Guid> knowledgeId);
     }
 }

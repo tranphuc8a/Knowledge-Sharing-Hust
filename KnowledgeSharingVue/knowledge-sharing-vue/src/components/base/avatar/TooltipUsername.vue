@@ -1,15 +1,17 @@
 <template>
-    <TooltipFrame>
-        <template #tooltipMask>
-            <div class="p-tooltip-username" @:click="resolveClickUsername">
-                {{ user?.FullName ?? "User"}}
-            </div>
-        </template>
-
-        <template #tooltipContent>
-            <TooltipUser :user="user" />
-        </template>
-    </TooltipFrame>
+    <div class="p-tooltip-username-frame">
+        <TooltipFrame>
+            <template #tooltipMask>
+                <div class="p-tooltip-username" @:click="resolveClickUsername">
+                    {{ user?.FullName ?? "User"}}
+                </div>
+            </template>
+    
+            <template #tooltipContent>
+                <TooltipUser :user="user" />
+            </template>
+        </TooltipFrame>
+    </div>
 </template>
 
 
@@ -40,9 +42,11 @@ export default {
         async resolveClickUsername(){
             try {
                 let username = this.user?.Username;
-                if (Validator.isEmpty(username))
+                let userId = this.user?.UserId;
+                let userIdentifier = username ?? userId;
+                if (Validator.isEmpty(userIdentifier))
                     return;
-                this.router.push('/profile/' + username);
+                this.router.push('/profile/' + userIdentifier);
             } catch (e){
                 console.error(e);
             }
@@ -58,6 +62,9 @@ export default {
 </script>
 
 <style scoped>
+.p-tooltip-username-frame{
+    width: fit-content;
+}
 .p-tooltip-username{
     width: fit-content;
     font-weight: 600;

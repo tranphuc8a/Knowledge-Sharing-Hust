@@ -22,16 +22,11 @@ namespace KnowledgeSharingApi.Controllers
         ICourseRelationService courseRelationService,
         ICoursePaymentService coursePaymentService,
         IUserRepository userRepository
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly ICourseRelationService CourseRelationService = courseRelationService;
         protected readonly ICoursePaymentService CoursePaymentService = coursePaymentService;
         protected readonly IUserRepository UserRepository = userRepository;
-
-        protected virtual IActionResult StatusCode(ServiceResult result)
-        {
-            return StatusCode((int)result.StatusCode, new ApiResponse(result));
-        }
 
         #region Functionality methods
 
@@ -46,22 +41,11 @@ namespace KnowledgeSharingApi.Controllers
         {
             ValidatorException invalidEmail = new(ViConstantResource.INVALID_EMAIL);
             if (string.IsNullOrEmpty(email)) throw invalidEmail;
-            Guid myUid = GetCurrentUserId();
+            Guid myUid = GetCurrentUserIdStrictly();
             User? myUser = await UserRepository.Get(myUid);
             if (myUser?.Email != email) throw invalidEmail;
         }
 
-        /// <summary>
-        /// Lấy về user id của current User
-        /// </summary>
-        /// <returns></returns>
-        /// Created: PhucTV (29/3/24)
-        /// Modified: None
-        protected virtual Guid GetCurrentUserId()
-        {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return Guid.Parse(myUid);
-        } 
         #endregion
 
         #region Admin apies
@@ -76,8 +60,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/registers/{courseId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListCourseRegisters(Guid courseId, int? limit, int? offset)
-            => StatusCode(await CourseRelationService.AdminGetCourseRegisters(courseId, limit, offset));
+        public async Task<IActionResult> AdminGetListCourseRegisters(Guid courseId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await CourseRelationService.AdminGetCourseRegisters(courseId, 
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
 
         /// <summary>
@@ -113,10 +98,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("registers/{courseId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetRegisters(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetRegisters(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseRelationService.UserGetRegisters(Guid.Parse(myUid), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserGetRegisters(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
 
@@ -132,10 +117,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("invites/{courseId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetCourseInvites(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetCourseInvites(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseRelationService.UserGetCourseInvites(Guid.Parse(myUid), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserGetCourseInvites(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
         /// <summary>
@@ -150,10 +135,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("requests/{courseId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetCourseRequests(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetCourseRequests(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseRelationService.UserGetCourseRequests(Guid.Parse(myUid), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserGetCourseRequests(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
         /// <summary>
@@ -167,10 +152,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("invites/my")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetMyCourseInvites(int? limit, int? offset)
+        public async Task<IActionResult> UserGetMyCourseInvites(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseRelationService.UserGetMyCourseInvites(Guid.Parse(myUid), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserGetMyCourseInvites(GetCurrentUserIdStrictly(), pagination));
         }
 
         /// <summary>
@@ -184,10 +169,44 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("requests/my")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetMyCourseRequests(int? limit, int? offset)
+        public async Task<IActionResult> UserGetMyCourseRequests(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await CourseRelationService.UserGetMyCourseRequests(Guid.Parse(myUid), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserGetMyCourseRequests(GetCurrentUserIdStrictly(), pagination));
+        }
+
+
+        /// <summary>
+        /// Yêu cầu user lay ve quan he voi mot khoa hoc
+        /// User
+        /// <paramref name="courseId"/> id cua khoa hoc can lay
+        /// <paramref name="isFocusCourse"/> focus vao course hay user
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (15/5/24)
+        /// Modified: None
+        [HttpGet("course-status/{courseId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserGetCourseStatus(Guid courseId, bool? isFocusCourse)
+        {
+            return StatusCode(await CourseRelationService.UserGetCourseRelationStatus(GetCurrentUserIdStrictly(), courseId, isFocusCourse));
+        }
+
+        /// <summary>
+        /// Yêu cầu user lay ve quan he voi mot khoa hoc
+        /// User
+        /// <paramref name="courseId"/> id cua khoa hoc can lay
+        /// <paramref name="userId"/> id user can lay
+        /// <paramref name="isFocusCourse"/> focus vao course hay user
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (15/5/24)
+        /// Modified: None
+        [HttpGet("course-user-status/{courseId}/{userId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserGetUserCourseStatus(Guid courseId, Guid userId, bool? isFocusCourse)
+        {
+            return StatusCode(await CourseRelationService.UserGetCourseRelationStatus(GetCurrentUserIdStrictly(), userId, courseId, isFocusCourse));
         }
 
 
@@ -210,7 +229,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserRegisterCourse(Guid courseId)
         {
-            return StatusCode(await CourseRelationService.UserRegisterCourse(GetCurrentUserId(), courseId));
+            return StatusCode(await CourseRelationService.UserRegisterCourse(GetCurrentUserIdStrictly(), courseId));
         }
 
         /// <summary>
@@ -225,7 +244,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserUnregisterCourse(Guid courseId)
         {
-            return StatusCode(await CourseRelationService.UserUnregisterCourse(GetCurrentUserId(), courseId));
+            return StatusCode(await CourseRelationService.UserUnregisterCourse(GetCurrentUserIdStrictly(), courseId));
         }
 
         /// <summary>
@@ -240,7 +259,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserDeleteRegister(Guid registerId)
         {
-            return StatusCode(await CourseRelationService.UserDeleteRegister(GetCurrentUserId(), registerId));
+            return StatusCode(await CourseRelationService.UserDeleteRegister(GetCurrentUserIdStrictly(), registerId));
         }
 
         #endregion
@@ -260,7 +279,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserRequestCourse(Guid courseId)
         {
-            return StatusCode(await CourseRelationService.UserRequestCourse(GetCurrentUserId(), courseId));
+            return StatusCode(await CourseRelationService.UserRequestCourse(GetCurrentUserIdStrictly(), courseId));
         }
 
         /// <summary>
@@ -274,7 +293,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserDeleteCourseRequest(Guid requestId)
         {
-            return StatusCode(await CourseRelationService.UserDeleteCourseRequest(GetCurrentUserId(), requestId));
+            return StatusCode(await CourseRelationService.UserDeleteCourseRequest(GetCurrentUserIdStrictly(), requestId));
         }
 
         /// <summary>
@@ -289,7 +308,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserConfirmCourseRequest(Guid requestId, bool isAccept)
         {
-            return StatusCode(await CourseRelationService.UserConfirmCourseRequest(GetCurrentUserId(), requestId, isAccept));
+            return StatusCode(await CourseRelationService.UserConfirmCourseRequest(GetCurrentUserIdStrictly(), requestId, isAccept));
         }
 
         #endregion
@@ -308,7 +327,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserInviteUserToCourse(Guid courseId, Guid userId)
         {
-            return StatusCode(await CourseRelationService.UserInviteUserToCourse(GetCurrentUserId(), courseId, userId));
+            return StatusCode(await CourseRelationService.UserInviteUserToCourse(GetCurrentUserIdStrictly(), courseId, userId));
         }
 
         /// <summary>
@@ -321,9 +340,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpPost("invite-list/{courseId}/{userId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserInviteListUserToCourse(Guid courseId, [FromBody] IEnumerable<Guid> listUserIds)
+        public async Task<IActionResult> UserInviteListUserToCourse(Guid courseId, [FromBody] List<Guid> listUserIds)
         {
-            return StatusCode(await CourseRelationService.UserInviteListUserToCourse(GetCurrentUserId(), courseId, listUserIds));
+            return StatusCode(await CourseRelationService.UserInviteListUserToCourse(GetCurrentUserIdStrictly(), courseId, listUserIds));
         }
 
         /// <summary>
@@ -338,7 +357,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserConfirmInvite(Guid inviteId, bool isAccept)
         {
-            return StatusCode(await CourseRelationService.UserConfirmCourseInvite(GetCurrentUserId(), inviteId, isAccept));
+            return StatusCode(await CourseRelationService.UserConfirmCourseInvite(GetCurrentUserIdStrictly(), inviteId, isAccept));
         }
 
         /// <summary>
@@ -352,7 +371,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UserDeleteInvite(Guid inviteId)
         {
-            return StatusCode(await CourseRelationService.UserDeleteCourseInvite(GetCurrentUserId(), inviteId));
+            return StatusCode(await CourseRelationService.UserDeleteCourseInvite(GetCurrentUserIdStrictly(), inviteId));
         }
 
         #endregion

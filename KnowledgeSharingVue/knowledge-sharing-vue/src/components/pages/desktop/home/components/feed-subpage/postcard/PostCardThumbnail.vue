@@ -1,7 +1,16 @@
 <template>
-    <div class="p-postcard-thumbnail">
-        <img :src="imgSrc" class="p-postcard-thumbnail__img" 
-            @:click="resolveClickThumbnail"/>
+    <div class="p-postcard-thumbnail"
+        @:click="resolveClickThumbnail"
+        :style="{
+            backgroundImage: `url('${this.imgSrc}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            cursor: 'pointer'
+        }"
+    >
+        <!-- <img :src="imgSrc" class="p-postcard-thumbnail__img" 
+            @:click="resolveClickThumbnail"/> -->
         <PreviewImage :src="imgSrc" ref="preview" />
     </div>
 </template>
@@ -81,6 +90,8 @@ export default {
     overflow: hidden;
     border-top: solid var(--grey-color-300) 1px;
     border-bottom: solid var(--grey-color-300) 1px;
+    cursor: pointer;
+    aspect-ratio: 16 / 9;
 }
 
 .p-postcard-thumbnail__img{

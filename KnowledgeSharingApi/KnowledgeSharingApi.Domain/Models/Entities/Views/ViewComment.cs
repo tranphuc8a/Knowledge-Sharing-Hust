@@ -24,6 +24,14 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
 
         public string Role { get; set; } = string.Empty;
 
+        public int? TotalStar { get; set; }
+
+        public int? SumStar { get; set; }
+
+        public double? AverageStar { get; set; }
+
+        public int? TotalComment { get; set; }
+
         protected override ViewComment Init() {
             return new ViewComment();
         }

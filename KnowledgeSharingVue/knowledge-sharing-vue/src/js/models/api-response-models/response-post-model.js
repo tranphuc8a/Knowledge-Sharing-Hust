@@ -9,9 +9,9 @@ class ResponsePostModel extends ViewPost {
         this.NumberComments = null;
         this.TopComments = null;
         this.IsMarked = null;
-        this.AverageStars = null;
+        this.AverageStar = null;
         this.MyStars = null;
-        this.TotalStars = null;
+        this.TotalStar = null;
         this.Categories = [];
     }
 

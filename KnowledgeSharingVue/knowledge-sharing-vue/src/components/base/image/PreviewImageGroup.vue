@@ -10,7 +10,7 @@
             }"
         >
             <a-image
-                v-for="(src, index) in srcs"
+                v-for="(src, index) in dSrcs"
                 :key="index"
                 :src="src"
             />
@@ -21,7 +21,7 @@
 
 
 <script>
-
+import Common from '@/js/utils/common';
 
 export default {
     name: 'PreviewImageGroup',
@@ -34,10 +34,12 @@ export default {
     data(){
         return {
             visible: false,
-            current: 0
+            current: 0,
+            dSrcs: []
         }
     },
     mounted(){
+        this.refresh();
     },
     methods: {
         async show(index = 0){
@@ -47,8 +49,26 @@ export default {
                 this.current = index;
             }
             this.visible = true;
+        },
+
+        async refresh(){
+            try {
+                this.dSrcs = [];
+                let awaitAll = await Promise.all(this.srcs.map(src => Common.isValidImage(src)));
+                this.dSrcs = this.srcs.map((src, index) => {
+                    return awaitAll[index] ? src : null;
+                    // return awaitAll[index] ? null : null;
+                }).filter(src => src !== null);
+            } catch (e){
+                console.error(e);
+            }
         }
-    }
+    },
+    watch: {
+        srcs(){
+            this.refresh();
+        }
+    },
 }
 
 </script>

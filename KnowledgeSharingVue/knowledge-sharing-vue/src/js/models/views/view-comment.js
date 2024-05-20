@@ -9,6 +9,10 @@ class ViewComment extends Comment {
         this.Avatar = null;
         this.Cover = null;
         this.Role = null;
+        this.TotalStar = null;
+        this.SumStar = null;
+        this.AverageStar = null;
+        this.TotalComment = null;
     }
 
     init() {

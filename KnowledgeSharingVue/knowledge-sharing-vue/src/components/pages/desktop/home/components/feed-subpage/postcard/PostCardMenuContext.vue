@@ -83,7 +83,7 @@ export default {
                 await new DeleteRequest(url + this.getPost()?.UserItemId)
                     .execute();
                 // delete success:
-                this.getPopupManager().success(`Xóa ${this.postResource} thành công!`);
+                this.getToastManager().success(`Xóa ${this.postResource} thành công!`);
                 window.location.reload();
             } catch (error) {
                 console.error(error);
@@ -99,6 +99,7 @@ export default {
                     .execute();
                 this.getPost().IsMarked = true;
                 await this.updateOptions();
+                this.getToastManager().success(`Lưu thành công!`);
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -110,6 +111,7 @@ export default {
                     .execute();
                 this.getPost().IsMarked = false;
                 await this.updateOptions();
+                this.getToastManager().success(`Đã bỏ lưu!`);
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -127,6 +129,7 @@ export default {
                     .execute();
                 this.getPost().IsAcepted = true;
                 await this.updateOptions();
+                this.getToastManager().success(`Bài thảo luận đã hoàn thành!`);
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -138,6 +141,7 @@ export default {
                     .execute();
                     this.getPost().IsAcepted = false;
                 await this.updateOptions();
+                this.getToastManager().success(`Bài thảo luận chưa hoàn thành!`);
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -149,6 +153,7 @@ export default {
                     .execute();
                 this.getPost().IsBlockComment = true;
                 await this.updateOptions();
+                this.getToastManager().success(`Đã khóa bình luận!`);
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -159,6 +164,7 @@ export default {
                 await new PostRequest('Comments/unblock/' + this.getPost()?.UserItemId)
                     .execute();
                 this.getPost().IsBlockComment = false;
+                this.getToastManager().success(`Đã mở khóa bình luận!`);
                 await this.updateOptions();
             } catch (error) {
                 console.error(error);

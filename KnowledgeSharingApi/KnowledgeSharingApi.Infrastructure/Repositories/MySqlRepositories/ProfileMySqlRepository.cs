@@ -58,17 +58,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         //public virtual Task<PaginationResponseModel<Profile>> Search(Guid uid, string searchKey, int? limit, int? offset)
         //{
         //    // Không bị blockee và blocked
-        //    IEnumerable<Guid> lstBlockeeUid = DbContext.UserRelations
+        //    List<Guid> lstBlockeeUid = DbContext.UserRelations
         //        .Where(relation => relation.UserRelationType == EUserRelationType.Block && relation.ReceiverI == uid)
         //        .Select(relation => relation.SenderId)
         //        .AsEnumerable();
-        //    IEnumerable<Guid> lstBlockedUid = DbContext.UserRelations
+        //    List<Guid> lstBlockedUid = DbContext.UserRelations
         //        .Where(relation => relation.UserRelationType == EUserRelationType.Block && relation.SenderI == uid)
         //        .Select(relation => relation.ReceiverId)
         //        .AsEnumerable();
 
         //    // Tiêu chí tìm kiếm: Username, Họ tên, Số điện thoại
-        //    IEnumerable<Profile> listed =
+        //    List<Profile> listed =
         //        from profile in DbContext.Profiles
         //        join user in DbContext.Users on profile.UserId equals user.UserId
         //        let commonLength = Algorithm.LongestCommonSubsequence(profile.FullName, searchKey)
@@ -82,7 +82,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         //    listed = listed.AsEnumerable();
         //    limit ??= listed.Count();
-        //    IEnumerable<Profile> res = listed.Skip(offset ?? 0).Take((int) limit);
+        //    List<Profile> res = listed.Skip(offset ?? 0).Take((int) limit);
         //    return Task.FromResult(new PaginationResponseModel<Profile>()
         //    {
         //        Limit = (int) limit,

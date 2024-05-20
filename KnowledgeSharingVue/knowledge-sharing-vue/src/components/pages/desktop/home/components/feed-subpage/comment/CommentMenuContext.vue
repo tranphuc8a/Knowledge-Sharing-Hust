@@ -9,7 +9,7 @@
 
         <template #popupContextContent>
             <div class="p-cmc-content">
-                <template v-for="(option) in listOptions" :key="option?.id">
+                <template v-for="(option) in listOptions" :key="option?.id + random()">
                     <div class="p-cmc-option" @:click="options[option].onClick">
                         <MIcon :style="iconStyle" :fa="options[option].fa"> </MIcon>
                         <span> {{ options[option].label }} </span>
@@ -24,7 +24,7 @@
 <script>
 import MContextPopup from '@/components/base/popup/MContextPopup.vue';
 import CurrentUser from '@/js/models/entities/current-user';
-// import { MyRandom } from '@/js/utils/myrandom';
+import { MyRandom } from '@/js/utils/myrandom';
 export default {
     name: "CommentMenuContext",
     props: {
@@ -45,6 +45,9 @@ export default {
         }
     },
     methods: {
+        random(){
+            return MyRandom.generateUUID();
+        },
         async resolveEditComment(){
             if (this.onEdit){
                 this.onEdit();
@@ -84,6 +87,10 @@ export default {
                     this.listOptions = [
                         this.actions.Reply,
                         this.actions.Delete
+                    ];
+                } else {
+                    this.listOptions = [
+                        this.actions.Reply
                     ];
                 }
                 if (this.getComment()?.isHideCommentInformation == true){

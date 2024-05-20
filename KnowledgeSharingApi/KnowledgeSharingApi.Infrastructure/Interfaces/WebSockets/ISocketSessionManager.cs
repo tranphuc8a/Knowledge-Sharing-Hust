@@ -56,14 +56,14 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets
         /// <param name="username"> Người dùng muốn lấy socket </param>
         /// Created: PhucTV (13/3/24)
         /// Modified: None
-        IEnumerable<KSSocket> GetSockets(string username);
+        List<KSSocket> GetSockets(string username);
 
         /// <summary>
         /// Lấy danh sách toàn bộ socket
         /// </summary>
         /// Created: PhucTV (13/3/24)
         /// Modified: None
-        IEnumerable<KSSocket> GetAllSockets();
+        List<KSSocket> GetAllSockets();
 
 
         /// <summary>
@@ -71,6 +71,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets
         /// </summary>
         /// Created: PhucTV (13/3/24)
         /// Modified: None
-        IEnumerable<string> GetUsernames();
+        List<string> GetUsernames();
     }
 }

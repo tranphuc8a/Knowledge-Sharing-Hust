@@ -31,6 +31,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         protected readonly ILessonRepository LessonRepository;
         protected readonly IStarRepository StarRepository;
+        protected readonly ICalculateKnowledgeSearchScore CalculateKnowledgeSearchScore;
         protected readonly ICategoryRepository CategoryRepository;
         protected readonly ICourseRepository CourseRepository;
         protected readonly IImageRepository ImageRepository;
@@ -45,6 +46,7 @@ namespace KnowledgeSharingApi.Services.Services
         public LessonService(
             IResourceFactory resourceFactory,
             ILessonRepository lessonRepository,
+            ICalculateKnowledgeSearchScore calculateKnowledgeSearchScore,
             IStarRepository starRepository,
             ICourseRepository courseRepository,
             IUserRepository userRepository,
@@ -60,6 +62,7 @@ namespace KnowledgeSharingApi.Services.Services
             EntityResource = ResourceFactory.GetEntityResource();
 
             DecorationRepository = decorationRepository;
+            CalculateKnowledgeSearchScore = calculateKnowledgeSearchScore;
             KnowledgeRepository = knowledgeRepository;
             LessonRepository = lessonRepository;
             StarRepository = starRepository;
@@ -113,7 +116,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> AdminDeletePost(Guid postId)
         {
             // Kiểm tra lesson tồn tại
-            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+            Lesson lesson = await LessonRepository.CheckExisted(postId, NotExistedLesson);
 
             // OK xóa
             // Override xóa trong repo để xóa cả những course lesson tương ứng
@@ -123,25 +126,25 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(LessonResource));
         }
 
-        public virtual async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, PaginationDto pagination)
         {
-            IEnumerable<ViewLesson> listLessons =
-                await LessonRepository.GetPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewLesson> listLessons =
+                await LessonRepository.GetPostsOfCategory(catName, pagination);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource),
-                string.Empty, await DecorationRepository.DecorateResponseLessonModel(null, listLessons.ToList()));
+                string.Empty, await DecorationRepository.DecorateResponseLessonModel(null, listLessons));
         }
 
-        public async Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, PaginationDto pagination)
         {
             // Check course exist
             _ = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
 
             // Get list lesson
             PaginationResponseModel<ViewLesson> lessons =
-                await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
+                await LessonRepository.GetLessonsInCourse(courseId, pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(null, lessons.Results.ToList());
+            List<IResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(null, lessons.Results);
 
             // Return Success
             PaginationResponseModel<IResponseLessonModel> res =
@@ -149,7 +152,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetPostDetail(Guid postId)
+        public virtual async Task<ServiceResult> AdminGetPostDetail(Guid postId)
         {
             // Check lesson exist
             ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
@@ -161,30 +164,30 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetPosts(int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetPosts(PaginationDto pagination)
         {
             // Get all paginated
-            IEnumerable<ViewLesson> lessons =
-                await LessonRepository.GetViewPost(limit ?? DefaultLimit, offset ?? 0);
+            List<ViewLesson> lessons =
+                await LessonRepository.GetViewPost(pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons.ToList());
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetUserPosts(Guid userId, PaginationDto pagination)
         {
             // CHeck user existed:
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Get all paginated
-            IEnumerable<ViewLesson> lessons = await LessonRepository.GetByUserId(userId);
-            lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+            List<ViewLesson> lessons = await LessonRepository.GetByUserId(userId, pagination);
+            // lessons = LessonRepository.ApplyPagination(lessons, pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons.ToList());
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -192,20 +195,20 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region Anonymous services
-        public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, PaginationDto pagination)
         {
             // Get public list post
-            IEnumerable<ViewLesson> listLessons =
-                await LessonRepository.GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewLesson> listLessons =
+                await LessonRepository.GetPublicPostsOfCategory(catName, pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listLessons.ToList());
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listLessons);
 
             // Return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetPostDetail(Guid postId)
+        public virtual async Task<ServiceResult> AnonymousGetPostDetail(Guid postId)
         {
             // Check Lesson exist
             ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
@@ -217,31 +220,31 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
+        public virtual async Task<ServiceResult> AnonymousGetPosts(PaginationDto pagination)
         {
             // Get public lessons
-            IEnumerable<ViewLesson> listLessons =
-                await LessonRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
+            List<ViewLesson> listLessons =
+                await LessonRepository.GetPublicPosts(pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listLessons.ToList());
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listLessons);
 
             // Return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, PaginationDto pagination)
         {
             // Check user existed
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Get public lessons and Pagination
-            IEnumerable<ViewLesson> lessons =
-                await LessonRepository.GetPublicPostsByUserId(userId);
-            lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+            List<ViewLesson> lessons =
+                await LessonRepository.GetPublicPostsByUserId(userId, pagination);
+            //lessons = LessonRepository.ApplyPagination(lessons, pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons.ToList());
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, lessons);
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
@@ -252,7 +255,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region User operation services
 
-        public async Task<ServiceResult> ChangePrivacy(Guid myUid, ChangeKnowledgePrivacyModel model)
+        public virtual async Task<ServiceResult> ChangePrivacy(Guid myUid, ChangeKnowledgePrivacyModel model)
         {
             // Check lesson existed and owner
             Lesson lesson = await LessonRepository.CheckExisted(model.KnowledgeId ?? Guid.Empty, NotExistedLesson);
@@ -270,7 +273,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.UpdateSuccess(LessonResource));
         }
 
-        public async Task<ServiceResult> UserCreatePost(Guid myUid, CreatePostModel model)
+        public virtual async Task<ServiceResult> UserCreatePost(Guid myUid, CreatePostModel model)
         {
             // Check Create Lesson Model type:
             if (model is not CreateLessonModel lessonModel) throw new NotMatchTypeException();
@@ -290,24 +293,24 @@ namespace KnowledgeSharingApi.Services.Services
             if (res == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(LessonResource));
 
             // Insert categories nếu có:
-            if (model.Categories != null && model.Categories.Any())
+            if (model.Categories != null && model.Categories.Count != 0)
             {
-                _ = await CategoryRepository.UpdateKnowledgeCategories(lesson.UserItemId, model.Categories.ToList());
+                _ = await CategoryRepository.UpdateKnowledgeCategories(lesson.UserItemId, model.Categories);
             }
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.InsertSuccess(LessonResource), string.Empty, lesson);
         }
 
-        public async Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
+        public virtual async Task<ServiceResult> UserDeletePost(Guid myUid, Guid postId)
         {
             // Check lesson exist and owner
-            ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
+            Lesson lesson = await LessonRepository.CheckExisted(postId, NotExistedLesson);
             if (lesson.UserId != myUid) return ServiceResult.Forbidden("Bài giảng không phải của bạn");
 
             // Check lesson not in any course
-            IEnumerable<Tuple<CourseLesson, ViewCourse>> listCourses = await LessonRepository.GetListCoursesOfLesson(postId);
-            if (listCourses.Any())
+            List<Tuple<CourseLesson, ViewCourse>> listCourses = await LessonRepository.GetListCoursesOfLesson(postId);
+            if (listCourses.Count != 0)
                 return ServiceResult.BadRequest("Không thể xóa do bài giảng hiện đang ở trong khóa học khác");
 
             // Delete
@@ -318,7 +321,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(LessonResource));
         }
 
-        public async Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
+        public virtual async Task<ServiceResult> UserUpdatePost(Guid myUid, Guid postId, UpdatePostModel model)
         {
             // Kiểm tra lesson tồn tại và do user làm chủ
             Lesson lesson = await LessonRepository.CheckExisted(postId, NotExistedLesson);
@@ -341,9 +344,9 @@ namespace KnowledgeSharingApi.Services.Services
             int updated2 = 0;
 
             // Update categories nếu có:
-            if (model.Categories != null && model.Categories.Any())
+            if (model.Categories != null && model.Categories.Count != 0)
             {
-                updated2 = await CategoryRepository.UpdateKnowledgeCategories(postId, model.Categories.ToList());
+                updated2 = await CategoryRepository.UpdateKnowledgeCategories(postId, model.Categories);
             }
 
             if (updated1 + updated2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
@@ -356,15 +359,15 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region User get services
 
-        public async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, PaginationDto pagination)
         {
-            IEnumerable<ViewLesson> listLessons =
-                await LessonRepository.GetPostsOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewLesson> listLessons =
+                await LessonRepository.GetPostsOfCategory(myUid, catName, pagination);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource),
-                string.Empty, await DecorationRepository.DecorateResponseLessonModel(myUid, listLessons.ToList()));
+                string.Empty, await DecorationRepository.DecorateResponseLessonModel(myUid, listLessons));
         }
 
-        public async Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course exist
             _ = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
@@ -375,10 +378,10 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Get list lesson
             PaginationResponseModel<ViewLesson> lessons =
-                await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
+                await LessonRepository.GetLessonsInCourse(courseId, pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.Results.ToList());
+            List<IResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.Results);
 
             // Return Success
             PaginationResponseModel<IResponseLessonModel> res =
@@ -386,7 +389,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course exist and owner
             Course course = 
@@ -396,10 +399,10 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Get list lesson
             PaginationResponseModel<ViewLesson> lessons =
-                await LessonRepository.GetLessonsInCourse(courseId, limit ?? DefaultLimit, offset ?? 0);
+                await LessonRepository.GetLessonsInCourse(courseId, pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.Results.ToList());
+            List<IResponseLessonModel> listResLessons = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.Results);
 
             // Return Success
             PaginationResponseModel<IResponseLessonModel> res =
@@ -407,25 +410,24 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, PaginationDto pagination)
         {
             // GEt list về
-            IEnumerable<ViewLesson> listLessons = await LessonRepository.GetMarkedPosts(myUid);
+            List<ViewLesson> listLessons = await LessonRepository.GetMarkedPosts(myUid);
 
             // Pagination
-            int total = listLessons.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listLessons = listLessons.Skip(offsetValue).Take(limitValue);
+            int total = listLessons.Count;
+            listLessons = LessonRepository.ApplyPagination(listLessons, pagination);
 
             // DecorateResponseLessonModel 
-            List<IResponseLessonModel> listResLesson = await DecorationRepository.DecorateResponseLessonModel(myUid, listLessons.ToList());
+            List<IResponseLessonModel> listResLesson = await DecorationRepository.DecorateResponseLessonModel(myUid, listLessons);
 
             // Trả về thành công
-            PaginationResponseModel<IResponseLessonModel> res = new(total, limitValue, offsetValue, listResLesson);
+            PaginationResponseModel<IResponseLessonModel> res = new(total, pagination.Limit, pagination.Offset, listResLesson);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
+        public virtual async Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
         {
             // Check lesson existed and owner
             ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
@@ -439,20 +441,20 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(LessonResource), string.Empty, resLesson);
         }
 
-        public async Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetMyPosts(Guid myUid, PaginationDto pagination)
         {
             // Get all paginated
-            IEnumerable<ViewLesson> lessons = await LessonRepository.GetByUserId(myUid);
-            lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+            List<ViewLesson> lessons = await LessonRepository.GetByUserId(myUid, pagination);
+            // lessons = LessonRepository.ApplyPagination(lessons, pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.ToList());
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons);
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetPostDetail(Guid myUid, Guid postId)
+        public virtual async Task<ServiceResult> UserGetPostDetail(Guid myUid, Guid postId)
         {
             // Check lesson exist
             ViewLesson lesson = await LessonRepository.CheckExistedLesson(postId, NotExistedLesson);
@@ -470,36 +472,36 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetPosts(Guid myUid, PaginationDto pagination)
         {
             // Get all paginated
-            IEnumerable<ViewLesson> lessons =
-                await LessonRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
+            List<ViewLesson> lessons =
+                await LessonRepository.GetPublicPosts(pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.ToList());
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons);
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, PaginationDto pagination)
         {
             // CHeck user existed:
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Get all paginated
-            IEnumerable<ViewLesson> lessons = await LessonRepository.GetPublicPostsByUserId(userId);
-            lessons = lessons.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+            List<ViewLesson> lessons = await LessonRepository.GetPublicPostsByUserId(userId, pagination);
+            //lessons = LessonRepository.ApplyPagination(lessons, pagination);
 
             // DecorateResponseLessonModel
-            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons.ToList());
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, lessons);
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetListCourseOfLesson(Guid myUId, Guid lessonId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetListCourseOfLesson(Guid myUId, Guid lessonId, PaginationDto pagination)
         {
             // Kiểm tra lesson tồn tại và là của myUId
             ViewLesson lesson = await LessonRepository.CheckExistedLesson(lessonId, NotExistedLesson);
@@ -507,18 +509,17 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Bài giảng không phải của bạn");
 
             // Lấy về danh sách khóa học (ViewCourse)
-            IEnumerable<Tuple<CourseLesson, ViewCourse>> listCourses = await LessonRepository.GetListCoursesOfLesson(lessonId);
+            List<Tuple<CourseLesson, ViewCourse>> listCourses = await LessonRepository.GetListCoursesOfLesson(lessonId);
 
             // Phân trang
-            int total = listCourses.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listCourses = listCourses.Skip(offsetValue).Take(limitValue);
+            int total = listCourses.Count;
+            listCourses = LessonRepository.ApplyPagination(listCourses, pagination);
             
             // DecorateResponseLessonModel:
             // Thêm chi tiết xem bài học hiện tại là bài học thứ bao nhiêu của khóa học
             // Nên trả về ViewCourseLesson không ?? --> Hay lại sử dụng ResponseCourseLessonModel
             // -> Nên trả về ResponseCourseLessonModel hơn
-            IEnumerable<ResponseCourseLessonModel> listParticipants = listCourses.Select(participant =>
+            List<ResponseCourseLessonModel> listParticipants = listCourses.Select(participant =>
             {
                 ResponseCourseLessonModel resItem = 
                     (ResponseCourseLessonModel)new ResponseCourseLessonModel().Copy(participant.Item1);
@@ -528,10 +529,147 @@ namespace KnowledgeSharingApi.Services.Services
             }).ToList();
 
             // Trả về OK
-            PaginationResponseModel<ResponseCourseLessonModel> res = new(total, limitValue, offsetValue, listParticipants);
+            PaginationResponseModel<ResponseCourseLessonModel> res = new(total, pagination.Limit, pagination.Offset, listParticipants);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
+
+
         #endregion
 
+
+        #region Search APIS
+
+
+        public virtual async Task<ServiceResult> UserSearchPost(Guid myUid, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewLesson> listPost = await LessonRepository.GetPublicPosts();
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listPost = LessonRepository.ApplyFilter(listPost, pagination.Filters);
+            }
+            listPost = listPost.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, listPost);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public virtual async Task<ServiceResult> UserSearchMyPost(Guid myUid, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewLesson> listPost = await LessonRepository.GetByUserId(myUid);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listPost = LessonRepository.ApplyFilter(listPost, pagination.Filters);
+            }
+            listPost = listPost.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, listPost);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public virtual async Task<ServiceResult> UserSearchUserPost(Guid myUid, Guid userId, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewLesson> listPost = await LessonRepository.GetPublicPostsByUserId(userId);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listPost = LessonRepository.ApplyFilter(listPost, pagination.Filters);
+            }
+            listPost = listPost.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(myUid, listPost);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+        public virtual async Task<ServiceResult> AdminSearchUserPost(Guid userId, string? search, PaginationDto pagination)
+        {
+            // normalized search key
+            if (string.IsNullOrWhiteSpace(search))
+                return ServiceResult.BadRequest("Từ khóa rỗng");
+            search = search.ToLower();
+
+            // Get posts
+            List<ViewLesson> listPost = await LessonRepository.GetByUserId(userId);
+
+            // calculate score
+            List<(Guid, string, string, string, string?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
+
+            // apply pagination
+            if (pagination.Filters != null)
+            {
+                listPost = LessonRepository.ApplyFilter(listPost, pagination.Filters);
+            }
+            listPost = listPost.Skip(pagination.Offset ?? 0).Take(pagination.Limit ?? 15).ToList();
+
+            // decoration
+            List<IResponseLessonModel> res = await DecorationRepository.DecorateResponseLessonModel(null, listPost);
+
+            // return 
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
+        }
+
+
+
+        #endregion
     }
 }

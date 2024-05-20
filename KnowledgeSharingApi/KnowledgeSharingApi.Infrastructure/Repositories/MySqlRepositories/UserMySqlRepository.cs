@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
@@ -42,14 +43,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return res;
         }
 
-        public virtual async Task<IEnumerable<ViewUser>> GetDetail()
+        public virtual async Task<List<ViewUser>> GetDetail()
         {
             return await DbContext.ViewUsers.ToListAsync();
         }
 
-        public virtual async Task<IEnumerable<ViewUser>> GetDetail(int limit, int offset)
+        public virtual async Task<List<ViewUser>> GetDetail(PaginationDto pagination)
         {
-            return await DbContext.ViewUsers.Skip(offset).Take(limit).ToListAsync();
+            return await ApplyPagination(DbContext.ViewUsers, pagination).ToListAsync();
         }
 
         public virtual Task<ViewUser?> GetDetail(Guid userId)
@@ -100,43 +101,39 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public virtual async Task<PaginationResponseModel<T>> GetByUserId<T>(Guid userId, int limit, int offset) where T : Entity
+        public virtual async Task<PaginationResponseModel<T>> GetByUserId<T>(Guid userId, PaginationDto pagination) where T : Entity
         {
             string tableName = typeof(T).Name;
             // Check bảng T phải có trường UserId:
             _ = typeof(T).GetProperty("UserId") ?? throw new NotMatchTypeException();
             string sqlCommand = $"Select * from {tableName} " +
                                 $"where UserId = @userId; ";
-            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, new { userId, limit, offset });
-            res.Limit = limit;
-            res.Offset = offset;
+            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, pagination, new { userId });
             return res;
         }
 
-        public virtual async Task<PaginationResponseModel<T>> GetByUsername<T>(string username, int limit, int offset) where T : Entity
+        public virtual async Task<PaginationResponseModel<T>> GetByUsername<T>(string username, PaginationDto pagination) where T : Entity
         {
             string tableName = typeof(T).Name;
             // Check bảng T phải có trường UserId:
             _ = typeof(T).GetProperty("UserId") ?? throw new NotMatchTypeException();
             string sqlCommand = $"Select * from {tableName} " +
                                 $"where UserId in (Select UserId from User where Username = @username); ";
-            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, new { username, limit, offset });
-            res.Limit = limit;
-            res.Offset = offset;
+            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, pagination, new { username });
             return res;
         }
 
         public virtual async Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage)
         {
-            return await DbContext.ViewUsers.Where(user => user.UserId == userId).FirstOrDefaultAsync()
-                ?? throw new NotExistedEntityException(errorMessage);
+            return (ViewUser) ((await DbContext.ViewUsers.Where(user => user.UserId == userId).FirstOrDefaultAsync())?.Clone()
+                ?? throw new NotExistedEntityException(errorMessage));
         }
 
         public virtual async Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds)
         {
             Dictionary<Guid, ViewUser?> res = userIds.ToDictionary(id => id, id => (ViewUser?)null);
 
-            IEnumerable<ViewUser> users = await DbContext.ViewUsers
+            List<ViewUser> users = await DbContext.ViewUsers
                 .Where(user => userIds.Contains(user.UserId))
                 .ToListAsync();
 

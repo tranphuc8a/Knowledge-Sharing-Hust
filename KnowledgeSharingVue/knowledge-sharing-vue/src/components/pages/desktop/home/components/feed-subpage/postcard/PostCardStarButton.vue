@@ -196,16 +196,16 @@ export default {
 
         async updateToolbar(star){
             try {
-                let numStars = this.getPost().TotalStars ?? 0;
-                let averageStars = this.getPost().AverageStars ?? 0;
+                let numStars = this.getPost().TotalStar ?? 0;
+                let averageStars = this.getPost().AverageStar ?? 0;
                 if (this.getPost().MyStars == null){
                     averageStars = (averageStars * numStars + star) / (numStars + 1);
                     numStars += 1;
-                    this.getPost().TotalStars = numStars;
-                    this.getPost().AverageStars = averageStars;
+                    this.getPost().TotalStar = numStars;
+                    this.getPost().AverageStar = averageStars;
                 } else if (numStars > 0) {
                     averageStars = (averageStars * numStars + star - this.getPost().MyStars) / numStars;
-                    this.getPost().AverageStars = averageStars;
+                    this.getPost().AverageStar = averageStars;
                 }  
                 this.getPost().MyStars = star;
                 this.forceUpdateToolbar();

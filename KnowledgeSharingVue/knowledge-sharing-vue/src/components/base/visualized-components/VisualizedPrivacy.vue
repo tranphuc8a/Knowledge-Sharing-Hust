@@ -1,17 +1,19 @@
 <template>
-    <TooltipFrame>
-        <template #tooltipMask>
-            <div class="p-visual-privacy-mask">
-                <MIcon v-if="isPrivate()" fa="lock" :style="iconStyle"/>
-                <MIcon v-else fa="globe-americas" :style="iconStyle"/>
-            </div>
-        </template>
-        <template #tooltipContent>
-            <div class="p-visual-privacy-content">
-                {{ isPrivate() ? 'Riêng tư' : 'Công khai'}}
-            </div>
-        </template>
-    </TooltipFrame>
+    <div class="p-visual-privacy-mask-container">
+        <TooltipFrame>
+            <template #tooltipMask>
+                <div class="p-visual-privacy-mask">
+                    <MIcon v-if="isPrivate()" fa="lock" :style="iconStyle"/>
+                    <MIcon v-else fa="globe-americas" :style="iconStyle"/>
+                </div>
+            </template>
+            <template #tooltipContent>
+                <div class="p-visual-privacy-content">
+                    {{ isPrivate() ? 'Riêng tư' : 'Công khai'}}
+                </div>
+            </template>
+        </TooltipFrame>
+    </div>
 </template>
 
 <script>
@@ -56,6 +58,9 @@ export default {
 </script>
 
 <style scoped>
+.p-visual-privacy-mask-container{
+    width: fit-content;
+}
 .p-visual-privacy-mask{
     width: fit-content;
     display: flex;

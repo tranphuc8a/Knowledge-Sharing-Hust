@@ -11,7 +11,7 @@ export default {
     data() {
         return {
             isValidImage: false,
-            dSrc: this.src,
+            dSrc: null,
             dGradientDirection: this.gradientDirection,
             dGradientStyle: this.gradientStyle(),
             defaultImage: require('@/assets/default-thumbnail/default-cover.jpg')
@@ -51,6 +51,7 @@ export default {
             let isValidImage = await Common.isValidImage(this.src);
             if (isValidImage) {
                 this.isValidImage = true;
+                this.dSrc = this.src;
             } else {
                 this.dSrc = this.defaultImage;
                 this.isValidImage = false;

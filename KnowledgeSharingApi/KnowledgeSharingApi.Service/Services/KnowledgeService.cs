@@ -50,7 +50,7 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
 
-        protected virtual async Task<IEnumerable<ResponseUserCardModel>> DecorateUser(Guid myUid, List<ViewUser> users)
+        protected virtual async Task<List<ResponseUserCardModel>> DecorateUser(Guid myUid, List<ViewUser> users)
         {
             Dictionary<Guid, EUserRelationType> userRelationDict = 
                 await UserRelationRepository.GetUserRelationType(myUid, users.Select(user => user.UserId).ToList());
@@ -63,7 +63,7 @@ namespace KnowledgeSharingApi.Services.Services
             }).ToList();
         }
 
-        public async Task<ServiceResult> GetListUserMarkKnowledge(Guid myUid, Guid knowledgeId, int? limit, int? offset)
+        public async Task<ServiceResult> GetListUserMarkKnowledge(Guid myUid, Guid knowledgeId, PaginationDto pagination)
         {
             // Kiểm tra knowledge tồn tại và phải là chủ nhân myUid
             Knowledge knowledge = await KnowledgeRepository.CheckExisted(knowledgeId, ResponseResource.NotExist(KnowledgeResource));
@@ -73,7 +73,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Lấy về danh sách những người đã mark knowledge (có tính người đã bị banned không?)
             // Tạm thời lấy toàn bộ những người đã mark, kể cả banned
             PaginationResponseModel<ViewUser> listUsers =
-                await KnowledgeRepository.GetListUserMaredKnowledge(knowledgeId, limit ?? DefaultLimit, offset ?? 0);
+                await KnowledgeRepository.GetListUserMaredKnowledge(knowledgeId, pagination);
 
             // Phân trang và trang trí cho từng ViewUser -> ResponseUserCardModel
             PaginationResponseModel<ResponseUserCardModel> res = new()
@@ -81,7 +81,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Total = listUsers.Total,
                 Limit = listUsers.Limit,
                 Offset = listUsers.Offset,
-                Results = await DecorateUser(myUid, listUsers.Results.ToList())
+                Results = await DecorateUser(myUid, listUsers.Results)
             };
 
             // Trả về thành công (PaginationItemModel)
@@ -91,7 +91,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> Mark(Guid myUid, Guid knowledgeId, bool isMark)
         {
             // Kiểm tra myUid và knowledgeId tồn tại
-            _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(myUid, ResponseResource.NotExistUser());
             _ = await KnowledgeRepository.CheckExisted(knowledgeId, ResponseResource.NotExist(KnowledgeResource));
 
             // Cho phép mark/unmark cả những knowledgeId mà không truy cập tới, chỉ không hiển thị được khi get ra mà thôi

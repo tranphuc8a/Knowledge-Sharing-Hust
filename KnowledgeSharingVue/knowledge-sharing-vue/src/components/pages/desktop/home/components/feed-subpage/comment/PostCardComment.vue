@@ -35,13 +35,13 @@
             </div>
         </div>
 
-        <div class="p-comment-line p-edit-comment" v-if="isEditing">
+        <div class="p-comment-line p-edit-comment" v-show="isEditing">
             <PostCardEnterComment ref="edit-comment" 
                 :is-editing="true"
                 :edit-for="this.comment.UserItemId"
                 :useritem="comment" 
                 :value="dComment?.Content ?? 'Chinh sua binh luan'"
-                :on-comment-submitted="resolveSubmittedComment"
+                :on-comment-submitted="resolveCommentEdited"
                 />
 
             <div class="p-cancel-edit-comment">
@@ -51,31 +51,43 @@
             </div>
         </div>
 
-        <div class="p-comment-line">
-            <div class="p-comment-left">
-                
-            </div>
-
+        <div class="p-comment-line" v-if="listReplies.length > 0">
+            <div class="p-comment-left"></div>
             <div class="p-comment-right">
-                <div class="p-comment-replies" v-if="dComment?.TotalReplies > 0">
+                <div class="p-comment-replies">
                     <PostCardComment 
                         v-for="(cmt, index) in listReplies" 
                         :key="cmt?.UserItemId ?? index" 
                         :comment="cmt"
                     />
                 </div>
-                <div class="p-reply-enter" v-if="isShowEnterComment && dComment?.ReplyId == null">
-                    <PostCardEnterComment ref="reply-enter" :useritem="comment" placeholder="Phản hồi bình luận"/>
-                </div>
-                <MLinkButton v-show="!isOutOfReplies && (listReplies?.length <= 0)" 
+            </div>
+        </div>
+
+        <div class="p-comment-line" v-show="!isOutOfReplies">
+            <div class="p-comment-left"></div>
+            <div class="p-comment-right">
+                <MLinkButton v-show="listReplies?.length <= 0" 
                     :onclick="getMoreReplies" 
                     :label="`Có ${dComment.TotalReplies ?? 0} phản hồi`" :href="null"
                     :buttonStyle="buttonStyle"
                 />
-                <MLinkButton v-show="!isOutOfReplies && (listReplies?.length > 0)" :onclick="getMoreReplies" 
+                <MLinkButton v-show="listReplies?.length > 0" :onclick="getMoreReplies" 
                     label="Tải thêm phản hồi" :href="null"
                     :buttonStyle="buttonStyle"
                 />
+            </div>
+        </div>
+
+        <div class="p-comment-line" v-show="isShowEnterComment && dComment?.ReplyId == null">
+            <div class="p-comment-left"></div>
+            <div class="p-comment-right">
+                <div class="p-reply-enter">
+                    <PostCardEnterComment ref="reply-enter" 
+                        :useritem="comment" 
+                        :on-comment-submitted="resolveSubmittedReplies"
+                        placeholder="Phản hồi bình luận"/>
+                </div>
             </div>
         </div>
 
@@ -92,7 +104,7 @@ import PostCardEnterComment from './PostCardEnterComment.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import { Validator } from '@/js/utils/validator';
 import ResponseCommentModel from '@/js/models/api-response-models/response-comment-model';
-import { GetRequest, Request } from '@/js/services/request';
+import { GetRequest, DeleteRequest, Request } from '@/js/services/request';
 import MLinkButton from './../../../../../../base/buttons/MLinkButton.vue'
 
 
@@ -126,7 +138,14 @@ export default {
         TooltipUsername, MLinkButton
     },
     mounted(){
-        this.refreshComment();
+        try {
+            if (this.comment?.registerObserver){
+                this.comment.registerObserver(this.refreshComment.bind(this));
+            }
+            this.refreshComment();
+        } catch (error){
+            console.error(error);
+        }
     },
     methods: {
         isOwner(){
@@ -195,14 +214,20 @@ export default {
         },
 
         async resolveEditComment(){
-            this.isEditing = true;
+            try {
+                this.isEditing = true;
+                await this.$refs['edit-comment'].setValue(this.dComment.Content);
+                this.$refs['edit-comment'].focus();
+            } catch (er){
+                console.error(er);
+            }
         },
 
         async resolveCancelEditComment(){
             this.isEditing = false;
         },
 
-        async resolveSubmittedComment(text){
+        async resolveCommentEdited(text){
             try {
                 this.isEditing = false;
                 this.dComment.Content = text;
@@ -213,7 +238,22 @@ export default {
         },
 
         async resolveDeleteComment(){
-            this.$emit('on-delete', this.dComment);
+            try {
+                let that = this;
+                let submitDeleteComment = async function(){
+                    try {
+                        await new DeleteRequest('Comments/' + that.dComment.UserItemId)
+                            .execute();
+                        that.getToastManager()?.success('Xóa bình luận thành công');
+                        that.onDeletedComment?.();
+                    } catch (error) {
+                        Request.resolveAxiosError(error);
+                    }
+                }
+                this.getPopupManager()?.inform('Bạn có chắc chắn muốn xóa bình luận này?', submitDeleteComment);
+            } catch (error) {
+                console.error(error);
+            }
         },
 
         async resolveToggleInformation(){
@@ -252,8 +292,16 @@ export default {
             } finally {
                 this.isLoadingMoreReplies = false;
             }
-        }
+        },
 
+        async resolveSubmittedReplies(comment){
+            try {
+                if (comment == null) return;
+                this.listReplies.push(comment);
+            } catch (error){
+                console.error(error);
+            }
+        },
     },
     props: {
         comment: {
@@ -262,16 +310,29 @@ export default {
 
         onPostedComment: {
             default: null
+        },
+
+        onDeletedComment: {
+            default: null
         }
     },
     watch: {
         comment(){
-            this.refreshComment();
+            try {
+                if (this.comment?.registerObserver){
+                    this.comment.registerObserver(this.refreshComment.bind(this));
+                }
+                this.refreshComment();
+            } catch (error){
+                console.error(error);
+            }
         }
     },
     inject: {
         getLanguage: {},
-        getPost: {}
+        getPost: {},
+        getPopupManager: {},
+        getToastManager: {}
     },
     provide(){
         return {
@@ -284,137 +345,6 @@ export default {
 
 <style scoped>
 
-.p-comment,
-.p-comment-card{
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 4px;
-}
-
-.p-comment{
-    width: 100%;
-    flex-flow: column nowrap;
-    gap: 8px;
-}
-
-.p-comment-left{
-    flex-shrink: 0;
-    flex-grow: 0;
-    width: 44px;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: flex-start;
-    box-sizing: border-box;
-}
-
-.p-comment-right{
-    width: 100%;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    box-sizing: border-box;
-}
-
-.p-comment-avatar{
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    border-radius: 100%;
-    box-sizing: border-box;
-}
-.p-comment-owner{
-    width: 44px;
-    height: 44px;
-    border: 3px solid var(--primary-color);
-}
-
-.p-comment-line{
-    width: 100%;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 4px;
-}
-
-.p-comment-line.p-edit-comment{
-    flex-flow: column nowrap;
-}
-.p-cancel-edit-comment{
-    width: 100%;
-    text-align: left;
-    font-size: 12px;
-    color: var(--primary-color);
-    padding-left: 40px;
-}
-.p-cancel-edit-comment span{
-    cursor: pointer;
-}
-.p-cancel-edit-comment span:hover{
-    text-decoration: underline;
-}
-
-.p-comment-card{
-    gap: 4px;
-}
-
-.p-comment-info{
-    width: calc(100% - 40px);
-}
-
-.p-comment-frame{
-    width: fit-content;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    
-    background-color: var(--primary-color-100);
-    border-radius: 22px;
-    padding: 8px 12px;;
-}
-
-.p-comment-menu-context{
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    visibility: hidden;
-
-    align-self: stretch;
-}
-
-.p-comment-text{
-    height: fit-content;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    font-size: 14px;
-}
-
-
-.p-my-comment{
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 4px;
-}
-
-.p-my-comment:hover .p-comment-menu-context{
-    visibility: visible;
-}
-
-.p-reply-enter{
-    margin-top: 8px;
-    width: 100%;
-}
+@import url(@/css/pages/desktop/components/comment.css);
 
 </style>

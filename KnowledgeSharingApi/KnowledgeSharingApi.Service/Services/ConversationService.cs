@@ -55,14 +55,22 @@ namespace KnowledgeSharingApi.Services.Services
                 ?? throw new ValidatorException(ResponseResource.NotFound(ConversationResource));
 
             // Lấy về danh sách participant
-            IEnumerable<ResponseParticipantModel> listParticipants =
+            List<ResponseParticipantModel> listParticipants =
                 (await ConversationRepository.GetParticipants(conversationId))
-                .Select(participant => (new ResponseParticipantModel().Copy(participant) as ResponseParticipantModel)!);
+                .Select(participant => (new ResponseParticipantModel().Copy(participant) as ResponseParticipantModel)!)
+                .ToList();
 
             // Lấy về top tin nhắn
-            IEnumerable<ResponseMessageModel> topMessages =
-                (await ConversationRepository.GetMessages(myUid, conversationId, limit: DefaultLimit, offset: 0))
-                .Select(message => (new ResponseMessageModel().Copy(message) as ResponseMessageModel)!);
+            List<ResponseMessageModel> topMessages =
+                (await ConversationRepository.GetMessages(myUid, conversationId, new PaginationDto()
+                {
+                    Limit = DefaultLimit,
+                    Offset = 0,
+                    Orders = null,
+                    Filters = null
+                }))
+                .Select(message => (new ResponseMessageModel().Copy(message) as ResponseMessageModel)!)
+                .ToList();
 
 
             ResponseConversationModel model = new();
@@ -82,8 +90,8 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<ViewUser> CheckExistedUser(Guid userId)
         {
-            return await UserRepository.GetDetail(userId)
-                ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().User()));
+            return (ViewUser) ((await UserRepository.GetDetail(userId))?.Clone()
+                ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().User())));
         }
 
         /// <summary>
@@ -95,8 +103,8 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<Conversation> CheckExistedConversation(Guid id)
         {
-            return await ConversationRepository.Get(id)
-                ?? throw new ValidatorException(ResponseResource.NotFound(ConversationResource));
+            return (Conversation) ((await ConversationRepository.Get(id))?.Clone()
+                ?? throw new ValidatorException(ResponseResource.NotFound(ConversationResource)));
         }
 
         /// <summary>
@@ -108,8 +116,8 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<ViewMessage> CheckExistedMessage(Guid id)
         {
-            return await MessageRepository.GetDetail(id)
-                ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().Message()));
+            return (ViewMessage) ((await MessageRepository.GetDetail(id))?.Clone()
+                ?? throw new ValidatorException(ResponseResource.NotFound(ResourceFactory.GetEntityResource().Message())));
         }
 
         /// <summary>
@@ -147,7 +155,7 @@ namespace KnowledgeSharingApi.Services.Services
             Conversation conversation = await CheckExistedConversation(conversationId);
 
             // Kiểm tra conversation phải chứa myUid
-            IEnumerable<ViewUserConversation> participants = await ConversationRepository.GetParticipants(conversationId);
+            List<ViewUserConversation> participants = await ConversationRepository.GetParticipants(conversationId);
             if (!participants.Any(participant => participant.UserId == myUId))
                 return ServiceResult.Forbidden("Bạn chưa tham gia cuộc hội thoại này");
 
@@ -158,13 +166,14 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetSuccess(ConversationResource), string.Empty, model);
         }
 
-        public virtual async Task<ServiceResult> GetConversations(Guid myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> GetConversations(Guid myUid, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
             await CheckExistedUser(myUid);
 
             // Lấy về danh sách cuộc trò chuyện
-            IEnumerable<Conversation> conversations = await ConversationRepository.GetListConversationByUserId(myUid);
+            List<Conversation> conversations = await ConversationRepository.GetListConversationByUserId(myUid);
+            conversations = ConversationRepository.ApplyPagination(conversations, pagination);
 
             // Trả về thành công
             return ServiceResult.Success(
@@ -172,8 +181,8 @@ namespace KnowledgeSharingApi.Services.Services
                 DevMessage: string.Empty,
                 new PaginationResponseModel<Conversation>()
                 {
-                    Total = conversations.Count(),
-                    Limit = conversations.Count(),
+                    Total = conversations.Count,
+                    Limit = conversations.Count,
                     Offset = 0,
                     Results = conversations
                 }
@@ -220,7 +229,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> DeleteConversation(Guid myUid, Guid conversationId)
         {
             //ViewUser user = await CheckExistedUser(myUid);
-            Conversation conv = await CheckExistedConversation(conversationId);
+            _ = await CheckExistedConversation(conversationId);
 
             // Kiểm tra đúng quyền
             ViewUserConversation userConversation = await ConversationRepository.GetParticipant(myUid, conversationId)
@@ -292,7 +301,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async virtual Task<ServiceResult> SetReadConversation(Guid myUid, Guid conversationId)
         {
             //ViewUser user = await CheckExistedUser(myUid);
-            Conversation conv = await CheckExistedConversation(conversationId);
+            _ = await CheckExistedConversation(conversationId);
 
             // Kiểm tra đúng quyền
             ViewUserConversation userConversation = await ConversationRepository.GetParticipant(myUid, conversationId)
@@ -311,7 +320,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region Message Operations
-        public async virtual Task<ServiceResult> GetMessages(Guid myUid, Guid conversationId, int? limit, int? offset)
+        public async virtual Task<ServiceResult> GetMessages(Guid myUid, Guid conversationId, PaginationDto pagination)
         {
             //ViewUser user = await CheckExistedUser(myUid);
             Conversation conv = await CheckExistedConversation(conversationId);
@@ -320,14 +329,11 @@ namespace KnowledgeSharingApi.Services.Services
             ViewUserConversation userConversation = await ConversationRepository.GetParticipant(myUid, conversationId)
                 ?? throw new ValidatorException("Bạn chưa tham gia cuộc hội thoại này");
 
-            // Validate limit và offset
-            int limitValue = limit ?? DefaultLimit;
-            int offsetValue = offset ?? 0;
-
             // Lấy về danh sách tin nhắn
-            IEnumerable<ResponseMessageModel> messages =
-                (await ConversationRepository.GetMessages(myUid, conversationId, limit: limitValue, offset: offsetValue))
-                .Select(message => (new ResponseMessageModel().Copy(message) as ResponseMessageModel)!);
+            List<ResponseMessageModel> messages =
+                (await ConversationRepository.GetMessages(myUid, conversationId, pagination))
+                .Select(message => (new ResponseMessageModel().Copy(message) as ResponseMessageModel)!)
+                .ToList();
 
             // Trả về thành công
             return ServiceResult.Success(

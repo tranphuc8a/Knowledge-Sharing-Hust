@@ -1,0 +1,59 @@
+
+
+<template>
+    <div class="p-home-feed-subpage">
+        <PostSubpage 
+            :get-post="getPost"
+            :is-show-add-post="true"
+        />
+    </div>
+</template>
+
+
+
+<script>
+import PostSubpage from './PostSubpage.vue';
+import CurrentUser from '@/js/models/entities/current-user';
+import { GetRequest } from '@/js/services/request';
+
+export default {
+    name: 'HomeFeedSubpage',
+    components: {
+        PostSubpage
+    },
+    props: {
+    },
+    data(){
+        return {
+        }
+    },
+    methods: {
+        async getPost(limit, offset){
+            let currentUser = await CurrentUser.getInstance();
+            let url = "Posts";
+            if (currentUser == null){
+                url = "Posts/anonymous";
+            }
+            let res = new GetRequest(url)
+                .setParams({
+                    limit: limit,
+                    offset: offset
+                })
+                .execute();
+            return res;
+        }
+    },
+}
+
+</script>
+
+<style scoped>
+
+.p-home-feed-subpage{
+    width: 100%;
+    padding-bottom: 32px;
+}
+
+
+</style>
+

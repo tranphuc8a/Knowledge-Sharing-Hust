@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Views;
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,31 +13,40 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <summary>
         /// Lấy về danh sách View Post
         /// </summary>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<IEnumerable<ReturnType>> GetViewPost(int limit, int offset);
+        Task<List<ReturnType>> GetViewPost(PaginationDto pagination);
 
-        /// <summary>
+        /// <summary
         /// Lấy về danh sách bài đăng của một user
         /// </summary>
         /// <param name="userId"> Id của user cần lấy </param>
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<IEnumerable<ReturnType>> GetByUserId(Guid userId);
+        Task<List<ReturnType>> GetByUserId(Guid userId);
+
+        /// <summary>
+        /// Lấy về danh sách bài đăng của một user
+        /// </summary>
+        /// <param name="userId"> Id của user cần lấy </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<List<ReturnType>> GetByUserId(Guid userId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về danh sách bài đăng public
         /// </summary>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<IEnumerable<ReturnType>> GetPublicPosts(int limit, int offset);
+        Task<List<ReturnType>> GetPublicPosts(PaginationDto pagination);
+        Task<List<ReturnType>> GetPublicPosts();  // Get All - Not pagination
 
         /// <summary>
         /// Lấy về danh sách bài đăng public của một user
@@ -45,21 +55,33 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<IEnumerable<ReturnType>> GetPublicPostsByUserId(Guid userId);
+        Task<List<ReturnType>> GetPublicPostsByUserId(Guid userId);
+
+        /// <summary>
+        /// Lấy về danh sách bài đăng public của một user
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns> Danh sách bài đăng </returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<List<ReturnType>> GetPublicPostsByUserId(Guid userId, PaginationDto pagination);
 
 
         /// <summary>
         /// Lấy về danh sách bài đăng của một category
+        /// Bai dang public - chi lay nhung post public
+        /// Bai dang binh thuong - lay moi bai dang (cho admin)
+        /// Bai dang filtered - Lay bai dang public va bai dang xem duoc (cho user)
         /// </summary>
         /// <param name="catName"> Tên category </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<IEnumerable<ReturnType>> GetPublicPostsOfCategory(string catName, int limit, int offset);
-        Task<IEnumerable<ReturnType>> GetPostsOfCategory(string catName, int limit, int offset);
-        Task<IEnumerable<ReturnType>> GetPostsOfCategory(Guid myUId, string catName, int limit, int offset);
+        Task<List<ReturnType>> GetPublicPostsOfCategory(string catName, PaginationDto pagination);
+        Task<List<ReturnType>> GetPostsOfCategory(string catName, PaginationDto pagination);
+        Task<List<ReturnType>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination);
 
 
         /// <summary>
@@ -69,6 +91,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// <returns> Danh sách bài đăng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<IEnumerable<ReturnType>> GetMarkedPosts(Guid userId);
+        Task<List<ReturnType>> GetMarkedPosts(Guid userId);
+
+        /// <summary>
+        /// Lấy về danh sách bài đăng đã được mark của một user
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy  </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns> Danh sách bài đăng </returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<List<ReturnType>> GetMarkedPosts(Guid userId, PaginationDto pagination);
     }
 }

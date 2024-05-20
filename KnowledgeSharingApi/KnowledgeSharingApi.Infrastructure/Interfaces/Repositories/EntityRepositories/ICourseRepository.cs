@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId);
+        Task<List<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId);
+
+        /// <summary>
+        /// Lấy về danh sách user đã đăng ký tham gia khóa học
+        /// </summary>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (24/3/24)
+        /// Modified: None
+        Task<List<ViewCourseRegister>> GetRegistersOfCourse(Guid courseId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về danh sách khóa học đã đăng ký của một user
@@ -28,7 +38,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourseRegister>> GetRegistersOfUser(Guid userId);
+        Task<List<ViewCourseRegister>> GetRegistersOfUser(Guid userId);
+
+        /// <summary>
+        /// Lấy về danh sách khóa học đã đăng ký của một user
+        /// </summary>
+        /// <param name="userId"> id của user </param>
+        /// <returns></returns>
+        /// Created: PhucTV (24/3/24)
+        /// Modified: None
+        Task<List<ViewCourseRegister>> GetRegistersOfUser(Guid userId, PaginationDto pagination);
 
         /// <summary>
         /// Kiểm tra một user có tham gia khóa học không
@@ -42,6 +61,8 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Modified: None
         Task<ViewCourseRegister?> GetViewCourseRegister(Guid userId, Guid courseId); 
         #endregion
+
+
 
         #region Get View Courses
 
@@ -71,38 +92,44 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse?>> GetViewCourse(Guid[] courseIds);
+        Task<List<ViewCourse?>> GetViewCourse(Guid[] courseIds);
 
         /// <summary>
         /// Lấy về Danh sách view course
         /// </summary>
-        /// <param name="limit"> Số lượng bản ghi của trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetViewCourse(int limit, int offset);
+        Task<List<ViewCourse>> GetViewCourse(PaginationDto pagination);
 
         /// <summary>
         /// Lấy về Danh sách view course
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
-        /// <param name="limit"> Số lượng bản ghi của trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetViewCourse(Guid myUid, int limit, int offset);
+        Task<List<ViewCourse>> GetViewCourse(Guid myUid, PaginationDto pagination);
+
+        /// <summary>
+        /// Lấy về Danh sách view course công khai
+        /// Lay toan bo khong phan trang
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<ViewCourse>> GetPublicViewCourse();
 
         /// <summary>
         /// Lấy về Danh sách view course công khai
         /// </summary>
-        /// <param name="limit"> Số lượng bản ghi của trang </param>
-        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetPublicViewCourse(int limit, int offset);
+        Task<List<ViewCourse>> GetPublicViewCourse(PaginationDto pagination);
 
         /// <summary>
         /// Lấy về Danh sách view course công khai của một user
@@ -111,7 +138,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetPublicViewCourseOfUser(Guid userId);
+        Task<List<ViewCourse>> GetPublicViewCourseOfUser(Guid userId);
 
         /// <summary>
         /// Lấy về Danh sách view course của một user (cho admin)
@@ -120,7 +147,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetViewCourseOfUser(Guid userId);
+        Task<List<ViewCourse>> GetViewCourseOfUser(Guid userId);
 
         /// <summary>
         /// Lấy về Danh sách view course của một user cho một user khác
@@ -130,7 +157,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetViewCourseOfUser(Guid myUid, Guid userId);
+        Task<List<ViewCourse>> GetViewCourseOfUser(Guid myUid, Guid userId);
 
         /// <summary>
         /// Lấy về Danh sách view course của một catefories
@@ -141,7 +168,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetViewCourseOfCategory(string catName, int limit, int offset);
+        Task<List<ViewCourse>> GetViewCourseOfCategory(string catName, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về Danh sách view course public của một catefories
@@ -152,7 +179,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetPublicViewCourseOfCategory(string catName, int limit, int offset);
+        Task<List<ViewCourse>> GetPublicViewCourseOfCategory(string catName, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về Danh sách view course của một catefories theo user
@@ -164,7 +191,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetViewCourseOfCategory(Guid myUid, string catName, int limit, int offset);
+        Task<List<ViewCourse>> GetViewCourseOfCategory(Guid myUid, string catName, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về Danh sách view course của một user đã mark
@@ -175,7 +202,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<IEnumerable<ViewCourse>> GetMarkedCoursesOfUse(Guid userId, int limit, int offset);
+        Task<List<ViewCourse>> GetMarkedCoursesOfUse(Guid userId, PaginationDto pagination);
 
         #endregion
 

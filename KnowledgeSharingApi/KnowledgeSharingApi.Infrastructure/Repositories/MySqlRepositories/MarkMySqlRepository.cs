@@ -14,7 +14,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class MarkMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Mark>(dbContext), IMarkRepository
     {
-        public virtual async Task<Dictionary<Guid, bool>> GetUserMarkListKnowledge(Guid userId, IEnumerable<Guid> knowledgeId)
+        public virtual async Task<Dictionary<Guid, bool>> GetUserMarkListKnowledge(Guid userId, List<Guid> knowledgeId)
         {
             Dictionary<Guid, bool> result = knowledgeId.ToDictionary(id => id, id => false);
 

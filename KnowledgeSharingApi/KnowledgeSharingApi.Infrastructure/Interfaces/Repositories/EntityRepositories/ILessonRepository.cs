@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
@@ -28,12 +29,11 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Lấy về danh sách lesson trong một course
         /// </summary>
         /// <param name="courseid"> id của course cần lấy </param>
-        /// <param name="limit"> Số lượng lesson cần lấy </param>
-        /// <param name="offset"> Độ lệch bản ghi đầu </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (24/3/24)
         /// Modified: None
-        Task<PaginationResponseModel<ViewLesson>> GetLessonsInCourse(Guid courseid, int limit, int offset);
+        Task<PaginationResponseModel<ViewLesson>> GetLessonsInCourse(Guid courseid, PaginationDto pagination);
 
 
         /// <summary>
@@ -43,6 +43,6 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<IEnumerable<Tuple<CourseLesson, ViewCourse>>> GetListCoursesOfLesson(Guid lessonId);
+        Task<List<Tuple<CourseLesson, ViewCourse>>> GetListCoursesOfLesson(Guid lessonId);
     }
 }

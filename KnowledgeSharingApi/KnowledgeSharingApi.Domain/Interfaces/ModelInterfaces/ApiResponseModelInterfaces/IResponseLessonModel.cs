@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Annotations.Converters;
+using KnowledgeSharingApi.Domains.Annotations.Converters.ResponseModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces
 {
-    [JsonConverter(typeof(IResponseLessonModel))]
+    [JsonConverter(typeof(ResponseLessonConverter))]
     public interface IResponseLessonModel : IResponsePostModel
     {
     }

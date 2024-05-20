@@ -14,7 +14,7 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class ConversationsController(
         IConversationService conversationService    
-    ) : ControllerBase
+    ) : BaseController
     {
         protected readonly IConversationService ConversationService = conversationService;
 
@@ -29,9 +29,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> GetConversation(Guid conversationId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.GetConversation(Guid.Parse(myUId), conversationId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.GetConversation(GetCurrentUserIdStrictly(), conversationId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -44,11 +43,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> GetListConversations(int? limit, int? offset)
+        public async Task<IActionResult> GetListConversations(int? limit, int? offset, string? order, string? filter)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.GetConversations(Guid.Parse(myUId), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await ConversationService.GetConversations(GetCurrentUserIdStrictly(), pagination);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -62,9 +61,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> GetConversationWith(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.GetConversationWith(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.GetConversationWith(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -78,9 +76,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> StartConversationWith(Guid userId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.StartConversation(Guid.Parse(myUId), userId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.StartConversation(GetCurrentUserIdStrictly(), userId);
+            return StatusCode(res);
         }
 
 
@@ -95,9 +92,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> DeleteConversation(Guid conversationId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.DeleteConversation(Guid.Parse(myUId), conversationId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.DeleteConversation(GetCurrentUserIdStrictly(), conversationId);
+            return StatusCode(res);
         }
 
 
@@ -112,9 +108,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UpdateConversation([FromBody] UpdateConversationModel model)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.UpdateConversation(Guid.Parse(myUId), model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.UpdateConversation(GetCurrentUserIdStrictly(), model);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -128,9 +123,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UpdateParticipant([FromBody] UpdateUserConversationModel model)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.UpdateUserConversation(Guid.Parse(myUId), model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.UpdateUserConversation(GetCurrentUserIdStrictly(), model);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -144,9 +138,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> SetReadConversation(Guid conversationId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.SetReadConversation(Guid.Parse(myUId), conversationId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.SetReadConversation(GetCurrentUserIdStrictly(), conversationId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -160,11 +153,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("messages/{conversationId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> GetMessages(Guid conversationId, int? limit, int? offset)
+        public async Task<IActionResult> GetMessages(Guid conversationId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.GetMessages(Guid.Parse(myUId), conversationId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await ConversationService.GetMessages(GetCurrentUserIdStrictly(), conversationId, pagination);
+            return StatusCode(res);
         }
 
 
@@ -179,9 +172,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> PostMessage(SendMessageModel model)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.SendMessage(Guid.Parse(myUId), model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.SendMessage(GetCurrentUserIdStrictly(), model);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -195,9 +187,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> SendMessage(SendMessageModel model)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.SendMessage(Guid.Parse(myUId), model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.SendMessage(GetCurrentUserIdStrictly(), model);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -211,9 +202,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> DeleteMessage(Guid messageId)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.DeleteMessage(Guid.Parse(myUId), messageId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.DeleteMessage(GetCurrentUserIdStrictly(), messageId);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -227,9 +217,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> UpdateMessage([FromBody] UpdateMessageModel model)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.UpdateMessage(Guid.Parse(myUId), model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.UpdateMessage(GetCurrentUserIdStrictly(), model);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -243,9 +232,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public async Task<IActionResult> ReplyMessage([FromBody] ReplyMessageModel model)
         {
-            string myUId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await ConversationService.ReplyMessage(Guid.Parse(myUId), model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ConversationService.ReplyMessage(GetCurrentUserIdStrictly(), model);
+            return StatusCode(res);
         }
 
     }

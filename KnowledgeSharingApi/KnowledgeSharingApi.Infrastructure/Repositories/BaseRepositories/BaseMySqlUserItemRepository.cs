@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 {
@@ -43,28 +44,28 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             return (T?) (await GetDbSet().FindAsync(id))?.Clone();
         }
 
-        public override async Task<IEnumerable<T>> Get()
+        public override async Task<List<T>> Get()
         {
             return await GetDbSet().OrderByDescending(item => item.CreatedTime).ToListAsync();
         }
 
-        public override async Task<PaginationResponseModel<T>> Get(int limit, int offset)
+        public override async Task<PaginationResponseModel<T>> Get(PaginationDto pagination)
         {
-            IQueryable<T> list = GetDbSet().OrderByDescending(item => item.CreatedTime);
-            int total = list.Count();
+            List<T> list = await GetDbSet().OrderByDescending(item => item.CreatedTime).ToListAsync();
+            int total = list.Count;
             PaginationResponseModel<T> res = new()
             {
                 Total = total,
-                Limit = limit,
-                Offset = offset,
-                Results = await list.Skip(offset).Take(limit).ToListAsync()
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = ApplyPagination(list, pagination)
             };
             return res;
         }
 
-        public override async Task<IEnumerable<T?>> Get(Guid[] ids)
+        public override async Task<List<T?>> Get(Guid[] ids)
         {
-            IEnumerable<T> lists = await GetDbSet()
+            List<T> lists = await GetDbSet()
                 .Where(item => ids.Contains(item.UserItemId)).ToListAsync();
             return ids.Select(id => lists.Where(it => it.UserItemId == id).FirstOrDefault()).ToList();
         }
@@ -105,7 +106,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         }
         public override async Task<int> Delete(Guid[] ids)
         {
-            IEnumerable<T> list = await GetDbSet()
+            List<T> list = await GetDbSet()
                 .Where(item => ids.Contains(item.UserId)).ToListAsync();
             GetDbSet().RemoveRange(list);
             return await DbContext.SaveChangesAsync();

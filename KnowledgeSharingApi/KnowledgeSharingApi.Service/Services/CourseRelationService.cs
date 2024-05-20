@@ -70,40 +70,39 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<PaginationResponseModel<ResponseCourseRelationModel>> PaginationAndDecoration(
             Guid? myUid,
-            IEnumerable<CourseRelation> relations,
-            int? limit, int? offset,
+            List<CourseRelation> relations,
+            PaginationDto pagination,
             ECourseRelationType relationType,
             bool isDecorateUser = false,
             bool isDecorateCourse = false
         )
         {
             // Pagination
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            int total = relations.Count();
-            relations = relations.Skip(offsetValue).Take(limitValue);
+            int total = relations.Count;
+            relations = CoursePaymentRepository.ApplyPagination(relations, pagination);
 
             // Decoration:
-            IEnumerable<ResponseCourseRelationModel> lsRes = await 
-                DecorationRepository.DecorateResponseCourseRelationModel(myUid, relations.ToList(), relationType, isDecorateUser, isDecorateCourse);
+            List<ResponseCourseRelationModel> lsRes = await
+                DecorationRepository.DecorateResponseCourseRelationModel(myUid, relations, relationType, isDecorateUser, isDecorateCourse);
 
             // Return:
-            return new PaginationResponseModel<ResponseCourseRelationModel>(total, limitValue, offsetValue, lsRes);
+            return new PaginationResponseModel<ResponseCourseRelationModel>(total, pagination.Limit, pagination.Offset, lsRes);
         }
 
         #endregion
 
 
         #region Admin apies
-        public async Task<ServiceResult> AdminDeleteUserFromCourse(Guid registerId)
+        public virtual async Task<ServiceResult> AdminDeleteUserFromCourse(Guid registerId)
         {
             // Check register is existed
             ViewCourseRegister? register = await CourseRegisterRepository.GetCourseRegister(registerId);
             if (register == null) return ServiceResult.BadRequest(NotExistedMember);
 
             // Check register has payment
-            IEnumerable<ViewCoursePayment> payments =
+            List<ViewCoursePayment> payments =
                 await CoursePaymentRepository.GetCoursePayment(register.UserId, register.CourseId);
-            if (payments.Any())
+            if (payments.Count != 0)
                 return ServiceResult.BadRequest("Không thể xóa thành viên đã thanh toán khóa học");
 
             // Delete register 
@@ -114,118 +113,189 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(MemberResource));
         }
 
-        public async Task<ServiceResult> AdminGetCourseRegisters(Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> AdminGetCourseRegisters(Guid courseId, PaginationDto pagination)
         {
             // CHeck course Existed
-            _ = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Get lisst register
-            IEnumerable<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
+            List<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
 
-            // Pagination
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            int total = registers.Count();
-            registers = registers.Skip(offsetValue).Take(limitValue);
+            // Pagination;
+            int total = registers.Count;
+            registers = CourseRegisterRepository.ApplyPagination(registers, pagination);
 
-            // DecorateResponseLessonModel (lam sau)
+            // DecorateResponseResgiterModel (lam sau)
 
             // Return Success
-            PaginationResponseModel<ViewCourseRegister> res = new(total, limitValue, offsetValue, registers);
+            PaginationResponseModel<ViewCourseRegister> res = new(total, pagination.Limit, pagination.Offset, registers);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(MemberResource), string.Empty, res);
         }
         #endregion
 
         #region User gets
-        public async Task<ServiceResult> UserGetCourseInvites(Guid myUid, Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetCourseInvites(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course exist
-            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Check role is owner
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOnwner);
 
             // Get list invite of course
-            IEnumerable<CourseRelation> relations = await CourseRelationRepository.GetRelationsOfCourse(courseId, ECourseRelationType.Invite);
+            List<CourseRelation> relations = await CourseRelationRepository.GetRelationsOfCourse(courseId, ECourseRelationType.Invite);
 
             // Pagination and Decoration
             PaginationResponseModel<ResponseCourseRelationModel> res = await PaginationAndDecoration(
-                myUid, relations, limit, offset, ECourseRelationType.Invite, isDecorateUser: true, isDecorateCourse: false
+                myUid, relations, pagination, ECourseRelationType.Invite, isDecorateUser: true, isDecorateCourse: false
             );
 
             // Return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course is existed
-            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Check owner
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOnwner);
 
             // Get list requests
-            IEnumerable<CourseRelation> relations = await CourseRelationRepository.GetRelationsOfCourse(courseId, ECourseRelationType.Request);
+            List<CourseRelation> relations = await CourseRelationRepository.GetRelationsOfCourse(courseId, ECourseRelationType.Request);
 
             // Pagination and Decoration
             PaginationResponseModel<ResponseCourseRelationModel> res = await PaginationAndDecoration(
-                myUid, relations, limit, offset, ECourseRelationType.Request, isDecorateUser: true, isDecorateCourse: false);
+                myUid, relations, pagination, ECourseRelationType.Request, isDecorateUser: true, isDecorateCourse: false);
 
             // Return Success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyCourseInvites(Guid myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetMyCourseInvites(Guid myUid, PaginationDto pagination)
         {
             // Get list
-            IEnumerable<CourseRelation> lisRelations = await CourseRelationRepository.GetRelationsOfUser(myUid, ECourseRelationType.Invite);
+            List<CourseRelation> lisRelations = await CourseRelationRepository.GetRelationsOfUser(myUid, ECourseRelationType.Invite);
 
             // Pagination and decoration
             PaginationResponseModel<ResponseCourseRelationModel> res = await PaginationAndDecoration(
-                myUid, lisRelations, limit, offset, ECourseRelationType.Invite, isDecorateUser: false, isDecorateCourse: true);
+                myUid, lisRelations, pagination, ECourseRelationType.Invite, isDecorateUser: false, isDecorateCourse: true);
 
             // return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyCourseRequests(Guid myUid, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetMyCourseRequests(Guid myUid, PaginationDto pagination)
         {
             // Get list
-            IEnumerable<CourseRelation> lisRelations = await CourseRelationRepository.GetRelationsOfUser(myUid, ECourseRelationType.Request);
+            List<CourseRelation> lisRelations = await CourseRelationRepository.GetRelationsOfUser(myUid, ECourseRelationType.Request);
 
             // Pagination and decoration
             PaginationResponseModel<ResponseCourseRelationModel> res = await PaginationAndDecoration(
-                myUid, lisRelations, limit, offset, ECourseRelationType.Request, isDecorateUser: false, isDecorateCourse: true);
+                myUid, lisRelations, pagination, ECourseRelationType.Request, isDecorateUser: false, isDecorateCourse: true);
 
             // return success
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetRegisters(Guid myUid, Guid courseId, int? limit, int? offset)
+        public virtual async Task<ServiceResult> UserGetRegisters(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course existed
-            _ = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Check role is owner or member
             ECourseRoleType roleType = await CourseRelationRepository.GetRole(myUid, courseId);
-            if (roleType != ECourseRoleType.Owner && roleType != ECourseRoleType.Member)
+            if (roleType == ECourseRoleType.NotAccessible)
                 return ServiceResult.Forbidden(NotAccessibleCourse);
 
             // Get lisst register
-            IEnumerable<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
+            List<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
 
             // Pagination
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            int total = registers.Count();
-            registers = registers.Skip(offsetValue).Take(limitValue);
+            int total = registers.Count;
+            registers = CourseRegisterRepository.ApplyPagination(registers, pagination);
 
-            // DecorateResponseLessonModel (lam sau)
+            // DecorateResponseResgiterModel (lam sau)
 
             // Return Success
-            PaginationResponseModel<ViewCourseRegister> res = new(total, limitValue, offsetValue, registers);
+            PaginationResponseModel<ViewCourseRegister> res = new(total, pagination.Limit, pagination.Offset, registers);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(MemberResource), string.Empty, res);
+        }
+
+        public virtual async Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid courseId, bool? isFocusCourse = true)
+        {
+            // check course exist
+            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+
+            // get course role type type
+            Dictionary<Guid, CourseRoleTypeDto> dictRoleType = await CourseRelationRepository.GetCourseRoleType(myUid, [courseId]);
+            if (dictRoleType.TryGetValue(courseId, out CourseRoleTypeDto? value))
+            {
+                if (value.CourseRoleType == ECourseRoleType.NotAccessible)
+                {
+                    return ServiceResult.Forbidden("Bạn không có quyền truy cập khóa học này");
+                }
+                if (isFocusCourse == false)
+                {
+                    ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+                    ResponseUserCardModel resUser = new();
+                    resUser.Copy(user);
+                    resUser.CourseRoleType = value.CourseRoleType;
+                    resUser.CourseRelationId = value.CourseRelationId;
+                    return ServiceResult.Success(ResponseResource.GetSuccess(), string.Empty, resUser);
+                }
+                else
+                {
+                    ResponseCourseCardModel res = new();
+                    res.Copy(course);
+                    res.CourseRoleType = value.CourseRoleType;
+                    res.CourseRelationId = value.CourseRelationId;
+                    return ServiceResult.Success(ResponseResource.GetSuccess(), string.Empty, res);
+                }
+            }
+
+            // return server error
+            return ServiceResult.ServerError(ResponseResource.GetFailure());
+        }
+
+        public async Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid userId, Guid courseId, bool? isFocusCourse = true)
+        {
+            // Check userid and courseid existed
+            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            ViewUser user = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+
+            // Check myUid is owner
+            if (course.UserId != myUid)
+            {
+                return ServiceResult.Forbidden("Bạn không phải là chủ khóa học này");
+            }
+
+            // Get course status
+            Dictionary<Guid, CourseRoleTypeDto> dictRole = await CourseRelationRepository.GetCourseRoleType(userId, [courseId]);
+            if (dictRole.TryGetValue(userId, out CourseRoleTypeDto? value))
+            {
+                if (isFocusCourse == false)
+                {
+                    ResponseUserCardModel resUser = new();
+                    resUser.Copy(user);
+                    resUser.CourseRoleType = value.CourseRoleType;
+                    resUser.CourseRelationId = value.CourseRelationId;
+                    return ServiceResult.Success(ResponseResource.GetSuccess(), string.Empty, resUser);
+                }
+                else
+                {
+                    ResponseCourseCardModel res = new();
+                    res.Copy(course);
+                    res.CourseRoleType = value.CourseRoleType;
+                    res.CourseRelationId = value.CourseRelationId;
+                    return ServiceResult.Success(ResponseResource.GetSuccess(), string.Empty, res);
+                }
+            }
+
+            return ServiceResult.ServerError(ResponseResource.GetFailure());
         }
 
         #endregion
@@ -233,7 +303,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region User Operations apies
         #region Requestation
-        public async Task<ServiceResult> UserRequestCourse(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserRequestCourse(Guid myUid, Guid courseId)
         {
             // Check course is existed
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -275,10 +345,10 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Return success
-            return ServiceResult.Success(ResponseResource.Success());
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, request);
         }
 
-        public async Task<ServiceResult> UserDeleteCourseRequest(Guid myUid, Guid requestId)
+        public virtual async Task<ServiceResult> UserDeleteCourseRequest(Guid myUid, Guid requestId)
         {
             // Check course relation is existed
             CourseRelation? courseRelation = await CourseRelationRepository.GetRelation(requestId);
@@ -297,7 +367,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public async Task<ServiceResult> UserConfirmCourseRequest(Guid myUid, Guid requestId, bool isAccept)
+        public virtual async Task<ServiceResult> UserConfirmCourseRequest(Guid myUid, Guid requestId, bool isAccept)
         {
             // Check course relation is existed
             CourseRelation? courseRelation = await CourseRelationRepository.GetRelation(requestId);
@@ -329,7 +399,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Invitation
 
-        public async Task<ServiceResult> UserInviteUserToCourse(Guid myUid, Guid courseId, Guid userId)
+        public virtual async Task<ServiceResult> UserInviteUserToCourse(Guid myUid, Guid courseId, Guid userId)
         {
             // CHeck two id is different
             if (myUid == userId)
@@ -343,7 +413,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden(NotBeCourseOnwner);
 
             // CHeck userId is existed
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // CHeck not invite yet
             CourseRelation? beforeInvite = await CourseRelationRepository.GetInvite(userId, courseId);
@@ -374,10 +444,10 @@ namespace KnowledgeSharingApi.Services.Services
             if (res == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Return success
-            return ServiceResult.Success(ResponseResource.Success());
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, invite);
         }
 
-        public async Task<ServiceResult> UserInviteListUserToCourse(Guid myUid, Guid courseId, IEnumerable<Guid> listUserIds)
+        public virtual async Task<ServiceResult> UserInviteListUserToCourse(Guid myUid, Guid courseId, List<Guid> listUserIds)
         {
             // Check course exist
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -386,12 +456,14 @@ namespace KnowledgeSharingApi.Services.Services
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOnwner);
 
-            // lam sau
+            // Kiem tra danh sach user phai chua tham gia khoa hoc, chưa request khoa hoc, khong phai chu nhan khoa hoc
+
+            // Bỏ không làm vì quá phức tạp
 
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceResult> UserDeleteCourseInvite(Guid myUid, Guid inviteId)
+        public virtual async Task<ServiceResult> UserDeleteCourseInvite(Guid myUid, Guid inviteId)
         {
             // Kiem tra relation ton tai
             CourseRelation? invite = await CourseRelationRepository.Get(inviteId);
@@ -409,7 +481,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public async Task<ServiceResult> UserConfirmCourseInvite(Guid myUid, Guid inviteId, bool isAccept)
+        public virtual async Task<ServiceResult> UserConfirmCourseInvite(Guid myUid, Guid inviteId, bool isAccept)
         {
             // Check course relation is existed
             CourseRelation? courseRelation = await CourseRelationRepository.GetRelation(inviteId);
@@ -439,7 +511,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region Register
-        public async Task<ServiceResult> UserRegisterCourse(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserRegisterCourse(Guid myUid, Guid courseId)
         {
             // Kiem tra khoa hoc ton tai
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -474,10 +546,10 @@ namespace KnowledgeSharingApi.Services.Services
             if (res == null) return ServiceResult.ServerError(ResponseResource.ServerError());
 
             // Tra ve thanh cong
-            return ServiceResult.Success(ResponseResource.Success());
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, courseRegister);
         }
 
-        public async Task<ServiceResult> UserDeleteRegister(Guid myUid, Guid registerId)
+        public virtual async Task<ServiceResult> UserDeleteRegister(Guid myUid, Guid registerId)
         {
             // Check register is existed
             ViewCourseRegister? register = await CourseRegisterRepository.GetCourseRegister(registerId);
@@ -489,9 +561,9 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden(NotBeCourseOnwner);
 
             // Check register has payment
-            IEnumerable<ViewCoursePayment> payments =
+            List<ViewCoursePayment> payments =
                 await CoursePaymentRepository.GetCoursePayment(register.UserId, register.CourseId);
-            if (payments.Any())
+            if (payments.Count != 0)
                 return ServiceResult.BadRequest("Không thể xóa thành viên đã thanh toán khóa học");
 
             // Delete register 
@@ -502,10 +574,10 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(MemberResource));
         }
 
-        public async Task<ServiceResult> UserUnregisterCourse(Guid myUid, Guid courseId)
+        public virtual async Task<ServiceResult> UserUnregisterCourse(Guid myUid, Guid courseId)
         {
             // Kiem tra khoa hoc ton tai
-            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
+            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Kiem tra role phai la member (lay ve register)
             ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, courseId);
@@ -517,8 +589,9 @@ namespace KnowledgeSharingApi.Services.Services
             if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure());
 
             // Tra ve thanh cong
-            return ServiceResult.Success(ResponseResource.DeleteSuccess());
+            return ServiceResult.Success(ResponseResource.Success());
         }
+
         #endregion
 
         #endregion

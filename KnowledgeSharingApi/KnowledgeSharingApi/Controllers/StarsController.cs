@@ -15,7 +15,7 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class StarsController(
         IStarService starService    
-    ): ControllerBase
+    ): BaseController
     {
         protected IStarService StarService = starService;
 
@@ -33,10 +33,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("anonymous/{itemId}")]
         [AllowAnonymous]
-        public virtual async Task<IActionResult> AnonymousGetUserItemStars(Guid itemId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AnonymousGetUserItemStars(Guid itemId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.AnonymousGetUserItemStars(itemId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.AnonymousGetUserItemStars(itemId, pagination);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -50,11 +51,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("{itemId}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> UserGetUserItemStars(Guid itemId, int? limit, int? offset)
+        public virtual async Task<IActionResult> UserGetUserItemStars(Guid itemId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetUserItemStars(Guid.Parse(myUid), itemId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetUserItemStars(GetCurrentUserIdStrictly(), itemId, pagination);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -68,10 +69,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin/{itemId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public virtual async Task<IActionResult> AdminGetUserItemStars(Guid itemId, int? limit, int? offset)
+        public virtual async Task<IActionResult> AdminGetUserItemStars(Guid itemId, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await StarService.AdminGetUserItemStars(itemId, limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.AdminGetUserItemStars(itemId, pagination);
+            return StatusCode(res);
         }
 
         #endregion
@@ -89,11 +91,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("useritems")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredUserItems(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredUserItems(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredUserItems(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredUserItems(GetCurrentUserIdStrictly(), pagination);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -107,11 +109,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("comments")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredComments(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredComments(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredComments(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredComments(GetCurrentUserIdStrictly(), pagination);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -124,11 +126,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("courses")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredCourse(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredCourse(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredCourses(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredCourses(GetCurrentUserIdStrictly(), pagination);
+            return StatusCode(res);
         }
 
 
@@ -142,11 +144,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("posts")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredPosts(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredPosts(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredPosts(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredPosts(GetCurrentUserIdStrictly(), pagination);
+            return StatusCode(res);
         }
 
 
@@ -160,11 +162,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("questions")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredQuestions(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredQuestions(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredQuestions(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredQuestions(GetCurrentUserIdStrictly(), pagination);
+            return StatusCode(res);
         }
 
 
@@ -178,11 +180,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("lessons")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> GetMyStaredLessons(int? limit, int? offset)
+        public virtual async Task<IActionResult> GetMyStaredLessons(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserGetMyScoredLessons(Guid.Parse(myUid), limit, offset);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await StarService.UserGetMyScoredLessons(GetCurrentUserIdStrictly(), pagination);
+            return StatusCode(res);
         }
 
         #endregion
@@ -199,9 +201,8 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> StarAnUserItem(PutScoreModel starModel)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await StarService.UserPutScores(Guid.Parse(myUid), starModel);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await StarService.UserPutScores(GetCurrentUserIdStrictly(), starModel);
+            return StatusCode(res);
         }
 
         #endregion

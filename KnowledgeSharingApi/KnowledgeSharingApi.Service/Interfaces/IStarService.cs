@@ -14,39 +14,36 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Anonymous lấy về danh sách star của một user item
         /// </summary>
         /// <param name="userItemId"> id của item cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (27/3/24)
         /// Modified: None
-        Task<ServiceResult> AnonymousGetUserItemStars(Guid userItemId, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetUserItemStars(Guid userItemId, PaginationDto page);
 
         /// <summary>
         /// User lấy về danh sách star của một user item
         /// </summary>
         /// <param name="userItemId"> id của item cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (27/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetUserItemStars(Guid myUid, Guid userItemId, int? limit, int? offset);
+        Task<ServiceResult> UserGetUserItemStars(Guid myUid, Guid userItemId, PaginationDto page);
 
         /// <summary>
         /// User lấy về danh sách user item mà mình đã đánh giá số sao
         /// </summary>
         /// <param name="myUid"> id của user cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (27/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyScoredUserItems(Guid myUid, int? limit, int? offset);
-        Task<ServiceResult> UserGetMyScoredComments(Guid myUid, int? limit, int? offset);
-        Task<ServiceResult> UserGetMyScoredCourses(Guid myUid, int? limit, int? offset);
-        Task<ServiceResult> UserGetMyScoredQuestions(Guid myUid, int? limit, int? offset);
-        Task<ServiceResult> UserGetMyScoredLessons(Guid myUid, int? limit, int? offset);
-        Task<ServiceResult> UserGetMyScoredPosts(Guid myUid, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyScoredUserItems(Guid myUid, PaginationDto page);
+        Task<ServiceResult> UserGetMyScoredComments(Guid myUid, PaginationDto page);
+        Task<ServiceResult> UserGetMyScoredCourses(Guid myUid, PaginationDto page);
+        Task<ServiceResult> UserGetMyScoredQuestions(Guid myUid, PaginationDto page);
+        Task<ServiceResult> UserGetMyScoredLessons(Guid myUid, PaginationDto page);
+        Task<ServiceResult> UserGetMyScoredPosts(Guid myUid, PaginationDto page);
 
         /// <summary>
         /// User đánh giá star cho một item
@@ -62,12 +59,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Admin lấy về danh sách star của một user item
         /// </summary>
         /// <param name="userItemId"> id của item cần lấy </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (27/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetUserItemStars(Guid userItemId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetUserItemStars(Guid userItemId, PaginationDto page);
 
     }
 }

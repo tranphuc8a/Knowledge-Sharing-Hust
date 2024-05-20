@@ -7,6 +7,7 @@ class Entity {
         this.CreatedTime = null;
         this.ModifiedBy = null;
         this.ModifiedTime = null;
+        this.ListObservers = [];
     }
 
 
@@ -76,7 +77,13 @@ class Entity {
         return this;
     }
 
-
+    /**
+     * Tra ve user cua mot entity
+     * @param none
+     * @returns {Object} - trả về một object chứa thông tin của người dùng
+     * @Created PhucTV (12/5/24)
+     * @Modified None
+     */
     getUser(){
         return {
             UserId: this.UserId,
@@ -88,6 +95,31 @@ class Entity {
             UserRelationType: this.UserRelationType,
             UserRelationId: this.UserRelationId,
         };
+    }
+
+    /**
+     * Dang ky mot observer
+     * @param {Function} callback - hàm callback
+     * @returns none
+     * @Created PhucTV (12/5/24)
+     * @Modified None
+     */
+    registerObserver(callback){
+        if (callback == null) return;
+        this.ListObservers.push(callback);
+    }
+
+    /**
+     * Thông báo cho các observer
+     * @param none
+     * @returns none
+     * @Created PhucTV (12/5/24)
+     * @Modified None
+     */
+    notifyObserver(){
+        this.ListObservers.forEach((callback) => {
+            callback();
+        });
     }
 }
 

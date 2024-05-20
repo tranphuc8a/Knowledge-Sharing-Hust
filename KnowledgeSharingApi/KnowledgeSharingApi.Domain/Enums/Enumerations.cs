@@ -248,6 +248,12 @@ namespace KnowledgeSharingApi.Domains.Enums
         // Chỉ được phép xem trang thông tin giới thiệu khóa học
         // Chưa đăng ký, khóa học public hoặc (khóa học private + được chủ khóa học invite)
         Guest = 1,
+        GuestNotInRelation = 10,
+        GuestRequesting = 11,
+        GuestInvited = 12,
+        NotInRelation = 10,
+        Requesting = 11,
+        Invited = 12,
 
         // Được phép truy cập mọi tài nguyên trong khóa học
         // Đã đăng ký là thành viên khóa học

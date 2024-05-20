@@ -80,7 +80,7 @@ namespace KnowledgeSharingApi.Infrastructures.UnitOfWorks
             return this;
         }
 
-        public virtual IUnitOfWork RegisterRepository<T>(IEnumerable<IRepository<T>> repositories) where T : Entity
+        public virtual IUnitOfWork RegisterRepository<T>(List<IRepository<T>> repositories) where T : Entity
         {
             if (Transaction == null)
             {

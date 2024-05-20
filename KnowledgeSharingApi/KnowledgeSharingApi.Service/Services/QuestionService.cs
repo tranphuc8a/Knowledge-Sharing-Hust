@@ -109,7 +109,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AdminDeletePost(Guid postId)
         {
             // Kiểm tra câu hỏi tồn tại
-            _ = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            _ = await QuestionRepository.CheckExisted(postId, NotExistedQuestion);
 
             int res = await QuestionRepository.Delete(postId);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure(QuestionResource));
@@ -117,22 +117,21 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess());
         }
 
-        public async Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetListPostsOfCourse(Guid courseId, PaginationDto pagination)
         {
             string CourseResource = ResourceFactory.GetEntityResource().Course();
             _ = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(CourseResource));
 
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewQuestion> listQuestion = await QuestionRepository.GetQuestionInCourse(courseId);
+            List<ViewQuestion> listQuestion = await QuestionRepository.GetQuestionInCourse(courseId);
 
             PaginationResponseModel<IResponseQuestionModel> res = new()
             {
-                Total = listQuestion.Count(),
-                Limit = limitValue,
-                Offset = offsetValue,
+                Total = listQuestion.Count,
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
                 Results = await DecorationRepository.DecorateResponseQuestionModel(
                     null,
-                    listQuestion.Skip(offsetValue).Take(limitValue).ToList()
+                    QuestionRepository.ApplyPagination(listQuestion, pagination)
                 )
             };
 
@@ -153,23 +152,21 @@ namespace KnowledgeSharingApi.Services.Services
                 GetQuestionSuccess, string.Empty, questionItemModel);
         }
 
-        public async Task<ServiceResult> AdminGetPosts(int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetPosts(PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetViewPost(limitValue, offsetValue);
-            List<IResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList());
+            List<ViewQuestion> questions = await QuestionRepository.GetViewPost(pagination);
+            List<IResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions);
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminGetUserPosts(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserPosts(Guid userId, PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetByUserId(userId);
-            questions = questions.Skip(offsetValue).Take(limitValue);
+            List<ViewQuestion> questions = await QuestionRepository.GetByUserId(userId, pagination);
+            //questions = QuestionRepository.ApplyPagination(questions, pagination);
 
-            List<IResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList());
+            List<IResponseQuestionModel> res = await DecorationRepository.DecorateResponseQuestionModel(null, questions);
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, res);
         }
         #endregion
@@ -186,32 +183,30 @@ namespace KnowledgeSharingApi.Services.Services
                 (await DecorationRepository.DecorateResponseQuestionModel(null, [question])).First());
         }
 
-        public async Task<ServiceResult> AnonymousGetPosts(int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetPosts(PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPosts(limitValue, offsetValue);
+            List<ViewQuestion> questions = await QuestionRepository.GetPublicPosts(pagination);
 
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
-                await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList()));
+                await DecorationRepository.DecorateResponseQuestionModel(null, questions));
         }
 
-        public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId);
-            questions = questions.Skip(offsetValue).Take(limitValue);
+            List<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId, pagination);
+            //questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
-                await DecorationRepository.DecorateResponseQuestionModel(null, questions.ToList()));
+                await DecorationRepository.DecorateResponseQuestionModel(null, questions));
         }
         #endregion
 
         #region User APIes
         public async Task<ServiceResult> ConfirmQuestion(Guid myUid, Guid questionId, bool isConfirm)
         {
-            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(questionId, NotExistedQuestion);
+            Question question = await QuestionRepository.CheckExisted(questionId, NotExistedQuestion);
             if (question.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải bài thảo luận của bạn");
             question.IsAccept = isConfirm;
@@ -256,9 +251,9 @@ namespace KnowledgeSharingApi.Services.Services
             if (inserted == null) return ServiceResult.ServerError(ResponseResource.InsertFailure(QuestionResource));
 
             // Insert categories nếu có:
-            if (model.Categories != null && model.Categories.Any())
+            if (model.Categories != null && model.Categories.Count != 0)
             {
-                _ = await CategoryRepository.UpdateKnowledgeCategories(inserted.Value, model.Categories.ToList());
+                _ = await CategoryRepository.UpdateKnowledgeCategories(inserted.Value, model.Categories);
             }
 
             // Trả về thành công
@@ -274,7 +269,7 @@ namespace KnowledgeSharingApi.Services.Services
                 throw new NotMatchTypeException();
 
             // Kiểm tra postId tồn tại, và chủ nhân là myUid
-            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            Question question = await QuestionRepository.CheckExisted(postId, NotExistedQuestion);
             if (question.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải là bài thảo luận của bạn");
 
@@ -292,9 +287,9 @@ namespace KnowledgeSharingApi.Services.Services
             int res2 = 0;
 
             // Update categories:
-            if (model.Categories != null && model.Categories.Any())
+            if (model.Categories != null && model.Categories.Count != 0)
             {
-                res2 = await CategoryRepository.UpdateKnowledgeCategories(postId, model.Categories.ToList());
+                res2 = await CategoryRepository.UpdateKnowledgeCategories(postId, model.Categories);
             }
 
             if (res1 + res2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(QuestionResource));
@@ -308,7 +303,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Không nhất thiết
 
             // Kiểm tra post tồn tại
-            ViewQuestion question = await QuestionRepository.CheckExistedQuestion(postId, NotExistedQuestion);
+            Question question = await QuestionRepository.CheckExisted(postId, NotExistedQuestion);
 
             // Kiểm tra user là chủ post
             if (question.UserId != myUid)
@@ -323,10 +318,10 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
         #region User Gets
-        public async Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Kiểm tra course tồn tại và user phải tham gia course
-            Course course = await CourseRepository.CheckExisted(courseId,
+            _ = await CourseRepository.CheckExisted(courseId,
                    ResponseResource.NotExist(EntityResource.Course()));
 
             // Kiểm tra user đã join course hay chưa
@@ -335,16 +330,15 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
 
             // Lấy về danh sách câu hỏi trong course
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetQuestionInCourse(courseId);
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            questions = questions.Skip(limitValue).Take(offsetValue);
+            List<ViewQuestion> questions = await QuestionRepository.GetQuestionInCourse(courseId);
+            questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             // Trả về thành công
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
-                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions));
         }
 
-        public async Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListPostsOfMyCourse(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại (không nhất thiết)
 
@@ -355,13 +349,12 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Bạn không phải chủ của khóa học này");
 
             // Lấy về danh sách câu hỏi trong course
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetQuestionInCourse(courseId);
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            questions = questions.Skip(limitValue).Take(offsetValue);
+            List<ViewQuestion> questions = await QuestionRepository.GetQuestionInCourse(courseId);
+            questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             // Trả về thành công
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
-                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions));
         }
 
         public async Task<ServiceResult> UserGetMyPostDetail(Guid myUid, Guid postId)
@@ -378,18 +371,17 @@ namespace KnowledgeSharingApi.Services.Services
                 (await DecorationRepository.DecorateResponseQuestionModel(myUid, [question])).First());
         }
 
-        public async Task<ServiceResult> UserGetMyPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyPosts(Guid myUid, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
-            _ = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(myUid, ResponseResource.NotExistUser());
 
             // Lấy về và trả về thành công
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetByUserId(myUid);
-            questions = questions.Skip(offsetValue).Take(limitValue);
+            List<ViewQuestion> questions = await QuestionRepository.GetByUserId(myUid, pagination);
+            //questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
-                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions));
         }
 
         public async Task<ServiceResult> UserGetPostDetail(Guid myUid, Guid postId)
@@ -421,31 +413,31 @@ namespace KnowledgeSharingApi.Services.Services
                 (await DecorationRepository.DecorateResponseQuestionModel(myUid, [question])).First());
         }
 
-        public async Task<ServiceResult> UserGetPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetPosts(Guid myUid, PaginationDto pagination)
         {
             // Chỉ lấy public question, tính toán sắp xếp theo độ ưu tiên của riêng myUId, làm sau
 
             // Lấy về danh sách public question
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPosts(limit ?? DefaultLimit, offset ?? 0);
+            List<ViewQuestion> questions = await QuestionRepository.GetPublicPosts(pagination);
 
             // Trả về thành công
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
-                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions));
         }
 
-        public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetUserPosts(Guid myUid, Guid userId, PaginationDto pagination)
         {
             // Kiểm tra myUid tồn tại (không nhất thiết) và userId tồn tại
-            _ = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+            _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
             // Lấy về danh sách userId question? (có lấy trong private question không?)
             // Để đơn giản, hiện chỉ lấy public question
-            IEnumerable<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId);
-            questions = questions.Skip(offset ?? 0).Take(limit ?? DefaultLimit);
+            List<ViewQuestion> questions = await QuestionRepository.GetPublicPostsByUserId(userId, pagination);
+            //questions = QuestionRepository.ApplyPagination(questions, pagination);
 
             // Trả về thành công
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty,
-                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions.ToList()));
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions));
         }
         #endregion
 
@@ -454,53 +446,72 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Get of a category
 
-        public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetListPostsOfCategory(string catName, PaginationDto pagination)
         {
-            IEnumerable<ViewQuestion> posts = await QuestionRepository.GetPublicPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewQuestion> posts = await QuestionRepository.GetPublicPostsOfCategory(catName, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecorationRepository.DecorateResponseQuestionModel(null, posts.ToList())
+                await DecorationRepository.DecorateResponseQuestionModel(null, posts)
             );
         }
 
-        public async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListPostsOfCategory(Guid myUid, string catName, PaginationDto pagination)
         {
-            IEnumerable<ViewQuestion> posts = await QuestionRepository.GetPostsOfCategory(myUid, catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewQuestion> posts = await QuestionRepository.GetPostsOfCategory(myUid, catName, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecorationRepository.DecorateResponseQuestionModel(myUid, posts.ToList())
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, posts)
             );
         }
 
-        public async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetListPostsOfCategory(string catName, PaginationDto pagination)
         {
-            IEnumerable<ViewQuestion> posts = await QuestionRepository.GetPostsOfCategory(catName, limit ?? DefaultLimit, offset ?? 0);
+            List<ViewQuestion> posts = await QuestionRepository.GetPostsOfCategory(catName, pagination);
 
             return ServiceResult.Success(
                 ResponseResource.GetMultiSuccess(),
                 string.Empty,
-                await DecorationRepository.DecorateResponseQuestionModel(null, posts.ToList())
+                await DecorationRepository.DecorateResponseQuestionModel(null, posts)
             );
         }
 
-        public async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, PaginationDto pagination)
         {
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            IEnumerable<ViewQuestion> listed = await QuestionRepository.GetMarkedPosts(myUid);
-            int total = listed.Count();
-            listed = listed.Skip(offsetValue).Take(limitValue);
+            List<ViewQuestion> listed = await QuestionRepository.GetMarkedPosts(myUid);
+            int total = listed.Count;
+            listed = QuestionRepository.ApplyPagination(listed, pagination);
             PaginationResponseModel<IResponseQuestionModel> res = new()
             {
                 Total = total,
-                Limit = limitValue,
-                Offset = offsetValue,
-                Results = await DecorationRepository.DecorateResponseQuestionModel(myUid, listed.ToList())
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = await DecorationRepository.DecorateResponseQuestionModel(myUid, listed)
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(QuestionResource), string.Empty, res);
+        }
+
+        public Task<ServiceResult> UserSearchPost(Guid myUid, string? search, PaginationDto pagination)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> UserSearchMyPost(Guid myUid, string? search, PaginationDto pagination)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> UserSearchUserPost(Guid myUid, Guid userId, string? search, PaginationDto pagination)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServiceResult> AdminSearchUserPost(Guid userId, string? search, PaginationDto pagination)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

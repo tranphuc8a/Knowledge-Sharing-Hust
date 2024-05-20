@@ -19,52 +19,52 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class UserRelationMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<UserRelation>(dbContext), IUserRelationRepository
     {
-        public virtual Task<bool> CheckBlock(Guid blockerId, Guid blockeeId)
+        public virtual async Task<bool> CheckBlock(Guid blockerId, Guid blockeeId)
         {
-            IEnumerable<UserRelation> listBlock = DbContext.UserRelations
+            IQueryable<UserRelation> listBlock = DbContext.UserRelations
                 .Where(relation => 
                     relation.UserRelationType == EUserRelationType.Block
                     && relation.SenderId == blockerId
                     && relation.ReceiverId == blockeeId
                 );
-            return Task.FromResult(listBlock.Any());
+            return (await listBlock.ToListAsync()).Count > 0;
         }
 
-        public virtual Task<bool> CheckBlockByUsername(string blockerUsername, string blockeeUsername)
+        public virtual async Task<bool> CheckBlockByUsername(string blockerUsername, string blockeeUsername)
         {
-            IEnumerable<ViewUserRelation> listBlock = 
+            IQueryable<ViewUserRelation> listBlock = 
                 from relation in DbContext.ViewUserRelations
                 where relation.UserRelationType == EUserRelationType.Block
                         && relation.SenderUsername == blockerUsername 
                         && relation.ReceiverUsername == blockeeUsername
                 select relation;
-            return Task.FromResult(listBlock.Any());
+            return (await listBlock.ToListAsync()).Count > 0;
 
         }
 
-        public virtual Task<bool> CheckBlockByUsernameEachOther(string username1, string username2)
+        public virtual async Task<bool> CheckBlockByUsernameEachOther(string username1, string username2)
         {
-            IEnumerable<ViewUserRelation> listBlock =
+            IQueryable<ViewUserRelation> listBlock =
                 from relation in DbContext.ViewUserRelations
                 where relation.UserRelationType == EUserRelationType.Block
                 where (relation.SenderUsername == username1 && relation.ReceiverUsername == username2)
                       || (relation.SenderUsername == username2 && relation.ReceiverUsername == username1)
                 select relation;
-            return Task.FromResult(listBlock.Any());
+            return (await listBlock.ToListAsync()).Count > 0;
         }
 
-        public virtual Task<bool> CheckBlockEachOther(Guid user1Id, Guid user2Id)
+        public virtual async Task<bool> CheckBlockEachOther(Guid user1Id, Guid user2Id)
         {
-            IEnumerable<UserRelation> listBlock = DbContext.UserRelations
+            List<UserRelation> listBlock = await DbContext.UserRelations
                 .Where(relation =>
                     relation.UserRelationType == EUserRelationType.Block
                     && (relation.SenderId == user1Id || relation.ReceiverId == user2Id)
                     && (relation.SenderId == user2Id || relation.ReceiverId == user1Id)
-                );
-            return Task.FromResult(listBlock.Any());
+                ).ToListAsync();
+            return listBlock.Count != 0;
         }
 
-        public virtual async Task<IEnumerable<ViewUserRelation>> GetByUserId(Guid userId, bool isActive)
+        public virtual async Task<List<ViewUserRelation>> GetByUserId(Guid userId, bool isActive)
         {
             var query = DbContext.ViewUserRelations.AsQueryable();
 
@@ -75,7 +75,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return await query.ToListAsync();
         }
 
-        public virtual async Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type)
+        public virtual async Task<List<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type)
         {
             // Sử dụng biến 'userIdProperty' để đại diện cho SenderId hay ReceiverId dựa trên 'isActive'
             Expression<Func<ViewUserRelation, bool>> userIdPredicate = isActive
@@ -92,14 +92,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         }
 
 
-        protected virtual UserRelationTypeDto GetUserRelationType(Guid myUid, IEnumerable<ViewUserRelation> userRelations)
+        protected virtual UserRelationTypeDto GetUserRelationType(Guid myUid, List<ViewUserRelation> userRelations)
         {
             UserRelationTypeDto res = new()
             {
                 UserRelationType = EUserRelationType.NotInRelation,
                 UserRelationId = null
             };
-            if (!userRelations.Any()) return res;
+            if (userRelations.Count == 0) return res;
 
             // Check block:
             ViewUserRelation? block = userRelations
@@ -186,8 +186,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             // Xác định loại quan hệ cho từng cặp người dùng
             foreach (Guid otherUser in users2)
             {
-                IEnumerable<ViewUserRelation> relations = userRelations
-                    .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser);
+                List<ViewUserRelation> relations = userRelations
+                    .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser)
+                    .ToList();
                 EUserRelationType relationType = GetUserRelationType(user1, relations).UserRelationType;
                 results[otherUser] = relationType;
             }
@@ -212,8 +213,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             // Xác định loại quan hệ cho từng cặp người dùng
             foreach (Guid otherUser in users2)
             {
-                IEnumerable<ViewUserRelation> relations = userRelations
-                    .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser);
+                List<ViewUserRelation> relations = userRelations
+                    .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser)
+                    .ToList();
                 UserRelationTypeDto relationType = GetUserRelationType(user1, relations);
                 results[otherUser] = relationType;
             }

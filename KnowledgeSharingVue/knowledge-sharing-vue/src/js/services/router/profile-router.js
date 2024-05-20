@@ -2,7 +2,9 @@
 
 import ProfilePage from '@/components/pages/desktop/profile/ProfilePage.vue';
 import ProfileHomeSubpage from '@/components/pages/desktop/profile/subpages/profile-home/ProfileHomeSubpage.vue';
-
+import ProfileLearnSubpage from '@/components/pages/desktop/profile/subpages/profile-learn/ProfileLearnSubpage.vue';
+import ProfileLessonSubpage from '@/components/pages/desktop/profile/subpages/profile-lesson/ProfileLessonSubpage.vue';
+import ProfileQuestionSubpage from '@/components/pages/desktop/profile/subpages/profile-question/ProfileQuestionSubpage.vue';
 
 
 const profileRouter = [
@@ -25,15 +27,15 @@ const profileRouter = [
             }, { // when /profile.../learn
                 path: 'learn',
                 name: 'profile-learn-page',
-                component: null, 
+                component: ProfileLearnSubpage, 
             }, { // when /profile.../lesson
                 path: 'lesson',
                 name: 'profile-lesson-page',
-                component: null, 
+                component: ProfileLessonSubpage,  
             }, { // when /profile.../question
                 path: 'question',
                 name: 'profile-question-page',
-                component: null, 
+                component: ProfileQuestionSubpage,  
             }, { // when /profile.../course
                 path: 'course',
                 name: 'profile-course-page',

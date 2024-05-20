@@ -28,7 +28,7 @@ export default {
     data(){
         return {
             iconStyle: {
-                fontSize: '16px',
+                fontSize: '12px',
                 color: 'var(--primary-color)',
                 cursor: 'pointer'
             },
@@ -38,7 +38,9 @@ export default {
     methods: {
 
         async resolveClickCategory(){
-            if (this.isEditing) return;
+            if (this.isEditing){
+                return await this.resolveClickClose();
+            }
             console.log("Clicked category: " + this.category);
         },
 
@@ -85,7 +87,7 @@ export default {
     font-size: 12px;
     color: var(--primary-color);
     cursor: pointer;
-    max-width: 100px;
+    max-width: 200px;
 
     display: block;
     overflow: hidden;
@@ -94,7 +96,9 @@ export default {
     /* text-overrlow only active with these four attributes */
 }
 
-
+.category-frame > * {
+    font-size: 12px;
+}
 
 .category-icon{
     flex-shrink: 0;

@@ -19,8 +19,8 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         public int TotalStars { get; set; }
 
         public int NumberComments { get; set; }
-        public IEnumerable<ResponseCommentModel> TopComments { get; set; } = [];
+        public List<ResponseCommentModel> TopComments { get; set; } = [];
         public bool IsMarked { get; set; }
-        public IEnumerable<Category> Categories { get; set; } = [];
+        public List<Category> Categories { get; set; } = [];
     }
 }

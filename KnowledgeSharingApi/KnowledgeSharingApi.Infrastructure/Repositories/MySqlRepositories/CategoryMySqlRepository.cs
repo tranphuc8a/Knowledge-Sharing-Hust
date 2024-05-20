@@ -19,7 +19,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     public class CategoryMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Category>(dbContext), ICategoryRepository
     {
-        public async Task<IEnumerable<Category>> GetByKnowledgeId(Guid knowledgeId)
+        public async Task<List<Category>> GetByKnowledgeId(Guid knowledgeId)
         {
             var cateIds = DbContext.KnowledgeCategories
                 .Where(item => item.KnowledgeId == knowledgeId)
@@ -31,25 +31,25 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<Dictionary<Guid, IEnumerable<Category>?>> GetByKnowledgeId(IEnumerable<Guid> knowledgeIds)
+        public async Task<Dictionary<Guid, List<Category>?>> GetByKnowledgeId(List<Guid> knowledgeIds)
         {
-            Dictionary<Guid, IEnumerable<ViewKnowledgeCategory>> categories = await DbContext.ViewKnowledgeCategories
+            Dictionary<Guid, List<ViewKnowledgeCategory>> categories = await DbContext.ViewKnowledgeCategories
                 .Where(knowCate => knowledgeIds.Contains(knowCate.KnowledgeId))
                 .GroupBy(knowCate => knowCate.KnowledgeId)
-                .ToDictionaryAsync(group => group.Key, group => group.AsEnumerable());
+                .ToDictionaryAsync(group => group.Key, group => group.ToList());
 
             return knowledgeIds.ToDictionary(
                 id => id,
                 id =>
                 {
-                    if (categories.TryGetValue(id, out IEnumerable<ViewKnowledgeCategory>? value))
+                    if (categories.TryGetValue(id, out List<ViewKnowledgeCategory>? value))
                     {
                         return value.Select(viewCate =>
                         {
                             Category cat = new();
                             cat.Copy(viewCate);
                             return cat;
-                        });
+                        }).ToList();
                     }
                     return null;
                 }
@@ -63,7 +63,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<ViewKnowledgeCategory>> GetKnowledgesByCategory(Guid catId)
+        public async Task<List<ViewKnowledgeCategory>> GetKnowledgesByCategory(Guid catId)
         {
             return await DbContext.ViewKnowledgeCategories
                 .Where(cate => cate.CategoryId == catId)
@@ -71,7 +71,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<ViewKnowledgeCategory>> GetKnowledgesByCategory(string catName)
+        public async Task<List<ViewKnowledgeCategory>> GetKnowledgesByCategory(string catName)
         {
             return await DbContext.ViewKnowledgeCategories
                 .Where(cate => cate.CategoryName == catName)

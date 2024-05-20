@@ -60,27 +60,26 @@ namespace KnowledgeSharingApi.Services.Services
             NotExistedItem = ResponseResource.NotExist(EntityResource.UserItem());
         }
 
-        public async Task<ServiceResult> AdminGetUserItemStars(Guid userItemId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetUserItemStars(Guid userItemId, PaginationDto pagination)
         {
             // CHeck userItem existed:
             _ = await UserItemRepository.CheckExisted(userItemId, NotExistedItem);
 
-            IEnumerable<Star> listStars = await StarRepository.GetListStarOfUserItem(userItemId);
-            int total = listStars.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listStars = listStars.Skip(offsetValue).Take(limitValue);
+            List<Star> listStars = await StarRepository.GetListStarOfUserItem(userItemId);
+            int total = listStars.Count;
+            listStars = StarRepository.ApplyPagination(listStars, pagination);
             PaginationResponseModel<ResponseStarModel> res = new()
             {
                 Total = total,
-                Limit = limitValue,
-                Offset = offsetValue,
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
                 Results = await DecorationRepository
-                    .DecorateResponseStarModel(listStars.ToList(), isDecorateUser: true, isDecorateItem: false)
+                    .DecorateResponseStarModel(listStars, isDecorateUser: true, isDecorateItem: false)
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(StarResourcse), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AnonymousGetUserItemStars(Guid userItemId, int? limit, int? offset)
+        public async Task<ServiceResult> AnonymousGetUserItemStars(Guid userItemId, PaginationDto pagination)
         {
             // Kiểm tra quyền truy cập
             UserItem item = await UserItemRepository.CheckExisted(userItemId, NotExistedItem);
@@ -92,29 +91,28 @@ namespace KnowledgeSharingApi.Services.Services
             }
 
             // Trả về giống như admin lấy:
-            return await AdminGetUserItemStars(userItemId, limit, offset);
+            return await AdminGetUserItemStars(userItemId, pagination);
         }
 
-        public async Task<ServiceResult> UserGetMyScoredComments(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyScoredComments(Guid myUid, PaginationDto pagination)
         {
             // Lấy về
-            IEnumerable<Tuple<ViewComment, Star>> stars = await StarRepository.GetStaredComments(myUid);
-            int total = stars.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            stars = stars.Skip(offsetValue).Take(limitValue);
-            IEnumerable<ResponseStarModel> results = stars.Select(star =>
+            List<Tuple<ViewComment, Star>> stars = await StarRepository.GetStaredComments(myUid);
+            int total = stars.Count;
+            stars = StarRepository.ApplyPagination(stars, pagination);
+            List<ResponseStarModel> results = stars.Select(star =>
             {
                 ResponseStarModel model = (ResponseStarModel) new ResponseStarModel().Copy(star.Item2);
                 model.Item = (ResponseCommentModel) new ResponseCommentModel().Copy(star.Item1);
                 return model;
-            });
+            }).ToList();
 
             // DecorateResponseLessonModel
             PaginationResponseModel<ResponseStarModel> res = new()
             {
                 Total = total,
-                Limit = limitValue,
-                Offset = offsetValue,
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
                 Results = results
             };
 
@@ -122,55 +120,52 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiFailure(StarResourcse), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyScoredCourses(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyScoredCourses(Guid myUid, PaginationDto pagination)
         {
             // Lấy về
-            IEnumerable<Tuple<ViewCourse, Star>> stars = await StarRepository.GetStaredCourses(myUid);
-            int total = stars.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            stars = stars.Skip(offsetValue).Take(limitValue);
-            IEnumerable<ResponseStarModel> results = stars.Select(star =>
+            List<Tuple<ViewCourse, Star>> stars = await StarRepository.GetStaredCourses(myUid);
+            int total = stars.Count;
+            stars = StarRepository.ApplyPagination(stars, pagination);
+            List<ResponseStarModel> results = stars.Select(star =>
             {
                 ResponseStarModel model = (ResponseStarModel)new ResponseStarModel().Copy(star.Item2);
                 model.Item = (ResponseCourseModel)new ResponseCourseModel().Copy(star.Item1);
                 return model;
-            });
+            }).ToList();
 
             // DecorateResponseLessonModel
-            PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
+            PaginationResponseModel<ResponseStarModel> res = new(total, pagination.Limit, pagination.Offset, results);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiFailure(StarResourcse), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyScoredLessons(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyScoredLessons(Guid myUid, PaginationDto pagination)
         {
             // Lấy về
-            IEnumerable<Tuple<ViewLesson, Star>> stars = await StarRepository.GetStaredLessons(myUid);
-            int total = stars.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            stars = stars.Skip(offsetValue).Take(limitValue);
-            IEnumerable<ResponseStarModel> results = stars.Select(star =>
+            List<Tuple<ViewLesson, Star>> stars = await StarRepository.GetStaredLessons(myUid);
+            int total = stars.Count;
+            stars = StarRepository.ApplyPagination(stars, pagination);
+            List<ResponseStarModel> results = stars.Select(star =>
             {
                 ResponseStarModel model = (ResponseStarModel)new ResponseStarModel().Copy(star.Item2);
                 model.Item = (ResponseLessonModel)new ResponseLessonModel().Copy(star.Item1);
                 return model;
-            });
+            }).ToList();
 
             // DecorateResponseLessonModel
-            PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
+            PaginationResponseModel<ResponseStarModel> res = new(total, pagination.Limit, pagination.Offset, results);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiFailure(StarResourcse), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyScoredPosts(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyScoredPosts(Guid myUid, PaginationDto pagination)
         {
             // Lấy về
-            IEnumerable<Tuple<ViewPost, Star>> stars = (await StarRepository.GetStaredPosts(myUid)).ToList();
-            int total = stars.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            stars = stars.Skip(offsetValue).Take(limitValue);
+            List<Tuple<ViewPost, Star>> stars = (await StarRepository.GetStaredPosts(myUid));
+            int total = stars.Count;
+            stars = StarRepository.ApplyPagination(stars, pagination);
             
             Dictionary<Guid, IResponseUserItemModel?> itemsDict = await PostRepository
                 .GetExactlyResponseUserItemModel(stars.Select(star => star.Item1.UserItemId)
@@ -186,51 +181,49 @@ namespace KnowledgeSharingApi.Services.Services
             }).ToList();
 
             // DecorateResponseLessonModel
-            PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
+            PaginationResponseModel<ResponseStarModel> res = new(total, pagination.Limit, pagination.Offset, results);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiFailure(StarResourcse), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyScoredQuestions(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyScoredQuestions(Guid myUid, PaginationDto pagination)
         {
             // Lấy về
-            IEnumerable<Tuple<ViewQuestion, Star>> stars = await StarRepository.GetStaredQuestions(myUid);
-            int total = stars.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            stars = stars.Skip(offsetValue).Take(limitValue);
-            IEnumerable<ResponseStarModel> results = stars.Select(star =>
+            List<Tuple<ViewQuestion, Star>> stars = await StarRepository.GetStaredQuestions(myUid);
+            int total = stars.Count;
+            stars = StarRepository.ApplyPagination(stars, pagination);
+            List<ResponseStarModel> results = stars.Select(star =>
             {
                 ResponseStarModel model = (ResponseStarModel)new ResponseStarModel().Copy(star.Item2);
                 model.Item = (ResponseQuestionModel)new ResponseQuestionModel().Copy(star.Item1);
                 return model;
-            });
+            }).ToList();
 
             // DecorateResponseLessonModel
-            PaginationResponseModel<ResponseStarModel> res = new(total, limitValue, offsetValue, results);
+            PaginationResponseModel<ResponseStarModel> res = new(total, pagination.Limit, pagination.Offset, results);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiFailure(StarResourcse), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetMyScoredUserItems(Guid myUid, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetMyScoredUserItems(Guid myUid, PaginationDto pagination)
         {
             // Get về và phân trang
-            IEnumerable<Star> listStars = await StarRepository.GetListStarOfUser(myUid);
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            int total = listStars.Count();
-            listStars = listStars.Skip(offsetValue).Take(limitValue);
+            List<Star> listStars = await StarRepository.GetListStarOfUser(myUid);
+            int total = listStars.Count;
+            listStars = StarRepository.ApplyPagination(listStars, pagination);
 
             // DecorateResponseLessonModel
             List<ResponseStarModel> res = await DecorationRepository
-                .DecorateResponseStarModel(listStars.ToList(), isDecorateUser: false, isDecorateItem: true);
+                .DecorateResponseStarModel(listStars, isDecorateUser: false, isDecorateItem: true);
 
             // Return Response
-            PaginationResponseModel<ResponseStarModel> pageRes = new(total, limitValue, offsetValue, res);
+            PaginationResponseModel<ResponseStarModel> pageRes = new(total, pagination.Limit, pagination.Offset, res);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(StarResourcse), string.Empty, pageRes);
         }
 
-        public async Task<ServiceResult> UserGetUserItemStars(Guid myUid, Guid userItemId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetUserItemStars(Guid myUid, Guid userItemId, PaginationDto pagination)
         {
             // Kiểm tra quyền truy cập
             UserItem item = await UserItemRepository.CheckExisted(userItemId, NotExistedItem);
@@ -243,7 +236,7 @@ namespace KnowledgeSharingApi.Services.Services
             }
 
             // Trả về như admin lấy
-            return await AdminGetUserItemStars(userItemId, limit, offset);
+            return await AdminGetUserItemStars(userItemId, pagination);
         }
 
         public async Task<ServiceResult> UserPutScores(Guid myUid, PutScoreModel scoreModel)

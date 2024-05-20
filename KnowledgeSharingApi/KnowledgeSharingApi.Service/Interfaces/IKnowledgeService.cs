@@ -27,12 +27,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="page"> TT phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> GetListUserMarkKnowledge(Guid myuid, Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> GetListUserMarkKnowledge(Guid myuid, Guid knowledgeId, PaginationDto page);
 
         // Nhóm API lấy danh sách knowledge được đánh dấu đã được phân bổ về từng post/course/quesion/lesson
         // IPostService và ICourseService

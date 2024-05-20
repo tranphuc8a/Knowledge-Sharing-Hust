@@ -1,6 +1,6 @@
 <template>
 
-    <div class="p-enter-comment"  @keydown.shift.enter.prevent.stop="resolveSubmitComment">
+    <div class="p-enter-comment"  @keydown.shift.enter.prevent.stop="resolvePressShiftEnter">
         <div class="p-enter-comment-avatar">
             <UserAvatar :user="currentUser" :size="36" />
         </div>
@@ -16,7 +16,8 @@
         <div class="p-enter-comment-submit" ref="submit">
             <MActionIcon fa="paper-plane" 
                 :containerStyle="{width: '36px', height: '36px'}"
-                :onclick="resolveSubmitComment" />
+                :onclick="resolveSubmitComment" 
+                ref="actionicon"/>
         </div>
     </div>
 
@@ -77,7 +78,7 @@ export default {
                 this.isSubmiting = true;
 
                 // validate form
-                if(!this.$refs.textarea.validate()){
+                if(! await this.$refs.textarea.validate()){
                     this.$refs['textarea'].startDynamicValidate();
                     this.$refs['textarea'].focus();
                     return;
@@ -99,6 +100,17 @@ export default {
                 console.error(e);
             } finally {
                 this.isSubmiting = false;
+            }
+        },
+
+        async resolvePressShiftEnter(){
+            try {
+                let actionIcon = this.$refs.actionicon;
+                if (actionIcon?.resolveOnClick){
+                    await actionIcon.resolveOnClick();
+                }
+            } catch (error){
+                console.error(error);
             }
         },
 
@@ -184,6 +196,21 @@ export default {
         async focus(){
             try {
                 this.$refs.textarea?.focus?.();
+            } catch (e){
+                console.error(e);
+            }
+        },
+
+        /**
+         * Set value to textarea
+         * @param none
+         * @returns none
+         * @Created PhucTV (13/05/24)
+         * @Modified None
+         */
+        async setValue(value){
+            try {
+                this.$refs.textarea?.setValue?.(value);
             } catch (e){
                 console.error(e);
             }

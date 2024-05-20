@@ -49,7 +49,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewUserRelation>> GetByUserId(Guid userId, bool isActive);
+        Task<List<ViewUserRelation>> GetByUserId(Guid userId, bool isActive);
 
         /// <summary>
         /// Lấy về danh sách quan hệ theo UserId và loại quan hệ
@@ -60,7 +60,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        Task<IEnumerable<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type);
+        Task<List<ViewUserRelation>> GetByUserIdAndType(Guid userId, bool isActive, EUserRelationType type);
 
         /// <summary>
         /// Lấy về mối quan hệ giữa hai user

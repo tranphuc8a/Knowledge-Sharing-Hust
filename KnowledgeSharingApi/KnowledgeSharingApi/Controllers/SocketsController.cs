@@ -11,7 +11,7 @@ namespace KnowledgeSharingApi.Controllers
         ILiveChatSocketService liveChatSocketService,
         INotificationSocketService notificationSocketService,
         INewMessageNotificationSocketService newMessageNotificationSocketService
-        ) : ControllerBase
+        ) : BaseController
     {
         protected readonly ILiveChatSocketService liveChatSocketService = liveChatSocketService;
         protected readonly INotificationSocketService notificationSocketService = notificationSocketService;
@@ -28,7 +28,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> ConnectToLiveChatSocket(string? token)
         {
             ServiceResult res = await liveChatSocketService.ConnectSocket(HttpContext, token);
-            return new ApiResponse(res);
+            return StatusCode(res);
         }
 
 
@@ -43,7 +43,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> ConnectToNotificationSocket(string? token)
         {
             ServiceResult res = await notificationSocketService.ConnectSocket(HttpContext, token);
-            return new ApiResponse(res);
+            return StatusCode(res);
         }
 
 
@@ -58,7 +58,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> ConnectToNewMessageNotificationSocket(string? token)
         {
             ServiceResult res = await newMessageNotificationSocketService.ConnectSocket(HttpContext, token);
-            return new ApiResponse(res);
+            return StatusCode(res);
         }
     }
 }

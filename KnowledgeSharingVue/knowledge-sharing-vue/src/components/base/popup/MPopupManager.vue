@@ -1,4 +1,5 @@
 <template>
+    <!-- <transition-group name="popup" > -->
     <Popup  v-for="popup in this.listPopup"
             :key="popup.id"
             :isShowDescription="false"
@@ -36,6 +37,8 @@
             </div>
         </div>
     </Popup>
+    <!-- </transition-group> -->
+
 </template>
 
 
@@ -182,25 +185,6 @@ export default {
 
 <style scoped>
 
-.p-popup-content{
-    display: flex;
-    justify-content: space-between;
-    flex-flow: row nowrap;
-    align-items: flex-start;
-    width: 100%;
-    margin: 0;
-    padding: 12px 12px 24px 12px;
-    gap: 8px;
-    box-sizing: border-box;
-}
-
-.p-popup-content .p-popup-content-text{
-    width: 100%;
-    text-align: start;
-    overflow-wrap: normal;
-    word-break: break-all;
-    word-wrap: break-word;
-    overflow: hidden;
-}
+@import url(@/css/base/popup/popup-manager.css);
 
 </style>

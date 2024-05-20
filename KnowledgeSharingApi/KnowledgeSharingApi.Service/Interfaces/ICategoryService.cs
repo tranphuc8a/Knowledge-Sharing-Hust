@@ -1,5 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +15,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// Lấy về danh sách categories trong hệ thống
         /// </summary>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> TT phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> GetListCategories(int? limit, int? offset);
+        Task<ServiceResult> GetListCategories(PaginationDto pagination);
 
         /// <summary>
         /// Lấy về chi tiết một category theo id

@@ -67,14 +67,14 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AddLessonToCourse(Guid myUid, AddLessonToCourseModel model)
         {
             // Kiem tra khoa hoc ton tai
-            ViewCourse course = await CourseRepository.CheckExistedCourse(model.CourseId ?? Guid.Empty, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(model.CourseId ?? Guid.Empty, NotExistedCourse);
 
             // Kiem tra la chu khoa hoc
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOwner);
 
             // Kiem tra bai giang ton tai
-            ViewLesson lesson = await LessonRepository.CheckExistedLesson(model.LessonId ?? Guid.Empty,
+            Lesson lesson = await LessonRepository.CheckExisted(model.LessonId ?? Guid.Empty,
                 ResponseResource.NotExist(EntityResource.Lesson()));
 
             // Kiem tra la chu bai giang
@@ -96,12 +96,12 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> AddListLessonToCourse(Guid myUid, AddListLessonToCourseModel model)
         {
             // Kiem tra khoa hoc ton tai va la chu khoa hoc
-            ViewCourse course = await CourseRepository.CheckExistedCourse(model.CourseId ?? Guid.Empty, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(model.CourseId ?? Guid.Empty, NotExistedCourse);
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOwner);
 
             // Kiem tra danh sach bai giang ton tai va la chu cua danh sach bai giang nay
-            IEnumerable<Lesson?> listLesson = await LessonRepository.Get(
+            List<Lesson?> listLesson = await LessonRepository.Get(
                 model.ListLessonModel!.Select(lesson => lesson.LessonId ?? Guid.Empty).ToArray()
             );
             ServiceResult notExistedLesson = ServiceResult.BadRequest(ResponseResource.NotExist(EntityResource.Lesson()));
@@ -113,13 +113,13 @@ namespace KnowledgeSharingApi.Services.Services
             }
 
             // OK them danh sach bai giang vao khoa hoc
-            IEnumerable<CourseLesson>? listLessonAdded = await CourseLessonRepository.AddListLessonToCourse(model);
+            List<CourseLesson>? listLessonAdded = await CourseLessonRepository.AddListLessonToCourse(model);
             if (listLessonAdded == null)
                 return ServiceResult.ServerError(ResponseResource.InsertMultiFalure(ParticipantResource));
 
             // Decorate:
-            IEnumerable<ResponseCourseLessonModel> insertedLesson = await DecorationRepository
-                .DecorateResponseCourseLessonModel(myUid, listLessonAdded.ToList(), isDecorateLesson: true);
+            List<ResponseCourseLessonModel> insertedLesson = await DecorationRepository
+                .DecorateResponseCourseLessonModel(myUid, listLessonAdded, isDecorateLesson: true);
 
             // Tra ve thanh cong
             return ServiceResult.Success(ResponseResource.InsertMultiSuccess(ParticipantResource), string.Empty, insertedLesson);
@@ -148,11 +148,12 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.DeleteSuccess(ParticipantResource));
         }
 
-        public async Task<ServiceResult> DeleteListLessonFromCourse(Guid myUid, IEnumerable<Guid> listParticipantIds)
+        public async Task<ServiceResult> DeleteListLessonFromCourse(Guid myUid, List<Guid> listParticipantIds)
         {
             // Kiểm tra toàn bộ participant phải tồn tại và chung 1 khóa học
-            IEnumerable<CourseLesson?> listParticipants = await CourseLessonRepository.Get(listParticipantIds.ToArray());
-            if (!listParticipants.Any() && listParticipants.Any(p => p == null))
+            List<CourseLesson?> listParticipants = await CourseLessonRepository.Get([.. listParticipantIds]);
+
+            if (listParticipants.Count == 0 && listParticipants.Any(p => p == null))
                 return ServiceResult.BadRequest(NotExistedParticipant);
             Guid courseId = listParticipants.First()!.CourseId;
             if (listParticipants.Any(p => p?.CourseId != courseId))
@@ -197,12 +198,13 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.UpdateSuccess(ParticipantResource));
         }
 
-        public async Task<ServiceResult> UpdateListLessonInCourse(Guid myUid, IEnumerable<UpdateLessonInCourseModel> model)
+        public async Task<ServiceResult> UpdateListLessonInCourse(Guid myUid, List<UpdateLessonInCourseModel> model)
         {
             // Kiểm tra toàn bộ participant phải tồn tại và chung 1 khóa học
-            IEnumerable<CourseLesson?> listParticipants = await CourseLessonRepository.Get(
-                model.Select(part => part.ParticipantId ?? Guid.Empty).ToArray());
-            if (!listParticipants.Any() && listParticipants.Any(p => p == null))
+            List<CourseLesson?> listParticipants = await CourseLessonRepository
+                .Get(model.Select(part => part.ParticipantId ?? Guid.Empty).ToArray());
+
+            if (listParticipants.Count == 0 && listParticipants.Any(p => p == null))
                 return ServiceResult.BadRequest(NotExistedParticipant);
             Guid courseId = listParticipants.First()!.CourseId;
             if (listParticipants.Any(p => p?.CourseId != courseId))
@@ -225,8 +227,8 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UpdateOffsetOfListLessonInCourse(Guid myUId, Guid[] listParticipantIds)
         {
             // Kiểm tra toàn bộ participant phải tồn tại và chung 1 khóa học
-            IEnumerable<CourseLesson?> listParticipants = await CourseLessonRepository.Get(listParticipantIds);
-            if (!listParticipants.Any() && listParticipants.Any(p => p == null))
+            List<CourseLesson?> listParticipants = await CourseLessonRepository.Get(listParticipantIds);
+            if (listParticipants.Count == 0 || listParticipants.Any(p => p == null))
                 return ServiceResult.BadRequest(NotExistedParticipant);
             Guid courseId = listParticipants.First()!.CourseId;
             if (listParticipants.Any(p => p?.CourseId != courseId))
@@ -238,9 +240,9 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden(NotBeCourseOwner);
 
             // Kiểm tra listParticipantIds phải là hoán vị của danh sách participant của course:
-            IEnumerable<Guid> courseParticipantIds = (await CourseLessonRepository.GetCourseParticipant(courseId))
-                .Select(cl => cl.CourseLessonId);
-            if (!Algorithm.IsPermutation(courseParticipantIds, listParticipantIds.AsEnumerable()))
+            List<Guid> courseParticipantIds = (await CourseLessonRepository.GetCourseParticipant(courseId))
+                .Select(cl => cl.CourseLessonId).ToList();
+            if (!Algorithm.IsPermutation(courseParticipantIds, [.. listParticipantIds]))
                 return ServiceResult.BadRequest("Danh sách yêu cầu không phải là hoán vị của một danh sách bài giảng");
 
             // Thực hiện cập nhật
@@ -255,29 +257,28 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region Get Apies
-        public async Task<ServiceResult> AdminGetListCourseParticipants(Guid courseId, int? limit, int? offset)
+        public async Task<ServiceResult> AdminGetListCourseParticipants(Guid courseId, PaginationDto pagination)
         {
             // Kiem tra khoa hoc ton tai
-            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
+            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Get list vè
-            IEnumerable<CourseLesson> listLesson = await CourseLessonRepository.GetCourseParticipant(courseId);
+            List<CourseLesson> listLesson = await CourseLessonRepository.GetCourseParticipant(courseId);
 
             // Phân trang
-            int total = listLesson.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listLesson = listLesson.Skip(offsetValue).Take(limitValue);
+            int total = listLesson.Count;
+            listLesson = CourseLessonRepository.ApplyPagination(listLesson, pagination);
 
             // Decorate
-            IEnumerable<ResponseCourseLessonModel> listResponse = await
-                DecorationRepository.DecorateResponseCourseLessonModel(null, listLesson.ToList(), isDecorateLesson: true);
-            PaginationResponseModel<ResponseCourseLessonModel> res = new(total, limitValue, offsetValue, listResponse);
+            List<ResponseCourseLessonModel> listResponse = await
+                DecorationRepository.DecorateResponseCourseLessonModel(null, listLesson, isDecorateLesson: true);
+            PaginationResponseModel<ResponseCourseLessonModel> res = new(total, pagination.Limit, pagination.Offset, listResponse);
 
             // Tra ve thanh cong
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(ParticipantResource), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UserGetListCourseParticipants(Guid myUid, Guid courseId, int? limit, int? offset)
+        public async Task<ServiceResult> UserGetListCourseParticipants(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Kiem tra khoa hoc ton tai
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
@@ -288,17 +289,16 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Forbidden("Bạn không phải là thành viên của khóa học này");
 
             // Get list vè
-            IEnumerable<CourseLesson> listLesson = await CourseLessonRepository.GetCourseParticipant(courseId);
+            List<CourseLesson> listLesson = await CourseLessonRepository.GetCourseParticipant(courseId);
 
             // Phân trang
-            int total = listLesson.Count();
-            int limitValue = limit ?? DefaultLimit, offsetValue = offset ?? 0;
-            listLesson = listLesson.Skip(offsetValue).Take(limitValue);
+            int total = listLesson.Count;
+            listLesson = CourseLessonRepository.ApplyPagination(listLesson, pagination);
 
             // Decorate
-            IEnumerable<ResponseCourseLessonModel> listResponse = await
-                DecorationRepository.DecorateResponseCourseLessonModel(myUid, listLesson.ToList(), isDecorateLesson: true);
-            PaginationResponseModel<ResponseCourseLessonModel> res = new(total, limitValue, offsetValue, listResponse);
+            List<ResponseCourseLessonModel> listResponse = await
+                DecorationRepository.DecorateResponseCourseLessonModel(myUid, listLesson, isDecorateLesson: true);
+            PaginationResponseModel<ResponseCourseLessonModel> res = new(total, pagination.Limit, pagination.Offset, listResponse);
 
             // Tra ve thanh cong
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(ParticipantResource), string.Empty, res);

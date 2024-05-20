@@ -20,7 +20,7 @@
                 <div class="p-popup-buttons">
                     <div class="p-popup-left-buttons">
                         <CancelButton :label="previousButtonLabel" :onclick="resolveOnPrevious" 
-                                      v-show="isShowPreviousButton" />
+                                    v-show="isShowPreviousButton" />
                     </div>
                     <div class="p-popup-right-buttons">
                         <CancelButton :label="cancelButtonLabel" :onclick="resolveOnCancel" 

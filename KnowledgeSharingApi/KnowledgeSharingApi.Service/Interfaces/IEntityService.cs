@@ -22,13 +22,12 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <summary>
         /// Dịch vụ lấy về tất cả bản ghi 
         /// </summary>
-        /// <param name="limit"> thuộc tính phân trang - số lượng bản ghi cần lấy</param>
-        /// <param name="offset"> thuộc tính phân trang - độ lệch bản ghi đầu tiên</param>
+        /// <param name="page"> Thuoc tinh phan trang </param>
         /// <default> Mặc định lấy tất cả bản ghi </default>
         /// <returns></returns>
         /// Created: PhucTV (27/12/23)
         /// Modified: None
-        Task<ServiceResult> GetService(int? limit = null, int? offset = null);
+        Task<ServiceResult> GetService(PaginationDto page);
 
 
 
@@ -84,12 +83,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Dịch vụ lọc danh sách thực thể theo từ khóa tìm kiếm
         /// </summary>
         /// <param name="search"> từ khóa tìm kiếm </param>
-        /// <param name="limit"> thuộc tính phân trang - số lượng bản ghi cần lấy </param>
-        /// <param name="offset"> thuộc tính phân trang - độ lệch bản ghi đầu tiên </param>
+        /// <param name="page"> Thuoc tinh phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (27/12/23)
         /// Modified: PhucTV (10/1/24) Move up to IBaseService
-        Task<ServiceResult> FilterService(string search, int? limit = null, int? offset = null);
+        Task<ServiceResult> FilterService(string search, PaginationDto page);
 
     }
 }

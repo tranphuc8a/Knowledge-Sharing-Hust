@@ -16,14 +16,9 @@ namespace KnowledgeSharingApi.Controllers
     [ApiController]
     public class LessonsController(
         ILessonService lessonService   
-    ) : ControllerBase
+    ) : BaseController
     {
         public ILessonService LessonService = lessonService;
-
-        protected virtual IActionResult StatusCode(ServiceResult result)
-        {
-            return StatusCode((int)result.StatusCode, new ApiResponse(result));
-        }
 
         #region Anonymous
 
@@ -37,8 +32,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("anonymous")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetList(int? limit, int? offset)
-            => StatusCode(await LessonService.AnonymousGetPosts(limit, offset));
+        public async Task<IActionResult> AnonymousGetList(int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await LessonService.AnonymousGetPosts(
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu lấy về danh sách bài giảng của một người dùng
@@ -51,8 +47,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/anonymous/lessons/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetUserList(Guid userId, int? limit, int? offset)
-            => StatusCode(await LessonService.AnonymousGetUserPosts(userId, limit, offset));
+        public async Task<IActionResult> AnonymousGetUserList(Guid userId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await LessonService.AnonymousGetUserPosts(userId, 
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu lấy về chi tiết bài giảng
@@ -79,8 +76,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("admin")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListLessons(int? limit, int? offset)
-            => StatusCode(await LessonService.AdminGetPosts(limit, offset));
+        public async Task<IActionResult> AdminGetListLessons(int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await LessonService.AdminGetPosts(
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin lấy về danh sách bài giảng của một user
@@ -93,8 +91,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/admin/lessons/{userId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListUserLessons(Guid userId, int? limit, int? offset)
-            => StatusCode(await LessonService.AdminGetUserPosts(userId, limit, offset));
+        public async Task<IActionResult> AdminGetListUserLessons(Guid userId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await LessonService.AdminGetUserPosts(userId, 
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin lấy về chi tiết bài giảng
@@ -118,8 +117,9 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Courses/admin/lessons/{courseId}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListCourseLessons(Guid courseId, int? limit, int? offset)
-            => StatusCode(await LessonService.AdminGetListPostsOfCourse(courseId, limit, offset));
+        public async Task<IActionResult> AdminGetListCourseLessons(Guid courseId, int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await LessonService.AdminGetListPostsOfCourse(courseId, 
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
         /// <summary>
         /// Yêu cầu admin xóa một bài giảng cụ thể
@@ -147,10 +147,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListLesson(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListLesson(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserGetPosts(Guid.Parse(myUid), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await LessonService.UserGetPosts(GetCurrentUserIdStrictly(), pagination));
         }
 
         /// <summary>
@@ -164,10 +164,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Users/lessons/{userId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListUserLesson(Guid userId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListUserLesson(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserGetUserPosts(Guid.Parse(myUid), userId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await LessonService.UserGetUserPosts(GetCurrentUserIdStrictly(), userId, pagination));
         }
 
         /// <summary>
@@ -180,10 +180,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListMyLesson(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMyLesson(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserGetMyPosts(Guid.Parse(myUid), limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await LessonService.UserGetMyPosts(GetCurrentUserIdStrictly(), pagination));
         }
 
         /// <summary>
@@ -197,8 +197,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetDetailLesson(Guid lessonId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserGetPostDetail(Guid.Parse(myUid), lessonId));
+            return StatusCode(await LessonService.UserGetPostDetail(GetCurrentUserIdStrictly(), lessonId));
         }
 
         /// <summary>
@@ -212,8 +211,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetDetailMyLesson(Guid lessonId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserGetMyPostDetail(Guid.Parse(myUid), lessonId));
+            return StatusCode(await LessonService.UserGetMyPostDetail(GetCurrentUserIdStrictly(), lessonId));
         }
 
         /// <summary>
@@ -227,10 +225,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Courses/lessons/{courseId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListCourseLesson(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListCourseLesson(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserGetListPostsOfCourse(Guid.Parse(myUid), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await LessonService.UserGetListPostsOfCourse(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
         /// <summary>
@@ -244,10 +242,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Courses/my/lessons/{courseId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListMyCourseLesson(Guid courseId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMyCourseLesson(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserGetListPostsOfMyCourse(Guid.Parse(myUid), courseId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await LessonService.UserGetListPostsOfMyCourse(GetCurrentUserIdStrictly(), courseId, pagination));
         }
 
         /// <summary>
@@ -261,10 +259,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("my/courses/{lessonId}")]
         [CustomAuthorization(Roles: "Admin, User")]
-        public async Task<IActionResult> UserGetListMyCoursesOfALesson(Guid lessonId, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMyCoursesOfALesson(Guid lessonId, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserGetListCourseOfLesson(Guid.Parse(myUid), lessonId, limit, offset));
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await LessonService.UserGetListCourseOfLesson(GetCurrentUserIdStrictly(), lessonId, pagination));
         }
 
 
@@ -283,9 +281,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/anonymous/lessons/{category}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AnonymousGetListPostsOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> AnonymousGetListPostsOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await LessonService.AnonymousGetListPostsOfCategory(category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.AnonymousGetListPostsOfCategory(category, pagination);
             return StatusCode(res);
         }
 
@@ -300,9 +299,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/admin/lessons/{category}")]
         [CustomAuthorization(Roles: "Admin")]
-        public async Task<IActionResult> AdminGetListPostsOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> AdminGetListPostsOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            ServiceResult res = await LessonService.AdminGetListPostsOfCategory(category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.AdminGetListPostsOfCategory(category, pagination);
             return StatusCode(res);
         }
 
@@ -318,10 +318,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Categories/lessons/{category}")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListPostsOfCategory(string category, int? limit, int? offset)
+        public async Task<IActionResult> UserGetListPostsOfCategory(string category, int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await LessonService.UserGetListPostsOfCategory(Guid.Parse(myUid), category, limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.UserGetListPostsOfCategory(GetCurrentUserIdStrictly(), category, pagination);
             return StatusCode(res);
         }
 
@@ -335,10 +335,10 @@ namespace KnowledgeSharingApi.Controllers
         /// Modified: None
         [HttpGet("/api/v1/Marks/my/lessons")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public async Task<IActionResult> UserGetListMarkedLessons(int? limit, int? offset)
+        public async Task<IActionResult> UserGetListMarkedLessons(int? limit, int? offset, string? order, string? filter)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            ServiceResult res = await LessonService.UserGetMyMarkedPosts(Guid.Parse(myUid), limit, offset);
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.UserGetMyMarkedPosts(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
 
@@ -358,8 +358,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserAddNewLesson([FromForm] CreateLessonModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserCreatePost(Guid.Parse(myUid), model));
+            return StatusCode(await LessonService.UserCreatePost(GetCurrentUserIdStrictly(), model));
         }
 
 
@@ -375,8 +374,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserUpdateLesson(Guid lessonId, [FromForm] UpdateLessonModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserUpdatePost(Guid.Parse(myUid), lessonId, model));
+            return StatusCode(await LessonService.UserUpdatePost(GetCurrentUserIdStrictly(), lessonId, model));
         }
 
 
@@ -391,8 +389,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserDeleteLesson(Guid lessonId)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.UserDeletePost(Guid.Parse(myUid), lessonId));
+            return StatusCode(await LessonService.UserDeletePost(GetCurrentUserIdStrictly(), lessonId));
         }
 
 
@@ -407,9 +404,98 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserUpdatePrivacy([FromBody] ChangeKnowledgePrivacyModel model)
         {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return StatusCode(await LessonService.ChangePrivacy(Guid.Parse(myUid), model));
+            return StatusCode(await LessonService.ChangePrivacy(GetCurrentUserIdStrictly(), model));
         }
+
+        #endregion
+
+
+
+        #region Search Apies
+
+
+        /// <summary>
+        /// Xử lý yêu cầu user tim kiem danh sach bai giang
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (28/3/24)
+        /// Modified: None
+        [HttpGet("search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchLessons(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.UserSearchPost(GetCurrentUserIdStrictly(), search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user tim kiem danh sach bai giang
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/my")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchMyLessons(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.UserSearchMyPost(GetCurrentUserIdStrictly(), search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài giảng mà mình đã mark
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="userId"> id user can lay </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/user/{userId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchUserLessons(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.UserSearchUserPost(GetCurrentUserIdStrictly(), userId, search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài giảng mà mình đã mark
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="userId"> id user can lay </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/admin/user/{userId}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public async Task<IActionResult> AdminSearchUserLessons(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await LessonService.AdminSearchUserPost(userId, search, pagination);
+            return StatusCode(res);
+        }
+
 
         #endregion
     }

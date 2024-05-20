@@ -1,6 +1,7 @@
 // This is a C# code snippet
 
-import CourseRelation from '../course-relation';
+import CourseRelation from "../entities/course-relation";
+
 class ResponseCourseRelationModel extends CourseRelation {
     constructor() {
         super();

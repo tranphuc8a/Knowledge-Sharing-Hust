@@ -12,15 +12,10 @@ namespace KnowledgeSharingApi.Controllers
     [CustomAuthorization(Roles: "User, Admin")]
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class ImagesController(IImageService imageService) : ControllerBase
+    public class ImagesController(IImageService imageService) : BaseController
     {
         protected readonly IImageService ImageService = imageService;
 
-        protected Guid GetCurrentUserId()
-        {
-            string myUid = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier) ?? string.Empty;
-            return Guid.Parse(myUid);
-        }
 
         /// <summary>
         /// Yêu càu lấy về danh sách image của một user
@@ -31,8 +26,8 @@ namespace KnowledgeSharingApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetListImages()
         {
-            ServiceResult res = await ImageService.GetListImage(GetCurrentUserId());
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ImageService.GetListImage(GetCurrentUserIdStrictly());
+            return StatusCode(res);
         }
 
 
@@ -45,8 +40,8 @@ namespace KnowledgeSharingApi.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadImage([FromForm] UploadImageModel model)
         {
-            ServiceResult res = await ImageService.UploadImage(GetCurrentUserId(), model);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ImageService.UploadImage(GetCurrentUserIdStrictly(), model);
+            return StatusCode(res);
         }
 
 
@@ -60,8 +55,8 @@ namespace KnowledgeSharingApi.Controllers
         [HttpDelete("{imageId}")]
         public async Task<IActionResult> DeleteImage(Guid imageId)
         {
-            ServiceResult res = await ImageService.DeleteImage(GetCurrentUserId(), imageId);
-            return StatusCode((int)res.StatusCode, new ApiResponse(res));
+            ServiceResult res = await ImageService.DeleteImage(GetCurrentUserIdStrictly(), imageId);
+            return StatusCode(res);
         }
     }
 }

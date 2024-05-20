@@ -17,7 +17,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (1/5/24)
         /// Modified: None
-        Task<IEnumerable<Image>> GetByUserId(Guid userId);
+        Task<List<Image>> GetByUserId(Guid userId);
 
 
         /// <summary>

@@ -18,7 +18,7 @@ export default {
             defaultAvatar: require('@/assets/default-thumbnail/student-image-icon.png'),
             // defaultUrl: require('@/assets/images/default-avatar.png'),
             iconStyle: {width: this.size + 'px', height: this.size + 'px'},
-            validatedSrc: this.src
+            validatedSrc: null
         }
     },
     async mounted() {
@@ -47,7 +47,10 @@ export default {
         async refresh(){
             try {
                 this.validatedSrc = this.defaultAvatar;
-                this.validatedSrc = (await Common.isValidImage(this.src)) ? this.src : this.defaultAvatar;
+                if (await Common.isValidImage(this.src)) {
+                    this.validatedSrc = this.src;
+                    return;
+                }
             } catch (e){
                 this.validatedSrc = this.defaultAvatar;
                 console.error(e);

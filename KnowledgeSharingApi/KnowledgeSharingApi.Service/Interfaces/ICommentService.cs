@@ -17,32 +17,32 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Anonymous Lấy về danh sách comment của một một knowledge
         /// </summary>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> AnonymousGetListKnowledgeComments(Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về danh sách comment đã reply một comment khác
         /// </summary>
+        /// <param name="myUid"> id cua user can lay</param>
         /// <param name="commentId"> id của comment </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> TT phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
-        /// Modified: None
-        Task<ServiceResult> GetListCommentReplies(Guid commentId, int? limit, int? offset);
+        /// Modified: PhucTV (13/5/24)
+        Task<ServiceResult> GetListCommentReplies(Guid? myUid, Guid commentId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về chi tiết một comment
         /// </summary>
+        /// <param name="myUid"> id cua user can lay </param>
         /// <param name="commentId"> id của comment </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> GetComment(Guid commentId);
+        Task<ServiceResult> GetComment(Guid? myUid, Guid commentId);
 
         #endregion
 
@@ -53,12 +53,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Admin Lấy về danh sách comment của một một knowledge
         /// </summary>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> phan trang <param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> AdminGetListKnowledgeComments(Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> AdminGetListKnowledgeComments(Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// Admin xóa một comment
@@ -91,24 +90,22 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// </summary>
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> phan trang <param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetListKnowledgeComments(Guid myuid, Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> UserGetListKnowledgeComments(Guid myuid, Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// User lấy về danh sách bình luận của mình trong một knowledge
         /// </summary>
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> phan trang <param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetMyCommentsOfKnowledge(Guid myuid, Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> UserGetMyCommentsOfKnowledge(Guid myuid, Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// User lấy về danh sách bình luận của một user khác trong một knowledge
@@ -116,12 +113,11 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="myuid"> id của người đi lấy </param>
         /// <param name="myuid"> id của người được lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> phan trang </param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myuid, Guid userId, Guid knowledgeId, int? limit, int? offset);
+        Task<ServiceResult> UserGetUserCommentsOfKnowledge(Guid myuid, Guid userId, Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// User tìm kiếm bình luận của một knowledge theo từ khóa 
@@ -129,12 +125,34 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <param name="myuid"> id của người lấy </param>
         /// <param name="knowledgeId"> id của knowledge </param>
         /// <param name="search"> Từ khóa tìm kiếm </param>
-        /// <param name="limit"> Số lượng </param>
-        /// <param name="offset"> Độ lệch </param>
+        /// <param name="pagination"> phan trang <param>
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string search, int? limit, int? offset);
+        Task<ServiceResult> UserSearchCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// User tìm kiếm bình luận của minh trong cac binh luan da binh luan
+        /// </summary>
+        /// <param name="myuid"> id của người lấy </param>
+        /// <param name="search"> Từ khóa tìm kiếm </param>
+        /// <param name="pagination"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchMyComments(Guid myuid, string? search, PaginationDto pagination);
+
+        /// <summary>
+        /// User tìm kiếm bình luận của minh trong một knowledge cho truoc theo từ khóa 
+        /// </summary>
+        /// <param name="myuid"> id của người lấy </param>
+        /// <param name="knowledgeId"> id của knowledge </param>
+        /// <param name="search"> Từ khóa tìm kiếm </param>
+        /// <param name="pagination"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (25/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchMyCommentsOfKnowledge(Guid myuid, Guid knowledgeId, string? search, PaginationDto pagination);
         #endregion
 
 
@@ -181,7 +199,6 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (25/3/24)
         /// Modified: None
         Task<ServiceResult> UserDeleteComment(Guid myuid, Guid commentId);
-
 
         /// <summary>
         /// User bật/tắt chức năng khóa bình luận cho knowledge của mình (đang phát triển...)

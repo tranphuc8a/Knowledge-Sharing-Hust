@@ -1,5 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Annotations.Converters;
 using KnowledgeSharingApi.Domains.Annotations.Converters.ResponseModel;
+using KnowledgeSharingApi.Domains.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,7 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseMode
     [JsonConverter(typeof(ResponseCourseConverter))]
     public interface IResponseCourseModel : IResponseKnowledgeModel
     {
+        ECourseRoleType CourseRoleType { get; set; }
+        Guid? CourseRelationId { get; set; }
     }
 }
