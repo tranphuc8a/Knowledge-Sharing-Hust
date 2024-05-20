@@ -2,7 +2,8 @@
     <div class="p-tooltip-username-frame">
         <TooltipFrame>
             <template #tooltipMask>
-                <div class="p-tooltip-username" @:click="resolveClickUsername">
+                <div class="p-tooltip-username" @:click="resolveClickUsername"
+                    :style="style">
                     {{ user?.FullName ?? "User"}}
                 </div>
             </template>
@@ -56,6 +57,9 @@ export default {
         user: {
             required: true,
             default: null
+        }, 
+        style: {
+            default: {}
         }
     },
 };

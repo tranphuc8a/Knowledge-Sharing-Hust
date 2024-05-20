@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Infrastructures.Encrypts;
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
+using KnowledgeSharingApi.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -256,6 +257,96 @@ namespace KnowledgeSharingApi.Controllers
             ServiceResult res = await PostService.UserGetMyMarkedPosts(GetCurrentUserIdStrictly(), pagination);
             return StatusCode(res);
         }
+        #endregion
+
+
+
+        #region Search Apies
+
+
+        /// <summary>
+        /// Xử lý yêu cầu user tim kiem danh sach bai post
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchPosts(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await PostService.UserSearchPost(GetCurrentUserIdStrictly(), search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user tim kiem danh sach bai post
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/my")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchMyPosts(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await PostService.UserSearchMyPost(GetCurrentUserIdStrictly(), search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài giảng mà mình đã mark
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="userId"> id user can lay </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/user/{userId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchUserPosts(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await PostService.UserSearchUserPost(GetCurrentUserIdStrictly(), userId, search, pagination);
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu user lấy về danh sách bài giảng mà mình đã mark
+        /// </summary>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="userId"> id user can lay </param>
+        /// <returns></returns>
+        /// Created: PhucTV (19/5/24)
+        /// Modified: None
+        [HttpGet("search/admin/user/{userId}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public async Task<IActionResult> AdminSearchUserPosts(Guid userId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await PostService.AdminSearchUserPost(userId, search, pagination);
+            return StatusCode(res);
+        }
+
+
         #endregion
     }
 }

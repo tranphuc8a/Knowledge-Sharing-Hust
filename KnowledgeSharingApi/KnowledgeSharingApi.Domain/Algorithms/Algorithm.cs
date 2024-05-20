@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace KnowledgeSharingApi.Domains.Algorithms
 {
     public static class Algorithm
     {
-        private static readonly string[] separator = [" ", ",", ".", ";", "!", ":", "?"];
+        //private static readonly string[] separator = [" ", ",", ".", ";", "!", ":", "?"];
+        private static char[] separator = [' ', '\t', '\n', '\r', ',', '.', ';', '!', '?'];
 
         public static bool IsPermutation<T>(List<T> A, List<T> B)
         {
@@ -192,12 +194,14 @@ namespace KnowledgeSharingApi.Domains.Algorithms
         }
 
 
-        private static Dictionary<string, int> GetMapGram(string text)
+        private static Dictionary<string, int> GetMapGramCharacter(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return [];
 
             var mapGram = new Dictionary<string, int>();
-            var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
+            int maxLengthSentences = 200;
+            if (words.Count > 200) words = words[..maxLengthSentences];
 
             foreach (var word in words)
             {
@@ -225,6 +229,39 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             return mapGram;
         }
 
+        private static Dictionary<string, int> GetMapGramWord(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return [];
+
+            var mapGram = new Dictionary<string, int>();
+            List<string> words = [.. text.Split(separator, StringSplitOptions.RemoveEmptyEntries)];
+
+            int maxWords = 100; // only focus first 100 words of text
+            if (words.Count > maxWords)
+                words = words.Take(maxWords).ToList();
+
+            int sentenceLength = words.Count;
+
+            for (int l = 1; l <= sentenceLength; l++)
+            {
+                for (int startIndex = 0; startIndex <= sentenceLength - l; startIndex++)
+                {
+                    string gram = string.Join(" ", words.Skip(startIndex).Take(l));
+                    if (string.IsNullOrWhiteSpace(gram)) continue;
+                    if (!mapGram.TryGetValue(gram, out int value))
+                    {
+                        mapGram[gram] = 1;
+                    }
+                    else
+                    {
+                        mapGram[gram] = value + 1;
+                    }
+                }
+            }
+
+            return mapGram;
+        }
+
         /**
          * Calculates the similarity between two strings using the n-gram similarity algorithm
          * @param a 
@@ -233,15 +270,15 @@ namespace KnowledgeSharingApi.Domains.Algorithms
          * @Created PhucTV (17/5/24)
          * @Modified None
          */
-        public static double NgramSimilarity(string a, string b)
+        public static double NgramCharacterSimilarity(string a, string b)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b))
                     return 0;
 
-                Dictionary<string, int> mapGramOfStringA = GetMapGram(a);
-                Dictionary<string, int> mapGramOfStringB = GetMapGram(b);
+                Dictionary<string, int> mapGramOfStringA = GetMapGramCharacter(Unicode.RemoveVietnameseTone(a).ToLower());
+                Dictionary<string, int> mapGramOfStringB = GetMapGramCharacter(Unicode.RemoveVietnameseTone(b).ToLower());
 
                 double score = 0;
                 foreach (var gram in mapGramOfStringA)
@@ -251,7 +288,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                         int countInA = gram.Value;
                         int countInB = value;
                         int gramLength = gram.Key.Length;
-                        double addScore = countInA * countInB * gramLength * gramLength;
+                        double addScore = countInA * countInB * gramLength * gramLength / 1e3;
                         score += addScore;
                     }
                 }
@@ -265,7 +302,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             }
         }
 
-        public static Dictionary<string, double> NgramSimilarityList(string search, List<string> listText)
+        public static Dictionary<string, double> NgramCharacterSimilarityList(string search, List<string> listText)
         {
             try
             {
@@ -277,12 +314,12 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                     mapScore[text] = 0;
                 }
                 // calculate n-gram of search string
-                Dictionary<string, int> mapGramOfStringA = GetMapGram(Unicode.RemoveVietnameseTone(search).ToLower());
+                Dictionary<string, int> mapGramOfStringA = GetMapGramCharacter(Unicode.RemoveVietnameseTone(search).ToLower());
 
                 // calculate n-gram of each text in listText
                 foreach (var text in listText)
                 {
-                    Dictionary<string, int> mapGramOfStringB = GetMapGram(Unicode.RemoveVietnameseTone(text).ToLower());
+                    Dictionary<string, int> mapGramOfStringB = GetMapGramCharacter(Unicode.RemoveVietnameseTone(text).ToLower());
                     double score = 0;
                     foreach (var gram in mapGramOfStringA)
                     {
@@ -306,11 +343,102 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             }
         }
 
+        /**
+         * Calculates the similarity between two strings using the n-gram similarity algorithm
+         * @param a 
+         * @param b 
+         * @returns double in [0, 1]
+         * @Created PhucTV (17/5/24)
+         * @Modified None
+         */
+        public static double NgramWordSimilarity(string a, string b)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b))
+                    return 0;
+
+                Dictionary<string, int> mapGramOfStringA = GetMapGramWord(Unicode.RemoveVietnameseTone(a).ToLower());
+                Dictionary<string, int> mapGramOfStringB = GetMapGramWord(Unicode.RemoveVietnameseTone(b).ToLower());
+
+                double score = 0;
+                foreach (var gram in mapGramOfStringA)
+                {
+                    if (mapGramOfStringB.TryGetValue(gram.Key, out int value))
+                    {
+                        int countInA = gram.Value;
+                        int countInB = value;
+                        int gramLength = gram.Key.Length;
+                        double addScore = countInA * countInB * gramLength * gramLength / 1e2;
+                        score += addScore;
+                    }
+                }
+
+                return score;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                return 0;
+            }
+        }
+
+        public static Dictionary<string, double> NgramWordSimilarityList(string search, List<string> listText)
+        {
+            try
+            {
+                Dictionary<string, double> mapScore = [];
+                if (string.IsNullOrEmpty(string.Join("", listText)))
+                    return mapScore;
+                foreach (var text in listText)
+                {
+                    mapScore[text] = 0;
+                }
+                // calculate n-gram of search string
+                Dictionary<string, int> mapGramOfStringA = GetMapGramWord(Unicode.RemoveVietnameseTone(search).ToLower());
+
+                // calculate n-gram of each text in listText
+                foreach (var text in listText)
+                {
+                    Dictionary<string, int> mapGramOfStringB = GetMapGramWord(Unicode.RemoveVietnameseTone(text).ToLower());
+                    double score = 0;
+                    foreach (var gram in mapGramOfStringA)
+                    {
+                        if (mapGramOfStringB.TryGetValue(gram.Key, out int value))
+                        {
+                            int countInA = gram.Value;
+                            int countInB = value;
+                            int gramLength = gram.Key.Length;
+                            double addScore = countInA * countInB * gramLength * gramLength / 1e2;
+                            score += addScore;
+                        }
+                    }
+                    mapScore[text] = score;
+                }
+                return mapScore;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                return [];
+            }
+        }
+
 
 
         public static Dictionary<string, double> SimilarityList(string search, List<string> listText)
         {
-            return NgramSimilarityList(search, listText);
+            Dictionary<string, double> characterLevels = NgramCharacterSimilarityList(search, listText);
+            Dictionary<string, double> wordLevels = NgramWordSimilarityList(search, listText);
+            return listText.Distinct().ToDictionary(
+                text => text,
+                text =>
+                {
+                    double characterScore = characterLevels.TryGetValue(text, out double value) ? value : 0;
+                    double wordScore = wordLevels.TryGetValue(text, out double value2) ? value2 : 0;
+                    return characterScore + wordScore;
+                }
+            );
         }
 
         public static double CalculateCompositeSimilarity(string a, string b)

@@ -112,12 +112,16 @@ export default {
 }
 
 .p-list-friends__item_container{
-    padding: 2px;
+    width: 34px;
+    height: 34px;
     border-radius: 100%;
     background-color: white;
-    width: fit-content;
-    height: fit-content;
     position: relative;
+
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
 }
 
 </style>

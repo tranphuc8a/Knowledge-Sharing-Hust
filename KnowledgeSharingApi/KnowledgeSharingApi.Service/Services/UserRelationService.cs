@@ -197,9 +197,9 @@ namespace KnowledgeSharingApi.Services.Services
             List<string> listUsername = allFriends.Select(fu => fu.Username).ToList();
             List<string> listEmail = allFriends.Select(fu => fu.Email).ToList();
 
-            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(search, listFullname);
-            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(search, listUsername);
-            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(search, listEmail);
+            Dictionary<string, double> scoreFullName = Algorithm.SimilarityList(search, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.SimilarityList(search, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.SimilarityList(search, listEmail);
 
             double fullnameWeight = 0.5, usernameWeight = 0.3, emailWeight = 0.2;
 
@@ -237,9 +237,9 @@ namespace KnowledgeSharingApi.Services.Services
             List<string> listUsername = listRelations.Select(usRelation => usRelation.Username).ToList();
             List<string> listEmail = listRelations.Select(usRelation => usRelation.Email).ToList();
 
-            Dictionary<string, double> scoreFullName = Algorithm.NgramSimilarityList(search, listFullname);
-            Dictionary<string, double> scoreUsername = Algorithm.NgramSimilarityList(search, listUsername);
-            Dictionary<string, double> scoreEmail = Algorithm.NgramSimilarityList(search, listEmail);
+            Dictionary<string, double> scoreFullName = Algorithm.SimilarityList(search, listFullname);
+            Dictionary<string, double> scoreUsername = Algorithm.SimilarityList(search, listUsername);
+            Dictionary<string, double> scoreEmail = Algorithm.SimilarityList(search, listEmail);
 
             double fullnameWeight = 0.5, usernameWeight = 0.3, emailWeight = 0.2;
 

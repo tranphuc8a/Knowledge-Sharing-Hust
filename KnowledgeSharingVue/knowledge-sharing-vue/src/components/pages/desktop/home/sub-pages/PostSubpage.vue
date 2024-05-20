@@ -111,7 +111,7 @@ export default {
                 let leftPostNumber = 2;
 
                 if (scrollHeight - scrollPosition < averagePostHeight * leftPostNumber){
-                    console.log("Load more post");
+                    // console.log("Load more post");
                     await this.loadMorePost();
                 }
             } catch (e){

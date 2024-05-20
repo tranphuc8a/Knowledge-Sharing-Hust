@@ -13,6 +13,7 @@ class ResponseFriendCardModel extends Entity{
         this.Avatar = null;
         this.IsActive = null;
         this.Time = null;
+        this.UserRelationType = null;
     }
 
     init() {

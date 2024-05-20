@@ -210,7 +210,7 @@ export default {
 .p-nav-item-text{
     padding: 16px;
     border-radius: 4px;
-    height: 60px;
+    height: 52px;
     display: flex;
     flex-flow: row nowrap;
     justify-self: center;
