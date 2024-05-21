@@ -1,36 +1,125 @@
 
 
 <template>
-    <div class="card">
-        
+    <div class="p-profile-edit-navigation-card">
+        <div class="p-penav card">
+            <div class="p-penav-header">
+                <div class="p-penav-heading">
+                    Chỉnh sửa thông tin cá nhân
+                </div>
+            </div>
+            <div class="p-penav-tabs">
+                <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.General }]" 
+                    @:click="resolveOnChangeTab(tabEnum.General)"
+                >
+                    Tổng quan
+                </div>
+
+                <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.Information }]" 
+                    @:click="resolveOnChangeTab(tabEnum.Information)"
+                >
+                    Thông tin chi tiết
+                </div>
+
+                <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.Contact }]" 
+                    @:click="resolveOnChangeTab(tabEnum.Contact)"
+                >
+                    Thông tin liên hệ
+                </div>
+
+                <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.Career }]" 
+                    @:click="resolveOnChangeTab(tabEnum.Career)"
+                >
+                    Thông tin nghề nghiệp
+                </div>
+            </div>
+
+            <div class="p-devide"></div>
+            
+            <div class="p-penav__save" @:click="resolveOnSave">
+
+                <MButton 
+                    label="Lưu thay đổi"
+                    :onclick="resolveOnSave"
+                />
+            </div>
+        </div>
     </div>
 </template>
 
 
 
 <script>
-
+import MButton from './../../../../../base/buttons/MButton.vue';
 
 
 export default {
     name: 'ProfileEditNavigationCard',
     components: {
+        MButton,
     },
     props: {
+        onChangeTab: {
+            type: Function,
+            required: true,
+        },
+        onSave: {
+            type: Function,
+            required: true,
+        },
     },
     data(){
         return {
-            
+            tabEnum: {
+                General: "General",
+                Information: "Information",
+                Contact: "Contact",
+                Career: "Career",
+            },
+            tabIndex: null,
+            isWorking: false,
         }
     },
     async mounted(){
+        this.refresh();
     },
     methods: {
+        async refresh(){
+            try {
+                this.tabIndex = this.tabEnum.General;
+            } catch (error){
+                console.error(error);
+            }
+        },
 
+        async resolveOnChangeTab(tabIndex){
+            try {
+                this.tabIndex = tabIndex;
+                if (this.onChangeTab){
+                    await this.onChangeTab(tabIndex);
+                }
+            } catch (error){
+                console.error(error);
+            }
+        },
+
+        async resolveOnSave(){
+            if (this.isWorking){
+                return;
+            }
+            try {
+                this.isWorking = true;
+                if (this.onSave){
+                    await this.onSave();
+                }
+            } catch (error){
+                console.error(error);
+            } finally {
+                this.isWorking = false;
+            }
+        },
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
     },
     provide(){
         return{}
@@ -41,6 +130,53 @@ export default {
 
 
 <style scoped>
+
+.p-profile-edit-navigation-card{
+    width: 100%;
+}
+
+.p-penav{
+    padding: 16px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 16px;
+}
+
+.p-penav > * {
+    text-align: left;
+}
+
+.p-penav-heading{
+    font-family: 'ks-font-semibold';
+    font-size: 24px;
+}
+
+.p-penav-tabs{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 4px;
+}
+
+.p-penav-tab{
+    padding: 16px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: 'ks-font-semibold';
+    color: var(--grey-color-600);
+}
+
+.p-penav-tab:hover{
+    background-color: var(--grey-color-200);
+}
+
+.p-penav-tab.p-penav-active{
+    background-color: var(--primary-color-100);
+    color: var(--primary-color);
+}
 
 </style>
 

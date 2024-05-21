@@ -17,6 +17,7 @@ import ProfileBlockeeContent from '@/components/pages/desktop/profile/subpages/p
 
 
 import ProfileImageSubpage from '@/components/pages/desktop/profile/subpages/profile-image/ProfileImageSubpage.vue';
+import ProfileEditSubpage from '@/components/pages/desktop/profile/subpages/profile-edit/ProfileEditSubpage.vue';
 
 import ProfileAccountSubpage from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountSubpage.vue';
 import ProfileAccountChangePasswordContent from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountChangePasswordContent.vue';
@@ -136,7 +137,7 @@ const profileRouter = [
             }, { // when /profile.../profile-edit
                 path: 'profile-edit',
                 name: 'profile-profile-edit-page',
-                component: null, 
+                component: ProfileEditSubpage, 
             }, { // when /profile.../profile-detail
                 path: 'profile-detail',
                 name: 'profile-profile-detail-page',

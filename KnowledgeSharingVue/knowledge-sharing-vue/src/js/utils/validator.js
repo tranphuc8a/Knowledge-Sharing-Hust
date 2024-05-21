@@ -181,6 +181,46 @@ class PositiveNumberValidator extends Validator{
     }
 }
 
+class RangeNumberValidator extends Validator{
+    constructor(errorMsg){
+        super(errorMsg ?? "Positive Number Validator");
+        this.min = null;
+        this.max = null;
+    }
+
+    setBoundary(min, max){
+        this.min = min;
+        this.max = max;
+        return this;
+    }
+
+    validate(value){
+        try {
+            if (!Validator.isNotEmpty(value)) {
+                if (this.min != null && value < this.min){
+                    return {
+                        isValid: false,
+                        msg: this.errorMsg
+                    };
+                }
+                if (this.max != null && value > this.max){
+                    return {
+                        isValid: false,
+                        msg: this.errorMsg
+                    };
+                }
+            }
+            return super.validate(value);
+        } catch (error){
+            console.error(error);
+            return {
+                isValid: false,
+                msg: error
+            };
+        }
+    }
+}
+
 
 class UsernameValidator extends RegexValidator{
     constructor(errorMsg){
@@ -238,6 +278,16 @@ class PhoneValidator extends RegexValidator{
         // eslint-disable-next-line
         // this.regex = /^(1[ \-\+]{0,3}|\+1[ -\+]{0,3}|\+1|\+)?((\(\+?1-[2-9][0-9]{1,2}\))|(\(\+?[2-8][0-9][0-9]\))|(\(\+?[1-9][0-9]\))|(\(\+?[17]\))|(\([2-9][2-9]\))|([ \-\.]{0,3}[0-9]{2,4}))?([ \-\.][0-9])?([ \-\.]{0,3}[0-9]{2,4}){2,3}$/;
         this.regex = /^.*$/;
+    }
+}
+
+class UrlValidator extends RegexValidator{
+    constructor(errorMsg){
+        super(errorMsg ?? "Url Validator");
+        // eslint-disable-next-line
+        // this.regex = /^(1[ \-\+]{0,3}|\+1[ -\+]{0,3}|\+1|\+)?((\(\+?1-[2-9][0-9]{1,2}\))|(\(\+?[2-8][0-9][0-9]\))|(\(\+?[1-9][0-9]\))|(\(\+?[17]\))|(\([2-9][2-9]\))|([ \-\.]{0,3}[0-9]{2,4}))?([ \-\.][0-9])?([ \-\.]{0,3}[0-9]{2,4}){2,3}$/;
+        // eslint-disable-next-line
+        this.regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
     }
 }
 
@@ -414,10 +464,13 @@ class LimitItemNumberValidator extends Validator {
     }
 }
 
+
+
 export { 
     Validator, RegexValidator, NotEmptyValidator,
-    DateValidator, PhoneValidator, EmailValidator, 
-    IdentityCardNumberValidator, MoneyValidator, PositiveNumberValidator,
+    DateValidator, PhoneValidator, EmailValidator, UrlValidator,
+    IdentityCardNumberValidator, MoneyValidator, 
+    PositiveNumberValidator, RangeNumberValidator,
     UsernameValidator, PasswordValidator, RepasswordValidator,
     ComboboxValidator, GreaterThanTodayValidator,
     LimitItemNumberValidator
