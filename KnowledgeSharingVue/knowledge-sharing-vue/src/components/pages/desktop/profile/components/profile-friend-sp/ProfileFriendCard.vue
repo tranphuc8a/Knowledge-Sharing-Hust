@@ -19,7 +19,7 @@
             </div>
             <div class="p-pfc__right">
                 <div class="p-pfc__button">
-                    <UserRelationButton />
+                    <UserRelationButton :is-call-api-when-create="false"/>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@ export default {
     },
     data(){
         return {
-            dUser: null,
+            dUser: this.user,
             usernameStyle: {
                 fontSize: '18px',
             }
@@ -77,8 +77,6 @@ export default {
         }
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
     },
     provide(){
         return {

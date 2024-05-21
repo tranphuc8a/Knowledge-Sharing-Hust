@@ -46,8 +46,8 @@
 import { Validator } from '@/js/utils/validator';
 import { MyRandom } from '@/js/utils/myrandom';
 import Popup from './MPopup.vue';
-import appConfig from '@/app-config';
-import Common from '@/js/utils/common';
+// import appConfig from '@/app-config';
+// import Common from '@/js/utils/common';
 import { useRouter } from 'vue-router';
 
 export default {
@@ -166,13 +166,15 @@ export default {
                 if (currentPath != null){
                     localStorage.setItem("redirect-to", currentPath);
                 }
-                let homepage = appConfig.getHomePageUrl();
-                homepage = Common.removeTrailingSlash(homepage);
+                // let homepage = appConfig.getHomePageUrl();
+                // homepage = Common.removeTrailingSlash(homepage);
+                let router = this.router;
                 this.inform("Bạn cần đăng nhập để thực hiện chức năng này!",
                     async function(){
-                        window.location.href = homepage + "/login";
+                        // window.location.href = homepage + "/login";
+                        router.push("/login");
                     }
-                )
+                );
             } catch (error){
                 console.error(error);
             }

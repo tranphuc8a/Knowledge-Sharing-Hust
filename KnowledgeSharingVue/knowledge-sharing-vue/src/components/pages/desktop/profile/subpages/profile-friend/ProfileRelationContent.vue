@@ -151,7 +151,7 @@ export default {
                 let userRelationType = this.userRelationType;
                 let tempResponseUserModel = tempResponseFriendModel.map(function(item){
                     let userCard = new ResponseUserCardModel().copy(item);
-                    userCard.UserRelationType = userRelationType;
+                    userCard.UserRelationType = userCard.UserRelationType ?? userRelationType;
                     userCard.UserRelationId = item.FriendId;
                     return userCard;
                 });

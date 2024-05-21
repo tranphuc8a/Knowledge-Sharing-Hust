@@ -62,8 +62,8 @@ export default {
             isShowComponent: true,
             label: null,
             dotIconStyle: {fontSize: '3px', color: 'var(--grey-color-600)'},
-            iconStyle: {color: 'var(--grey-color)'},
-            buttonStyle: {color: 'var(--grey-color-800)'},
+            iconStyle: {color: 'var(--grey-color-600)'},
+            buttonStyle: {color: 'var(--grey-color-600)'},
             tinyIconStyle: {},
             router: useRouter(),
         }
@@ -219,7 +219,7 @@ export default {
     cursor: pointer;
     font-size: 14px;
     font-family: 'ks-font-semibold';
-    color: var(--primary-color);
+    color: var(--grey-color);
 }
 
 .p-pct-numstar:hover,
@@ -228,14 +228,14 @@ export default {
 .p-pct-numstar:hover svg,
 .p-pct-numcomment:hover svg,
 .p-pct-numview:hover svg{
-    color: var(--primary-color-700);
+    color: var(--primary-color);
 }
 
 .p-postcard-toolbar__devide{
     margin: 8px 0 4px 0;
     width: 100%;
     height: 1px;
-    background-color: var(--grey-color-300);
+    background-color: var(--primary-color-200);
 }
 
 .p-postcard-toolbar__actions{

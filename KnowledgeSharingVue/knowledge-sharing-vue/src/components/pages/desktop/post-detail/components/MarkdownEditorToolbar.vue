@@ -319,7 +319,7 @@ export default{
 .p-editor-toolbar-devide{
     width: 1px;
     height: 24px;
-    background-color: var(--primary-color-300);
+    background-color: var(--primary-color-200);
     margin: 0 4px;
 }
 

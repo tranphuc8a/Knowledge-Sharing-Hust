@@ -25,7 +25,7 @@ export default {
     data() {
         return {
             iconStyle: {
-                color: 'var(--grey-color)',
+                color: 'var(--primary-color)',
                 fontSize: '12px'
             }
         }

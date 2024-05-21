@@ -40,8 +40,8 @@ export default {
             lesson: null,
             router: useRouter(),
             iconStyle: {
-                width: '28px',
-                height: '28px'
+                width: '24px',
+                height: '24px'
             }
         }
     },
@@ -86,7 +86,7 @@ export default {
 .d-item-label{
     font-family: 'ks-font-semibold';
     font-size: 15px;
-    color: var(--primary-color);
+    color: var(--grey-color-600);
 
     width: 100%;
     align-self: stretch;

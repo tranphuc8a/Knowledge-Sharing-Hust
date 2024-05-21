@@ -30,6 +30,15 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySQL(ConnectionString);
+
+            // This strategy connection does not support default transaction of EF core
+            //optionsBuilder.UseMySQL(ConnectionString, mySqlOptions =>
+            //{
+            //    mySqlOptions.EnableRetryOnFailure(
+            //        maxRetryCount: 5,
+            //        maxRetryDelay: TimeSpan.FromSeconds(10),
+            //        errorNumbersToAdd: null);
+            //});
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

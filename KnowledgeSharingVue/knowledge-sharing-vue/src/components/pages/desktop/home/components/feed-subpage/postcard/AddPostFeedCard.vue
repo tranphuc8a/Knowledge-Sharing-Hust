@@ -11,6 +11,7 @@
             <div class="p-feedcard-buttons">
                 <MEmbeddedButton 
                     fa="book-open"
+                    icon-family="fas"
                     :label="getLabel()?.addLesson"
                     :onclick="resolveClickAddLesson"
                     :buttonStyle="buttonStyle"
@@ -41,7 +42,7 @@ export default {
         return {
             label: null,
             buttonStyle: {
-                color: 'var(--blue-grey-color-800)',
+                color: 'var(--grey-color-600)',
             },
             iconStyle: {
                 color: 'var(--grey-color)',
@@ -129,7 +130,7 @@ export default {
     min-height: 42px;
     border-radius: 32px;
     background-color: var(--grey-color-200);
-    padding: 4px 12px;
+    padding: 8px 16px;
     box-sizing: border-box;
     cursor: pointer;
     color: var(--grey-color-600);
@@ -142,7 +143,7 @@ export default {
 .p-feedcard-devide{
     width: 100%;
     height: 1px;
-    background-color: var(--grey-color-300);
+    background-color: var(--primary-color-200);
 }
 
 .p-feedcard-buttons{

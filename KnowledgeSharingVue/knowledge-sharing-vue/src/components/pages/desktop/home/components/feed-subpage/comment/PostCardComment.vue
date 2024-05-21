@@ -16,7 +16,7 @@
                             </div>
                             <div class="p-comment-text">
                                 <LimitLengthText :text="dComment?.Content"
-                                    :length="50" />
+                                    :length="250" />
                             </div>
                         </div>
                         <div class="p-comment-menu-context" ref="comment-menu-context">
@@ -69,7 +69,7 @@
             <div class="p-comment-right">
                 <MLinkButton v-show="listReplies?.length <= 0" 
                     :onclick="getMoreReplies" 
-                    :label="`Có ${dComment.TotalReplies ?? 0} phản hồi`" :href="null"
+                    :label="`Có ${dComment.TotalComment ?? 0} phản hồi`" :href="null"
                     :buttonStyle="buttonStyle"
                 />
                 <MLinkButton v-show="listReplies?.length > 0" :onclick="getMoreReplies" 
@@ -190,7 +190,7 @@ export default {
                 };
 
                 this.dComment = tempComment;
-                this.isOutOfReplies = ! (this.dComment?.TotalReplies > 0); 
+                this.isOutOfReplies = ! (this.dComment?.TotalComment > 0); 
                 this.getLabel();
             } catch (error) {
                 console.error(error);

@@ -11,6 +11,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
 {
     public interface ILessonService : IBasePostService
     {
+        Task<ServiceResult> AnonymousGetPostsNotConvert(PaginationDto page);
 
         /// <summary>
         /// User thay đổi quyền truy cập của bài học

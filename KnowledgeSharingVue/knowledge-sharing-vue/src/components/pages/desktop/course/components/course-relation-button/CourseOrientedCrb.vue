@@ -49,7 +49,7 @@ export default {
             this.dCourse = this.getCourse();
             this.dCourseRoleType.value = this.dCourse.CourseRoleType;
             this.dCourseRelationId.value = this.dCourse.CourseRelationId;
-            this.refresh();
+            // this.refresh();
         } catch (error) {
             console.error(error);
         }
@@ -57,23 +57,23 @@ export default {
     mounted(){
     },
     methods: {
-        async refresh(){
-            try {
-                // let courseId = this.getCourse?.()?.UserItemId;
-                console.log(".")
-                // get status between course and userid
-                // let url = 'CourseRelations/course-status/' + courseId;
-                // let res = await new GetRequest(url)
-                //     .setParams({
-                //         isFocusCourse: true
-                //     }).execute();
-                // let body = await Request.tryGetBody(res);
-                // this.dCourseRoleType.value = body.CourseRoleType;
-                // this.dCourseRelationId.value = body.CourseRelationId;
-            } catch (error) {
-                console.error(error);
-            }
-        },
+        // async refresh(){
+        //     try {
+        //         // let courseId = this.getCourse?.()?.UserItemId;
+        //         // console.log(".")
+        //         // get status between course and userid
+        //         // let url = 'CourseRelations/course-status/' + courseId;
+        //         // let res = await new GetRequest(url)
+        //         //     .setParams({
+        //         //         isFocusCourse: true
+        //         //     }).execute();
+        //         // let body = await Request.tryGetBody(res);
+        //         // this.dCourseRoleType.value = body.CourseRoleType;
+        //         // this.dCourseRelationId.value = body.CourseRelationId;
+        //     } catch (error) {
+        //         console.error(error);
+        //     }
+        // },
 
         async forceRender(){
             try {

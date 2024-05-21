@@ -1,6 +1,6 @@
 <template>
     <div class="p-postcard-comment-list" v-if="isLoaded">
-        <div class="p-pcl-filter-button">
+        <div class="p-pcl-filter-button" v-if="false">
             <CommentFilterButton :on-change="resolveOnchangeFilter" />
         </div>
         <div class="p-pcl-comment-list" v-if="listComments?.length > 0">
@@ -232,6 +232,8 @@ export default {
     width: 100%;
     text-align: center;
     padding: 12px 0px 18px 0px;
+    color: var(--grey-color);
+    font-family: 'ks-font-regular';
 }
 
 .p-pcl-comment-load-more{

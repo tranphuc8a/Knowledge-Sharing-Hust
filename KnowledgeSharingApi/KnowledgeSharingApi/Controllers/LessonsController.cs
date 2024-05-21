@@ -36,6 +36,12 @@ namespace KnowledgeSharingApi.Controllers
             => StatusCode(await LessonService.AnonymousGetPosts(
                 new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
 
+        [HttpGet("anonymous-not-convert")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AnonymousGetListNotConverter(int? limit, int? offset, string? order, string? filter)
+            => StatusCode(await LessonService.AnonymousGetPostsNotConvert(
+                new PaginationDto(limit, offset, ParseOrder(order), ParseFilter(filter))));
+
         /// <summary>
         /// Yêu cầu lấy về danh sách bài giảng của một người dùng
         /// </summary>

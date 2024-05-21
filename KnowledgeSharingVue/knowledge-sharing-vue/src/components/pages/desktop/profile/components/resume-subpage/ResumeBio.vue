@@ -261,7 +261,7 @@ export default {
 .prb-devider{
     width: 100%;
     height: 1.5px;
-    background-color: var(--primary-color-300);
+    background-color: var(--primary-color-200);
 }
 
 .prb-button{

@@ -224,7 +224,9 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
 
             // Tạo quy vấn
             string sqlCommand =
-                $"SET sql_require_primary_key=OFF; " +
+                // for database with required primary key
+                /* $"SET sql_require_primary_key=OFF; " +  */
+                $"DROP TEMPORARY TABLE IF EXISTS temp_selected_records; " +
                 $"CREATE TEMPORARY TABLE temp_selected_records AS {subCommand}; " +
                 $"SELECT COUNT(*) AS record_count FROM temp_selected_records; " +
                 $"SELECT * FROM temp_selected_records {whereClause} {orderClause} {limsetClause}; " +

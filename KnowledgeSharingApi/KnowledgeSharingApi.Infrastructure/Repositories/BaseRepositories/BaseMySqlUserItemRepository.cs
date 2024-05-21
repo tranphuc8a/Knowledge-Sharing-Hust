@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         protected BaseMySqlUserItemRepository(IDbContext dbContext) : base(dbContext)
         {
             TableNameId = "UserItemId";
-            _ = DbContext.Users.FirstOrDefault();
+            //_ = DbContext.Users.FirstOrDefault();
         }
 
         /// <summary>

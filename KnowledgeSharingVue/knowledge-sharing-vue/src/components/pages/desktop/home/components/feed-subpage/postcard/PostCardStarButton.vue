@@ -2,7 +2,7 @@
     <TooltipFrame ref="tooltip" :delay-hiding="500" :delay-showing="500">
         <template #tooltipMask>
             <div class="p-star-button-frame">
-                <MEmbeddedButton v-if="myStar != null" :iconStyle="staredIconStyle" :buttonStyle="buttonStyle" 
+                <MEmbeddedButton v-if="myStar != null" :iconStyle="staredIconStyle" :buttonStyle="staredButtonStyle" 
                     fa="star" iconFamily="fas" :label="getStaredLabel()"
                     :onclick="resolveUnStar"/>
                 <MEmbeddedButton v-else :iconStyle="notStaredIconStyle" :buttonStyle="buttonStyle"
@@ -53,7 +53,7 @@ export default {
             myStar: this.getPost()?.MyStars,
             currentUser: null,
             notStaredIconStyle: {
-                color: 'var(--grey-color)',
+                color: 'var(--grey-color-600)',
                 fontSize: '18px'
             },
             staredIconStyle: {
@@ -67,7 +67,8 @@ export default {
                 color: 'var(--red-color)',
                 fontSize: '28px'
             },
-            buttonStyle: {color: 'var(--grey-color-800)'},
+            buttonStyle: {color: 'var(--grey-color-600)'},
+            staredButtonStyle: {color: 'var(--primary-color)'},
             currentStar: 0,
 
             tooltip: null,
