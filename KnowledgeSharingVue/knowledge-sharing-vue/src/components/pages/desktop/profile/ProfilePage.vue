@@ -89,6 +89,7 @@ export default {
             getUser: () => this.user,
             getIsMySelf: this.isMySelf,
             registerScrollHandler: this.registerScrollHandler,
+            refreshProfilePage: this.createPage,
         }
     },
     methods: {

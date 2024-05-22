@@ -30,7 +30,7 @@
                 <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.Career }]" 
                     @:click="resolveOnChangeTab(tabEnum.Career)"
                 >
-                    Thông tin nghề nghiệp
+                    Thông tin học tập, nghề nghiệp
                 </div>
             </div>
 

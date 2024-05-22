@@ -148,9 +148,7 @@ export default {
                         Content: text
                     }).execute();
                 let body = await Request.tryGetBody(res);
-                let comment = new ResponseCommentModel();
-                comment.copy(body);
-                comment.User = this.currentUser;
+                let comment = new ResponseCommentModel().copy(this.currentUser).copy(body);
 
                 // update ui
                 if (this.onCommentSubmitted) {
@@ -173,9 +171,7 @@ export default {
                         Content: text
                     }).execute();
                 let body = await Request.tryGetBody(res);
-                let comment = new ResponseCommentModel();
-                comment.copy(body);
-                comment.User = this.currentUser;
+                let comment = new ResponseCommentModel().copy(this.currentUser).copy(body);
 
                 // update ui
                 if (this.onCommentSubmitted) {

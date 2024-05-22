@@ -5,7 +5,7 @@
         <MMenuContextPopup :options="getOptions()">
             <MSecondaryButton 
                 label="Phản hổi lời mời"
-                :onclick="()=>{}"
+                :onclick="null"
                 :buttonStyle="buttonStyle"
                 fa="circle-question" family="fas" :iconStyle="iconStyle"
                 ref="button"

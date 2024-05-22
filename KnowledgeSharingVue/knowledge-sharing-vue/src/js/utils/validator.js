@@ -196,7 +196,7 @@ class RangeNumberValidator extends Validator{
 
     validate(value){
         try {
-            if (!Validator.isNotEmpty(value)) {
+            if (Validator.isNotEmpty(value)) {
                 if (this.min != null && value < this.min){
                     return {
                         isValid: false,

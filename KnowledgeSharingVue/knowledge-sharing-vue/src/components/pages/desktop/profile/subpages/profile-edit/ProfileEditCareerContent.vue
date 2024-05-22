@@ -7,6 +7,12 @@
                 <div class="p-profile-card-heading">
                     Chỉnh sửa thông tin học tập, nghề nghiệp
                 </div>
+                <div class="p-profile-card-description">
+                    Hãy cập nhật thông tin học tập, nghề nghiệp của bạn để mọi người biết rõ hơn về bạn nhé! 
+                    Thông tin học tập, nghề nghiệp giúp bạn kết nối với những người bạn mới, 
+                    cũng như giúp bạn bè hiểu rõ hơn về bạn hơn. <br/>
+                    Hãy chia sẻ thông tin học tập, nghề nghiệp của bạn để tạo ra một môi trường kết nối tốt hơn nhé!
+                </div>
             </div>
             
             <div class="p-pec-form">
@@ -205,11 +211,20 @@ export default {
     align-items: stretch;
     justify-content: flex-start;
 
-    gap: 96px;
+    gap: 64px;
 }
 
 .p-pec-card > * {
     text-align: left;
+}
+
+.p-pec-header{
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 16px;
 }
 
 

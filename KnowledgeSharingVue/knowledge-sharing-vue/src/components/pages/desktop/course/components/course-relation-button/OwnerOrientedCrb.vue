@@ -5,7 +5,7 @@
         <MMenuContextPopup :options="getOptions()">
             <MSecondaryButton 
                 label="Tùy chỉnh khóa học"
-                :onclick="()=>{}"
+                :onclick="null"
                 :buttonStyle="buttonStyle"
                 fa="pencil" family="fas" :iconStyle="iconStyle"
                 ref="button"

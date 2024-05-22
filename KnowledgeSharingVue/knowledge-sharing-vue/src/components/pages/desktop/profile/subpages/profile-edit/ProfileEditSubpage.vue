@@ -109,7 +109,7 @@ export default {
 
         async resolveOnSaveProfile(){
             try {
-                if (! this.validateData()){
+                if (! await this.validateData()){
                     return;
                 }
 
@@ -122,7 +122,7 @@ export default {
 
                 // set patch request
                 await new PatchRequest('Users/me/update-profile')
-                    .setBody(this.profile)
+                    .setBody(profile)
                     .execute();
 
                 // success: update profile for current user
@@ -132,6 +132,10 @@ export default {
                 // update profile for input:
                 this.user = newUser;
                 await this.setInputValue();
+
+                // toast Success:
+                this.getToastManager().success('Cập nhật thông tin thành công');
+                this.refreshProfilePage?.();
             } catch (e){
                 Request.resolveAxiosError(e);
             }
@@ -220,6 +224,7 @@ export default {
     inject: {
         getToastManager: {},
         getPopupManager: {},
+        refreshProfilePage: {},
     }
 }
 

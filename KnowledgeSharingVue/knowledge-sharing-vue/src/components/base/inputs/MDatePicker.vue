@@ -66,6 +66,7 @@ export default{
     methods: {
         ...input.methods,
         formatDate(date) {
+            date?.setUTCHours(12);
             return new MyDate(date).toFormat(this.format);
         }
     },

@@ -2,7 +2,7 @@
 
 <template>
     <div class="pl-button-frame" tabindex="1" v-on:blur="isFocus=false">
-        <div class="pl-button" v-on:click="isFocus = !isFocus">
+        <div class="pl-button" v-on:click.stop="isFocus = !isFocus">
             <div class="pl-button-left">
                 <div class="pl-button-flag vietnam" v-show="!isEnglish">
                 </div>

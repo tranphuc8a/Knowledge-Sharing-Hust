@@ -27,7 +27,11 @@ export default {
             try {
                 let result = {};
                 for (let key of this.keys){
-                    result[key] = await this.components[key].getValue?.();
+                    let value = await this.components[key].getValue?.();
+                    if (value != null && key == "Grade"){
+                        value = String(value);
+                    }
+                    result[key] = value;
                 }
                 return result;
             } catch (error){
@@ -39,7 +43,11 @@ export default {
             try {
                 if (Validator.isEmpty(user)) return;
                 for (let key of this.keys){
-                    await this.components[key].setValue?.(user[key]);
+                    let value = user[key];
+                    if (["Grade", "Cpa"].includes(key)){
+                        value = Number(value);
+                    }
+                    await this.components[key].setValue?.(value);
                 }
             } catch (error){
                 console.error(error);
@@ -49,8 +57,8 @@ export default {
         async focusError(){
             try {
                 for (let key of this.keys){
-                    if (!await this.components[key].validate?.()) 
-                        return await this.components[key].focusError?.();
+                    if (!await this.components[key].validate()) 
+                        return await this.components[key].focus();
                 }
             } catch (error){
                 console.error(error);
@@ -60,7 +68,7 @@ export default {
         async validate(){
             try {
                 for (let key of this.keys){
-                    if (!await this.components[key].validate?.()) return false;
+                    if (!await this.components[key].validate()) return false;
                 }
                 return true;
             } catch (error){

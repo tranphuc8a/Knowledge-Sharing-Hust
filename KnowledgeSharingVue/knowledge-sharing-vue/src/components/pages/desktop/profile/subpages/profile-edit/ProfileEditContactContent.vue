@@ -7,6 +7,11 @@
                 <div class="p-profile-card-heading">
                     Chỉnh sửa thông tin liên hệ 
                 </div>
+                <div class="p-profile-card-description">
+                    Hãy cập nhật thông tin liên hệ của bạn để mọi người có thể kết nối với bạn dễ dàng hơn! 
+                    Thông tin liên hệ giúp bạn bè liên lạc với bạn một cách nhanh chóng và thuận tiện hơn. <br/>
+                    Hãy chia sẻ thông tin liên hệ của bạn để tạo ra một môi trường kết nối tốt hơn nhé!
+                </div>
             </div>
             
             <div class="p-pec-form">
@@ -144,11 +149,20 @@ export default {
     align-items: stretch;
     justify-content: flex-start;
 
-    gap: 96px;
+    gap: 64px;
 }
 
 .p-pec-card > * {
     text-align: left;
+}
+
+.p-pec-header{
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 16px;
 }
 
 

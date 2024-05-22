@@ -3,7 +3,7 @@
 <template>
     <m-context-popup :delay-hiding="0">
         <template #popupContextMask>
-            <MActionIcon fa="ellipsis-h" :onclick="()=>{}"
+            <MActionIcon fa="ellipsis-h" :onclick="null"
                 :iconStyle="iconStyle" :containerStyle="containerStyle" />
         </template>
 

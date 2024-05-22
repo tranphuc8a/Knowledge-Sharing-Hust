@@ -151,6 +151,9 @@ export default {
         },
         async focusError(){
         },
+        async validate(){
+            return true;
+        },
 
         async resolveOnChangeAvatar(){
             try {

@@ -67,6 +67,7 @@ let radio = {
         **/
         async validate(){
             try {
+                if (this.validator?.validate == null) return true;
                 let rs = await this.validator.validate(this.data.items, this.data.value);
                 if (rs.isValid) {
                     return true;
@@ -89,7 +90,6 @@ let radio = {
                 console.error(error);
             }
         },
-       
     },
     props: {
         ...input.props,

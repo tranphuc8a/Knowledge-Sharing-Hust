@@ -14,13 +14,16 @@ let button = {
          * @Created PhucTV (28/1/24)
          * @Modified None
         */
-        async resolveOnclick() {
+        async resolveOnclick(event) {
             try {
                 if (this.data.state !== myEnum.buttonState.NORMAL){
                     return;
                 }
                 this.data.state = myEnum.buttonState.LOADING;
-                await this.onclick();
+                if (this.onclick != null){
+                    await this.onclick();
+                    event?.stopPropagation?.();
+                }
                 this.data.state = myEnum.buttonState.NORMAL;
             } catch (e) {
                 console.error(e);
@@ -65,11 +68,7 @@ let button = {
 
     props: {
         onclick: {
-            type: Function,
-            default: async function(){
-                await new Promise(e => setTimeout(e, 1000));
-                console.log(`Click ${this.label}`);
-            }
+            default: null,
         },
         label: {
             type: String,
