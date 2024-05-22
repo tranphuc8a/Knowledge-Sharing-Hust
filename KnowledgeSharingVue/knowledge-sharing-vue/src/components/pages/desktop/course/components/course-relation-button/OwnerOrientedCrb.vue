@@ -5,7 +5,7 @@
         <MMenuContextPopup :options="getOptions()">
             <MSecondaryButton 
                 label="Tùy chỉnh khóa học"
-                :onclick="()=>{}"
+                :onclick="null"
                 :buttonStyle="buttonStyle"
                 fa="pencil" family="fas" :iconStyle="iconStyle"
                 ref="button"
@@ -120,7 +120,7 @@ export default {
             try {
                 let courseId = this.dCourse?.UserItemId;
                 if (courseId == null) return;
-                this.router.push(`/course-edit/${courseId}`); 
+                this.router.push(`/course/${courseId}/edit`); 
             } catch (e){
                 console.error(e);
             }
@@ -130,7 +130,7 @@ export default {
             try {
                 let courseId = this.dCourse?.UserItemId;
                 if (courseId == null) return;
-                this.router.push(`/course-update/${courseId}`);
+                this.router.push(`/course/${courseId}/lesson-edit`);
             } catch (e){
                 console.error(e);
             }

@@ -31,6 +31,7 @@ import MButton from '@/components/base/buttons/MButton';
 import CurrentUser from '@/js/models/entities/current-user';
 import UserRelationButton from '../user-relation-button/UserRelationButton.vue';
 import MessageButton from '../user-relation-button/MessageButton.vue';
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'ProfilePanelButton',
@@ -50,6 +51,7 @@ export default {
             },
             currentUser: null,
             isNotMySelf: true,
+            router: useRouter(),
         }
     },
     mounted(){
@@ -62,7 +64,11 @@ export default {
     methods: {
         async resolveClickButton(){
             try {
-                console.log("click edit profile button");
+                let currentUser = await CurrentUser.getInstance();
+                let username = currentUser?.Username ?? currentUser?.UserId;
+                if (currentUser == null) return;
+                let path = '/profile/' + username + '/profile-edit';
+                this.router.push(path);
             } catch (e) {
                 console.error(e);
             }

@@ -44,7 +44,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
 
         /// <summary>
         /// Yêu cầu user lấy về danh sách những người đã đăng ký tham gia khóa học
-        /// Owner hoặc member
+        /// Owner, invited hoặc member (cho khoa hoc private), Public cho every body
         /// </summary>
         /// <param name="myUId"> id của user muốn lấy </param>
         /// <param name="courseId"> id của khóa học cần lấy </param>
@@ -52,7 +52,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (29/3/24)
         /// Modified: None
-        Task<ServiceResult> UserGetRegisters(Guid myUId, Guid courseId, PaginationDto page);
+        Task<ServiceResult> UserGetRegisters(Guid? myUId, Guid courseId, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu chủ khóa học lấy về danh sách invite của một khóa học

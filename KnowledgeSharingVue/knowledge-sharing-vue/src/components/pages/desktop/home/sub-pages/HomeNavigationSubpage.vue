@@ -3,6 +3,7 @@
 <template>
     <div class="d-subpage">
         <HomeNavigationUser />
+        <div class="p-devide"></div>
         <div v-for="item in items" :key="item.label">
             <HomeNavigationItem 
                 :fa="item.fa" 

@@ -1,14 +1,14 @@
 <template>
     <div class="p-postcard-comment-list" v-if="isLoaded">
-        <div class="p-pcl-filter-button">
+        <div class="p-pcl-filter-button" v-show="false">
             <CommentFilterButton :on-change="resolveOnchangeFilter" />
         </div>
-        <div class="p-pcl-comment-list" v-if="listComments?.length > 0">
+        <div class="p-pcl-comment-list" v-show="listComments?.length > 0">
             <PostCardComment 
                 v-for="comment in listComments" 
                 :key="comment?.UserItemId" 
                 :comment="comment"
-                :on-delete-comment="resolveDeletedComment(comment)"
+                :on-deleted-comment="resolveDeletedComment(comment)"
             />
             
             <MLinkButton v-show="!isOutOfComments" :onclick="getMoreComments" 
@@ -16,7 +16,7 @@
             />
 
         </div>
-        <div class="p-pcl-empty-comment" v-if="listComments?.length <= 0">
+        <div class="p-pcl-empty-comment" v-show="listComments?.length <= 0">
             Hiện không có bình luận nào
         </div>
         <div class="p-pcl-enter-comment">
@@ -138,11 +138,11 @@ export default {
             } catch (e) {
                 console.error(e);
             } finally {
-                let that = this;
-                this.isLoaded = false;
-                this.$nextTick(() => {
-                    that.isLoaded = true;
-                });
+                // let that = this;
+                // this.isLoaded = false;
+                // this.$nextTick(() => {
+                //     that.isLoaded = true;
+                // });
             }
         },
 
@@ -193,11 +193,12 @@ export default {
         },
 
         resolveDeletedComment(comment){
+            let that = this;
             return async function(){
                 try {
-                    let index = this.listComments.indexOf(comment);
+                    let index = that.listComments.indexOf(comment);
                     if (index >= 0){
-                        this.listComments.splice(index, 1);
+                        that.listComments.splice(index, 1);
                     }
                 } catch (e) {
                     console.error(e);
@@ -232,6 +233,8 @@ export default {
     width: 100%;
     text-align: center;
     padding: 12px 0px 18px 0px;
+    color: var(--grey-color);
+    font-family: 'ks-font-regular';
 }
 
 .p-pcl-comment-load-more{

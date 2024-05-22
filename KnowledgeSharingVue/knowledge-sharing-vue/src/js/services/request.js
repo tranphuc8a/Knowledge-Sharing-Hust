@@ -236,7 +236,7 @@ class Request {
             let body = this.tryGetBody(response);
             let user = new CurrentUser();
             user.copy(body);
-            CurrentUser.setInstance(user);
+            await CurrentUser.setInstance(user);
             return true;
         } catch (error){
             console.error(error);

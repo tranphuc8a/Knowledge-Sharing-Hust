@@ -23,9 +23,15 @@
 <script>
 import appConfig from '@/app-config';
 import Common from '@/js/utils/common';
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'OtherRegisterOptions',
+    data() {
+        return {
+            router: useRouter()
+        }
+    },
     methods: {
         /**
          * Handle click google icon
@@ -45,7 +51,8 @@ export default {
                 const response_type = 'token';
                 const state = 'knowledgesharinghusttoken22042001';
                 const url = `${googleOAuthUrl}?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}&state=${state}`;
-                window.location.href = url;
+                // window.location.href = url;
+                this.router.push(url);
             } catch (error) {
                 console.error(error);
             }
@@ -60,7 +67,7 @@ export default {
          * @Created PhucTV (12/4/24)
          * @Modified None
          */
-         async resolveClickAppleIcon() {
+        async resolveClickAppleIcon() {
             try {
                 const googleOAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
                 const client_id = '17403549430-no5m3svllo81fcnj5suedcg42meb204u.apps.googleusercontent.com';
@@ -70,7 +77,8 @@ export default {
                 const response_type = 'token';
                 const state = 'knowledgesharinghusttoken22042001';
                 const url = `${googleOAuthUrl}?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}&state=${state}`;
-                window.location.href = url;
+                // window.location.href = url;
+                this.router.push(url);
             } catch (error) {
                 console.error(error);
             }
@@ -84,7 +92,7 @@ export default {
          * @Created PhucTV (12/4/24)
          * @Modified None
          */
-         async resolveClickMicrosoftIcon() {
+        async resolveClickMicrosoftIcon() {
             try {
                 const googleOAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
                 const client_id = '17403549430-no5m3svllo81fcnj5suedcg42meb204u.apps.googleusercontent.com';
@@ -94,7 +102,8 @@ export default {
                 const response_type = 'token';
                 const state = 'knowledgesharinghusttoken22042001';
                 const url = `${googleOAuthUrl}?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}&state=${state}`;
-                window.location.href = url;
+                // window.location.href = url;
+                this.router.push(url);
             } catch (error) {
                 console.error(error);
             }

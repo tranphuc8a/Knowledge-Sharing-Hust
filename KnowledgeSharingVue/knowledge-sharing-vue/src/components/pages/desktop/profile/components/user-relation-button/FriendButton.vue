@@ -4,7 +4,7 @@
     <MMenuContextPopup :options="getOptions()">
         <MCancelButton 
             label="Bạn bè"
-            :onclick="()=>{}"
+            :onclick="null"
             :buttonStyle="buttonStyle"
             fa="user-friends" family="fas" :iconStyle="iconStyle"
             ref="button"

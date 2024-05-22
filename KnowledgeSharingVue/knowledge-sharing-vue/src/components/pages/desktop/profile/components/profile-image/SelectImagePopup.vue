@@ -1,8 +1,12 @@
 
 
 <template>
-    <div class="card">
-        
+    <div class="p-select-image-popup">
+        <div class="p-popup-background">
+            <div class="p-popup-content card">
+
+            </div>
+        </div>
     </div>
 </template>
 
@@ -10,6 +14,7 @@
 
 <script>
 
+import CurrentUser from '@/js/models/entities/current-user';
 
 
 export default {
@@ -20,12 +25,22 @@ export default {
     },
     data(){
         return {
-            
+            currentUser: null,
         }
     },
     async mounted(){
+        await this.initPopup();
     },
     methods: {
+        async initPopup(){
+            try {
+                this.currentUser = await CurrentUser.getInstance();
+            } catch (e){
+                console.error(e);
+                return;
+            }
+        },
+
         async show(){
 
         },
@@ -34,8 +49,6 @@ export default {
         },
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
     },
     provide(){
         return{}

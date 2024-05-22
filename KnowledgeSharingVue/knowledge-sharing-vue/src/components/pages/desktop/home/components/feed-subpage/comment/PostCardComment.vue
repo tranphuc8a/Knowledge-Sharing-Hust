@@ -16,7 +16,7 @@
                             </div>
                             <div class="p-comment-text">
                                 <LimitLengthText :text="dComment?.Content"
-                                    :length="50" />
+                                    :length="250" />
                             </div>
                         </div>
                         <div class="p-comment-menu-context" ref="comment-menu-context">
@@ -38,8 +38,8 @@
         <div class="p-comment-line p-edit-comment" v-show="isEditing">
             <PostCardEnterComment ref="edit-comment" 
                 :is-editing="true"
-                :edit-for="this.comment.UserItemId"
-                :useritem="comment" 
+                :edit-for="dComment?.UserItemId"
+                :useritem="dComment" 
                 :value="dComment?.Content ?? 'Chinh sua binh luan'"
                 :on-comment-submitted="resolveCommentEdited"
                 />
@@ -51,14 +51,15 @@
             </div>
         </div>
 
-        <div class="p-comment-line" v-if="listReplies.length > 0">
+        <div class="p-comment-line" v-show="listReplies.length > 0">
             <div class="p-comment-left"></div>
             <div class="p-comment-right">
                 <div class="p-comment-replies">
                     <PostCardComment 
                         v-for="(cmt, index) in listReplies" 
-                        :key="cmt?.UserItemId ?? index" 
+                        :key="cmt?.UserItemId" 
                         :comment="cmt"
+                        :on-deleted-comment="resolveDeletedReply(index)"
                     />
                 </div>
             </div>
@@ -69,7 +70,7 @@
             <div class="p-comment-right">
                 <MLinkButton v-show="listReplies?.length <= 0" 
                     :onclick="getMoreReplies" 
-                    :label="`Có ${dComment.TotalReplies ?? 0} phản hồi`" :href="null"
+                    :label="`Có ${dComment?.TotalComment ?? 0} phản hồi`" :href="null"
                     :buttonStyle="buttonStyle"
                 />
                 <MLinkButton v-show="listReplies?.length > 0" :onclick="getMoreReplies" 
@@ -96,6 +97,7 @@
 </template>
 
 <script>
+import PostCardComment from './PostCardComment.vue';
 import LimitLengthText from '@/components/base/text/LimitLengthText.vue';
 import CommentInformationBar from './CommentInformationBar.vue';
 import CommentMenuContext from './CommentMenuContext.vue';
@@ -130,6 +132,7 @@ export default {
         }
     },
     components: {
+        PostCardComment,
         LimitLengthText,
         CommentInformationBar,
         CommentMenuContext,
@@ -139,9 +142,6 @@ export default {
     },
     mounted(){
         try {
-            if (this.comment?.registerObserver){
-                this.comment.registerObserver(this.refreshComment.bind(this));
-            }
             this.refreshComment();
         } catch (error){
             console.error(error);
@@ -178,7 +178,11 @@ export default {
 
         async refreshComment(){
             try {
-                let tempComment = this.comment;
+                let tempComment = new ResponseCommentModel().copy(this.comment);
+                if (tempComment?.registerObserver){
+                    tempComment.registerObserver(this.refreshComment.bind(this));
+                }
+                
                 if (tempComment == null) tempComment = {};
                 tempComment.isHideCommentInformation = false;
                 tempComment.ForceUpdate = this.forceRender.bind(this);
@@ -190,7 +194,7 @@ export default {
                 };
 
                 this.dComment = tempComment;
-                this.isOutOfReplies = ! (this.dComment?.TotalReplies > 0); 
+                this.isOutOfReplies = ! (this.dComment?.TotalComment > 0); 
                 this.getLabel();
             } catch (error) {
                 console.error(error);
@@ -256,6 +260,17 @@ export default {
             }
         },
 
+        resolveDeletedReply(index){
+            let that = this;
+            return async function(){    
+                try {
+                    that.listReplies.splice(index, 1);
+                } catch (error){
+                    console.error(error);
+                }
+            }
+        },
+
         async resolveToggleInformation(){
             try {
                 this.dComment.isHideCommentInformation = !this.dComment.isHideCommentInformation;
@@ -283,9 +298,10 @@ export default {
                 }
                 let results = body.Results;
                 let tempComment = results.map(function(com){
-                    return new ResponseCommentModel().copy(com);
+                    let comm = new ResponseCommentModel();
+                    comm.copy(com);
+                    return comm;
                 });
-                
                 this.listReplies = this.listReplies.concat(tempComment);
             } catch (error){
                 Request.resolveAxiosError(error);
@@ -319,9 +335,9 @@ export default {
     watch: {
         comment(){
             try {
-                if (this.comment?.registerObserver){
-                    this.comment.registerObserver(this.refreshComment.bind(this));
-                }
+                // if (this.comment?.registerObserver){
+                //     this.comment.registerObserver(this.refreshComment.bind(this));
+                // }
                 this.refreshComment();
             } catch (error){
                 console.error(error);

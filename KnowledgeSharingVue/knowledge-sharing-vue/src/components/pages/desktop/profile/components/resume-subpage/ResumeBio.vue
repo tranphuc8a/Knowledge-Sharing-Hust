@@ -165,6 +165,9 @@ export default {
                     .setBody("").execute();
                 this.getUser().Bio = "";
                 this.isEditing = false;
+                this.currentUser = await CurrentUser.getInstance();
+                this.currentUser.Bio = "";
+                await CurrentUser.setInstance(this.currentUser);
                 this.refreshBio();
             } catch (error) {
                 Request.resolveAxiosError(error);
@@ -188,6 +191,9 @@ export default {
                     .setBody(text).execute();
                 this.getUser().Bio = text;
                 this.dBio = text;
+                this.currentUser = await CurrentUser.getInstance();
+                this.currentUser.Bio = text;
+                await CurrentUser.setInstance(this.currentUser);
                 this.isEditing = false;
                 this.refreshBio();
             } catch (error) {
@@ -261,7 +267,7 @@ export default {
 .prb-devider{
     width: 100%;
     height: 1.5px;
-    background-color: var(--primary-color-300);
+    background-color: var(--primary-color-200);
 }
 
 .prb-button{

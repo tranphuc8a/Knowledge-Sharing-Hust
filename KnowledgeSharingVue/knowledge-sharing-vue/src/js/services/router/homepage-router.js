@@ -12,7 +12,7 @@ const homepageRouter = [
         name: 'home',
         component: DesktopHomePage,
         meta: {
-            requiredAuth: true
+            requiredAuth: false
         },
         children: [ { // when /
             path: '',

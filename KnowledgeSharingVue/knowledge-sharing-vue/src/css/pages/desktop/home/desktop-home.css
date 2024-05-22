@@ -14,6 +14,7 @@
     --body-min-width: 1074px;
     
     --profile-page-max-width: 1186px;
+    --course-page-max-width: 1186px;
 }
 
 .d-home {
@@ -29,4 +30,10 @@
                 0 2px 4px 0 rgba(0, 0, 0, 0.06);
     width: 100%;
     color: var(--blue-grey-color-900);
+}
+
+.p-devide{
+    width: 100%;
+    height: 1px;
+    background-color: var(--primary-color-200);
 }

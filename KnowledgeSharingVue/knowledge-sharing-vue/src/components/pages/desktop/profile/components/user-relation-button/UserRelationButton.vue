@@ -40,6 +40,10 @@ export default {
         RequesteeButton, RequesterButton, FriendButton,
     },
     props: {
+        isCallApiWhenCreate: {
+            type: Boolean,
+            default: true,
+        }
     },
     data(){
         return {
@@ -53,7 +57,7 @@ export default {
     },
     async created(){
         this.isLoaded = false;
-        await this.refreshRelation();
+        await this.refreshRelation(this.isCallApiWhenCreate);
         this.isLoaded = true;
     },
     mounted(){
@@ -71,7 +75,7 @@ export default {
             }
         },
 
-        async refreshRelation(){
+        async refreshRelation(isCallApi = true){
             try {
                 this.user = this.getUser();
                 this.userRelation = this.user?.UserRelationType ?? this.userRelationType.NotInRelationType;
@@ -80,13 +84,15 @@ export default {
                     this.userRelation = this.userRelationType.NotInRelation;
                     return;
                 }
-                if (this.getUser() == null) return;
-                let res = await new GetRequest('UserRelations/relation-status/' + this.getUser().UserId)
-                    .execute();
-                let body = await Request.tryGetBody(res);
-                this.userCard = new ResponseUserCardModel().copy(body);
-                this.userRelation = this.userCard.UserRelationType;
-                this.getUser().UserRelationId = this.userCard.UserRelationId;
+                if (isCallApi){
+                    if (this.getUser() == null) return;
+                    let res = await new GetRequest('UserRelations/relation-status/' + this.getUser().UserId)
+                        .execute();
+                    let body = await Request.tryGetBody(res);
+                    this.userCard = new ResponseUserCardModel().copy(body);
+                    this.userRelation = this.userCard.UserRelationType;
+                    this.getUser().UserRelationId = this.userCard.UserRelationId;
+                }
             } catch (e) {
                 console.error(e);
             }

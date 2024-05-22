@@ -89,6 +89,7 @@ export default {
             getUser: () => this.user,
             getIsMySelf: this.isMySelf,
             registerScrollHandler: this.registerScrollHandler,
+            refreshProfilePage: this.createPage,
         }
     },
     methods: {
@@ -206,6 +207,9 @@ export default {
         },
         '$route.params.username'(){
             this.navigateNewUser();
+        },
+        '$route.fullPath'() {
+            this.handlers = [];
         }
     },
     inject: {

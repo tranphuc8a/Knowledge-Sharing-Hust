@@ -4,7 +4,7 @@
     <MMenuContextPopup :options="getOptions()">
         <MButton 
             label="Phản hồi lời mời"
-            :onclick="()=>{}"
+            :onclick="null"
             :buttonStyle="buttonStyle"
             fa="user-cog" family="fas" :iconStyle="iconStyle"
             ref="button"

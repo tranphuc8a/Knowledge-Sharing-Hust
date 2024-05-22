@@ -15,6 +15,7 @@
 <script>
 import buttonScript from '@/js/components/base/button';
 import { myEnum } from '@/js/resources/enum';
+import { useRouter } from 'vue-router';
 
 let button = {
     name: "LinkButton",
@@ -22,6 +23,7 @@ let button = {
         return {
             data: {
                 state: this.state,
+                router: useRouter(),
             }
         };
     },
@@ -35,7 +37,8 @@ let button = {
             try {
                 this.data.state = myEnum.buttonState.LOADING;
                 if (this.href != null){
-                    location.href = this.href;
+                    // window.location.href = this.href;
+                    this.router.push(this.href);
                 } else if (this.onclick != null){
                     await this.onclick();
                 }

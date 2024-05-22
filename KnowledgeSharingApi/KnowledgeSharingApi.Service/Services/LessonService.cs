@@ -233,6 +233,20 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
         }
 
+        public virtual async Task<ServiceResult> AnonymousGetPostsNotConvert(PaginationDto pagination)
+        {
+            // Get public lessons
+            List<ViewLesson> listLessons =
+                await LessonRepository.GetPublicPosts(pagination);
+
+            // DecorateResponseLessonModel
+            List<ResponseLessonModel> res = (await DecorationRepository.DecorateResponseLessonModel(null, listLessons))
+                .OfType<ResponseLessonModel>().ToList();
+
+            // Return success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(LessonResource), string.Empty, res);
+        }
+
         public virtual async Task<ServiceResult> AnonymousGetUserPosts(Guid userId, PaginationDto pagination)
         {
             // Check user existed

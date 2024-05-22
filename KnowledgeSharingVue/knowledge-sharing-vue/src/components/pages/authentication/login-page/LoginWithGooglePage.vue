@@ -31,11 +31,11 @@
 
 <script>
 import BaseAuthenticationPage from '@/components/pages/authentication/base-page/BaseAuthenticationPage.vue';
-import { Request, PostRequest } from '@/js/services/request';
+import { Request, PostRequest, GetRequest } from '@/js/services/request';
 import appConfig from '@/app-config';
 import statusCodeEnum from '@/js/resources/status-code-enum';
 import { Validator } from '@/js/utils/validator';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 export default {
     name: 'KSLoginWithGoogle',
@@ -60,7 +60,8 @@ export default {
                 prompt: null,
             },
 
-            route: useRoute()
+            route: useRoute(),
+            router: useRouter(),
         }
     },
     async mounted() {
@@ -145,7 +146,7 @@ export default {
          * @Created PhucTV (11/04/24)
          * @Modified None 
          */
-         async resolveLoginSuccess(tokenModel){
+        async resolveLoginSuccess(tokenModel){
             try {
                 if (tokenModel == null){
                     let msg = "tokenModel is null";
@@ -153,13 +154,15 @@ export default {
                     throw new Error(msg);
                 }
                 await Request.setTokenToLocalStorage(tokenModel.Token, tokenModel.RefreshToken);
+                await new GetRequest().checkLogedIn();
 
                 let redirectTo = localStorage.getItem("redirect-to");
                 localStorage.setItem("redirect-to", "");
                 if (Validator.isEmpty(redirectTo)){
                     redirectTo = appConfig.getHomePageUrl();
                 }
-                window.location.href = redirectTo;
+                // window.location.href = redirectTo;
+                this.router.push(redirectTo);
             } catch (error){
                 console.error(error);
             }

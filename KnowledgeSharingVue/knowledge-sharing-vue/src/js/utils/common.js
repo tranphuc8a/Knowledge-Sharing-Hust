@@ -22,7 +22,14 @@ class Common {
      * @Modified None
      */
     static isValidImage(url) {
+        // Kiểm tra URL có trống không
         if (Validator.isEmpty(url)) return false;
+
+        // Kiểm tra URL có bắt đầu với 'https://' không
+        const isHttps = url.startsWith('https://');
+        if (!isHttps) return false;
+
+        // Kiểm tra URL có phải là hình ảnh hợp lệ không
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => resolve(true);

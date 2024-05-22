@@ -20,12 +20,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         /// <returns></returns>
         /// Created: PhucTV (31/3/24)
         /// Modified: None
-        protected virtual CourseRegister CreateCourseRegister(ViewUser user, ViewCourse course)
+        protected virtual CourseRegister CreateCourseRegister(User user, Course course)
         {
             return new CourseRegister()
             {
                 // Entity:
-                CreatedBy = user.FullName,
+                CreatedBy = user.Username,
                 CreatedTime = DateTime.Now,
                 // CourseRegister:
                 CourseRegisterId = Guid.NewGuid(),
@@ -42,15 +42,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             Guid courseId = relation.CourseId;
             Guid userId = relation.CourseRelationType == ECourseRelationType.Invite ? relation.ReceiverId : relation.SenderId;
 
-            ViewUser? user = await DbContext.ViewUsers.FindAsync(userId);
-            ViewCourse? course = await DbContext.ViewCourses.FindAsync(courseId);
+            User? user = await DbContext.Users.FindAsync(userId);
+            Course? course = await DbContext.Courses.FindAsync(courseId);
             if (user == null || course == null) return 0;
 
             using var transaction = await DbContext.BeginTransaction();
             try
             {
-                // Delete courseRelation
-                DbContext.CourseRelations.Remove(relation);
+                // Delete other relation between user and course:
+                IQueryable<CourseRelation> listRelations = DbContext.CourseRelations
+                    .Where(cre => cre.CourseId == courseId && (cre.SenderId == userId || cre.ReceiverId == userId));
+                DbContext.CourseRelations.RemoveRange(listRelations);
 
                 // Add course register
                 CourseRegister register = CreateCourseRegister(user, course);
@@ -178,16 +180,16 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                         result[id].CourseRelationId = value2.CourseRegisterId;
                         continue;
                     }
-                    if (course.Privacy == EPrivacy.Private)
-                    {
-                        result[id].CourseRoleType = ECourseRoleType.NotAccessible;
-                        result[id].CourseRelationId = null;
-                        continue;
-                    }
                     if (invitedDict.TryGetValue(id, out CourseRelation? relation))
                     {
                         result[id].CourseRoleType = ECourseRoleType.Invited;
                         result[id].CourseRelationId = relation.CourseRelationId;
+                        continue;
+                    }
+                    if (course.Privacy == EPrivacy.Private)
+                    {
+                        result[id].CourseRoleType = ECourseRoleType.NotAccessible;
+                        result[id].CourseRelationId = null;
                         continue;
                     }
                     if (requestingDict.TryGetValue(id, out CourseRelation? relation2))

@@ -26,7 +26,7 @@ export default {
     },
     data(){
         return {
-            userRelationType: null,
+            userRelationType: myEnum.EUserRelationType.Friend,
             getMoreUserCallback: null,
             isMySelf: null,
         }

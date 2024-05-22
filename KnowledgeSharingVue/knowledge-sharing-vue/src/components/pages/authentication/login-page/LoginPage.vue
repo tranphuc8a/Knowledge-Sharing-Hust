@@ -67,6 +67,7 @@ import { UsernameValidator, PasswordValidator, Validator, NotEmptyValidator } fr
 import { Request, PostRequest, GetRequest } from '@/js/services/request';
 import statusCodeEnum from '@/js/resources/status-code-enum';
 import appConfig from '@/app-config';
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'KSLoginPage',
@@ -90,7 +91,8 @@ export default {
                 password: new PasswordValidator(this.getLabel()?.invalidPassword),
                 captcha: new NotEmptyValidator(this.getLabel()?.invalidCaptcha)
             },
-            button: null
+            button: null,
+            router: useRouter(),
         }
     },
     async mounted(){
@@ -342,13 +344,15 @@ export default {
                     throw new Error(msg);
                 }
                 await Request.setTokenToLocalStorage(tokenModel.Token, tokenModel.RefreshToken);
+                await new GetRequest().checkLogedIn();
 
                 let redirectTo = localStorage.getItem("redirect-to");
                 localStorage.setItem("redirect-to", "");
                 if (Validator.isEmpty(redirectTo)){
                     redirectTo = appConfig.getHomePageUrl();
                 }
-                window.location.href = redirectTo;
+                // window.location.href = redirectTo;
+                this.router.push(redirectTo);
             } catch (error){
                 console.error(error);
             }

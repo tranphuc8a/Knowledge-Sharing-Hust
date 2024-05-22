@@ -74,7 +74,7 @@ class MyDate extends Date{
      * @Modified None
      */
     toFormat(format){
-        this.Get
+        // this.Get
         const mappings = {
             yyyy: this.getFullYear(),
             yy: ('' + this.getFullYear()).slice(-2),

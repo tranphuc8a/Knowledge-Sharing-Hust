@@ -83,6 +83,9 @@ export default {
     flex-shrink: 1;
     flex-grow: 2;
 
+    position: sticky;
+    bottom: 0;
+
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;

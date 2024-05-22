@@ -1,6 +1,6 @@
 <template>
     <div class="p-popup-context-container" tabindex="1" 
-        @:click.stop="togglePopup" @:blur="hidePopup">
+        @:click="togglePopup" @:blur="hidePopup">
         <div class="p-popup-context-mask" ref="popup-context-mask">
             <slot name="popupContextMask"></slot>
         </div>
@@ -49,13 +49,19 @@
             },
         },
         methods: {
-            async togglePopup(){
-                // this.isPopupContextVisible = !this.isPopupContextVisible;
-                if (this.isPopupContextVisible){
-                    await this.hidePopup();
-                } else {
-                    await this.showPopup();
+            async togglePopup(event){
+                try {
+                    // this.isPopupContextVisible = !this.isPopupContextVisible;
+                    if (this.isPopupContextVisible){
+                        await this.hidePopup();
+                    } else {
+                        await this.showPopup();
+                    }
+                    event.stopPropagation();
+                } catch (e){
+                    console.error(e);
                 }
+
             },
             async hidePopup(delay) {
                 this.isWaitingToHide = true;

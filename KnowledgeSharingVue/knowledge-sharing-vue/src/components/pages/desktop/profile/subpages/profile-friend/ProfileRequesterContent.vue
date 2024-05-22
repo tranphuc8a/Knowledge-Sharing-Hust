@@ -26,7 +26,7 @@ export default {
     },
     data(){
         return {
-            userRelationType: null,
+            userRelationType: myEnum.EUserRelationType.Requester,
             getMoreUserCallback: null,
             isMySelf: null,
         }
@@ -62,7 +62,7 @@ export default {
                 if (this.registerOnClickSearch != null){
                     this.registerOnClickSearch(this.resolveOnClickSearch.bind(this));
                 }
-                this.userRelationType = myEnum.EUserRelationType.Friend;
+                this.userRelationType = myEnum.EUserRelationType.Requester;
                 
                 // prepare Url
                 let url = "UserRelations/my/requesters/";

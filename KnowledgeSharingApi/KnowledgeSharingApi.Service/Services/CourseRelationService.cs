@@ -125,8 +125,6 @@ namespace KnowledgeSharingApi.Services.Services
             int total = registers.Count;
             registers = CourseRegisterRepository.ApplyPagination(registers, pagination);
 
-            // DecorateResponseResgiterModel (lam sau)
-
             // Return Success
             PaginationResponseModel<ViewCourseRegister> res = new(total, pagination.Limit, pagination.Offset, registers);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(MemberResource), string.Empty, res);
@@ -201,15 +199,21 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 
-        public virtual async Task<ServiceResult> UserGetRegisters(Guid myUid, Guid courseId, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserGetRegisters(Guid? myUid, Guid courseId, PaginationDto pagination)
         {
             // Check course existed
-            _ = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
-            // Check role is owner or member
-            ECourseRoleType roleType = await CourseRelationRepository.GetRole(myUid, courseId);
-            if (roleType == ECourseRoleType.NotAccessible)
-                return ServiceResult.Forbidden(NotAccessibleCourse);
+            if (course.Privacy == EPrivacy.Private)
+            {
+                // Check role is owner, invited or member
+                if (myUid == null) // anonymous --> not accessible
+                    return ServiceResult.Forbidden(NotAccessibleCourse);
+
+                ECourseRoleType roleType = await CourseRelationRepository.GetRole(myUid.Value, courseId);
+                if (roleType != ECourseRoleType.Owner && roleType != ECourseRoleType.Invited && roleType != ECourseRoleType.Member)
+                    return ServiceResult.Forbidden(NotAccessibleCourse);
+            }
 
             // Get lisst register
             List<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
@@ -217,8 +221,6 @@ namespace KnowledgeSharingApi.Services.Services
             // Pagination
             int total = registers.Count;
             registers = CourseRegisterRepository.ApplyPagination(registers, pagination);
-
-            // DecorateResponseResgiterModel (lam sau)
 
             // Return Success
             PaginationResponseModel<ViewCourseRegister> res = new(total, pagination.Limit, pagination.Offset, registers);
@@ -238,6 +240,11 @@ namespace KnowledgeSharingApi.Services.Services
                 {
                     return ServiceResult.Forbidden("Bạn không có quyền truy cập khóa học này");
                 }
+
+                // Return ResponseUseCardModel if focus user
+                // Return ResponseCourseCardModel if focus course
+                // Both have CourseRoleType and CourseRelationId
+
                 if (isFocusCourse == false)
                 {
                     ViewUser user = await UserRepository.CheckExistedUser(myUid, ResponseResource.NotExistUser());
@@ -270,10 +277,10 @@ namespace KnowledgeSharingApi.Services.Services
             // Check myUid is owner
             if (course.UserId != myUid)
             {
-                return ServiceResult.Forbidden("Bạn không phải là chủ khóa học này");
+                return ServiceResult.Forbidden(NotBeCourseOnwner);
             }
 
-            // Get course status
+            // Get course status (tuong tu o tren)
             Dictionary<Guid, CourseRoleTypeDto> dictRole = await CourseRelationRepository.GetCourseRoleType(userId, [courseId]);
             if (dictRole.TryGetValue(userId, out CourseRoleTypeDto? value))
             {
@@ -308,12 +315,13 @@ namespace KnowledgeSharingApi.Services.Services
             // Check course is existed
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
-            // Check Not request yet
-            CourseRelation? beforerequest = await CourseRelationRepository.GetRequest(myUid, courseId);
-            if (beforerequest != null)
-                return ServiceResult.BadRequest("Duplicate request");
+            // Kiem tra khoa hoc la co tinh phi:
+            if (course.IsFree || course.Fee <= 0)
+            {
+                return ServiceResult.BadRequest("Đây là khóa học miễn phí, hãy đăng ký trực tiếp tham gia khóa học");
+            }
 
-            // Check Role is Guest
+            // Check Role is Guest, Accessible, (Not Invited, Not Requested, Not Owner and Not Member, NOt of NotAccessible)
             ECourseRoleType roleType = await CourseRelationRepository.GetRole(myUid, courseId);
             if (roleType == ECourseRoleType.NotAccessible)
                 return ServiceResult.Forbidden(NotAccessibleCourse);
@@ -321,11 +329,15 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.BadRequest("Bạn đã tham gia khóa học này rồi");
             if (roleType == ECourseRoleType.Owner)
                 return ServiceResult.BadRequest("Bạn là chủ của khóa học");
+            if (roleType == ECourseRoleType.Requesting)
+                return ServiceResult.BadRequest("Bạn đã gửi yêu cầu tham gia khóa học trước đó rồi");
+            if (roleType == ECourseRoleType.Invited)
+                return ServiceResult.BadRequest("Hãy xác nhận lời mời tham gia khóa học của chủ khóa học trước");
 
             // Get course owner
-            ViewUser? courseOwner = await UserRepository.GetDetail(course.UserId);
+            User? courseOwner = await UserRepository.Get(course.UserId);
             if (courseOwner == null)
-                return ServiceResult.ServerError("Course owner is null");
+                return ServiceResult.ServerError("Không tìm thấy chủ của khóa học này");
 
             // Add Request
             CourseRelation request = new()
@@ -376,7 +388,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Check owner receiver
             if (courseRelation.ReceiverId != myUid)
-                return ServiceResult.Forbidden("Đây không phải yêu cầu của bạn");
+                return ServiceResult.Forbidden("Đây không phải yêu cầu dành cho bạn");
 
 
             // OK thuc hienj
@@ -384,15 +396,15 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 int effects = await CourseRelationRepository.ConfirmCourseRelation(requestId);
                 if (effects <= 0)
-                    return ServiceResult.ServerError(ResponseResource.DeleteFailure());
+                    return ServiceResult.ServerError(ResponseResource.Failure());
             }
             else
-            { // delete request
-                int deleted = await CourseRelationRepository.Delete(courseRelation.CourseRelationId);
-                if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure());
+            { // tu choi: delete request
+                int deleted = await CourseRelationRepository.Delete(requestId);
+                if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.Failure());
             }
 
-            return ServiceResult.Success(ResponseResource.DeleteSuccess());
+            return ServiceResult.Success(ResponseResource.Success());
         }
 
         #endregion
@@ -415,17 +427,16 @@ namespace KnowledgeSharingApi.Services.Services
             // CHeck userId is existed
             _ = await UserRepository.CheckExisted(userId, ResponseResource.NotExistUser());
 
-            // CHeck not invite yet
-            CourseRelation? beforeInvite = await CourseRelationRepository.GetInvite(userId, courseId);
-            if (beforeInvite != null)
-                return ServiceResult.BadRequest("Bạn đã gửi lời mời trước đó rồi");
-
-            // Check user role is guest or inAccessible
+            // Check user role is guest or inAccessible (Not be owner, not be member, not be requesting, not be invited)
             ECourseRoleType userRoles = await CourseRelationRepository.GetRole(userId, courseId);
             if (userRoles == ECourseRoleType.Member)
                 return ServiceResult.BadRequest("Người dùng đã tham gia khóa học này rồi");
             if (userRoles == ECourseRoleType.Owner)
                 return ServiceResult.BadRequest("Không thể mời chủ khóa học");
+            if (userRoles == ECourseRoleType.Requesting)
+                return ServiceResult.BadRequest("Hãy phê duyệt yêu cầu tham gia khóa học của user này trước");
+            if (userRoles == ECourseRoleType.Invited)
+                return ServiceResult.BadRequest("Người dùng đã được mời tham gia khóa học trước đó");
 
             // OK create new invite and insert
             CourseRelation invite = new()
@@ -490,7 +501,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Check owner receiver
             if (courseRelation.ReceiverId != myUid)
-                return ServiceResult.Forbidden("Đây không phải yêu cầu của bạn");
+                return ServiceResult.Forbidden("Đây không phải lời mời gửi tới bạn");
 
 
             // OK thuc hienj
@@ -498,15 +509,15 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 int effects = await CourseRelationRepository.ConfirmCourseRelation(inviteId);
                 if (effects <= 0)
-                    return ServiceResult.ServerError(ResponseResource.DeleteFailure());
+                    return ServiceResult.ServerError(ResponseResource.Failure());
             }
             else
             { // delete request
                 int deleted = await CourseRelationRepository.Delete(courseRelation.CourseRelationId);
-                if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure());
+                if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.Failure());
             }
 
-            return ServiceResult.Success(ResponseResource.DeleteSuccess());
+            return ServiceResult.Success(ResponseResource.Success());
         }
         #endregion
 
@@ -518,7 +529,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiem tra khoa hoc mien phi, cong khai
             if (!course.IsFree || course.Fee > 0)
-                return ServiceResult.Forbidden("Hãy thanh toán khóa học tính phí này");
+                return ServiceResult.Forbidden("Đây là khóa học có tính phí, hãy thanh toán để tham gia khóa học này");
             if (course.Privacy != EPrivacy.Public)
                 return ServiceResult.Forbidden(NotAccessibleCourse);
 
@@ -530,6 +541,10 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.BadRequest("Bạn đã tham gia khóa học này rồi");
             if (roleType == ECourseRoleType.Owner)
                 return ServiceResult.BadRequest("Bạn là chủ của khóa học");
+            if (roleType == ECourseRoleType.Invited)
+                return ServiceResult.BadRequest("Hãy xác nhận lời mời tham gia khóa học này trước");
+            if (roleType == ECourseRoleType.Requesting)
+                return ServiceResult.BadRequest("Bạn đã gửi yêu cầu tham gia khóa học này trước đó, hãy hủy yêu cầu trước khi đăng ký tham gia lại");
 
             // OK, dang ky user
             CourseRegister courseRegister = new()
@@ -582,7 +597,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Kiem tra role phai la member (lay ve register)
             ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, courseId);
             if (courseRegister == null)
-                return ServiceResult.Forbidden("Bạn không phải là thành viên của khóa học này");
+                return ServiceResult.Forbidden(NotBeCourseMember);
 
             // Delete
             int deleted = await CourseRegisterRepository.Delete(courseRegister.CourseRegisterId);

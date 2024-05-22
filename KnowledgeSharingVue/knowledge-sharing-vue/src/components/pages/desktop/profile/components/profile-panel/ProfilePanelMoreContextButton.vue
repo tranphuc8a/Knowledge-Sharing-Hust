@@ -6,7 +6,7 @@
         <template #popupContextMask>
             <MSecondaryButton
                 :label="null"
-                :onclick="()=>{}"
+                :onclick="null"
                 :buttonStyle="buttonStyle"
                 fa="ellipsis-h" family="fas" :iconStyle="iconStyle"
             />

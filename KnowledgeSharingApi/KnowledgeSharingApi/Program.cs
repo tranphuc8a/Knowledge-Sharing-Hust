@@ -154,7 +154,7 @@ builder.Services.AddScoped<ILessonRepository, LessonMySqlRepository>();
 builder.Services.AddScoped<ICourseRegisterRepository, CourseRegisterMySqlRepository>();
 builder.Services.AddScoped<ICourseRelationRepository, CourseRelationMySqlRepository>();
 builder.Services.AddScoped<ICoursePaymentRepository, CoursePaymentMySqlRepository>();
-builder.Services.AddScoped<IDecorationRepository, SingletonDecorationRepository>();
+builder.Services.AddScoped<IDecorationRepository, DecorationRepository>();
 builder.Services.AddScoped<ICourseLessonRepository, CourseLessonMySqlRepository>();
 builder.Services.AddScoped<IImageRepository, ImageMySqlRepository>();
 builder.Services.AddScoped<IAdministrationRepository, AdministrationRepository>();

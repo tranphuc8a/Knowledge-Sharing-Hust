@@ -8,8 +8,14 @@
         <label>
 
             <div class="p-image-input">
-                <div class="p-image" v-if="data.imgSrc != null">
-                    <img :src="data.imgSrc" alt="image"  />
+                <div class="p-image" v-if="data.imgSrc != null"
+                    :style="{
+                        backgroundImage: 'url(' + data.imgSrc + ')',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat'
+                    }"
+                >
                 </div>
                 <div class="p-image-icon">
                     <MIcon fa="upload" :style="iconStyle" class="p-upload-icon" />
