@@ -97,11 +97,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         [HttpGet("registers/{courseId}")]
-        [CustomAuthorization(Roles: "User, Admin")]
+        [AllowAnonymous]
         public async Task<IActionResult> UserGetRegisters(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
-            return StatusCode(await CourseRelationService.UserGetRegisters(GetCurrentUserIdStrictly(), courseId, pagination));
+            return StatusCode(await CourseRelationService.UserGetRegisters(GetCurrentUserId(), courseId, pagination));
         }
 
 

@@ -6,6 +6,7 @@ import authenticationRouter from '@/js/services/router/authentication-router';
 import homepageRouter from '@/js/services/router/homepage-router';
 import lestionDecreaditRouter from '@/js/services/router/lestion-decreadit-router';
 import profileRouter from '@/js/services/router/profile-router';
+import courseRouter from './router/course-router';
 
 import TestPage from '@/components/pages/test-page/TestPage.vue';
 import HustPage from '@/components/pages/hust-page/HustPage.vue';
@@ -26,7 +27,8 @@ routers = routers.concat(
     authenticationRouter, 
     homepageRouter, 
     lestionDecreaditRouter, 
-    profileRouter
+    profileRouter,
+    courseRouter,
 );
 
 

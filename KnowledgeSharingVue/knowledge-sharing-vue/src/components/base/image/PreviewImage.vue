@@ -16,7 +16,7 @@
 
 
 <script>
-import Common from '@/js/utils/common';
+// import Common from '@/js/utils/common';
 
 export default {
     name: 'PreviewImage',
@@ -40,11 +40,12 @@ export default {
         },
         async refresh(){
             try {
-                this.dSrc = null;
-                if (await Common.isValidImage(this.src)) {
-                    this.dSrc = this.src;
-                    return;
-                }
+                // this.dSrc = null;
+                // if (await Common.isValidImage(this.src)) {
+                //     this.dSrc = this.src;
+                //     return;
+                // }
+                this.dSrc = this.src;
             } catch (e){
                 console.error(e);
             }

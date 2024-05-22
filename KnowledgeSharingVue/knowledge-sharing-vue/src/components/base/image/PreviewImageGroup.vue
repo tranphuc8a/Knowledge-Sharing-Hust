@@ -21,7 +21,7 @@
 
 
 <script>
-import Common from '@/js/utils/common';
+// import Common from '@/js/utils/common';
 
 export default {
     name: 'PreviewImageGroup',
@@ -53,12 +53,12 @@ export default {
 
         async refresh(){
             try {
-                this.dSrcs = [];
-                let awaitAll = await Promise.all(this.srcs.map(src => Common.isValidImage(src)));
-                this.dSrcs = this.srcs.map((src, index) => {
-                    return awaitAll[index] ? src : null;
-                    // return awaitAll[index] ? null : null;
-                }).filter(src => src !== null);
+                this.dSrcs = this.srcs;
+                // let awaitAll = await Promise.all(this.srcs.map(src => Common.isValidImage(src)));
+                // this.dSrcs = this.srcs.map((src, index) => {
+                //     return awaitAll[index] ? src : null;
+                //     // return awaitAll[index] ? null : null;
+                // }).filter(src => src !== null);
             } catch (e){
                 console.error(e);
             }
