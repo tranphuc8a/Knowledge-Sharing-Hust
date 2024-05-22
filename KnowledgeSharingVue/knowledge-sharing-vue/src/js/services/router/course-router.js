@@ -1,5 +1,7 @@
 
-import CoursePage from "@/components/pages/desktop/course/CoursePage.vue"
+import CoursePage from "@/components/pages/desktop/course/CoursePage.vue";
+
+import CourseIntroductionSubpage from "@/components/pages/desktop/course/subpages/course-introduction/CourseIntroductionSubpage.vue";
 
 
 export default [
@@ -14,12 +16,12 @@ export default [
             {
                 path: '',
                 name: 'course-home-page',
-                component: null,
+                component: CourseIntroductionSubpage,
             },
             {
                 path: 'introduction',
                 name: 'course-introduction-page',
-                component: null,
+                component: CourseIntroductionSubpage,
             },
             {
                 path: 'lesson',

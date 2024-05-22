@@ -219,6 +219,18 @@ export default {
 
 </script>
 
+
+<style>
+
+.p-course .p-course-subpage{
+    max-width: var(--course-page-max-width);
+    width: 100%;
+    height: fit-content;
+}
+
+</style>
+
+
 <style scoped>
 .d-content.p-course{
     padding-top: 0;
