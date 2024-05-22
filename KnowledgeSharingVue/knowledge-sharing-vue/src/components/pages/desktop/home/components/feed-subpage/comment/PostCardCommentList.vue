@@ -193,11 +193,12 @@ export default {
         },
 
         resolveDeletedComment(comment){
+            let that = this;
             return async function(){
                 try {
-                    let index = this.listComments.indexOf(comment);
+                    let index = that.listComments.indexOf(comment);
                     if (index >= 0){
-                        this.listComments.splice(index, 1);
+                        that.listComments.splice(index, 1);
                     }
                 } catch (e) {
                     console.error(e);

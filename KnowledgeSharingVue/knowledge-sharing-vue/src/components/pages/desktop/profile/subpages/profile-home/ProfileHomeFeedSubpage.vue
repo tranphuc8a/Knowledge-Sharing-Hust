@@ -99,7 +99,7 @@ export default {
                 let scrollPosition = clientHeight + scrollTop;
                 // console.log("scrollTop: " + scrollTop + " scrollHeight: " + scrollHeight + " clientHeight: " + clientHeight);
                 let averagePostHeight = 800;
-                let leftPostNumber = 2;
+                let leftPostNumber = 5;
 
                 if (scrollHeight - scrollPosition < averagePostHeight * leftPostNumber){
                     // console.log("Load more post");

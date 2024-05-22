@@ -41,6 +41,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 {
                     comment.ReplyId = null;
                 }
+                int rows1 = await DbContext.SaveChangesAsync();
 
                 // Xóa comment
                 var commentToDelete = await DbContext.Comments.FindAsync(commentId);
@@ -49,7 +50,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     DbContext.Comments.Remove(commentToDelete);
                 }
 
-                int affectedRows = await DbContext.SaveChangesAsync();
+                int affectedRows = rows1 + await DbContext.SaveChangesAsync();
 
                 // Commit and return affected rows
                 await transaction.CommitAsync();

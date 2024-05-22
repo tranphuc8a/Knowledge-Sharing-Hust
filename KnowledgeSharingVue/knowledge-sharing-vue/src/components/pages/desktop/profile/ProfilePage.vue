@@ -207,6 +207,9 @@ export default {
         },
         '$route.params.username'(){
             this.navigateNewUser();
+        },
+        '$route.fullPath'() {
+            this.handlers = [];
         }
     },
     inject: {
