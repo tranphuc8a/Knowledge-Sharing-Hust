@@ -42,7 +42,7 @@
 
 <script>
 import MTextfield from './../../base/inputs/MTextfield.vue';
-import StringAlgorithm from '@/js/utils/string-algorithm';
+// import StringAlgorithm from '@/js/utils/string-algorithm';
 
 export default {
     name: 'StringSimiliarityPage',
@@ -68,6 +68,7 @@ export default {
                 let btextfield = this.$refs['b-textfield'];
                 let atext = await atextfield.getValue();
                 let btext = await btextfield.getValue();
+                console.log(atext + "  " + btext);
                 
             } catch (e){
                 console.error(e);
