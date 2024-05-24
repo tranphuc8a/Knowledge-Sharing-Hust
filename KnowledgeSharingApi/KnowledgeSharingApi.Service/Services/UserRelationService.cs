@@ -34,8 +34,8 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IUserRepository UserRepository = userRepository;
         protected readonly IUnitOfWork UnitOfWork = unitOfWork;
         protected readonly int DefaultLimit = 50;
-       
-        
+
+
         #region Functional methods
 
         /// <summary>
@@ -128,7 +128,8 @@ namespace KnowledgeSharingApi.Services.Services
                     FullName = isActive ? fri.ReceiverName : fri.SenderName,
                     Avatar = isActive ? fri.ReceiverAvatar : fri.SenderAvatar,
                     Time = fri.Time,
-                    IsActive = isActive
+                    IsActive = isActive,
+                    UserRelationType = EUserRelationType.Friend
                 };
                 return res;
             }).ToList();
@@ -147,11 +148,32 @@ namespace KnowledgeSharingApi.Services.Services
         /// Modified: None
         protected virtual async Task<List<ResponseFriendCardModel>> GetAllRelations(Guid userId, EUserRelationType relationType, bool isActive)
         {
+            EUserRelationType responseUserRelationType = relationType;
+            if (relationType == EUserRelationType.Block)
+            {
+                responseUserRelationType = isActive ? EUserRelationType.Blocker : EUserRelationType.Blockee;
+            }
+            else if (relationType == EUserRelationType.Follow)
+            {
+                responseUserRelationType = isActive ? EUserRelationType.Follower : EUserRelationType.Followee;
+            }
+            else if (relationType == EUserRelationType.FriendRequest)
+            {
+                responseUserRelationType = isActive ? EUserRelationType.Requester : EUserRelationType.Requestee;
+            }
+
             // Lấy danh sách quan hệ relationType của uid
             List<ViewUserRelation> ls1 = await UserRelationRepository.GetByUserIdAndType(userId, isActive: isActive, relationType);
             List<ResponseFriendCardModel> lsRelation = [.. ls1.Select(
                 relation => new ResponseFriendCardModel()
                 {
+                    // Entity
+                    CreatedBy = relation.CreatedBy,
+                    CreatedTime = relation.CreatedTime,
+                    ModifiedBy = relation.ModifiedBy,
+                    ModifiedTime = relation.ModifiedTime,
+
+                    // Friend
                     FriendId = relation.UserRelationId,
                     UserId = isActive ? relation.ReceiverId : relation.SenderId,
                     Email = isActive ? relation.ReceiverEmail : relation.SenderEmail,
@@ -160,18 +182,16 @@ namespace KnowledgeSharingApi.Services.Services
                     Avatar = isActive ? relation.ReceiverAvatar : relation.SenderAvatar,
                     Time = relation.Time,
                     IsActive = isActive,
-                    CreatedBy = relation.CreatedBy,
-                    CreatedTime = relation.CreatedTime,
-                    ModifiedBy = relation.ModifiedBy,
-                    ModifiedTime = relation.ModifiedTime
+                    UserRelationType = responseUserRelationType
+
                 }
             ).OrderByDescending(relation => relation.Time)];
             return lsRelation;
         }
 
         #endregion
-        
-        
+
+
         public virtual async Task<ServiceResult> GetFriends(Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user id tồn tại

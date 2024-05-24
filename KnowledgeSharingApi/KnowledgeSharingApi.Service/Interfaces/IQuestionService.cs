@@ -19,5 +19,17 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         Task<ServiceResult> ConfirmQuestion(Guid myUid, Guid questionId, bool isConfirm);
+
+        /// <summary>
+        /// User tim kiem bai thao luan trong khoa hoc
+        /// </summary>
+        /// <param name="myUid"> id cua user thuc hien  </param>
+        /// <param name="courseId"> id cua khoa hoc can lay </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <param name="pagination"> thuoc tinh phan trang </param>
+        /// <returns></returns>
+        /// Created PhucTV (23/5/24)
+        /// Modified None
+        Task<ServiceResult> UserSearchQuestionOfCourse(Guid myUid, Guid courseId, string? search, PaginationDto pagination);
     }
 }

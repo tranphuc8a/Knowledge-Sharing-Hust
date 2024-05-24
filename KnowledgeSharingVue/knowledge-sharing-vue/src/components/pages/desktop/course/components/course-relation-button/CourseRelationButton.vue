@@ -2,8 +2,8 @@
 
 <template>
     <div class="p-course-relation-button" v-if="isShow">
-        <OwnerOrientedCrb v-if="dCourseRoleType == eCourseRoleType.Owner" />
-        <UserOrientedCrb v-else-if="dUser != null" />
+        <UserOrientedCrb v-if="dUser != null" />
+        <OwnerOrientedCrb v-else-if="dCourseRoleType == eCourseRoleType.Owner" />
         <CourseOrientedCrb v-else />
     </div>
 </template>

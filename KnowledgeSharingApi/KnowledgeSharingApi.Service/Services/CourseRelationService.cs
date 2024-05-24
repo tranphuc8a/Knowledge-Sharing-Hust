@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Enums;
+﻿using KnowledgeSharingApi.Domains.Algorithms;
+using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
@@ -8,6 +9,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepo
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Win32;
 using Org.BouncyCastle.Asn1.Cmp;
 using Org.BouncyCastle.Asn1.Ocsp;
 using System;
@@ -22,6 +24,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         protected readonly IUserRepository UserRepository;
         protected readonly IDecorationRepository DecorationRepository;
+        protected readonly ICalculateKnowledgeSearchScore CalculateKnowledgeSearchScore;
         protected readonly ICourseRepository CourseRepository;
         protected readonly ICourseRelationRepository CourseRelationRepository;
         protected readonly ICoursePaymentRepository CoursePaymentRepository;
@@ -38,6 +41,7 @@ namespace KnowledgeSharingApi.Services.Services
             IResourceFactory resourceFactory,
             IUserRepository userRepository,
             ICourseRelationRepository courseRelationRepository,
+            ICalculateKnowledgeSearchScore calculateKnowledgeSearchScore,
             ICoursePaymentRepository coursePaymentRepository,
             ICourseRegisterRepository courseRegisterRepository,
             IDecorationRepository decorationRepository,
@@ -51,6 +55,7 @@ namespace KnowledgeSharingApi.Services.Services
             UserRepository = userRepository;
             CourseRepository = courseRepository;
             CourseRelationRepository = courseRelationRepository;
+            CalculateKnowledgeSearchScore = calculateKnowledgeSearchScore;
             CoursePaymentRepository = coursePaymentRepository;
             CourseRegisterRepository = courseRegisterRepository;
             DecorationRepository = decorationRepository;
@@ -126,7 +131,11 @@ namespace KnowledgeSharingApi.Services.Services
             registers = CourseRegisterRepository.ApplyPagination(registers, pagination);
 
             // Return Success
-            PaginationResponseModel<ViewCourseRegister> res = new(total, pagination.Limit, pagination.Offset, registers);
+            PaginationResponseModel<ResponseCourseRegisterModel> res = new(
+                total, 
+                pagination.Limit, 
+                pagination.Offset,
+                await DecorationRepository.DecorateResponseCourseRegisterModel(null, registers));
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(MemberResource), string.Empty, res);
         }
         #endregion
@@ -223,7 +232,12 @@ namespace KnowledgeSharingApi.Services.Services
             registers = CourseRegisterRepository.ApplyPagination(registers, pagination);
 
             // Return Success
-            PaginationResponseModel<ViewCourseRegister> res = new(total, pagination.Limit, pagination.Offset, registers);
+            PaginationResponseModel<ResponseCourseRegisterModel> res = new(
+                total,
+                pagination.Limit,
+                pagination.Offset,
+                await DecorationRepository.DecorateResponseCourseRegisterModel(myUid, registers));
+
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(MemberResource), string.Empty, res);
         }
 
@@ -268,7 +282,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.ServerError(ResponseResource.GetFailure());
         }
 
-        public async Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid userId, Guid courseId, bool? isFocusCourse = true)
+        public virtual async Task<ServiceResult> UserGetCourseRelationStatus(Guid myUid, Guid userId, Guid courseId, bool? isFocusCourse = true)
         {
             // Check userid and courseid existed
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
@@ -471,7 +485,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Bỏ không làm vì quá phức tạp
 
-            throw new NotImplementedException();
+            return ServiceResult.ServerError("This api is not be supported");
         }
 
         public virtual async Task<ServiceResult> UserDeleteCourseInvite(Guid myUid, Guid inviteId)
@@ -608,6 +622,198 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
         #endregion
+
+        #endregion
+
+
+        #region Search APIs
+
+        public virtual async Task<ServiceResult> UserSearchRegisters(Guid? myUid, Guid courseId, string? search, PaginationDto page)
+        {
+            if (string.IsNullOrEmpty(search)) return ServiceResult.BadRequest("Từ khóa tìm kiếm rỗng");
+
+            // check course existed
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
+
+            // check if course is private then Uid must join or be owner of course
+            if (course.Privacy == EPrivacy.Private)
+            {
+                // Check role is owner, invited or member
+                if (myUid == null) // anonymous --> not accessible
+                    return ServiceResult.Forbidden(NotAccessibleCourse);
+
+                ECourseRoleType roleType = await CourseRelationRepository.GetRole(myUid.Value, courseId);
+                if (roleType != ECourseRoleType.Owner && roleType != ECourseRoleType.Invited && roleType != ECourseRoleType.Member)
+                    return ServiceResult.Forbidden(NotAccessibleCourse);
+            }
+
+            // Get list register 
+            List<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
+
+            // Calculate score --> search by user: FullName.6, Username.4
+            search = search.ToLower();
+            double fullnameWeight = 0.6, usernameWeight = 0.4;
+            Dictionary<string, double> fullnameScore = Algorithm.SimilarityList(search, registers.Select(r => r.FullName).ToList());
+            Dictionary<string, double> usernameScore = Algorithm.SimilarityList(search, registers.Select(r => r.Username).ToList());
+            Dictionary<Guid, double> scored = registers.ToDictionary(
+                r => r.CourseRegisterId,
+                r => fullnameWeight * fullnameScore[r.FullName] + usernameWeight * usernameScore[r.Username]
+            );
+
+            // Order and apply pagination
+            registers = [.. registers.OrderByDescending(r => scored[r.CourseRegisterId])];
+            if (page.Filters != null)
+            {
+                registers = CourseRegisterRepository.ApplyFilter(registers, page.Filters);
+            }
+            registers = registers.Skip(page.Offset ?? 0).Take(page.Limit ?? 15).ToList();
+
+            // return success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, 
+                await DecorationRepository.DecorateResponseCourseRegisterModel(myUid, registers)
+                );
+        }
+
+        public virtual async Task<ServiceResult> UserSearchCourseInvites(Guid myUid, Guid courseId, string? search, PaginationDto page)
+        {
+            if (string.IsNullOrWhiteSpace(search)) return ServiceResult.BadRequest("Từ khóa tìm kiếm rỗng");
+            search = search.ToLower();
+
+            // check course existed and user must be owner of course
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
+            if (course.UserId != myUid)
+                return ServiceResult.Forbidden(NotBeCourseOnwner);
+
+            // get list invite of course
+            List<CourseRelation> relations = await CourseRelationRepository.GetRelationsOfCourse(courseId, ECourseRelationType.Invite);
+            List<ResponseCourseRelationModel> responseCourseRelationModels = await DecorationRepository
+                .DecorateResponseCourseRelationModel(myUid, relations, ECourseRelationType.Invite, isDecorateCourse: false, isDecorateUser: true);
+
+            // calculate score --> search by user
+            double fullnameWeight = 0.6, usernameWeight = 0.4;
+            Dictionary<string, double> fullnameScore = Algorithm.SimilarityList(search, responseCourseRelationModels
+                .Select(r => r.User?.FullName ?? string.Empty).ToList());
+            Dictionary<string, double> usernameScore = Algorithm.SimilarityList(search, responseCourseRelationModels
+                .Select(r => r.User?.Username ?? string.Empty).ToList());
+            Dictionary<Guid, double> scored = responseCourseRelationModels.ToDictionary(
+                r => r.CourseRelationId,
+                r => fullnameWeight * fullnameScore[r.User?.FullName ?? string.Empty]
+                    + usernameWeight * usernameScore[r.User?.Username ?? string.Empty]
+            );
+
+            // order and apply pagination
+            responseCourseRelationModels = [.. responseCourseRelationModels.OrderByDescending(r => scored[r.CourseRelationId])];
+            if (page.Filters != null)
+            {
+                responseCourseRelationModels = CourseRegisterRepository.ApplyFilter(responseCourseRelationModels, page.Filters);
+            }
+            responseCourseRelationModels = responseCourseRelationModels.Skip(page.Offset ?? 0).Take(page.Limit ?? 15).ToList();
+
+            // success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, responseCourseRelationModels);
+        }
+
+        public virtual async Task<ServiceResult> UserSearchCourseRequests(Guid myUid, Guid courseId, string? search, PaginationDto page)
+        {
+            if (string.IsNullOrWhiteSpace(search)) return ServiceResult.BadRequest("Từ khóa tìm kiếm rỗng");
+            search = search.ToLower();
+
+            // check course existed and user must be owner of course
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
+            if (course.UserId != myUid)
+                return ServiceResult.Forbidden(NotBeCourseOnwner);
+
+            // get list request of course 
+            List<CourseRelation> relations = await CourseRelationRepository.GetRelationsOfCourse(courseId, ECourseRelationType.Request);
+            List<ResponseCourseRelationModel> responseCourseRelationModels = await DecorationRepository
+                .DecorateResponseCourseRelationModel(myUid, relations, ECourseRelationType.Request, isDecorateCourse: false, isDecorateUser: true);
+
+            // calculate score --> search by user
+            double fullnameWeight = 0.6, usernameWeight = 0.4;
+            Dictionary<string, double> fullnameScore = Algorithm.SimilarityList(search, responseCourseRelationModels
+                .Select(r => r.User?.FullName ?? string.Empty).ToList());
+            Dictionary<string, double> usernameScore = Algorithm.SimilarityList(search, responseCourseRelationModels
+                .Select(r => r.User?.Username ?? string.Empty).ToList());
+            Dictionary<Guid, double> scored = responseCourseRelationModels.ToDictionary(
+                r => r.CourseRelationId,
+                r => fullnameWeight * fullnameScore[r.User?.FullName ?? string.Empty]
+                    + usernameWeight * usernameScore[r.User?.Username ?? string.Empty]
+            );
+
+            // order and apply pagination
+            responseCourseRelationModels = [.. responseCourseRelationModels.OrderByDescending(r => scored[r.CourseRelationId])];
+            if (page.Filters != null)
+            {
+                responseCourseRelationModels = CourseRegisterRepository.ApplyFilter(responseCourseRelationModels, page.Filters);
+            }
+            responseCourseRelationModels = responseCourseRelationModels.Skip(page.Offset ?? 0).Take(page.Limit ?? 15).ToList();
+
+            // success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, responseCourseRelationModels);
+        }
+
+        public virtual async Task<ServiceResult> UserSearchMyCourseInvites(Guid myUid, string? search, PaginationDto page)
+        {
+            if (string.IsNullOrWhiteSpace(search)) return ServiceResult.BadRequest("Từ khóa tìm kiếm rỗng");
+            search = search.ToLower();
+
+            // get list invite to myUid
+            List<CourseRelation> lisRelations = await CourseRelationRepository.GetRelationsOfUser(myUid, ECourseRelationType.Invite);
+            List<ResponseCourseRelationModel> models = await DecorationRepository
+                .DecorateResponseCourseRelationModel(myUid, lisRelations, ECourseRelationType.Invite, isDecorateCourse: true, isDecorateUser: false);
+
+            // calculate score --> search by course (title .4, owner fullname .3, content .2, abstract .1)
+            List<(Guid, string, string, string, string?)> shortKnowledge = models.Select(
+                    model => (model.CourseRelationId,
+                            model.Course?.Title ?? string.Empty,
+                            model.Course?.FullName ?? string.Empty,
+                            model.Course?.Introduction ?? string.Empty,
+                            model.Course?.Abstract)
+                ).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, shortKnowledge);
+
+            // order and apply pagination
+            models = [.. models.OrderByDescending(m => scored[m.CourseRelationId])];
+            if (page.Filters != null)
+            {
+                models = CourseRegisterRepository.ApplyFilter(models, page.Filters);
+            }
+            models = models.Skip(page.Offset ?? 0).Take(page.Limit ?? 15).ToList();
+
+            // success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, models);
+        }
+
+        public virtual async Task<ServiceResult> UserSearchMyCourseRequests(Guid myUid, string? search, PaginationDto page)
+        {
+            if (string.IsNullOrWhiteSpace(search)) return ServiceResult.BadRequest("Từ khóa tìm kiếm rỗng");
+            search = search.ToLower();
+
+            // get list request of myUid
+            List<CourseRelation> lisRelations = await CourseRelationRepository.GetRelationsOfUser(myUid, ECourseRelationType.Request);
+            List<ResponseCourseRelationModel> models = await DecorationRepository
+                .DecorateResponseCourseRelationModel(myUid, lisRelations, ECourseRelationType.Request, isDecorateCourse: true, isDecorateUser: false);
+
+            // calculate score --> search by course
+            List<(Guid, string, string, string, string?)> shortKnowledge = models.Select(
+                    model => (model.CourseRelationId,
+                            model.Course?.Title ?? string.Empty,
+                            model.Course?.FullName ?? string.Empty,
+                            model.Course?.Introduction ?? string.Empty,
+                            model.Course?.Abstract)
+                ).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, shortKnowledge);
+
+            models = [.. models.OrderByDescending(m => scored[m.CourseRelationId])];
+            if (page.Filters != null)
+            {
+                models = CourseRegisterRepository.ApplyFilter(models, page.Filters);
+            }
+            models = models.Skip(page.Offset ?? 0).Take(page.Limit ?? 15).ToList();
+
+            // success
+            return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, models);
+        }
 
         #endregion
     }

@@ -323,14 +323,17 @@ namespace KnowledgeSharingApi.Services.Services
         #region User Gets
         public virtual async Task<ServiceResult> UserGetListPostsOfCourse(Guid myUid, Guid courseId, PaginationDto pagination)
         {
-            // Kiểm tra course tồn tại và user phải tham gia course
-            _ = await CourseRepository.CheckExisted(courseId,
+            // Kiểm tra course tồn tại và user phải tham gia course hoac la chu nhan cua course
+            Course course = await CourseRepository.CheckExisted(courseId,
                    ResponseResource.NotExist(EntityResource.Course()));
 
-            // Kiểm tra user đã join course hay chưa
-            ViewCourseRegister? registerCourse = await CourseRepository.GetViewCourseRegister(myUid, courseId);
-            if (registerCourse == null)
-                return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
+            // Kiểm tra user co la chu nhan cua course hoac đã join course hay chưa
+            if (course.UserId != myUid)
+            {
+                ViewCourseRegister? registerCourse = await CourseRepository.GetViewCourseRegister(myUid, courseId);
+                if (registerCourse == null)
+                    return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
+            }
 
             // Lấy về danh sách câu hỏi trong course
             List<ViewQuestion> questions = await QuestionRepository.GetQuestionInCourse(courseId);
@@ -338,6 +341,43 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Trả về thành công
             return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty, 
+                await DecorationRepository.DecorateResponseQuestionModel(myUid, questions));
+        }
+
+        public virtual async Task<ServiceResult> UserSearchQuestionOfCourse(Guid myUid, Guid courseId, string? search, PaginationDto pagination)
+        {
+            if (string.IsNullOrEmpty(search))
+                return ServiceResult.BadRequest("Từ khóa tìm kiếm rỗng");
+
+            // Kiểm tra course tồn tại và user phải tham gia course hoac la chu nhan cua course
+            Course course = await CourseRepository.CheckExisted(courseId,
+                   ResponseResource.NotExist(EntityResource.Course()));
+
+            // Kiểm tra user co la chu nhan cua course hoac đã join course hay chưa
+            if (course.UserId != myUid)
+            {
+                ViewCourseRegister? registerCourse = await CourseRepository.GetViewCourseRegister(myUid, courseId);
+                if (registerCourse == null)
+                    return ServiceResult.Forbidden("Bạn chưa đăng ký tham gia khóa học này");
+            }
+
+            // Lấy về danh sách câu hỏi trong course
+            List<ViewQuestion> questions = await QuestionRepository.GetQuestionInCourse(courseId);
+
+            // Tinh diem score qua search
+            search = search.ToLower();
+            List<(Guid, string, string, string, string?)> listShortPost = questions
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+
+            // order by score
+            questions = [.. questions.OrderByDescending(p => scored[p.UserItemId])];
+
+            // Pagination
+            questions = QuestionRepository.ApplyPagination(questions, pagination);
+
+            // Trả về thành công
+            return ServiceResult.Success(GetMultiQuestionSuccess, string.Empty,
                 await DecorationRepository.DecorateResponseQuestionModel(myUid, questions));
         }
 

@@ -74,7 +74,7 @@ namespace KnowledgeSharingApi.Services.Services
                 Limit = pagination.Limit,
                 Offset = pagination.Offset,
                 Results = await DecorationRepository
-                    .DecorateResponseStarModel(listStars, isDecorateUser: true, isDecorateItem: false)
+                    .DecorateResponseStarModel(null, listStars, isDecorateUser: true, isDecorateItem: false)
             };
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(StarResourcse), string.Empty, res);
         }
@@ -216,7 +216,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // DecorateResponseLessonModel
             List<ResponseStarModel> res = await DecorationRepository
-                .DecorateResponseStarModel(listStars, isDecorateUser: false, isDecorateItem: true);
+                .DecorateResponseStarModel(myUid, listStars, isDecorateUser: false, isDecorateItem: true);
 
             // Return Response
             PaginationResponseModel<ResponseStarModel> pageRes = new(total, pagination.Limit, pagination.Offset, res);

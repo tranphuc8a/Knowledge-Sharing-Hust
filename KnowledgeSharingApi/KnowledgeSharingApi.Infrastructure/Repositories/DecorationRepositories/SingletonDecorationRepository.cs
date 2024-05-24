@@ -359,7 +359,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             );
             return mapUsers;
         }
-        public virtual async Task<List<ResponseStarModel>> DecorateResponseStarModel(List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
+        public virtual async Task<List<ResponseStarModel>> DecorateResponseStarModel(Guid? myUid, List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
         {
             Dictionary<Guid, ResponseUserCardModel?> mapUsers = [];
             Dictionary<Guid, IResponseUserItemModel?> mapItems = [];
@@ -437,6 +437,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             var decoratePromise = DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
             await decoratePromise;
             return res;
+        }
+
+        public Task<List<ResponseCourseRegisterModel>> DecorateResponseCourseRegisterModel(Guid? myUid, List<ViewCourseRegister> registers)
+        {
+            throw new NotImplementedException();
         }
     }
 }

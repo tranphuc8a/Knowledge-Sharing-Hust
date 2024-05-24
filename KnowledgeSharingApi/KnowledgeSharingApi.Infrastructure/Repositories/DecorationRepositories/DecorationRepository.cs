@@ -313,7 +313,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
                 {
                     userIds = relations.Select(r => r.SenderId).ToList();
                 }
-                dictUser = await GetMapUserCard(userIds);
+                dictUser = await GetMapUserCard(myUid, userIds);
             }
             if (isDecorateCourse)
             {
@@ -352,7 +352,31 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             return await Task.FromResult(res);
         }
 
-        protected virtual async Task<Dictionary<Guid, ResponseUserCardModel?>> GetMapUserCard(List<Guid> userIds)
+        public virtual async Task<List<ResponseCourseRegisterModel>> DecorateResponseCourseRegisterModel(Guid? myUid, List<ViewCourseRegister> registers)
+        {
+            List<ResponseCourseRegisterModel> res = registers.Select(r =>
+            {
+                ResponseCourseRegisterModel cr = new();
+                cr.Copy(r);
+                return cr;
+            }).ToList();
+            if (myUid != null)
+            {
+                Dictionary<Guid, UserRelationTypeDto> listUserType = await UserRelationRepository
+                    .GetDetailUserRelationType(myUid.Value, registers.Select(r => r.UserId).ToList());
+                foreach (var item in res)
+                {
+                    if (listUserType.TryGetValue(item.UserId, out UserRelationTypeDto? userType))
+                    {
+                        item.UserRelationId = userType.UserRelationId;
+                        item.UserRelationType = userType.UserRelationType;
+                    }
+                }
+            }
+            return res;
+        }
+
+        protected virtual async Task<Dictionary<Guid, ResponseUserCardModel?>> GetMapUserCard(Guid? myUid, List<Guid> userIds)
         {
             Dictionary<Guid, ResponseUserCardModel?> mapUsers = [];
             Dictionary<Guid, ViewUser?> listUsers = await UserRepository
@@ -368,9 +392,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
                     return resUser;
                 }
             );
+            await DecorateResponseUserCardModel(myUid, mapUsers
+                .Where(item => item.Value != null).Select(item => item.Value!).ToList());
             return mapUsers;
         }
-        public virtual async Task<List<ResponseStarModel>> DecorateResponseStarModel(List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
+        public virtual async Task<List<ResponseStarModel>> DecorateResponseStarModel(Guid? myUid, List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
         {
             Dictionary<Guid, ResponseUserCardModel?> mapUsers = [];
             Dictionary<Guid, IResponseUserItemModel?> mapItems = [];
@@ -380,7 +406,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             if (isDecorateUser)
             {
                 // Get Dictionary <userid, ViewUser -> ResponseUserCardModel>
-                mapUserPromise = GetMapUserCard(listStars.Select(st => st.UserId).ToList());
+                mapUserPromise = GetMapUserCard(myUid, listStars.Select(st => st.UserId).ToList());
             }
             mapUsers = await mapUserPromise;
             if (isDecorateItem)

@@ -2,6 +2,11 @@
 import CoursePage from "@/components/pages/desktop/course/CoursePage.vue";
 
 import CourseIntroductionSubpage from "@/components/pages/desktop/course/subpages/course-introduction/CourseIntroductionSubpage.vue";
+import CourseRevitationSubpage from "@/components/pages/desktop/course/subpages/course-revitation/CourseRevitationSubpage.vue";
+
+import CourseRequestContent from "@/components/pages/desktop/course/subpages/course-revitation/CourseRequestContent.vue";
+import CourseInviteContent from "@/components/pages/desktop/course/subpages/course-revitation/CourseInviteContent.vue";
+import CourseMemberContent from "@/components/pages/desktop/course/subpages/course-revitation/CourseMemberContent.vue";
 
 
 export default [
@@ -41,7 +46,24 @@ export default [
             {
                 path: 'revite',
                 name: 'course-request-invite-page',
-                component: null,
+                component: CourseRevitationSubpage,
+                children: [
+                    {
+                        path: 'request',
+                        name: 'course-revite-request-page',
+                        component: CourseRequestContent,
+                    },
+                    {
+                        path: 'invite',
+                        name: 'course-revite-invite-page',
+                        component: CourseInviteContent,
+                    },
+                    {
+                        path: 'member',
+                        name: 'course-revite-member-page',
+                        component: CourseMemberContent,
+                    },
+                ]
             },
             {
                 path: 'payment',

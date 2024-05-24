@@ -17,7 +17,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             // init Weight:
             search = search.ToLower();
-            double titleWeight = 0.4, fullnameWeight = 0.25, contentWeight = 0.2, abstractWeight = 0.15;
+            double titleWeight = 0.4, fullnameWeight = 0.3, contentWeight = 0.2, abstractWeight = 0.1;
 
             // init list Items:
             Dictionary<Guid, string> markdownConverted = listKnowledges.ToDictionary(
