@@ -3,8 +3,8 @@
         <TooltipFrame>
             <template #tooltipMask>
                 <div class="p-visual-privacy-mask">
-                    <MIcon v-if="isPrivate()" fa="lock" :style="iconStyle"/>
-                    <MIcon v-else fa="globe-americas" :style="iconStyle"/>
+                    <MIcon v-if="isPrivate()" fa="lock" :style="dIconStyle"/>
+                    <MIcon v-else fa="globe-americas" :style="dIconStyle"/>
                 </div>
             </template>
             <template #tooltipContent>
@@ -24,9 +24,10 @@ export default {
     name: 'VisualizedDatetime',
     data() {
         return {
-            iconStyle: {
+            dIconStyle: {
                 color: 'var(--primary-color)',
-                fontSize: '12px'
+                fontSize: '12px',
+                ...this.iconStyle
             }
         }
     },
@@ -39,6 +40,7 @@ export default {
         privacy: {
             required: true,
         },
+        iconStyle: {}
     },
     methods: {
 

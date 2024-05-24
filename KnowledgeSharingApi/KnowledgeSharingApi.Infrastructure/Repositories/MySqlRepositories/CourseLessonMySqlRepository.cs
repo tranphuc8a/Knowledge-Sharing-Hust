@@ -144,10 +144,12 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             // Chuan bi update
             DateTime now = DateTime.Now;
             string modifiedBy = "Knowledge Sharing Admin";
-            Dictionary<Guid, UpdateLessonInCourseModel> mapGuidToUpdate = model.ToDictionary(
-                item => item.ParticipantId!.Value,
-                item => item
-            );
+            Dictionary<Guid, UpdateLessonInCourseModel> mapGuidToUpdate = model
+                .GroupBy(item => item.ParticipantId!.Value)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.First()
+                );
 
             // Update:
             foreach (CourseLesson cl in courseLessons)

@@ -146,6 +146,8 @@ export default {
                     let user = new ResponseUserCardModel().copy(item);
                     user.CourseRoleType = myEnum.ECourseRoleType.Member;
                     user.CourseRelationId = item.CourseRegisterId;
+
+                    return user;
                 });
 
                 let courseRoleType = this.courseRoleType;
@@ -168,8 +170,6 @@ export default {
         }
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
         registerScrollHandler: {}
     },
     provide(){

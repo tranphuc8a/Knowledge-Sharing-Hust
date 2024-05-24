@@ -109,7 +109,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 )
             );
 
-            var result = knowledgeIds.ToDictionary(
+            var result = knowledgeIds.Distinct().ToDictionary(
                 id => id,
                 id =>
                 {
@@ -181,7 +181,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 )
             );
 
-            var result = commentIds.ToDictionary(
+            var result = commentIds.Distinct().ToDictionary(
                 id => id,
                 id =>
                 {

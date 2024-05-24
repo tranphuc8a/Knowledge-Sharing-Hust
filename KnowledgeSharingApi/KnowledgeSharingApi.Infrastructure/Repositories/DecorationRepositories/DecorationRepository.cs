@@ -136,7 +136,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             Dictionary<Guid, IResponseCourseModel?> mapCourse = [];
             List<ViewCourse> courses = await DbContext.ViewCourses.Where(c => courseIds.Contains(c.UserItemId)).ToListAsync();
             List<IResponseCourseModel> responseCourse = await DecorateResponseCourseModel(myUid, courses);
-            mapCourse = courseIds.ToDictionary(
+            mapCourse = courseIds.Distinct().ToDictionary(
                 id => id,
                 id => (IResponseCourseModel?)null
             );
@@ -151,7 +151,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             Dictionary<Guid, IResponseLessonModel?> mapLesson = [];
             List<ViewLesson> lessons = await DbContext.ViewLessons.Where(l => lessonids.Contains(l.UserItemId)).ToListAsync();
             List<IResponseLessonModel> responseLesson = await DecorateResponseLessonModel(myUid, lessons);
-            mapLesson = lessonids.ToDictionary(
+            mapLesson = lessonids.Distinct().ToDictionary(
                 id => id,
                 id => (IResponseLessonModel?)null
             );
@@ -269,7 +269,23 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             return responseUserCardModels;
         }
 
-
+        public virtual async Task<List<ResponseFriendCardModel>> DecorateResponseFriendCardModel(Guid? myUid, List<ResponseFriendCardModel> responseFriendCardModel)
+        {
+            if (myUid != null)
+            {
+                List<Guid> userId = responseFriendCardModel.Select(m => m.UserId).ToList();
+                Dictionary<Guid, UserRelationTypeDto> userRelationTypes = await UserRelationRepository.GetDetailUserRelationType(myUid.Value, userId);
+                foreach (ResponseFriendCardModel model in responseFriendCardModel)
+                {
+                    if (userRelationTypes.TryGetValue(model.UserId, out UserRelationTypeDto? value))
+                    {
+                        model.FriendId = value.UserRelationId ?? model.FriendId;
+                        model.UserRelationType = value.UserRelationType;
+                    }
+                }
+            }
+            return responseFriendCardModel;
+        }
 
 
         public virtual async Task<List<IResponseCommentModel>> DecorateResponseCommentModel(Guid? myUid, List<ViewComment> viewComments, bool isDecorateReplies = true)
@@ -319,7 +335,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             {
                 List<Guid> courseIds = relations.Select(r => r.CourseId).ToList();
                 Dictionary<Guid, IResponseCourseModel?> dictViewCourse = await GetMapCourse(myUid, courseIds);
-                dictCourse = courseIds.ToDictionary(
+                dictCourse = courseIds.Distinct().ToDictionary(
                     id => id,
                     id =>
                     {
@@ -439,7 +455,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             return res;
         }
 
-        public async Task<List<IResponsePostModel>> DecorateResponsePostModel(Guid? myUid, List<ViewPost> posts)
+        public virtual async Task<List<IResponsePostModel>> DecorateResponsePostModel(Guid? myUid, List<ViewPost> posts)
         {
             List<Guid> postIds = posts.Select(p => p.UserItemId).ToList();
             var postDictPromise = PostRepository.GetExactlyResponseUserItemModel(postIds);
@@ -475,5 +491,6 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             await decoratePromise;
             return res;
         }
+
     }
 }

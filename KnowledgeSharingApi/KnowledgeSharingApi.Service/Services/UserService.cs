@@ -124,6 +124,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
             List<ViewUser> lsUser = await UserRepository.GetDetail();
+            lsUser = lsUser.GroupBy(ls => ls.UserId).Select(g => g.First()).ToList();
 
             // Tinh toan similiarity Score
             List<string> listFullname = lsUser.Select(fu => fu.FullName).ToList();
@@ -314,6 +315,7 @@ namespace KnowledgeSharingApi.Services.Services
             List<ViewUser> filteredUser = lsUser
                 .Where(lsUser => lsUser.Role != UserRoles.Banned && !exceptId.Contains(lsUser.UserId))
                 .ToList();
+            filteredUser = filteredUser.GroupBy(f => f.UserId).Select(g => g.First()).ToList();
 
             // Tinh toan similiarity Score
             List<string> listFullname = filteredUser.Select(fu => fu.FullName).ToList();

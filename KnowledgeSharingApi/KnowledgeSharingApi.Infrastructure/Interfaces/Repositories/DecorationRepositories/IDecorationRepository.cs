@@ -66,6 +66,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.Decoration
         /// Modified: None
         Task<List<ResponseUserCardModel>> DecorateResponseUserCardModel(Guid? myUid, List<ResponseUserCardModel> responseUserCardModels);
 
+        /// <summary>
+        /// Them thong tin ve quan he ban be 
+        /// </summary>
+        /// <param name="myUid"> id chu the </param>
+        /// <param name="responseFriendCardModel"> Danh sach friendCardModel can decorate </param>
+        /// <returns></returns>
+        /// Created: PhucTV (24/5/24)
+        /// Modified: None
+        Task<List<ResponseFriendCardModel>> DecorateResponseFriendCardModel(Guid? myUid, List<ResponseFriendCardModel> responseFriendCardModel);
+
 
         /// <summary>
         /// Thêm các giá trị bổ sung cho mỗi comment của danh sách comment:

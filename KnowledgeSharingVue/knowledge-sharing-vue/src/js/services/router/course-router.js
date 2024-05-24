@@ -8,6 +8,9 @@ import CourseRequestContent from "@/components/pages/desktop/course/subpages/cou
 import CourseInviteContent from "@/components/pages/desktop/course/subpages/course-revitation/CourseInviteContent.vue";
 import CourseMemberContent from "@/components/pages/desktop/course/subpages/course-revitation/CourseMemberContent.vue";
 
+import CourseMemberSubpage from "@/components/pages/desktop/course/subpages/course-member/CourseMemberSubpage.vue";
+
+import CourseQuestionSubpage from "@/components/pages/desktop/course/subpages/course-question/CourseQuestionSubpage.vue";
 
 export default [
     {
@@ -36,18 +39,23 @@ export default [
             {
                 path: 'question',
                 name: 'course-question-page',
-                component: null,
+                component: CourseQuestionSubpage,
             },
             {
                 path: 'register',
                 name: 'course-register-page',
-                component: null,
+                component: CourseMemberSubpage,
             },
             {
                 path: 'revite',
                 name: 'course-request-invite-page',
                 component: CourseRevitationSubpage,
                 children: [
+                    {
+                        path: '',
+                        name: 'course-revite-home-page',
+                        component: CourseRequestContent,
+                    },
                     {
                         path: 'request',
                         name: 'course-revite-request-page',

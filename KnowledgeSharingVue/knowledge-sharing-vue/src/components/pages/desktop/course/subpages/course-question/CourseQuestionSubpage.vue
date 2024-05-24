@@ -1,24 +1,21 @@
 
 
 <template>
-    <div class="profile-question-subpage p-profile-main-subpage">
-        <div class="profile-question-subpage__left"
-            v-show="isMySelf"
-        >
-            <!-- ProfileQuestionToolbar -->
-            <ProfileQuestionToolbar 
+    <div class="p-course-question-subpage p-profile-main-subpage">
+        <div class="p-course-question-subpage__left">
+            <!-- CourseQuestionToolbar -->
+            <CourseQuestionToolbar 
                 :on-click-search="resolveOnChangeConfig"
             />
         </div>
 
-        <div class="profile-question-subpage__right">
-            <!-- ProfileQuestionFeedSubpage -->
-
+        <div class="p-course-question-subpage__right">
+            <!-- CourseQuestionFeedSubpage -->
             <PostSubpage 
                 :get-post="getPostCallback"
             >
                 <template #addpost>
-                    <AddPostFeedCard v-show="isMySelf" />
+                    <CourseAddQuestionCard />
                 </template>
             </PostSubpage>
         </div>
@@ -28,34 +25,29 @@
 
 
 <script>
-import ProfileQuestionToolbar from './ProfileQuestionToolbar.vue';
+import CourseQuestionToolbar from './CourseQuestionToolbar.vue';
 import PostSubpage from '../../../home/sub-pages/PostSubpage.vue';
 import { Validator } from '@/js/utils/validator';
-import { myEnum } from '@/js/resources/enum';
 import { GetRequest } from '@/js/services/request';
-import CurrentUser from '@/js/models/entities/current-user';
-import AddPostFeedCard from '../../../home/components/feed-subpage/postcard/AddPostFeedCard.vue';
+import CourseAddQuestionCard from './CourseAddQuestionCard.vue';
 
 export default {
-    name: 'ProfileQuestionSubpage',
+    name: 'CourseQuestionSubpage',
     components: {
-        ProfileQuestionToolbar,
+        CourseQuestionToolbar,
         PostSubpage,
-        AddPostFeedCard,
+        CourseAddQuestionCard,
     },
     props: {
     },
     data(){
         return {
-            isMySelf: false,
             getPostCallback: null,
         }
     },
     async mounted(){
         try {
-            this.isMySelf = await this.getIsMySelf();
             await this.resolveOnChangeConfig({});
-
         } catch (error){
             console.error(error);
         }
@@ -81,13 +73,13 @@ export default {
         },
 
         getFilterString(config){
-            let {  isPrivate } = config;
+            let { username } = config;
 
-            let filterPrivate = "";
-            if (isPrivate === true || isPrivate === false){
-                filterPrivate = "Privacy:" + (isPrivate ? myEnum.EPrivacy.Private : myEnum.EPrivacy.Public);
+            let filterUsername = "";
+            if (Validator.isNotEmpty(username)){
+                filterUsername = "Username:" + username;
             }
-            let filters = [filterPrivate].filter(x => x?.length > 0).join(",");
+            let filters = [filterUsername].filter(x => x?.length > 0).join(",");
 
             return filters;
         },
@@ -95,20 +87,15 @@ export default {
 
         async resolveOnChangeConfig(config){
             try {
-                if (! this.isMySelf){
-                    return await this.resolveOnChangeConfigOnOtherUser();
-                }
-
-                // mySelf
                 if (config === null || config === undefined){
                     config = {};
                 }
                 let { text } = config;
                 
                 // Get url
-                let url = "Questions/my";
+                let url = "Courses/questions";
                 if (Validator.isNotEmpty(text)){
-                    url = "Questions/search/my";
+                    url = "Courses/search/questions";
                 }
                 
                 // Get orderString
@@ -137,35 +124,8 @@ export default {
                 console.error(error);
             }
         },
-
-
-        async resolveOnChangeConfigOnOtherUser(){
-            try {
-                let userId = this.getUser()?.UserId;
-                if (userId == null) return;
-                // let that = this;
-                let url = "Users/questions/" + userId;
-                let currentUser = await CurrentUser.getInstance();
-                if (currentUser == null) {
-                    url = "User/anonymous/questions/" + userId;
-                }
-                this.getPostCallback = async function(limit, offset){
-                    let param = {
-                        limit: limit,
-                        offset: offset,
-                    };
-                    let res = await new GetRequest(url).setParams(param).execute();
-                    return res;
-                }
-            }
-            catch (error){
-                console.error(error);
-            }
-        }
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
     }
 }
 
@@ -181,7 +141,7 @@ export default {
 
 <style scoped>
 
-.profile-question-subpage{
+.p-course-question-subpage{
     display: flex;
     flex-flow: row nowrap;
     gap: 16px;
@@ -190,7 +150,7 @@ export default {
     padding-bottom: 32px;
 }
 
-.profile-question-subpage__left{
+.p-course-question-subpage__left{
     width: 0;
     flex-shrink: 1;
     flex-grow: 2;
@@ -202,7 +162,7 @@ export default {
     gap: 16px;
 }
 
-.profile-question-subpage__right{
+.p-course-question-subpage__right{
     width: 0;
     flex-shrink: 1;
     flex-grow: 3;

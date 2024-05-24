@@ -220,7 +220,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public override async Task<Dictionary<Guid, IResponseUserItemModel?>> GetExactlyResponseUserItemModel(List<Guid> knowledgeIds)
         {
-            Dictionary<Guid, IResponseUserItemModel?> res = knowledgeIds
+            Dictionary<Guid, IResponseUserItemModel?> res = knowledgeIds.Distinct()
                 .ToDictionary(id => id, id => (IResponseUserItemModel?)null);
 
             // Get List courseIds, lessonIds and questionsIds:

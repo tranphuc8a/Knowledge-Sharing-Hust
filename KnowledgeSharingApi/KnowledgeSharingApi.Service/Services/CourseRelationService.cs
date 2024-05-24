@@ -649,6 +649,10 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Get list register 
             List<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
+            registers = registers
+                .GroupBy(item => item.CourseRegisterId)
+                .Select(group => group.First())
+                .ToList();
 
             // Calculate score --> search by user: FullName.6, Username.4
             search = search.ToLower();
@@ -686,6 +690,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // get list invite of course
             List<CourseRelation> relations = await CourseRelationRepository.GetRelationsOfCourse(courseId, ECourseRelationType.Invite);
+            relations = relations.GroupBy(r => r.CourseRelationId).Select(g => g.First()).ToList();
             List<ResponseCourseRelationModel> responseCourseRelationModels = await DecorationRepository
                 .DecorateResponseCourseRelationModel(myUid, relations, ECourseRelationType.Invite, isDecorateCourse: false, isDecorateUser: true);
 
@@ -725,6 +730,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // get list request of course 
             List<CourseRelation> relations = await CourseRelationRepository.GetRelationsOfCourse(courseId, ECourseRelationType.Request);
+            relations = relations.GroupBy(r => r.CourseRelationId).Select(g => g.First()).ToList();
             List<ResponseCourseRelationModel> responseCourseRelationModels = await DecorationRepository
                 .DecorateResponseCourseRelationModel(myUid, relations, ECourseRelationType.Request, isDecorateCourse: false, isDecorateUser: true);
 

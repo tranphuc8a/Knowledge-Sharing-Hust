@@ -15,9 +15,10 @@
 
 
 <script>
-import { PostRequest } from '@/js/services/request';
+import { PostRequest, Request } from '@/js/services/request';
 import MButton from './../../../../../base/buttons/MButton.vue'
 import CourseRelation from '@/js/models/entities/course-relation';
+import { myEnum } from '@/js/resources/enum';
 
 export default {
     name: 'GuestUoCrb',
@@ -48,7 +49,7 @@ export default {
             try {
                 this.isWorking = true;
                 let userId = this.dUser.UserId;
-                let courseId = this.dCourse.CourseId;
+                let courseId = this.dCourse.UserItemId;
                 if (userId == null || courseId == null) {
                     return;
                 }
@@ -58,7 +59,7 @@ export default {
                 let relation = new CourseRelation().copy(body);
                 this.dCourseRelationId = relation.CourseRelationId;
                 this.getCourseRelationId().value = relation.CourseRelationId;
-                this.getCourseRoleType().value = relation.CourseRoleType;
+                this.getCourseRoleType().value = myEnum.ECourseRoleType.Invited;
             } catch (e) {
                 Request.resolveAxiosError(e);
             } finally {

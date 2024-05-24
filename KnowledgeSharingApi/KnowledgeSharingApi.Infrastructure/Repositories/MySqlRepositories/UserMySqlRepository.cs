@@ -131,7 +131,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds)
         {
-            Dictionary<Guid, ViewUser?> res = userIds.ToDictionary(id => id, id => (ViewUser?)null);
+            Dictionary<Guid, ViewUser?> res = userIds.Distinct().ToDictionary(id => id, id => (ViewUser?)null);
 
             List<ViewUser> users = await DbContext.ViewUsers
                 .Where(user => userIds.Contains(user.UserId))

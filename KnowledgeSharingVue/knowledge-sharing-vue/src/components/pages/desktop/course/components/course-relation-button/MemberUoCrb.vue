@@ -63,7 +63,7 @@ export default {
             return [
                 {
                     fa: 'user-minus',
-                    onclick: this.resolveDeleteMember,
+                    onclick: this.resolveDeleteMember.bind(this),
                     label: 'Xóa thành viên'
                 }
             ]
@@ -74,7 +74,7 @@ export default {
                 let alertMsg = 'Bạn có chắc chắn muốn xóa thành viên này?';
                 let that = this;
                 let callback = async function(){
-                    that.submitDeleteMember();
+                    await that.submitDeleteMember();
                 }
                 this.getPopupManager().inform(alertMsg, callback);
             } catch (e){

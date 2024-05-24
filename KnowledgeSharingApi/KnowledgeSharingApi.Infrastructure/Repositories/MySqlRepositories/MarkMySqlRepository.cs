@@ -16,7 +16,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
     {
         public virtual async Task<Dictionary<Guid, bool>> GetUserMarkListKnowledge(Guid userId, List<Guid> knowledgeId)
         {
-            Dictionary<Guid, bool> result = knowledgeId.ToDictionary(id => id, id => false);
+            Dictionary<Guid, bool> result = knowledgeId.Distinct().ToDictionary(id => id, id => false);
 
             List<Mark> listMarks = await DbContext.Marks
                 .Where(mark => mark.UserId == userId && knowledgeId.Contains(mark.KnowledgeId))

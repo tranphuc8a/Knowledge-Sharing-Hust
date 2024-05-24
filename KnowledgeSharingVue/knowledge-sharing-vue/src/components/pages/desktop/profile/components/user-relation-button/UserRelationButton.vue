@@ -14,6 +14,7 @@
         <RequesteeButton v-else-if="userRelation === userRelationType.Requestee" />
         <RequesterButton v-else-if="userRelation === userRelationType.Requester" />
         <NotRelationButton v-else-if="userRelation === userRelationType.NotInRelation" />
+        <div v-show="false" v-else-if="userRelation === userRelationType.IsMySelf"></div>
         <NotRelationButton v-else />
     </div>
 </template>
@@ -58,15 +59,17 @@ export default {
     async created(){
         this.isLoaded = false;
         await this.refreshRelation(this.isCallApiWhenCreate);
-        this.isLoaded = true;
+        if (this.getUser() != null){
+            this.isLoaded = true;
+        }
     },
     mounted(){
     },
     methods: {
         async forceRender(){
             try {
-                this.refreshRelation();
                 this.isLoaded = false;
+                this.refreshRelation();
                 this.$nextTick(() => {
                     this.isLoaded = true;
                 });
@@ -78,13 +81,13 @@ export default {
         async refreshRelation(isCallApi = true){
             try {
                 this.user = this.getUser();
-                this.userRelation = this.user?.UserRelationType ?? this.userRelationType.NotInRelationType;
+                this.userRelation = this.user?.UserRelationType;
                 this.currentUser = await CurrentUser.getInstance();
                 if (this.currentUser == null){
                     this.userRelation = this.userRelationType.NotInRelation;
                     return;
                 }
-                if (isCallApi){
+                if (isCallApi || (this.user != null && this.userRelation == null)){
                     if (this.getUser() == null) return;
                     let res = await new GetRequest('UserRelations/relation-status/' + this.getUser().UserId)
                         .execute();

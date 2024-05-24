@@ -25,7 +25,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
 
             // Chuyển đổi danh sách trung bình thành từ điển, với giá trị mặc định là null cho mọi giá trị.
-            var result = userItemsId.ToDictionary(id => id, id => (double?)null);
+            var result = userItemsId.Distinct().ToDictionary(id => id, id => (double?)null);
 
             // Đặt giá trị trung bình vào từ điển nếu có giá trị cho UserItemId.
             averages.ForEach(avg => result[avg.StarItemId] = avg.AverageStars);
@@ -49,7 +49,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             Dictionary<Guid, int> totals = await totalsQuery.ToDictionaryAsync(g => g.UserItemId, g => g.TotalStars);
 
             // Tạo dictionary kết quả, với mỗi UserItemId. Mặc định là 0 nếu không có giá trị tổng trong totals.
-            Dictionary<Guid, int> result = userItemsId.ToDictionary(
+            Dictionary<Guid, int> result = userItemsId.Distinct().ToDictionary(
                 id => id,
                 id => totals.TryGetValue(id, out int value) ? value : 0
             );
@@ -64,7 +64,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
 
             // Chuyển đổi danh sách trung bình thành từ điển, với giá trị mặc định là null cho mọi giá trị.
-            Dictionary<Guid, int?> result = userItemsId.ToDictionary(id => id, id => (int?)null);
+            Dictionary<Guid, int?> result = userItemsId.Distinct().ToDictionary(id => id, id => (int?)null);
 
             // Đặt giá trị star vào từ điển nếu có giá trị cho UserItemId.
             userstars.ForEach(ut => result[ut.UserItemId] = ut.Stars);

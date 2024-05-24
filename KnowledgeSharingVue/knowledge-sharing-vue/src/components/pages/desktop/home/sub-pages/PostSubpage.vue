@@ -2,7 +2,10 @@
 
 <template>
     <div class="p-feed-subpage" v-if="!isLoaded">
-        <AddPostFeedCard v-if="isShowAddPost"/>
+        <!-- <AddPostFeedCard v-if="isShowAddPost"/> -->
+
+        <slot name="addpost"></slot>
+
         <div v-for="item in [1, 2, 3]" :key="item" style="width: 100%">
             <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
                 class="card"
@@ -19,7 +22,7 @@
     <div class="p-feed-subpage" v-if="isLoaded"
         ref="list"
         >
-        <AddPostFeedCard v-if="isShowAddPost" />
+        <slot name="addpost"></slot>
 
         <component v-for="item in listPosts" 
             :key="item?.UserItemId"
@@ -43,7 +46,7 @@
 
 
 <script>
-import AddPostFeedCard from '../components/feed-subpage/postcard/AddPostFeedCard.vue';
+// import AddPostFeedCard from '../components/feed-subpage/postcard/AddPostFeedCard.vue';
 import LessonFeedCard from '../components/feed-subpage/postcard/LessonFeedCard.vue';
 import QuestionFeedCard from '../components/feed-subpage/postcard/QuestionFeedCard.vue';
 
@@ -56,7 +59,7 @@ import ResponseQuestionModel from '@/js/models/api-response-models/response-ques
 export default {
     name: 'PostSubpage',
     components: {
-        AddPostFeedCard,
+        // AddPostFeedCard,
         LessonFeedCard,
         QuestionFeedCard,
     },
@@ -67,10 +70,10 @@ export default {
                 return [];
             }
         },
-        isShowAddPost: {
-            type: Boolean,
-            default: true,
-        }
+        // isShowAddPost: {
+        //     type: Boolean,
+        //     default: true,
+        // }
     },
     data(){
         return {

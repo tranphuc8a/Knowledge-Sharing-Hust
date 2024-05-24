@@ -195,7 +195,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
 
             // Khởi tạo kết quả mặc định là NotInRelation
-            var results = users2.ToDictionary(user => user, user => EUserRelationType.NotInRelation);
+            var results = users2.Distinct().ToDictionary(user => user, user => EUserRelationType.NotInRelation);
 
             // Xác định loại quan hệ cho từng cặp người dùng
             foreach (Guid otherUser in users2)
@@ -218,7 +218,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
 
             // Khởi tạo kết quả mặc định là NotInRelation
-            var results = users2.ToDictionary(user => user, user => new UserRelationTypeDto()
+            var results = users2.Distinct().ToDictionary(user => user, user => new UserRelationTypeDto()
             {
                 UserRelationType = EUserRelationType.NotInRelation,
                 UserRelationId = null

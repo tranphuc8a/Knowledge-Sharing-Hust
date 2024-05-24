@@ -45,7 +45,9 @@ export default {
         try {
             this.post = this.getPost();
             this.isLesson = this.getPost()?.PostType == myEnum.EPostType.Lesson;
-            this.postResource = this.isLesson ? "Bài giảng" : "Bài thảo luận";
+            this.isCourse = this.getPost()?.KnowledgeType == myEnum.EKnowledgeType.Course;
+            this.isQuestion = this.getPost()?.PostType == myEnum.EPostType.Question;
+            this.postResource = this.isCourse ? "Khóa học" : this.isLesson ? "Bài giảng" : "Bài thảo luận";
             await this.updateOptions();
         } catch (error){
             console.error(error);

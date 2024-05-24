@@ -2,7 +2,7 @@
 
 <template>
     <MMenuContextPopup :options="getOptions()">
-        <MButton 
+        <MCancelButton 
             label="Đã gửi lời mời"
             :onclick="null"
             :buttonStyle="buttonStyle"
@@ -16,7 +16,7 @@
 
 <script>
 import MMenuContextPopup from '@/components/base/popup/MMenuContextPopup.vue';
-import MButton from '@/components/base/buttons/MButton';
+import MCancelButton from '@/components/base/buttons/MCancelButton';
 import { DeleteRequest, Request } from '@/js/services/request';
 import { myEnum } from '@/js/resources/enum';
 
@@ -25,7 +25,7 @@ export default {
     name: 'RequesterButton',
     components: {
         MMenuContextPopup,
-        MButton,
+        MCancelButton,
     },
     props: {
     },

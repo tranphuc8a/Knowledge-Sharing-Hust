@@ -8,6 +8,7 @@ using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Emails;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Services.Interfaces;
@@ -24,6 +25,7 @@ namespace KnowledgeSharingApi.Services.Services
     public class UserRelationService(
         IUserRelationRepository userRelationRepository,
         IResourceFactory resourceFactory,
+        IDecorationRepository decorationRepository,
         IUserRepository userRepository,
         IUnitOfWork unitOfWork
     ) : IUserRelationService
@@ -32,6 +34,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IResourceFactory ResourceFactory = resourceFactory;
         protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
         protected readonly IUserRepository UserRepository = userRepository;
+        protected readonly IDecorationRepository DecorationRepository = decorationRepository;
         protected readonly IUnitOfWork UnitOfWork = unitOfWork;
         protected readonly int DefaultLimit = 50;
 
@@ -108,7 +111,7 @@ namespace KnowledgeSharingApi.Services.Services
         //    List<ResponseFriendCardModel> listed = [.. lsFriend1.Concat(lsFriend2).OrderByDescending(item => item.Time)];
         //    return listed;
         //}
-        protected virtual async Task<List<ResponseFriendCardModel>> GetAllFriends(Guid userId)
+        protected virtual async Task<List<ResponseFriendCardModel>> GetAllFriends(Guid? myUid, Guid userId)
         {
             List<ViewUserRelation> friends = await UserRelationRepository.GetFriendsByUserId(userId);
             List<ResponseFriendCardModel> listFriends = friends.Select(fri =>
@@ -134,7 +137,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return res;
             }).ToList();
 
-            return listFriends;
+            return await DecorationRepository.DecorateResponseFriendCardModel(myUid, listFriends);
         }
         /// <summary>
         /// Lấy danh sách toàn bộ quan he cua user
@@ -146,7 +149,7 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (19/3/24)
         /// Modified: None
-        protected virtual async Task<List<ResponseFriendCardModel>> GetAllRelations(Guid userId, EUserRelationType relationType, bool isActive)
+        protected virtual async Task<List<ResponseFriendCardModel>> GetAllRelations(Guid? myUid, Guid userId, EUserRelationType relationType, bool isActive)
         {
             EUserRelationType responseUserRelationType = relationType;
             if (relationType == EUserRelationType.Block)
@@ -186,20 +189,24 @@ namespace KnowledgeSharingApi.Services.Services
 
                 }
             ).OrderByDescending(relation => relation.Time)];
-            return lsRelation;
+
+            return await DecorationRepository.DecorateResponseFriendCardModel(myUid, lsRelation);
         }
 
         #endregion
 
 
-        public virtual async Task<ServiceResult> GetFriends(Guid userId, PaginationDto pagination)
+
+        #region User Relation Get And Search
+
+        public virtual async Task<ServiceResult> GetFriends(Guid? myUid, Guid userId, PaginationDto pagination)
         {
             // Kiểm tra user id tồn tại
             User? user = await UserRepository.Get(userId);
             if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
 
             // Lấy danh sách friends của uid
-            List<ResponseFriendCardModel> listed = await GetAllFriends(userId);
+            List<ResponseFriendCardModel> listed = await GetAllFriends(myUid, userId);
 
             // Phân trang và trả về thành công
             PaginationResponseModel<ResponseFriendCardModel> res = new()
@@ -211,13 +218,13 @@ namespace KnowledgeSharingApi.Services.Services
             };
             return ServiceResult.Success(ResponseResource.GetSuccess(), string.Empty, res);
         }
-        public virtual async Task<ServiceResult> GetRelations(Guid userId, EUserRelationType relationType, bool isActive, PaginationDto pagination)
+        public virtual async Task<ServiceResult> GetRelations(Guid? myUid, Guid userId, EUserRelationType relationType, bool isActive, PaginationDto pagination)
         {
             // Kiểm tra user id tồn tại
             User? user = await UserRepository.Get(userId);
             if (user == null) return ServiceResult.BadRequest(ResponseResource.NotExistUser());
 
-            List<ResponseFriendCardModel> lsRelation = await GetAllRelations(userId, relationType, isActive);
+            List<ResponseFriendCardModel> lsRelation = await GetAllRelations(myUid, userId, relationType, isActive);
 
             // Phân trang và trả về thành công
             PaginationResponseModel<ResponseFriendCardModel> res = new()
@@ -229,15 +236,32 @@ namespace KnowledgeSharingApi.Services.Services
             };
             return ServiceResult.Success(ResponseResource.GetSuccess(), string.Empty, res);
         }
+        public virtual async Task<ServiceResult> GetRelationState(Guid myUid, Guid userId)
+        {
+            // Check myUid va userId ton tai
+            ViewUser user = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
 
+            // Lay ve UserCardItem
+            ResponseUserCardModel res = new();
+            res.Copy(user);
 
-        public virtual async Task<ServiceResult> SearchFriends(Guid myUid, string? search, PaginationDto page)
+            // Decorate
+            var dict = await UserRelationRepository.GetDetailUserRelationType(myUid, [userId]);
+            res.UserRelationType = dict[userId].UserRelationType;
+            res.UserRelationId = dict[userId].UserRelationId;
+
+            // Tra ve thanh cong
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
+        }
+
+        public virtual async Task<ServiceResult> SearchFriends(Guid? myUid, Guid userId, string? search, PaginationDto page)
         {
             if (string.IsNullOrWhiteSpace(search))
                 return ServiceResult.BadRequest("Từ khóa tìm kiếm không được trống");
 
             // Get ve danh sach tat ca ban be
-            List<ResponseFriendCardModel> allFriends = await GetAllFriends(myUid);
+            List<ResponseFriendCardModel> allFriends = await GetAllFriends(myUid, userId);
+            allFriends = allFriends.GroupBy(fr => fr.FriendId).Select(g => g.First()).ToList();
 
             // Thuc hien tinh toan score cho moi friendid
             List<string> listFullname = allFriends.Select(fu => fu.FullName).ToList();
@@ -271,13 +295,14 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, allFriends);
         }
 
-        public virtual async Task<ServiceResult> SearchRelations(Guid myUid, string? search, EUserRelationType relationType, bool isActive, PaginationDto page)
+        public virtual async Task<ServiceResult> SearchRelations(Guid? myUid, Guid userId, string? search, EUserRelationType relationType, bool isActive, PaginationDto page)
         {
             if (string.IsNullOrWhiteSpace(search))
                 return ServiceResult.BadRequest("Từ khóa tìm kiếm không được trống");
 
             // Get ve toan bo relation
-            List<ResponseFriendCardModel> listRelations = await GetAllRelations(myUid, relationType, isActive);
+            List<ResponseFriendCardModel> listRelations = await GetAllRelations(myUid, userId, relationType, isActive);
+            listRelations = listRelations.GroupBy(fr => fr.FriendId).Select(g => g.First()).ToList();
 
             // Tinh toan score
             List<string> listFullname = listRelations.Select(usRelation => usRelation.FullName).ToList();
@@ -309,7 +334,11 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, listRelations);
         }
 
+        #endregion
 
+
+
+        #region UserRelation actions
 
         public virtual async Task<ServiceResult> Follow(Guid myuid, Guid uid)
         {
@@ -401,57 +430,6 @@ namespace KnowledgeSharingApi.Services.Services
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.Success());
         }
-        protected virtual async Task ResolveBlock(Guid myuid, Guid uid)
-        {
-            try
-            {
-                // Begin Transaction và Đăng ký cho repository
-                UnitOfWork.BeginTransaction();
-                UnitOfWork.RegisterRepository(UserRelationRepository);
-
-                // Xóa quan hệ bạn bè
-                List<ResponseFriendCardModel> friends =
-                    (await GetAllFriends(myuid))
-                    .Where(friend => friend.UserId == uid)
-                    .ToList();
-                int deleted = await UserRelationRepository.Delete(
-                    friends.Select(friend => friend.FriendId).ToArray());
-                if (deleted <= 0) throw new Exception();
-
-                // Xóa quan hệ theo dõi lẫn nhau
-                List<ViewUserRelation> followers = (await UserRelationRepository.GetByUserIdAndType(myuid, true, EUserRelationType.Follow))
-                    .Where(follower => follower.ReceiverId == uid)
-                    .ToList();
-                deleted = await UserRelationRepository.Delete(followers.Select(follower => follower.UserRelationId).ToArray());
-                if (deleted <= 0) throw new Exception();
-
-                List<ViewUserRelation> followees = (await UserRelationRepository.GetByUserIdAndType(uid, true, EUserRelationType.Follow))
-                    .Where(follower => follower.ReceiverId == myuid)
-                    .ToList();
-                deleted = await UserRelationRepository.Delete(followers.Select(follower => follower.UserRelationId).ToArray());
-                if (deleted <= 0) throw new Exception();
-
-                // Thực hiện thêm blocker
-                UserRelation blocker = new()
-                {
-                    SenderId = myuid,
-                    ReceiverId = uid,
-                    UserRelationType = EUserRelationType.Block,
-                    Time = DateTime.Now,
-                    CreatedTime = DateTime.Now,
-                    CreatedBy = myuid.ToString()
-                };
-                Guid? id = await UserRelationRepository.Insert(blocker) ?? throw new Exception();
-
-                // Commit Transaction
-                UnitOfWork.CommitTransaction();
-            }
-            catch (Exception)
-            {
-                UnitOfWork.RollbackTransaction();
-                throw new Exception(ResponseResource.ServerError());
-            }
-        }
         public virtual async Task<ServiceResult> Unblock(Guid myuid, Guid uid)
         {
             if (myuid == uid)
@@ -533,7 +511,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Kiểm tra có tồn tại quan hệ bạn bè không
             List<ResponseFriendCardModel> friends =
-                (await GetAllFriends(myuid))
+                (await GetAllFriends(null, myuid))
                 .Where(friend => friend.UserId == uid)
                 .ToList();
             if (friends.Count == 0) return ServiceResult.BadRequest("Không thể thực hiện do các bạn hiện không phải bạn bè");
@@ -590,22 +568,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success());
         }
 
-        public virtual async Task<ServiceResult> GetRelationState(Guid myUid, Guid userId)
-        {
-            // Check myUid va userId ton tai
-            ViewUser user = await UserRepository.CheckExistedUser(userId, ResponseResource.NotExistUser());
+        #endregion
 
-            // Lay ve UserCardItem
-            ResponseUserCardModel res = new();
-            res.Copy(user);
-
-            // Decorate
-            var dict = await UserRelationRepository.GetDetailUserRelationType(myUid, [userId]);
-            res.UserRelationType = dict[userId].UserRelationType;
-            res.UserRelationId = dict[userId].UserRelationId;
-
-            // Tra ve thanh cong
-            return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
-        }
     }
 }

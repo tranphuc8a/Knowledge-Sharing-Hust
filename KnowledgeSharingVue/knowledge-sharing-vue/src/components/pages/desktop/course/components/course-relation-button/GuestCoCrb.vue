@@ -99,7 +99,7 @@ export default {
             if (this.isWorking) return;
             try {
                 this.isWorking = true;
-                let courseId = this.dCourse.CourseId;
+                let courseId = this.dCourse.UserItemId;
                 if (courseId == null) {
                     return;
                 }
@@ -121,7 +121,7 @@ export default {
             try {
                 this.isWorking = true;
                 this.$refs['button-payment'].loading();
-                let courseId = this.dCourse.CourseId;
+                let courseId = this.dCourse.UserItemId;
                 if (courseId == null) {
                     return;
                 }

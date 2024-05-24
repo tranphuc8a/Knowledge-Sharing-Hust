@@ -28,7 +28,7 @@
                 <div class="p-plcs-list-course-content">
                     <div class="p-plcs-card-item"
                         v-for="(course, index) in listFilteredCourses"
-                        :key="(course.CourseId ?? index) + random()"
+                        :key="(course.UserItemId ?? index) + random()"
                     >
                         <CourseRegisteredCard :course-register="course"/>
                     </div>

@@ -440,6 +440,10 @@ namespace KnowledgeSharingApi.Services.Services
             // Search
             // Lấy về toàn bộ comment cua knowledge
             List<ViewComment> listComments = await CommentRepository.GetListCommentsOfKnowledge(knowledgeId);
+            listComments = listComments
+                .GroupBy(item => item.UserItemId)
+                .Select(group => group.First())
+                .ToList();
             listComments = listComments.Where(com => !string.IsNullOrWhiteSpace(com.Content)).ToList();
 
             // Tinh toan do tuong dong
@@ -480,6 +484,10 @@ namespace KnowledgeSharingApi.Services.Services
             // Search
             // Lấy về toàn bộ comment cua user
             List<ViewComment> listComments = await CommentRepository.GetListCommentsOfUser(myUid);
+            listComments = listComments
+                .GroupBy(item => item.UserItemId)
+                .Select(group => group.First())
+                .ToList();
             listComments = listComments.Where(com => !string.IsNullOrWhiteSpace(com.Content)).ToList();
 
             // Tinh toan do tuong dong
@@ -520,6 +528,10 @@ namespace KnowledgeSharingApi.Services.Services
             // Search
             // Lấy về toàn bộ comment cua user
             List<ViewComment> listComments = await CommentRepository.GetListCommentsOfUserInKnowledge(myUid, knowledgeId);
+            listComments = listComments
+                .GroupBy(item => item.UserItemId)
+                .Select(group => group.First())
+                .ToList();
             listComments = listComments.Where(com => !string.IsNullOrWhiteSpace(com.Content)).ToList();
 
             // Tinh toan do tuong dong
