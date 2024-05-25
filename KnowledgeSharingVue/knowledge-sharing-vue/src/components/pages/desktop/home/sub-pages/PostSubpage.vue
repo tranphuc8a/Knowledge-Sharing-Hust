@@ -182,6 +182,7 @@ export default {
 
             } catch (e){
                 Request.resolveAxiosError(e);
+                this.isOutOfPost = true;
             } finally {
                 this.isLoadingMore = false;
             }
