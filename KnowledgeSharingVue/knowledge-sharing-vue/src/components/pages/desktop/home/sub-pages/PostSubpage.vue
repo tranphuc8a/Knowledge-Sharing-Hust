@@ -31,6 +31,26 @@
             Hello
         </component>
 
+        <div class="p-feed-notfound" v-show="isOutOfPost && !(listPosts.length > 0)">
+            <NotFoundPanel text="Không tìm thấy mục nào" />
+        </div>
+
+        <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
+            class="card" v-if="!isOutOfPost">
+            <div class="skeleton" style="width: 30%; height: 20px; margin-bottom: 18px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 50%; height: 20px; margin-bottom: 10px;"></div>
+        </div>
+
+        <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
+            class="card" v-if="!isOutOfPost">
+            <div class="skeleton" style="width: 30%; height: 20px; margin-bottom: 18px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 50%; height: 20px; margin-bottom: 10px;"></div>
+        </div>
+
         <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
             class="card" v-if="!isOutOfPost">
             <div class="skeleton" style="width: 30%; height: 20px; margin-bottom: 18px;"></div>
@@ -46,6 +66,7 @@
 
 
 <script>
+import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 // import AddPostFeedCard from '../components/feed-subpage/postcard/AddPostFeedCard.vue';
 import LessonFeedCard from '../components/feed-subpage/postcard/LessonFeedCard.vue';
 import QuestionFeedCard from '../components/feed-subpage/postcard/QuestionFeedCard.vue';
@@ -62,6 +83,7 @@ export default {
         // AddPostFeedCard,
         LessonFeedCard,
         QuestionFeedCard,
+        NotFoundPanel,
     },
     props: {
         getPost: {
@@ -70,6 +92,10 @@ export default {
                 return [];
             }
         },
+        // prop xac dinh context cua postsubpage hien tai (null, user, course)
+        owner: {
+            default: null,
+        }
         // isShowAddPost: {
         //     type: Boolean,
         //     default: true,
@@ -196,6 +222,15 @@ export default {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
+}
+
+.p-feed-notfound{
+    width: 100%;
+    height: 200px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
 }
 
 

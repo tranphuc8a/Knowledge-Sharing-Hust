@@ -1,11 +1,11 @@
 
 
-.p-crc-tooltip{
-    width: 500px;
+.p-csc-tooltip{
+    width: 420px;
     height: fit-content;
 }
 
-.p-crct-card{
+.p-csct-card{
     width: 100%;
     display: flex;
     flex-flow: column nowrap;
@@ -13,7 +13,7 @@
     align-items: flex-start;
 }
 
-.p-crct-card > div{
+.p-csct-card > div{
     flex-grow: 0;
     flex-shrink: 0;
     flex-basis: 50%;
@@ -24,14 +24,14 @@
     align-items: flex-start;
 }
 
-.p-crctc-thumbnail{
+.p-csctc-thumbnail{
     background-size: cover;
     background-position: center center;
     width: 100%;
     aspect-ratio: 2 / 1;
 }
 
-.p-crctc-bottom{
+.p-csctc-bottom{
     padding: 16px;
     display: flex;
     flex-flow: column nowrap;
@@ -40,7 +40,7 @@
     gap: 16px;
 }
 
-.p-crc-information{
+.p-csc-information{
     flex-grow: 1;
     flex-basis: 50%;
 
@@ -52,7 +52,7 @@
     gap: 16px;
 }
 
-.p-crc-title{
+.p-csc-title{
     width: 100%;
     text-align: left;
     cursor: pointer;
@@ -64,16 +64,16 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-.p-crc-title:hover{
+.p-csc-title:hover{
     text-decoration: underline;
 
 }
 
-.p-crc-abstract{
+.p-csc-abstract{
     width: 100%;
 }
 
-.p-crc-button{
+.p-csc-button{
     width: 100%;
     flex-shrink: 0;
     flex-grow: 0;

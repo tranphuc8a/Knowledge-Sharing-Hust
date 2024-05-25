@@ -4,7 +4,7 @@
             <div class="p-course-addquestion__header">
                 <TooltipUserAvatar :user="currentUser" :size="36" />
                 <div class="p-course-addquestion__reminder">
-                    Chào {{ currentUser?.FullName }}, bạn có thắc mắc gì về khóa học này khoông, hãy tạo một bài thảo luận ngay nào!
+                    Chào {{ currentUser?.FullName?? "bạn" }}, bạn có thắc mắc gì về khóa học này không, hãy tạo một bài thảo luận ngay nào!
                 </div>
             </div>
             <div class="p-course-devide"></div>
@@ -56,7 +56,7 @@ export default {
             try {
                 let courseId = this.getCourse().UserItemId;
                 if (courseId == null) return;
-                this.router.push('/question-create/' + courseId);
+                this.router.push('/question-create?courseId=' + courseId);
             } catch (error) {
                 console.log(error);
             }

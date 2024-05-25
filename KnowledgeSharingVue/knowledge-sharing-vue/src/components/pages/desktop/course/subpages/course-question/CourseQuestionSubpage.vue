@@ -87,15 +87,18 @@ export default {
 
         async resolveOnChangeConfig(config){
             try {
+                let courseId = this.getCourse()?.UserItemId;
+                if (courseId == null) return;
+
                 if (config === null || config === undefined){
                     config = {};
                 }
                 let { text } = config;
                 
                 // Get url
-                let url = "Courses/questions";
+                let url = "Courses/questions/" + courseId;
                 if (Validator.isNotEmpty(text)){
-                    url = "Courses/search/questions";
+                    url = "Courses/search/questions/" + courseId;
                 }
                 
                 // Get orderString
@@ -126,6 +129,7 @@ export default {
         },
     },
     inject: {
+        getCourse: {}
     }
 }
 

@@ -1,10 +1,10 @@
 
 
 <template>
-    <div class="p-crc-tooltip">
-        <div class="p-crct-card card">
-            <div class="p-crctc-top">
-                <div class="p-crctc-thumbnail"
+    <div class="p-lesson-tooltip">
+        <div class="p-lesson-tooltip-card card">
+            <div class="p-lesson-tooltip-top">
+                <div class="p-lesson-tooltip-thumbnail"
                     :click="resolveViewCourseDetail"
                     :style="{
                         'background-image': `url(${courseThumbnail})`
@@ -12,22 +12,16 @@
                 >
                 </div>
             </div>
-            <div class="p-crctc-bottom">
-                <div class="p-crc-information">
-                    <div class="p-crc-title" @:click="resolveViewCourseDetail">
+            <div class="p-lesson-tooltip-bottom">
+                <div class="p-lesson-tooltip-information">
+                    <div class="p-lesson-tooltip-title" @:click="resolveViewCourseDetail">
                         {{ dCourse?.Title ?? "" }}
                     </div>
-                    <!-- <div class="p-crc-abstract" v-if="dCourse?.Abstract != null">
+                    <div class="p-lesson-tooltip-abstract" v-if="dCourse?.Abstract != null">
                         {{ dCourse?.Abstract ?? "" }}
-                    </div> -->
-                    <div class="p-crc-abstract" v-if="dCourse?.Abstract != null">
-                        <EllipsisText 
-                            :text="dCourse?.Abstract ?? ''" 
-                            :max-line="3"
-                            :style="{}"/>
                     </div>
                 </div>
-                <div class="p-crc-button">
+                <div class="p-lesson-tooltip-button">
                     <!-- Course Relation Button -->
                     <CourseRelationButton />
                 </div>
@@ -44,13 +38,11 @@ import { GetRequest, Request } from '@/js/services/request';
 import ResponseCourseModel from '@/js/models/api-response-models/response-course-model';
 import { useRouter } from 'vue-router';
 import CourseRelationButton from '../course-relation-button/CourseRelationButton.vue';
-import EllipsisText from '@/components/base/text/EllipsisText.vue';
 
 export default {
     name: 'CourseRegisteredCardTooltip',
     components: {
-        CourseRelationButton,
-        EllipsisText,
+        CourseRelationButton
     },
     props: {
         course: {

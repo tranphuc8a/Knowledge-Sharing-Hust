@@ -291,8 +291,8 @@ class StringAlgorithm{
             return 0;
             }
         
-            const mapGramOfStringA = this.getMapGramWord(Unicode.unicodeToAscii(a).ToLowerCase());
-            const mapGramOfStringB = this.getMapGramWord(Unicode.unicodeToAscii(b).ToLowerCase());
+            const mapGramOfStringA = this.getMapGramWord(Unicode.unicodeToAscii(a).toLowerCase());
+            const mapGramOfStringB = this.getMapGramWord(Unicode.unicodeToAscii(b).toLowerCase());
         
             let score = 0;
             for (const [gram, countInA] of Object.entries(mapGramOfStringA)) {
@@ -321,10 +321,10 @@ class StringAlgorithm{
                 mapScore[text] = 0;
             }
         
-            const mapGramOfStringA = this.getMapGramWord(Unicode.unicodeToAscii(search).ToLowerCase());
+            const mapGramOfStringA = this.getMapGramWord(Unicode.unicodeToAscii(search).toLowerCase());
         
             for (const text of listText) {
-                const mapGramOfStringB = this.getMapGramWord(Unicode.unicodeToAscii(text).ToLowerCase());
+                const mapGramOfStringB = this.getMapGramWord(Unicode.unicodeToAscii(text).toLowerCase());
                 let score = 0;
                 for (const [gram, countInA] of Object.entries(mapGramOfStringA)) {
                     if (mapGramOfStringB[gram]) {

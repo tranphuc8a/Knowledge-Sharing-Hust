@@ -88,8 +88,8 @@ export default {
     height: 100%;
     display: flex;
     flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-end;
+    align-items: flex-end;
     gap: 12px;
 }
 

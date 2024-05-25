@@ -47,7 +47,7 @@
             
             <div class="p-course-infor">
                 <div class="p-course-title">
-                    <EllipisText 
+                    <EllipsisText 
                         :text="dCourse?.Title"  
                         :max-line="2"
                         :style="titleStyle"
@@ -84,7 +84,7 @@
 
 
 <script>
-import EllipisText from '@/components/base/text/EllipisText.vue';
+import EllipsisText from '@/components/base/text/EllipsisText.vue';
 import VisualizedPrivacy from '@/components/base/visualized-components/VisualizedPrivacy.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
@@ -96,7 +96,7 @@ import { myEnum } from '@/js/resources/enum';
 export default {
     name: 'CoursePanelInformation',
     components: {
-        EllipisText,
+        EllipsisText,
         TooltipUserAvatar,
         TooltipUsername,
         CoursePanelMember,

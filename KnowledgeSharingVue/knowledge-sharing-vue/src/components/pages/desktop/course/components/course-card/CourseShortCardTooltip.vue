@@ -1,10 +1,10 @@
 
 
 <template>
-    <div class="p-crc-tooltip">
-        <div class="p-crct-card card">
-            <div class="p-crctc-top">
-                <div class="p-crctc-thumbnail"
+    <div class="p-csc-tooltip">
+        <div class="p-csct-card card">
+            <div class="p-csctc-top">
+                <div class="p-csctc-thumbnail"
                     :click="resolveViewCourseDetail"
                     :style="{
                         'background-image': `url(${courseThumbnail})`
@@ -12,22 +12,23 @@
                 >
                 </div>
             </div>
-            <div class="p-crctc-bottom">
-                <div class="p-crc-information">
-                    <div class="p-crc-title" @:click="resolveViewCourseDetail">
+            <div class="p-csctc-bottom">
+                <div class="p-csc-information">
+                    <div class="p-csc-title" @:click="resolveViewCourseDetail">
                         {{ dCourse?.Title ?? "" }}
                     </div>
-                    <!-- <div class="p-crc-abstract" v-if="dCourse?.Abstract != null">
+                    <!-- <div class="p-csc-abstract" v-if="dCourse?.Abstract != null">
                         {{ dCourse?.Abstract ?? "" }}
                     </div> -->
-                    <div class="p-crc-abstract" v-if="dCourse?.Abstract != null">
+
+                    <div class="p-csc-abstract" v-if="dCourse?.Abstract != null">
                         <EllipsisText 
                             :text="dCourse?.Abstract ?? ''" 
                             :max-line="3"
                             :style="{}"/>
                     </div>
                 </div>
-                <div class="p-crc-button">
+                <div class="p-csc-button">
                     <!-- Course Relation Button -->
                     <CourseRelationButton />
                 </div>
@@ -47,10 +48,10 @@ import CourseRelationButton from '../course-relation-button/CourseRelationButton
 import EllipsisText from '@/components/base/text/EllipsisText.vue';
 
 export default {
-    name: 'CourseRegisteredCardTooltip',
+    name: 'CourseShortCardTooltip',
     components: {
         CourseRelationButton,
-        EllipsisText,
+        EllipsisText,  
     },
     props: {
         course: {
@@ -62,7 +63,7 @@ export default {
         return {
             courseThumbnail: null,
             defaultThumbnail: require('@/assets/default-thumbnail/course-image-icon.png'),
-            dCourse: null,
+            dCourse: this.course,
             isReloadCourse: false,
             router: useRouter(),
         }
@@ -109,6 +110,11 @@ export default {
             }
         }
     },
+    provide(){
+        return {
+            getCourse: () => this.dCourse,
+        }
+    },
     watch: {
         course: {
             handler: function() {
@@ -123,7 +129,7 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/course-registered-card-tooltip.css);
+@import url(@/css/pages/desktop/components/course-short-card-tooltip.css);
 
 </style>
 

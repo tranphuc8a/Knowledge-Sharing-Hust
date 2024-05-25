@@ -43,7 +43,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly string QuestionResource;
         protected readonly int DefaultLimit = 20;
         protected readonly int NumberOfTopComments = 5;
-        protected readonly string NotExistedQuestion, GetQuestionSuccess, GetMultiQuestionSuccess;
+        protected readonly string NotExistedQuestion, GetQuestionSuccess, GetMultiQuestionSuccess, QuestionForbidden;
 
         public QuestionService(
             IQuestionRepository questionRepository,
@@ -75,6 +75,7 @@ namespace KnowledgeSharingApi.Services.Services
             NotExistedQuestion = ResponseResource.NotExist(QuestionResource);
             GetQuestionSuccess = ResponseResource.GetSuccess(QuestionResource);
             GetMultiQuestionSuccess = ResponseResource.GetMultiSuccess(QuestionResource);
+            QuestionForbidden = "Bạn không có quyền truy cập bài thảo luận này";
         }
 
         #region Functional methods
@@ -103,6 +104,21 @@ namespace KnowledgeSharingApi.Services.Services
                 IsAccept = false
             };
             return question;
+        }
+
+        protected virtual async Task<ViewQuestion?> CheckModifiedQuestion(Guid myUid, Guid quesId)
+        {
+            ViewQuestion ques = await QuestionRepository.CheckExistedQuestion(quesId, ResponseResource.NotExist(QuestionResource));
+
+            if (ques.UserId == myUid) return ques;
+
+            if (ques.CourseId != null)
+            {
+                Course? course = await CourseRepository.Get(ques.CourseId.Value);
+                if (course != null && course.UserId == myUid)
+                    return ques;
+            }
+            return null;
         }
 
         #endregion
@@ -209,13 +225,15 @@ namespace KnowledgeSharingApi.Services.Services
         #region User APIes
         public virtual async Task<ServiceResult> ConfirmQuestion(Guid myUid, Guid questionId, bool isConfirm)
         {
-            Question question = await QuestionRepository.CheckExisted(questionId, NotExistedQuestion);
-            if (question.UserId != myUid)
-                return ServiceResult.Forbidden("Đây không phải bài thảo luận của bạn");
+            ViewQuestion? ques = await CheckModifiedQuestion(myUid, questionId);
+            if (ques == null)
+                return ServiceResult.Forbidden(QuestionForbidden);
+            
+            Question question = new();
+            question.Copy(ques);
             question.IsAccept = isConfirm;
-            Question questionToUpdate = new();
-            questionToUpdate.Copy(question);
-            await QuestionRepository.Update(questionId, questionToUpdate);
+            
+            await QuestionRepository.Update(questionId, question);
             return ServiceResult.Success(ResponseResource.UpdateSuccess());
         }
 
@@ -232,7 +250,6 @@ namespace KnowledgeSharingApi.Services.Services
                 Guid courseId = questionModel.CourseId.Value;
                 Course courseToCheck = await CourseRepository.CheckExisted(courseId, ResponseResource.NotExist(EntityResource.Course()));
 
-                // Kiểm tra user đã join course hay chưa, đợi course repository viết
                 if (courseToCheck.UserId != myUid)
                 {   // Trong trường hợp không là chủ nhân, check thêm phải join course
                     ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, courseId);
@@ -305,12 +322,10 @@ namespace KnowledgeSharingApi.Services.Services
             // Kiểm tra user tồn tại
             // Không nhất thiết
 
-            // Kiểm tra post tồn tại
-            Question question = await QuestionRepository.CheckExisted(postId, NotExistedQuestion);
-
-            // Kiểm tra user là chủ post
-            if (question.UserId != myUid)
-                return ServiceResult.Forbidden("Đây không phải khóa học của bạn");
+            // Kiểm tra Question tồn tại và user phài join course hoặc là chủ question
+            ViewQuestion? ques = await CheckModifiedQuestion(myUid, postId);
+            if (ques == null)
+                return ServiceResult.Forbidden(QuestionForbidden);
 
             // OK thực hiện xóa
             int res = await QuestionRepository.Delete(postId);
@@ -436,20 +451,9 @@ namespace KnowledgeSharingApi.Services.Services
             if (question.UserId == myUid)
                 return await UserGetMyPostDetail(myUid, postId);
 
-            // Kiểm tra nếu question là private thì có chung khóa học không
-            if (question.Privacy != EPrivacy.Public)
-            {
-                // Mặc định là không pass qua filter này
-                bool isAccessible = false;
-                if (question.CourseId != null)
-                {
-                    // Cho một cơ hội kiểm tra chung khóa học không
-                    ViewCourseRegister? courseRegister = await CourseRepository.GetViewCourseRegister(myUid, question.CourseId.Value);
-                    isAccessible = courseRegister != null;
-                }
-                if (!isAccessible)
-                    return ServiceResult.Forbidden("Bài thảo luận này ở trạng thái riêng tư");
-            }
+            // Kiểm tra accessible question:
+            bool isAccessible = await KnowledgeRepository.CheckQuestionAccessible(myUid, postId);
+            if (!isAccessible) return ServiceResult.Forbidden(QuestionForbidden);            
 
             // OK pass qua bộ lọc, Trả về thành công
             return ServiceResult.Success(GetQuestionSuccess, string.Empty,

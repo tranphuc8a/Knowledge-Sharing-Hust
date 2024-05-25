@@ -3,7 +3,7 @@
 <template>
     <div class="p-user-oriented-crb" v-if="isLoaded">
         <UserRelationButton v-if="isMyCourse === false" />
-        <InvitedUoCrb v-if="dCourseRoleType?.value == eCourseRoleType.Invited" />
+        <InvitedUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Invited" />
         <MemberUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Member" />
         <RequestedUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Requesting" />
         <GuestUoCrb v-else />

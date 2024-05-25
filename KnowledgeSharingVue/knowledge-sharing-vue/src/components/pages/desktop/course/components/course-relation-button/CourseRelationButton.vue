@@ -44,7 +44,7 @@ export default {
     async mounted(){
         try {
             this.dCourse = this.getCourse();
-            this.dCourseRoleType = this.dCourse.CourseRoleType;
+            this.dCourseRoleType = this.dCourse?.CourseRoleType;
             this.dUser = this.user;
             this.currentUser = await CurrentUser.getInstance();
         } catch (e) {

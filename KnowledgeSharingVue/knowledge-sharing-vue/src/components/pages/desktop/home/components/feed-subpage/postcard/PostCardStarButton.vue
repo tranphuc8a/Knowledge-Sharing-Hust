@@ -17,8 +17,9 @@
                     @:click="resolveClickStar(0)"
                     @:mouseenter="resolveMouseEnter(0)"
                     @:mouseleave="resolveMouseLeave(0)"
+                    title="0 sao"
                     >
-                    <MIcon v-if="currentStar==0" fa="star" family="fas"
+                    <MIcon v-if="currentStar===0" fa="star" family="fas"
                         :style="selectZeroStarIconStyle"/>
                     <MIcon v-else fa="star" family="far" 
                         :style="selectZeroStarIconStyle"/> 
@@ -28,6 +29,7 @@
                         @:click="resolveClickStar(index)"
                         @:mouseenter="resolveMouseEnter(index)"
                         @:mouseleave="resolveMouseLeave(index)"
+                        :title="index + ' sao'"
                         >
                         <MIcon v-if="currentStar >= index" fa="star" family="fas"
                             :style="selectStarIconStyle"/>
@@ -64,12 +66,12 @@ export default {
                 fontSize: '28px'
             },
             selectZeroStarIconStyle: {
-                color: 'var(--red-color)',
+                color: 'var(--grey-color)',
                 fontSize: '28px'
             },
             buttonStyle: {color: 'var(--grey-color-600)'},
             staredButtonStyle: {color: 'var(--primary-color)'},
-            currentStar: 0,
+            currentStar: null,
 
             tooltip: null,
         }
@@ -79,6 +81,7 @@ export default {
             this.tooltip = this.$refs?.tooltip;
             this.currentUser = await CurrentUser.getInstance();
             this.myStar = this.getPost()?.MyStars;
+            this.currentStar = this.myStar;
         } catch (e) {
             console.error(e);
         }

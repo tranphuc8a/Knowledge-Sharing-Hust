@@ -2,26 +2,26 @@
 
 <template>
 
-    <div class="p-course-register-card card">
-        <div class="p-crc-top">
-            <div class="p-crc-thumbnail">
+    <div class="p-course-short-card card">
+        <div class="p-csc-top">
+            <div class="p-csc-thumbnail">
                 <TooltipFrame ref="p-tooltip-course-thumbnail" :style="tooltipStyle">
                     <template #tooltipMask>
-                        <div class="p-crc-thumbnail" :style="{  
+                        <div class="p-csc-thumbnail" :style="{  
                             backgroundImage: `url(${courseThumbnail})`
                         }">
-                            <div class="p-crc-thumbnail-overlay">
+                            <div class="p-csc-thumbnail-overlay">
                             </div>
                         </div>
                     </template>
             
                     <template #tooltipContent>
-                        <CourseRegisteredCardTooltip :course="course" />
+                        <CourseShortCardTooltip :course="course" />
                     </template>
                 </TooltipFrame>
             </div>
 
-            <div class="p-crc-thumbnail-button">
+            <div class="p-csc-thumbnail-button">
                 <!-- View Detail Course Button -->
                 <MCancelButton
                     label="Xem chi tiết"
@@ -31,25 +31,25 @@
             </div>
         </div>
 
-        <div class="p-crc-bottom">
-            <div class="p-crc-bottom-infor">
-                <div class="p-crc-course-title" :title="course?.Title ?? ''">
+        <div class="p-csc-bottom">
+            <div class="p-csc-bottom-infor">
+                <div class="p-csc-course-title" :title="course?.Title ?? ''">
                     {{ course?.Title ?? "" }}
                 </div>
-                <div class="p-crc-course-owner">
+                <div class="p-csc-course-owner">
                     <TooltipUserAvatar :user="user" />
-                    <div class="p-crc-course-owner__username">
+                    <div class="p-csc-course-owner__username">
                         <TooltipUsername :user="user" />
                     </div>
                 </div>
             </div>
-            <div class="p-crc-bottom-devider">
+            <div class="p-csc-bottom-devider">
             </div>
-            <div class="p-crc-bottom-relation">
-                <div class="p-crc-course-cost">
-                    <VisualizedCurrency :money="course.Fee" />
+            <div class="p-csc-bottom-relation">
+                <div class="p-csc-course-cost">
+                    <VisualizedCurrency :money="course?.Fee" />
                 </div>
-                <!-- <div class="p-crc-course-relation-button">
+                <!-- <div class="p-csc-course-relation-button">
                     <CourseRelationButton />
                 </div> -->
             </div>
@@ -63,35 +63,36 @@
 
 <script>
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
-import CourseRegisteredCardTooltip from './CourseRegisteredCardTooltip.vue';
+import CourseShortCardTooltip from './CourseShortCardTooltip.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
 import MCancelButton from '@/components/base/buttons/MCancelButton.vue';
 // import CourseRelationButton from '../course-relation-button/CourseRelationButton.vue';
 import Common from '@/js/utils/common';
 import { useRouter } from 'vue-router';
-import ResponseCourseCardModel from '@/js/models/api-response-models/response-course-card-model';
-import { myEnum } from '@/js/resources/enum';
+// import ResponseCourseCardModel from '@/js/models/api-response-models/response-course-card-model';
+// import { myEnum } from '@/js/resources/enum';
 import VisualizedCurrency from '../course-cost/VisualizedCurrency.vue';
+import ResponseCourseModel from '@/js/models/api-response-models/response-course-model';
 
 export default {
-    name: 'CourseRegisteredCard',
+    name: 'CourseShortCard',
     components: {
         TooltipFrame,
-        CourseRegisteredCardTooltip,
+        CourseShortCardTooltip,
         TooltipUserAvatar, TooltipUsername,
         MCancelButton, 
         // CourseRelationButton,
         VisualizedCurrency
     },
     props: {
-        courseRegister: {
+        course: {
             type: Object,
             required: true
         }
     },
     watch: {
-        courseRegister: {
+        course: {
             handler(){
                 this.refresh();
             },
@@ -102,7 +103,7 @@ export default {
         return {
             tooltipStyle: { boxShadow: '0px 0px 8px 4px rgba(var(--primary-color-rgb), .56)'},
             user: null,
-            course: null,
+            dCourse: this.course,
             router: useRouter(),
             buttonStyle: {},
             courseThumbnail: null,
@@ -117,7 +118,7 @@ export default {
     },
     provide(){
         return {
-            getCourse: () => this.course,
+            getCourse: () => this.dCourse,
         }
     },
     methods: {
@@ -136,16 +137,13 @@ export default {
             try {
                 this.courseThumbnail = this.defaultCourseThumbnail;
                 // update course card
-                let course = this.courseRegister?.getCourse?.();
-                let courseCard = new ResponseCourseCardModel().copy(course);
-                courseCard.CourseRoleType = myEnum.ECourseRoleType.Member;
-                courseCard.CourseRelationId = this.courseRegister?.CourseRegisterId;
-                this.course = courseCard;
-                this.user = this.courseRegister?.getOwner?.();
+                this.dCourse = new ResponseCourseModel().copy(this.course);
+                this.user = this.dCourse?.getUser?.();
+                
                 // update thumbnail
-                if (await Common.isValidImage(courseCard?.Thumbnail)){
+                if (await Common.isValidImage(this.dCourse.Thumbnail)){
                     // console.log("image is valid");
-                    this.courseThumbnail = courseCard.Thumbnail;
+                    this.courseThumbnail = this.dCourse.Thumbnail;
                 }
             } catch (error){
                 console.error(error);
@@ -158,7 +156,7 @@ export default {
 
 <style scoped>
 
-@import url(@/css/pages/desktop/components/course-registered-card.css);
+@import url(@/css/pages/desktop/components/course-short-card.css);
 
 </style>
 

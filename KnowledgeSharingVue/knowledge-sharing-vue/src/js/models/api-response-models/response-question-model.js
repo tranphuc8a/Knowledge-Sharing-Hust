@@ -15,6 +15,8 @@ class ResponseQuestionModel extends ViewQuestion {
         this.MyStars = null;
         this.TotalStar = null;
         this.Categories = [];
+
+        this.myCourse = null;
     }
 
     init() {

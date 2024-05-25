@@ -1,6 +1,11 @@
 <template>
     <div class="p-body">
-        <router-view />
+        <RouterView />
+        <!-- <router-view v-slot="{ Component }">
+            <keep-alive>
+                <component :is="Component" />
+            </keep-alive>
+        </router-view> -->
     </div>
 
     <PopupManager ref="popupManager"/>

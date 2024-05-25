@@ -1,11 +1,11 @@
 
 
-.p-crc-tooltip{
-    width: 500px;
+.p-lesson-tooltip-tooltip{
+    width: 100%;
     height: fit-content;
 }
 
-.p-crct-card{
+.p-lesson-tooltip-card{
     width: 100%;
     display: flex;
     flex-flow: column nowrap;
@@ -13,7 +13,7 @@
     align-items: flex-start;
 }
 
-.p-crct-card > div{
+.p-lesson-tooltip-card > div{
     flex-grow: 0;
     flex-shrink: 0;
     flex-basis: 50%;
@@ -24,14 +24,14 @@
     align-items: flex-start;
 }
 
-.p-crctc-thumbnail{
+.p-lesson-tooltip-thumbnail{
     background-size: cover;
     background-position: center center;
     width: 100%;
     aspect-ratio: 2 / 1;
 }
 
-.p-crctc-bottom{
+.p-lesson-tooltip-bottom{
     padding: 16px;
     display: flex;
     flex-flow: column nowrap;
@@ -40,7 +40,7 @@
     gap: 16px;
 }
 
-.p-crc-information{
+.p-lesson-tooltip-information{
     flex-grow: 1;
     flex-basis: 50%;
 
@@ -52,9 +52,7 @@
     gap: 16px;
 }
 
-.p-crc-title{
-    width: 100%;
-    text-align: left;
+.p-lesson-tooltip-title{
     cursor: pointer;
     font-size: 18px;
     font-family: 'ks-font-semibold';
@@ -64,16 +62,23 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-.p-crc-title:hover{
+.p-lesson-tooltip-title:hover{
     text-decoration: underline;
 
 }
 
-.p-crc-abstract{
-    width: 100%;
+.p-lesson-tooltip-abstract{
+    width: 300px; /* Giới hạn chiều rộng */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; /* Giới hạn số dòng */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Thêm dấu ba chấm khi tràn */
+    word-wrap: break-word; /* Tự động xuống hàng */
+    word-break: break-all; /* Tự động xuống hàng nếu cần */
 }
 
-.p-crc-button{
+.p-lesson-tooltip-button{
     width: 100%;
     flex-shrink: 0;
     flex-grow: 0;

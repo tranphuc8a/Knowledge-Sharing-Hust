@@ -1,7 +1,7 @@
 
 
 <template>
-    <div class="card">
+    <div class="p-course-lesson-card card">
         
     </div>
 </template>
@@ -17,10 +17,18 @@ export default {
     components: {
     },
     props: {
+        responseCourseLessonModel: {}
     },
     data(){
         return {
-            
+            isLoaded: false,
+        }
+    },
+    async created(){
+        try {
+
+        } catch (e){
+            console.error(e);
         }
     },
     async mounted(){
@@ -29,8 +37,7 @@ export default {
 
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
+        getCourse: {}
     },
     provide(){
         return{}
@@ -41,6 +48,11 @@ export default {
 
 
 <style scoped>
+
+.p-course-lesson-card{
+    width: 100%;
+    padding: 16px;
+}
 
 </style>
 

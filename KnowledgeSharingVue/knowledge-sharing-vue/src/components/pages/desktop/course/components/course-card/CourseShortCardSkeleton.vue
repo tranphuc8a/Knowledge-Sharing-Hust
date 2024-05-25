@@ -46,7 +46,7 @@
 <script>
 
 export default {
-    name: 'CourseRegisteredCardSkeleton',
+    name: 'CourseShortCardSkeleton',
 }
 
 </script>

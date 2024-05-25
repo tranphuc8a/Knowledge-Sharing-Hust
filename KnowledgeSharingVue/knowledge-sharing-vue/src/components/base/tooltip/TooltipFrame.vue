@@ -3,7 +3,7 @@
         <div class="p-tooltip-mask" ref="tooltip-mask">
             <slot name="tooltipMask"></slot>
         </div>
-        <div v-show="isTooltipVisible" class="p-tooltip-content" :style="tooltipStyle" ref="tooltip-content">
+        <div v-show="isTooltipVisible" class="p-tooltip-content" :style="{ ...tooltipStyle, ...(style ?? {}) }" ref="tooltip-content">
             <!-- Nội dung của tooltip -->
             <slot name="tooltipContent"></slot>
         </div>
@@ -136,6 +136,7 @@ export default {
         delayHiding: {
             default: 500
         },
+        style: {}
     }
 };
 </script>
@@ -153,11 +154,12 @@ export default {
 }
 
 .p-tooltip-content {
+    width: fit-content;
     box-sizing: border-box;
     position: absolute;
     overflow: hidden;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 8px;
     box-shadow: 0 0px 2px rgba(0, 0, 0, 0.56);
     /* padding: 10px; */
     z-index: 9999;

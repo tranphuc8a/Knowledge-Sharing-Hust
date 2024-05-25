@@ -5,7 +5,7 @@
         <div class="p-guest-co-crb__notfree" v-show="!isCourseFree">
             <TooltipMenuContext :options="getOptions()">
                 <MButton 
-                    label="Thanh toán"
+                    label="Thanh toán ngay"
                     :onclick="resolveClickPayment"
                     :buttonStyle="buttonStyle"
                     fa="credit-card" family="fas" :iconStyle="iconStyle"
@@ -68,7 +68,7 @@ export default {
                 this.dCourse = this.getCourse();
                 this.dCourseRelationId = this.getCourseRelationId().value;
                 this.isWorking = false;
-                this.isCourseFree = this.dCourse.Fee > 0;
+                this.isCourseFree = !(Number(this.dCourse.Fee) > 0);
             } catch (e){
                 console.error(e);
             }
@@ -78,7 +78,7 @@ export default {
             return [
                 {
                     fa: 'hand',
-                    onclick: this,
+                    onclick: this.resolveClickRequest.bind(this),
                     label: 'Yêu cầu tham gia'
                 }
             ]

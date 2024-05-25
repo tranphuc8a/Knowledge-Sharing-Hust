@@ -245,6 +245,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     post.Privacy == EPrivacy.Public || // Question là public
                     post.UserId == userId || // Hoặc question là của user
                     (post.CourseId.HasValue && registeredCourseIds.Contains(post.CourseId.Value)) // Hoặc trong course đã đăng ký
+                    // hoac la chu cua course chua post
                 )
                 orderby mark.CreatedTime descending
                 select post;
