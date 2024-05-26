@@ -17,7 +17,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemMode
 
         public string? Introduction { get; set; }
 
-        public int? Fee { get; set; }
+        public decimal? Fee { get; set; }
 
         public int? EstimateTimeInMinutes { get; set; }
     }
