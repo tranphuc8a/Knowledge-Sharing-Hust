@@ -107,7 +107,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         protected virtual Course CreateCourse(ViewUser user, CreateCourseModel model, string? thumbnail = null)
         {
-            int fee = model.Fee!.Value;
+            decimal fee = model.Fee!.Value;
             Course course = new()
             {
                 // Entity:
@@ -382,7 +382,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             if (effects1 + effects2 <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CourseResource));
             // return success
-            return ServiceResult.Success(ResponseResource.UpdateSuccess(CourseResource), string.Empty, course);
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(CourseResource), string.Empty, courseToUpdate);
         }
 
         #endregion

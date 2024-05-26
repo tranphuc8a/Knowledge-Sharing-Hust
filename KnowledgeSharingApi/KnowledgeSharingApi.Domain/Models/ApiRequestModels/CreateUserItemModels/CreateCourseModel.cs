@@ -20,7 +20,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.CreateUserItemMode
         public string? Introduction { get; set; }
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.COURSE_FEE_EMPTY)]
-        public int? Fee { get; set; }
+        public decimal? Fee { get; set; }
 
         [CustomRequiredValidator(ErrorMessage = ViConstantResource.ESTIMATION_EMPTY)]
         public int? EstimateTimeInMinutes { get; set; }
