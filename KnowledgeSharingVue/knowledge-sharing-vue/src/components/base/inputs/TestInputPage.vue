@@ -91,6 +91,7 @@
             label="Chọn danh mục" 
             title="Chọn một danh mục phù hợp" 
             placeholder="--Chọn 1 danh mục--" 
+            :validator="null"
         />
 
         <MTextfieldButton 
@@ -104,6 +105,22 @@
             :oninput="resolveInputSearch"
             state="normal"
         />
+
+        <MImageInput 
+            :style="{ width: '200px', height: '200px' }"
+            label="Chọn ảnh" title="Chọn một ảnh phù hợp"
+            :is-show-title="true" :is-show-error="true" :is-obligate="true"
+            :validator="null"
+            state="normal"
+        />
+
+        <MTextArea
+            ref="textarea"
+            :placeholder="placeholder"
+            :is-show-title="false" :is-show-error="true" 
+            :validator="commentValidator"
+            max-height="150px" rows="3"
+            />
     </div>
 </template>
 
@@ -118,6 +135,8 @@ import MPasswordTextfield from '@/components/base/inputs/MPasswordTextfield.vue'
 import MSelectOption from './MSelectOption.vue';
 import CategoryInput from '../category/CategoryInput.vue';
 import MTextfieldButton from './MTextfieldButton.vue';
+import MImageInput from './MImageInput.vue';
+import MTextArea from './MTextArea.vue';
 
 
 export default {
@@ -125,7 +144,7 @@ export default {
     components: { 
         MCheckbox, MCombobox, MDatePicker, MRadio, MTextfield,
         MPasswordTextfield, MSelectOption, CategoryInput,
-        MTextfieldButton
+        MTextfieldButton, MImageInput, MTextArea
     },
     methods: {
         async getComboboxItems(){

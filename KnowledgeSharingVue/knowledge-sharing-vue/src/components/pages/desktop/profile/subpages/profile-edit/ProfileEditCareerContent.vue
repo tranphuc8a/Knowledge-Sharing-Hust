@@ -24,7 +24,7 @@
                         Bạn học trường nào? Hãy chia sẻ tên trường để mọi người biết bạn là 'thần đồng' từ đâu ra nhé! 
                         Biết đâu bạn sẽ tìm được những người bạn mới học cùng trường hay thậm chí là cùng lớp.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Nhập tên trường học"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -42,7 +42,7 @@
                         Bạn học khóa bao nhiêu? Hãy chia sẻ năm bạn nhập học để xem có ai cùng khóa không nhé! 
                         Khóa học của bạn sẽ giúp mọi người biết bạn là 'ma mới' hay 'ma cũ' của trường.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Nhập khóa học. Ex 64, 65..." type="number"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -60,7 +60,7 @@
                         Lớp học cụ thể của bạn là gì? Hãy để bạn bè dễ dàng nhận ra bạn trong đám đông và gọi bạn bằng tên lớp thân thương. 
                         Lớp học cũng là nơi bạn có thể gặp gỡ và làm quen với nhiều bạn mới.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Tối đa 255 ký tự"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -78,7 +78,7 @@
                         Chuyên ngành bạn đang theo học là gì? Hãy cho mọi người biết bạn đang đắm chìm trong lĩnh vực nào nhé! 
                         Để khi cần, bạn bè có thể tìm đến bạn để học hỏi thêm kiến thức chuyên sâu..
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Tối đa 255 ký tự"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -97,7 +97,7 @@
                         Hãy tự hào chia sẻ thành tích học tập của mình để mọi người biết bạn học giỏi đến mức nào nhé! 
                         Điểm CPA cao sẽ giúp bạn có thêm nhiều cơ hội học bổng và việc làm.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Nhập số thực. Ex 4.0, 3.66..." type="number"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -115,7 +115,7 @@
                         Bạn đang làm công việc gì? Hãy chia sẻ để mọi người biết bạn đang 'cày cuốc' ở lĩnh vực nào và có thể tìm kiếm sự giúp đỡ khi cần. 
                         Công việc của bạn sẽ là điều thú vị để mọi người hiểu thêm về cuộc sống và kinh nghiệm của bạn.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Tối đa 255 ký tự"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -247,7 +247,7 @@ export default {
     gap: 8px;
 }
 
-.p-input-content{
+.p-pec-input-content{
     width: 50%;
 }
 

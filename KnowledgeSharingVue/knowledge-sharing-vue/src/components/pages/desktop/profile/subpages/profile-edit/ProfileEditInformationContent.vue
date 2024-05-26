@@ -25,7 +25,7 @@
                         Hãy chia sẻ tên gọi thân mật của bạn để bạn bè dễ dàng nhận ra và gọi tên bạn một cách thân thương. 
                         Biệt danh sẽ làm cho bạn trở nên gần gũi và dễ mến hơn trong mắt mọi người.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Tối đa 50 ký tự"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -44,7 +44,7 @@
                         Dù là nam, nữ hay không xác định, bạn đều là chính mình. 
                         Hãy tự tin thể hiện bản thân và để mọi người tôn trọng giới tính của bạn.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MRadio
                             :is-show-title="false" :is-show-error="false" :is-obligate="false"
                             :items="genderItems" direction="row" group="gender-2"
@@ -62,7 +62,7 @@
                         Hãy để mọi người biết để không ai quên gửi lời chúc mừng sinh nhật đến bạn nhé! 
                         Ngày sinh cũng là dịp để bạn nhận được những món quà và lời chúc tốt đẹp từ bạn bè.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MDatePicker 
                             placeholder="dd/mm/yy"
                             :is-show-title="false" :is-show-error="true" :is-obligate="false"
@@ -81,7 +81,7 @@
                         Hãy cho mọi người biết quê quán của bạn để xem có ai là đồng hương không nhé! 
                         Biết đâu bạn sẽ gặp được những người bạn cũ hoặc kết nối với những người đồng hương mới.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Tối đa 255 ký tự"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -100,7 +100,7 @@
                         Để lỡ có dịp nào đó, bạn bè có thể gửi quà hay thư tay đến cho bạn. 
                         Chia sẻ địa chỉ cũng giúp bạn kết nối với những người bạn sống gần khu vực của mình.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Tối đa 255 ký tự"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -251,7 +251,7 @@ export default {
     gap: 8px;
 }
 
-.p-input-content{
+.p-pec-input-content{
     width: 50%;
 }
 

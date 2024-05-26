@@ -7,7 +7,7 @@
                 :isShowTitle="inputFrame.isShowTitle" :isShowError="inputFrame.isShowError">
         <label>
 
-            <div class="p-image-input">
+            <div class="p-image-input" :style="style">
                 <div class="p-image" v-if="data.imgSrc != null"
                     :style="{
                         backgroundImage: 'url(' + data.imgSrc + ')',
@@ -67,7 +67,7 @@ export default {
             },
             iconStyle: {
                 fontSize: '48px',
-                color: 'red',
+                color: 'var(--primary-color)',
             }
         }
     },
@@ -76,6 +76,7 @@ export default {
     },
     props: {
         ...input.props,
+        style: {},
     },
     methods: {
         ...input.methods,
@@ -142,10 +143,10 @@ label{
     justify-content: center;
     align-items: center;
     flex-flow: row nowrap;
-    border-radius: 50px;
+    border-radius: 100%;
     overflow: hidden;
 
-    box-shadow: 0px 0px 8px rgba(var(--primary-color-rgb), .86);
+    box-shadow: 0px 0px 4px 4px rgba(var(--primary-color-rgb), .86);
     cursor: pointer;
     background-color: var(--grey-color-100);
     position: relative;

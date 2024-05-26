@@ -7,6 +7,7 @@
             <ProfileEditNavigationCard
                 :on-save="resolveOnSaveProfile"
                 :on-change-tab="resolveOnChangeTab"
+                :tab-index="tabIndex"
             />
         </div>
 

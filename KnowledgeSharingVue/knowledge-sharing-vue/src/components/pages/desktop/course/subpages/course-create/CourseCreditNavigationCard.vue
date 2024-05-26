@@ -1,46 +1,46 @@
 
 
 <template>
-    <div class="p-profile-edit-navigation-card">
-        <div class="p-penav card">
-            <div class="p-penav-header">
-                <div class="p-penav-heading">
-                    Chỉnh sửa thông tin cá nhân
+    <div class="p-course-credit-navigation-card">
+        <div class="p-ccnav card">
+            <div class="p-ccnav-header">
+                <div class="p-ccnav-heading">
+                    {{ actionName }} khóa học
                 </div>
             </div>
-            <div class="p-penav-tabs">
-                <div :class="['p-penav-tab', {'p-penav-active': dTabIndex == tabEnum.General }]" 
+            <div class="p-ccnav-tabs">
+                <div :class="['p-ccnav-tab', {'p-ccnav-active': dTabIndex == tabEnum.General }]" 
                     @:click="resolveOnChangeTab(tabEnum.General)"
                 >
                     Tổng quan
                 </div>
 
-                <div :class="['p-penav-tab', {'p-penav-active': dTabIndex == tabEnum.Information }]" 
-                    @:click="resolveOnChangeTab(tabEnum.Information)"
+                <div :class="['p-ccnav-tab', {'p-ccnav-active': dTabIndex == tabEnum.Fee }]" 
+                    @:click="resolveOnChangeTab(tabEnum.Fee)"
                 >
-                    Thông tin chi tiết
+                    Học phí
                 </div>
 
-                <div :class="['p-penav-tab', {'p-penav-active': dTabIndex == tabEnum.Contact }]" 
-                    @:click="resolveOnChangeTab(tabEnum.Contact)"
+                <div :class="['p-ccnav-tab', {'p-ccnav-active': dTabIndex == tabEnum.Introduction }]" 
+                    @:click="resolveOnChangeTab(tabEnum.Introduction)"
                 >
-                    Thông tin liên hệ
+                    Bài giới thiệu
                 </div>
 
-                <div :class="['p-penav-tab', {'p-penav-active': dTabIndex == tabEnum.Career }]" 
-                    @:click="resolveOnChangeTab(tabEnum.Career)"
+                <div :class="['p-ccnav-tab', {'p-ccnav-active': dTabIndex == tabEnum.Other }]" 
+                    @:click="resolveOnChangeTab(tabEnum.Other)"
                 >
-                    Thông tin học tập, nghề nghiệp
+                    Khác
                 </div>
             </div>
 
             <div class="p-devide"></div>
             
-            <div class="p-penav__save" @:click="resolveOnSave">
+            <div class="p-ccnav__commit">
 
                 <MButton 
-                    label="Lưu thay đổi"
-                    :onclick="resolveOnSave"
+                    :label="buttonName"
+                    :onclick="resolveOnCommit"
                 />
             </div>
         </div>
@@ -54,7 +54,7 @@ import MButton from './../../../../../base/buttons/MButton.vue';
 
 
 export default {
-    name: 'ProfileEditNavigationCard',
+    name: 'CourseCreditNavigationCard',
     components: {
         MButton,
     },
@@ -63,14 +63,18 @@ export default {
             type: Function,
             required: true,
         },
-        onSave: {
+        onCommit: {
             type: Function,
             required: true,
         },
+        isEdit: {
+            type: Boolean,
+            default: false,
+        },
         tabIndex: {
             type: String,
-            required: true,
-        },
+            default: null,
+        }
     },
     watch: {
         tabIndex: {
@@ -84,12 +88,14 @@ export default {
         return {
             tabEnum: {
                 General: "General",
-                Information: "Information",
-                Contact: "Contact",
-                Career: "Career",
+                Fee: "Fee",
+                Introduction: "Introduction",
+                Other: "Other",
             },
-            dTabIndex: this.tabIndex,
+            dTabIndex: this.tabIndex || "General",
             isWorking: false,
+            actionName: this.isEdit ? "Chỉnh sửa" : "Tạo mới",
+            buttonName: this.isEdit ? "Lưu thay đổi" : "Tạo khóa học",
         }
     },
     async mounted(){
@@ -115,14 +121,14 @@ export default {
             }
         },
 
-        async resolveOnSave(){
+        async resolveOnCommit(){
             if (this.isWorking){
                 return;
             }
             try {
                 this.isWorking = true;
-                if (this.onSave){
-                    await this.onSave();
+                if (this.onCommit){
+                    await this.onCommit();
                 }
             } catch (error){
                 console.error(error);
@@ -143,11 +149,11 @@ export default {
 
 <style scoped>
 
-.p-profile-edit-navigation-card{
+.p-course-credit-navigation-card{
     width: 100%;
 }
 
-.p-penav{
+.p-ccnav{
     padding: 16px;
     display: flex;
     flex-flow: column nowrap;
@@ -156,16 +162,16 @@ export default {
     gap: 16px;
 }
 
-.p-penav > * {
+.p-ccnav > * {
     text-align: left;
 }
 
-.p-penav-heading{
+.p-ccnav-heading{
     font-family: 'ks-font-semibold';
     font-size: 24px;
 }
 
-.p-penav-tabs{
+.p-ccnav-tabs{
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -173,7 +179,7 @@ export default {
     gap: 4px;
 }
 
-.p-penav-tab{
+.p-ccnav-tab{
     padding: 16px 8px;
     cursor: pointer;
     border-radius: 4px;
@@ -181,11 +187,11 @@ export default {
     color: var(--grey-color-600);
 }
 
-.p-penav-tab:hover{
+.p-ccnav-tab:hover{
     background-color: var(--grey-color-200);
 }
 
-.p-penav-tab.p-penav-active{
+.p-ccnav-tab.p-ccnav-active{
     background-color: var(--primary-color-100);
     color: var(--primary-color);
 }

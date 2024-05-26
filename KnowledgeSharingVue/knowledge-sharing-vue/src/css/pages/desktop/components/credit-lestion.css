@@ -69,10 +69,10 @@
 }
 
 .p-credit-lestion .p-form .p-editor{
-    background-color: var(--primary-color-200);
+    /* background-color: var(--primary-color-200);
     border: solid 1px var(--primary-color-200);
-    border-radius: 4px;
-    height: 700px;
+    border-radius: 4px; */
+    height: 750px;
     /* overflow: hidden; */
 }
 

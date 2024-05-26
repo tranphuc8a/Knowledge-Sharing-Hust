@@ -12,7 +12,17 @@ import CourseMemberSubpage from "@/components/pages/desktop/course/subpages/cour
 
 import CourseQuestionSubpage from "@/components/pages/desktop/course/subpages/course-question/CourseQuestionSubpage.vue";
 
+import CourseCreatePage from "@/components/pages/desktop/course/CourseCreatePage.vue";
+
 export default [
+    {
+        path: '/course-create',
+        name: 'create-course',
+        component: CourseCreatePage,
+        meta: {
+            requiredAuth: true
+        }
+    },
     {
         path: '/course/:courseId',
         name: 'course',
