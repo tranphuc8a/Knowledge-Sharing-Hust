@@ -47,7 +47,7 @@
                     <div class="p-ccg-input-content">
                         <MRadio
                             :is-show-title="false" :is-show-error="false" :is-obligate="false"
-                            :items="privacyItems" direction="column" group="isfree-2"
+                            :items="privacyItems" direction="column" group="privacy-2"
                             ref="Privacy" :validator="null"
                             :onchange="()=>{}" :value="privacy"
                         />

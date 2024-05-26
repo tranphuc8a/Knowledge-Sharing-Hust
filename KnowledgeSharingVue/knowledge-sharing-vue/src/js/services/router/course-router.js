@@ -13,6 +13,7 @@ import CourseMemberSubpage from "@/components/pages/desktop/course/subpages/cour
 import CourseQuestionSubpage from "@/components/pages/desktop/course/subpages/course-question/CourseQuestionSubpage.vue";
 
 import CourseCreatePage from "@/components/pages/desktop/course/CourseCreatePage.vue";
+import CourseEditSubpage from './../../../components/pages/desktop/course/subpages/course-edit/CourseEditSubpage.vue'
 
 export default [
     {
@@ -91,7 +92,7 @@ export default [
             {
                 path: 'edit',
                 name: 'course-edit-page',
-                component: null,
+                component: CourseEditSubpage,
             },
             {
                 path: 'lesson-edit',

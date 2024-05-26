@@ -256,7 +256,7 @@ export default {
     flex-grow: 1;
 
     position: sticky;
-    bottom: 0;
+    top: 0;
 
     display: flex;
     flex-flow: column nowrap;

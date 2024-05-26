@@ -74,10 +74,10 @@ export default {
             components: {
             },
             isFreeItems: [
-                { value: true, label: "Miễn phí" },
-                { value: false, label: "Có phí" }
+                { value: 1, label: "Miễn phí" },
+                { value: 0, label: "Có phí" }
             ],
-            isFree: true
+            isFree: 1
         }
     },
     async mounted(){
@@ -103,14 +103,14 @@ export default {
 
         async setValue(obj){
             try {
-                if (Validator.isEmpty(obj?.Fee) || obj.Fee == 0){
-                    await this.components.IsFree.setValue(true);
+                if (Validator.isEmpty(obj?.Fee) || Number(obj.Fee) == 0){
+                    await this.components.IsFree.setValue(1);
                     await this.components.Fee.setValue(0);
-                    this.isFree = true;
+                    this.isFree = 1;
                 } else {
-                    await this.components.IsFree.setValue(false);
+                    await this.components.IsFree.setValue(0);
                     await this.components.Fee.setValue(Number(obj.Fee));
-                    this.isFree = false;
+                    this.isFree = 0;
                 }
             } catch (error){
                 console.error(error);

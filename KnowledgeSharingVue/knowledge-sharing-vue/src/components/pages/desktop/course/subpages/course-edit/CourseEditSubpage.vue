@@ -1,18 +1,18 @@
 
 
 <template>
-    <div class="p-course-create-subpage p-course-subpage">
-        <div class="p-course-create-subpage__left">
+    <div class="p-course-edit-subpage p-course-subpage">
+        <div class="p-course-edit-subpage__left">
             <!-- Navigation -->
             <CourseCreditNavigationCard
-                :on-commit="resolveOnCreateCourse"
+                :on-commit="resolveOnEditCourse"
                 :on-change-tab="resolveOnChangeTab"
-                :is-edit="false"
+                :is-edit="true"
                 :tab-index="tabIndex"
             />
         </div>
 
-        <div class="p-course-create-subpage__right">
+        <div class="p-course-edit-subpage__right">
             <!-- 4 content -->
             
             <CourseCreditGeneralContent
@@ -34,15 +34,13 @@
 
 
 <script>
-import CourseCreditNavigationCard from './CourseCreditNavigationCard.vue';
-import CourseCreditGeneralContent from './CourseCreditGeneralContent.vue';
-import CourseCreditFeeContent from './CourseCreditFeeContent.vue';
-import CourseCreditIntroductionContent from './CourseCreditIntroductionContent.vue';
-import CourseCreditOtherContent from './CourseCreditOtherContent.vue';
+import CourseCreditNavigationCard from '../course-create/CourseCreditNavigationCard.vue';
+import CourseCreditGeneralContent from '../course-create/CourseCreditGeneralContent.vue';
+import CourseCreditFeeContent from '../course-create/CourseCreditFeeContent.vue';
+import CourseCreditIntroductionContent from '../course-create/CourseCreditIntroductionContent.vue';
+import CourseCreditOtherContent from '../course-create/CourseCreditOtherContent.vue';
 
-import CurrentUser from '@/js/models/entities/current-user';
-import { PostRequest, Request } from '@/js/services/request';
-import { useRouter } from 'vue-router';
+import { PatchRequest, Request } from '@/js/services/request';
 
 export default {
     name: 'ProfileEditSubpage',
@@ -66,8 +64,8 @@ export default {
             tabIndex: null,
             components: {
             },
-            router: useRouter(),
             isWorking: false,
+            dCourse: {},
         }
     },
     async mounted(){
@@ -78,7 +76,6 @@ export default {
                 Introduction: this.$refs.introduction,
                 Other: this.$refs.other,
             }
-            this.user = await CurrentUser.getInstance();
             await this.refresh();
         } catch (error){
             console.error(error);
@@ -88,6 +85,10 @@ export default {
         async refresh(){
             try {
                 this.tabIndex = this.tabEnum.General;
+                this.dCourse = this.getCourse();
+                if (this.dCourse != null){
+                    await this.setInputValue(this.dCourse);
+                }
             } catch (error){
                 console.error(error);
             }
@@ -101,39 +102,39 @@ export default {
             }
         },
 
-        async resolveOnCreateCourse(){
+        async resolveOnEditCourse(){
             if (this.isWorking) return;
             try {
                 this.isWorking = true;
                 if (! await this.validateData()){
                     return;
                 }
+                let courseId = this.dCourse.UserItemId;
+                if (courseId == null) return;
 
                 // Get data from input
                 let inputValue = await this.getInputValue();
 
                 // set post request
-                let postRequest = new PostRequest('Courses')
+                let patchRequest = new PatchRequest('Courses/' + courseId)
                     .prepareFormData();
                 for (let key in inputValue){
                     if (key == "Categories"){
                         let listCate = inputValue[key];
                         for (let cate of listCate){
-                            postRequest.addFormData(key, cate);
+                            patchRequest.addFormData(key, cate);
                         }
                         continue;
                     }
-                    postRequest.addFormData(key, inputValue[key]);
+                    patchRequest.addFormData(key, inputValue[key]);
                 }
 
                 // send request
-                let response = await postRequest.execute();
-                let body = await Request.tryGetBody(response);
-                let courseId = body.UserItemId;
+                await patchRequest.execute();
 
                 // toast Success:
-                this.getToastManager().success('Tạo khóa học thành công');
-                this.router.push(`/course/${courseId}`);
+                this.getToastManager().success('Cập nhật khóa học thành công');
+                await this.refreshCoursePage?.();
             } catch (e){
                 Request.resolveAxiosError(e);
             } finally {
@@ -214,10 +215,10 @@ export default {
 
         async setInputValue(){
             try {
-                await this.components.General.setValue(null);
-                await this.components.Fee.setValue(null);
-                await this.components.Introduction.setValue(null);
-                await this.components.Other.setValue(null);
+                await this.components.General.setValue(this.dCourse);
+                await this.components.Fee.setValue(this.dCourse);
+                await this.components.Introduction.setValue(this.dCourse);
+                await this.components.Other.setValue(this.dCourse);
             } catch (e){
                 console.error(e);
             }
@@ -226,6 +227,8 @@ export default {
     inject: {
         getToastManager: {},
         getPopupManager: {},
+        refreshCoursePage: {},
+        getCourse: {},
     }
 }
 
@@ -241,7 +244,7 @@ export default {
 
 <style scoped>
 
-.p-course-create-subpage{
+.p-course-edit-subpage{
     display: flex;
     flex-flow: row nowrap;
     gap: 16px;
@@ -250,7 +253,7 @@ export default {
     padding-bottom: 32px;
 }
 
-.p-course-create-subpage__left{
+.p-course-edit-subpage__left{
     width: 0;
     flex-shrink: 1;
     flex-grow: 1;
@@ -265,7 +268,7 @@ export default {
     gap: 16px;
 }
 
-.p-course-create-subpage__right{
+.p-course-edit-subpage__right{
     width: 0;
     flex-shrink: 1;
     flex-grow: 3;
