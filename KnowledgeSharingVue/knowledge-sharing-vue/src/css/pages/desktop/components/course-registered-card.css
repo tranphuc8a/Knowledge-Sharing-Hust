@@ -31,6 +31,8 @@
 }
 
 .p-crc-thumbnail-overlay{
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     position: absolute;
     top: 0; left: 0;
     width: 100%;
@@ -57,7 +59,7 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 16px;
+    gap: 8px;
 }
 
 .p-crc-bottom-devider{
@@ -108,7 +110,7 @@
     width: 100%;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     gap: 16px;
 }

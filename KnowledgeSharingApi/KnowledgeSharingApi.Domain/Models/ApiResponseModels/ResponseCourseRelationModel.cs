@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
         public ResponseUserCardModel? User { get; set; }
 
-        public ResponseCourseCardModel? Course { get; set; }
+        public ResponseCourseCardModel? Course { get; set; } 
 
     }
 }

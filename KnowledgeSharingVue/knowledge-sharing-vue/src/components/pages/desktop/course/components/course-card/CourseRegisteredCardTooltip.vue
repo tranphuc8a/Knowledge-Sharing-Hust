@@ -17,8 +17,14 @@
                     <div class="p-crc-title" @:click="resolveViewCourseDetail">
                         {{ dCourse?.Title ?? "" }}
                     </div>
-                    <div class="p-crc-abstract" v-if="dCourse?.Abstract != null">
+                    <!-- <div class="p-crc-abstract" v-if="dCourse?.Abstract != null">
                         {{ dCourse?.Abstract ?? "" }}
+                    </div> -->
+                    <div class="p-crc-abstract" v-if="dCourse?.Abstract != null">
+                        <EllipsisText 
+                            :text="dCourse?.Abstract ?? ''" 
+                            :max-line="3"
+                            :style="{}"/>
                     </div>
                 </div>
                 <div class="p-crc-button">
@@ -38,11 +44,13 @@ import { GetRequest, Request } from '@/js/services/request';
 import ResponseCourseModel from '@/js/models/api-response-models/response-course-model';
 import { useRouter } from 'vue-router';
 import CourseRelationButton from '../course-relation-button/CourseRelationButton.vue';
+import EllipsisText from '@/components/base/text/EllipsisText.vue';
 
 export default {
     name: 'CourseRegisteredCardTooltip',
     components: {
-        CourseRelationButton
+        CourseRelationButton,
+        EllipsisText,
     },
     props: {
         course: {

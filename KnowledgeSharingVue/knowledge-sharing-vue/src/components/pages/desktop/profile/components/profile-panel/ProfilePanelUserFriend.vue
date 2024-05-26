@@ -1,7 +1,23 @@
 
 
 <template>
-    <div class="p-profile-panel-user-friend">
+    <div class="p-profile-panel-user-friend" v-if="!isLoaded">
+        <div class="p-number-friends">
+            <div class="skeleton"
+                style="width: 75px; height: 18px"
+            >
+
+            </div>
+        </div>
+        <div class="p-list-friends">
+            <div class="skeleton"
+                style="width: 150px; height: 24px"
+            >
+            </div>
+        </div>
+    </div>
+
+    <div class="p-profile-panel-user-friend" v-if="isLoaded">
         <div class="p-number-friends">
             <span>{{ numberFriends }} bạn bè</span>
         </div>
@@ -39,6 +55,7 @@ export default {
             listFriends: [],
             requiredFriendNumbers: 8,
             currentUser: null,
+            isLoaded: false
         }
     },
     async created(){
@@ -66,6 +83,7 @@ export default {
                 })?.map(function(item){
                     return new ResponseFriendCardModel().copy(item);
                 }) ?? [];
+                this.isLoaded = true;
             } catch (e) {
                 Request.resolveAxiosError(e);
             }

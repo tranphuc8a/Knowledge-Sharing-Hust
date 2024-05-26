@@ -86,10 +86,8 @@ export default {
     watch: {
         markdownContent: {
             immediate: true,
-            handler(newValue) {
-                if (newValue) {
-                    this.updateContent();
-                }
+            handler() {
+                this.updateContent();
             }
         }
     },

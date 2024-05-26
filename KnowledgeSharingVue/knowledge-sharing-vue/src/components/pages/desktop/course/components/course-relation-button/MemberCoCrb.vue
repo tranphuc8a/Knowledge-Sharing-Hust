@@ -72,7 +72,7 @@ export default {
                 let alertMsg = 'Bạn có chắc chắn muốn rời khóa học này?';
                 let that = this;
                 let callback = async function(){
-                    that.submitLeaveCourse();
+                    await that.submitLeaveCourse();
                 }
                 this.getPopupManager().inform(alertMsg, callback);
             } catch (e){

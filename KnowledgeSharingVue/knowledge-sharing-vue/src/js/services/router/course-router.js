@@ -2,9 +2,28 @@
 import CoursePage from "@/components/pages/desktop/course/CoursePage.vue";
 
 import CourseIntroductionSubpage from "@/components/pages/desktop/course/subpages/course-introduction/CourseIntroductionSubpage.vue";
+import CourseRevitationSubpage from "@/components/pages/desktop/course/subpages/course-revitation/CourseRevitationSubpage.vue";
 
+import CourseRequestContent from "@/components/pages/desktop/course/subpages/course-revitation/CourseRequestContent.vue";
+import CourseInviteContent from "@/components/pages/desktop/course/subpages/course-revitation/CourseInviteContent.vue";
+import CourseMemberContent from "@/components/pages/desktop/course/subpages/course-revitation/CourseMemberContent.vue";
+
+import CourseMemberSubpage from "@/components/pages/desktop/course/subpages/course-member/CourseMemberSubpage.vue";
+
+import CourseQuestionSubpage from "@/components/pages/desktop/course/subpages/course-question/CourseQuestionSubpage.vue";
+
+import CourseCreatePage from "@/components/pages/desktop/course/CourseCreatePage.vue";
+import CourseEditSubpage from './../../../components/pages/desktop/course/subpages/course-edit/CourseEditSubpage.vue'
 
 export default [
+    {
+        path: '/course-create',
+        name: 'create-course',
+        component: CourseCreatePage,
+        meta: {
+            requiredAuth: true
+        }
+    },
     {
         path: '/course/:courseId',
         name: 'course',
@@ -31,17 +50,39 @@ export default [
             {
                 path: 'question',
                 name: 'course-question-page',
-                component: null,
+                component: CourseQuestionSubpage,
             },
             {
                 path: 'register',
                 name: 'course-register-page',
-                component: null,
+                component: CourseMemberSubpage,
             },
             {
                 path: 'revite',
                 name: 'course-request-invite-page',
-                component: null,
+                component: CourseRevitationSubpage,
+                children: [
+                    {
+                        path: '',
+                        name: 'course-revite-home-page',
+                        component: CourseRequestContent,
+                    },
+                    {
+                        path: 'request',
+                        name: 'course-revite-request-page',
+                        component: CourseRequestContent,
+                    },
+                    {
+                        path: 'invite',
+                        name: 'course-revite-invite-page',
+                        component: CourseInviteContent,
+                    },
+                    {
+                        path: 'member',
+                        name: 'course-revite-member-page',
+                        component: CourseMemberContent,
+                    },
+                ]
             },
             {
                 path: 'payment',
@@ -51,7 +92,7 @@ export default [
             {
                 path: 'edit',
                 name: 'course-edit-page',
-                component: null,
+                component: CourseEditSubpage,
             },
             {
                 path: 'lesson-edit',

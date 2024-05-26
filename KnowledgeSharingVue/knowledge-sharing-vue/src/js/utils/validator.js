@@ -69,10 +69,10 @@ class Validator {
 
     /**
     * abtract method để validate dữ liệu 
-    * @param {*} value
+    * @Param {*} value
     * @Author TVPhuc (30/11/23)
-    * Edit none 
-    * Output: {
+    * @Edit none 
+    * @Output {
     *   isValid: true/false,
     *   msg: string
     * } 

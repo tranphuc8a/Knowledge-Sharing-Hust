@@ -420,6 +420,28 @@ namespace KnowledgeSharingApi.Controllers
             return StatusCode(res);
         }
 
+
+        /// <summary>
+        /// Xử lý yêu cầu user tim kiem danh sach bai thao luan trong mot khoa hoc
+        /// </summary>
+        /// <param name="courseId"> id khoa hoc can tim kiem bai thao luan </param>
+        /// <param name="limit"> Số lượng bài đăng cần lấy </param>
+        /// <param name="offset"> Độ lệch bài đăng đầu tiên </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/5/24)
+        /// Modified: None
+        [HttpGet("/api/v1/Courses/search/questions/{courseId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchQuestions(Guid courseId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            ServiceResult res = await QuestionService.UserSearchQuestionOfCourse(GetCurrentUserIdStrictly(), courseId, search, pagination);
+            return StatusCode(res);
+        }
+
         /// <summary>
         /// Xử lý yêu cầu user tim kiem danh sach bai thao luan
         /// </summary>

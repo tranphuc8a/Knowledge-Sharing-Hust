@@ -2,8 +2,8 @@
 
 <template>
     <div class="p-course-relation-button" v-if="isShow">
-        <OwnerOrientedCrb v-if="dCourseRoleType == eCourseRoleType.Owner" />
-        <UserOrientedCrb v-else-if="dUser != null" />
+        <UserOrientedCrb v-if="dUser != null" />
+        <OwnerOrientedCrb v-else-if="dCourseRoleType == eCourseRoleType.Owner" />
         <CourseOrientedCrb v-else />
     </div>
 </template>
@@ -44,7 +44,7 @@ export default {
     async mounted(){
         try {
             this.dCourse = this.getCourse();
-            this.dCourseRoleType = this.dCourse.CourseRoleType;
+            this.dCourseRoleType = this.dCourse?.CourseRoleType;
             this.dUser = this.user;
             this.currentUser = await CurrentUser.getInstance();
         } catch (e) {

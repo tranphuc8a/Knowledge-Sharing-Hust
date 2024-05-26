@@ -139,7 +139,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<Dictionary<Guid, CourseRoleTypeDto>> GetCourseRoleType(Guid userId, List<Guid> courseIds)
         {
-            Dictionary<Guid, CourseRoleTypeDto> result = courseIds.ToDictionary(
+            Dictionary<Guid, CourseRoleTypeDto> result = courseIds.Distinct().ToDictionary(
                 id => id,
                 id => new CourseRoleTypeDto()
                 {
@@ -156,13 +156,14 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToDictionaryAsync(group => group.Key, group => group.First());
             List<CourseRelation> relationList = await DbContext.CourseRelations
                 .Where(crl => (crl.SenderId == userId || crl.ReceiverId == userId) && courseIds.Contains(crl.CourseId))
+                .GroupBy(crl => crl.CourseId).Select(g => g.First())
                 .ToListAsync();
             Dictionary<Guid, CourseRelation> invitedDict = relationList
                 .Where(crl => crl.ReceiverId == userId)
                 .ToDictionary(crl => crl.CourseId, crl => crl);
             Dictionary<Guid, CourseRelation> requestingDict = relationList
                 .Where(crl => crl.SenderId == userId)
-                .ToDictionary(crl => crl.CourseId, crl => crl);
+                .Distinct().ToDictionary(crl => crl.CourseId, crl => crl);
 
             foreach (Guid id in courseIds)
             {

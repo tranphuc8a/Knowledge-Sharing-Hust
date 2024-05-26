@@ -2,7 +2,10 @@
 
 <template>
     <div class="p-feed-subpage" v-if="!isLoaded">
-        <AddPostFeedCard v-if="isShowAddPost"/>
+        <!-- <AddPostFeedCard v-if="isShowAddPost"/> -->
+
+        <slot name="addpost"></slot>
+
         <div v-for="item in [1, 2, 3]" :key="item" style="width: 100%">
             <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
                 class="card"
@@ -19,7 +22,7 @@
     <div class="p-feed-subpage" v-if="isLoaded"
         ref="list"
         >
-        <AddPostFeedCard v-if="isShowAddPost" />
+        <slot name="addpost"></slot>
 
         <component v-for="item in listPosts" 
             :key="item?.UserItemId"
@@ -27,6 +30,26 @@
             v-bind="{post: item}">
             Hello
         </component>
+
+        <div class="p-feed-notfound" v-show="isOutOfPost && !(listPosts.length > 0)">
+            <NotFoundPanel text="Không tìm thấy mục nào" />
+        </div>
+
+        <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
+            class="card" v-if="!isOutOfPost">
+            <div class="skeleton" style="width: 30%; height: 20px; margin-bottom: 18px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 50%; height: 20px; margin-bottom: 10px;"></div>
+        </div>
+
+        <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
+            class="card" v-if="!isOutOfPost">
+            <div class="skeleton" style="width: 30%; height: 20px; margin-bottom: 18px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 100%; height: 20px; margin-bottom: 10px;"></div>
+            <div class="skeleton" style="width: 50%; height: 20px; margin-bottom: 10px;"></div>
+        </div>
 
         <div style="padding: 16px; display: index; flex-flow: column nowrap; width: 100%"
             class="card" v-if="!isOutOfPost">
@@ -43,7 +66,8 @@
 
 
 <script>
-import AddPostFeedCard from '../components/feed-subpage/postcard/AddPostFeedCard.vue';
+import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
+// import AddPostFeedCard from '../components/feed-subpage/postcard/AddPostFeedCard.vue';
 import LessonFeedCard from '../components/feed-subpage/postcard/LessonFeedCard.vue';
 import QuestionFeedCard from '../components/feed-subpage/postcard/QuestionFeedCard.vue';
 
@@ -56,9 +80,10 @@ import ResponseQuestionModel from '@/js/models/api-response-models/response-ques
 export default {
     name: 'PostSubpage',
     components: {
-        AddPostFeedCard,
+        // AddPostFeedCard,
         LessonFeedCard,
         QuestionFeedCard,
+        NotFoundPanel,
     },
     props: {
         getPost: {
@@ -67,10 +92,14 @@ export default {
                 return [];
             }
         },
-        isShowAddPost: {
-            type: Boolean,
-            default: true,
+        // prop xac dinh context cua postsubpage hien tai (null, user, course)
+        owner: {
+            default: null,
         }
+        // isShowAddPost: {
+        //     type: Boolean,
+        //     default: true,
+        // }
     },
     data(){
         return {
@@ -153,6 +182,7 @@ export default {
 
             } catch (e){
                 Request.resolveAxiosError(e);
+                this.isOutOfPost = true;
             } finally {
                 this.isLoadingMore = false;
             }
@@ -193,6 +223,15 @@ export default {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
+}
+
+.p-feed-notfound{
+    width: 100%;
+    height: 200px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
 }
 
 

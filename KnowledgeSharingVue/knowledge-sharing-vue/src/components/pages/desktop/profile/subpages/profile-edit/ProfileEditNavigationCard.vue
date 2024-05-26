@@ -9,25 +9,25 @@
                 </div>
             </div>
             <div class="p-penav-tabs">
-                <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.General }]" 
+                <div :class="['p-penav-tab', {'p-penav-active': dTabIndex == tabEnum.General }]" 
                     @:click="resolveOnChangeTab(tabEnum.General)"
                 >
                     Tổng quan
                 </div>
 
-                <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.Information }]" 
+                <div :class="['p-penav-tab', {'p-penav-active': dTabIndex == tabEnum.Information }]" 
                     @:click="resolveOnChangeTab(tabEnum.Information)"
                 >
                     Thông tin chi tiết
                 </div>
 
-                <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.Contact }]" 
+                <div :class="['p-penav-tab', {'p-penav-active': dTabIndex == tabEnum.Contact }]" 
                     @:click="resolveOnChangeTab(tabEnum.Contact)"
                 >
                     Thông tin liên hệ
                 </div>
 
-                <div :class="['p-penav-tab', {'p-penav-active': tabIndex == tabEnum.Career }]" 
+                <div :class="['p-penav-tab', {'p-penav-active': dTabIndex == tabEnum.Career }]" 
                     @:click="resolveOnChangeTab(tabEnum.Career)"
                 >
                     Thông tin học tập, nghề nghiệp
@@ -67,6 +67,18 @@ export default {
             type: Function,
             required: true,
         },
+        tabIndex: {
+            type: String,
+            required: true,
+        },
+    },
+    watch: {
+        tabIndex: {
+            handler: function(newValue){
+                this.dTabIndex = newValue;
+            },
+            immediate: true,
+        }
     },
     data(){
         return {
@@ -76,7 +88,7 @@ export default {
                 Contact: "Contact",
                 Career: "Career",
             },
-            tabIndex: null,
+            dTabIndex: this.tabIndex,
             isWorking: false,
         }
     },
@@ -86,17 +98,17 @@ export default {
     methods: {
         async refresh(){
             try {
-                this.tabIndex = this.tabEnum.General;
+                this.dTabIndex = this.tabEnum.General;
             } catch (error){
                 console.error(error);
             }
         },
 
-        async resolveOnChangeTab(tabIndex){
+        async resolveOnChangeTab(dTabIndex){
             try {
-                this.tabIndex = tabIndex;
+                this.dTabIndex = dTabIndex;
                 if (this.onChangeTab){
-                    await this.onChangeTab(tabIndex);
+                    await this.onChangeTab(dTabIndex);
                 }
             } catch (error){
                 console.error(error);

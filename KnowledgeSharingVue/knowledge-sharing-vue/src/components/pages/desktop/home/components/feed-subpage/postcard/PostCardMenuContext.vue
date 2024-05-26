@@ -36,7 +36,7 @@ export default {
     props: {
         onEdit: {},
         onDelete: {},
-        onReply: {},
+        onComment: {},
     },
     components: {
         MContextPopup
@@ -84,6 +84,8 @@ export default {
                     .execute();
                 // delete success:
                 this.getToastManager().success(`Xóa ${this.postResource} thành công!`);
+
+                // push sang location hop ly hon
                 window.location.reload();
             } catch (error) {
                 console.error(error);
@@ -91,7 +93,13 @@ export default {
             }
         },
         async resolveComment(){
-            
+            try {
+                if (this.onComment != null){
+                    await this.onComment();
+                }
+            } catch (e){
+                console.error(e);
+            }
         },
         async resolveMark(){
             try {
@@ -118,10 +126,18 @@ export default {
             }
         },
         async resolveReport(){
-            
+            try {
+                this.getToastManager().inform("Tính năng đang được phát triển, vui lòng thử lại sau!");
+            } catch (e){
+                console.error(e);
+            }
         },
         async resolveHistory(){
-            
+            try {
+                this.getToastManager().inform("Tính năng đang được phát triển, vui lòng thử lại sau!");
+            } catch (e){
+                console.error(e);
+            }
         },
         async resolveComplete(){
             try {
@@ -182,9 +198,21 @@ export default {
                 console.error(error);
             }
         },
+        async resolveGotoCourse(){
+            try {
+                let courseId = this.getPost()?.CourseId;
+                if (courseId == null) return;
+                this.router.push('/course/' + courseId);
+            } catch (e){
+                console.error(e);
+            }
+        },
 
         async updateOptions(){
             try {
+                // role of user for a post:
+                // admin, anonymouse, owner, user, banned ( ~ anonymous )
+                // only question has more role is (owner of it's course)
                 this.currentUser = await CurrentUser.getInstance();
                 if (this.currentUser == null){ 
                     // Anonymous
@@ -224,7 +252,7 @@ export default {
                 } else {
                     // User:
                     if (this.currentUser.UserId == this.getPost()?.UserId){
-                        // Owmer
+                        // Owner
                         this.listOptions = [
                             this.actions.Edit,
                             this.actions.Delete,
@@ -265,6 +293,22 @@ export default {
                         }
                     }
                 }
+                let question = this.getPost();
+                let course = this.getCourse?.();
+                if (question?.PostType == myEnum.EPostType.Question 
+                    && question?.Privacy == myEnum.EPrivacy.Private
+                    && question?.CourseId != null){
+
+                    this.listOptions.push(this.actions.GotoCourse);
+                    
+                    if (question?.CourseId == course?.UserItemId && course?.UserId == this.currentUser?.UserId){
+                        if (question?.CourseId != null && course?.UserId != null){
+                            if (! this.listOptions.includes(this.actions.Delete)){
+                                this.listOptions.push(this.actions.Delete);
+                            }
+                        }
+                    }
+                }
             }
             catch (error){
                 console.error(error);
@@ -301,6 +345,7 @@ export default {
                 LockComment: 10,
                 UnlockComment: 11,
                 CopyUserItemId: 12,
+                GotoCourse: 13,
             },
             listOptions: [],
             options: {
@@ -377,13 +422,20 @@ export default {
                     label: 'Sao chép id phần tử',
                     fa: 'copy',
                     onClick: this.resolveCopyUserItemId,
-                }
+                },
+                [13]: {
+                    id: 13,
+                    label: 'Đi đến khóa học',
+                    fa: 'forward',
+                    onClick: this.resolveGotoCourse,
+                },
             }
         }
     },
     inject: {
         getLanguage: {},
         getPost: {},
+        getCourse: { default: () => null },
         getPopupManager: {},
         getToastManager: {},
     }

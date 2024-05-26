@@ -173,7 +173,7 @@
     position: absolute;
     overflow: hidden;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 8px;
     box-shadow: 0 0px 2px rgba(0, 0, 0, 0.56);
     z-index: 9999;
     white-space: nowrap; /* Đảm bảo nội dung không bị wrap nếu dài */

@@ -22,7 +22,7 @@
                     <div class="p-input-description p-profile-card-description">
                         Số điện thoại của bạn là gì? Để bạn bè có thể liên lạc và tám chuyện với bạn dễ dàng hơn.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Nhập số điện thoại của bạn"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -41,7 +41,7 @@
                         Hãy chia sẻ để nhận được thông báo quan trọng và những lời nhắn "yêu thương" từ bạn bè. 
                         Email cũng là kênh để bạn giữ liên lạc với các cơ hội học tập và nghề nghiệp.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Tối đa 255 ký tự"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -60,7 +60,7 @@
                         Để mọi người có thể theo dõi và kết nối với bạn trên mọi nền tảng. 
                         Hãy khoe những khoảnh khắc đẹp và những điều thú vị trong cuộc sống của bạn trên mạng xã hội.
                     </div>
-                    <div class="p-input-content">
+                    <div class="p-pec-input-content">
                         <MTextfield 
                             placeholder="Nhập chính xác đường dẫn URL"
                             :is-show-icon="false" :is-show-title="false" :is-show-error="true" :is-obligate="false" 
@@ -185,7 +185,7 @@ export default {
     gap: 8px;
 }
 
-.p-input-content{
+.p-pec-input-content{
     width: 50%;
 }
 

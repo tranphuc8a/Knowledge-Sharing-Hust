@@ -204,7 +204,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public async Task<List<Tuple<CourseLesson, ViewCourse>>> GetListCoursesOfLesson(Guid lessonId)
         {
             List<CourseLesson> courseLessons = await DbContext.CourseLessons
-                .Where(cl => cl.LessonId == lessonId).ToListAsync();
+                .Where(cl => cl.LessonId == lessonId)
+                .GroupBy(cl => cl.CourseId)
+                .Select(group => group.First())
+                .ToListAsync();
 
             List<Guid> listCoursesId = courseLessons.Select(cl => cl.CourseId).ToList();
             Dictionary<Guid, CourseLesson> mapCourseIdToCourseLesson 

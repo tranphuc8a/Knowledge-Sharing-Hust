@@ -272,12 +272,14 @@ let myEnum = {
     ECourseRoleType: {
         NotAccessible: 0,
         Guest: 1,
+        
         GuestNotInRelation: 10,
         GuestRequesting: 11,
         GuestInvited: 12,
         NotInRelation: 10,
         Requesting: 11,
         Invited: 12,
+        
         Member: 2,
         Owner: 3
     },

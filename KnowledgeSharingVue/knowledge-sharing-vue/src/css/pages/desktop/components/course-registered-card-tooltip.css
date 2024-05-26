@@ -1,7 +1,7 @@
 
 
 .p-crc-tooltip{
-    width: 100%;
+    width: 500px;
     height: fit-content;
 }
 
@@ -53,6 +53,8 @@
 }
 
 .p-crc-title{
+    width: 100%;
+    text-align: left;
     cursor: pointer;
     font-size: 18px;
     font-family: 'ks-font-semibold';
@@ -68,14 +70,7 @@
 }
 
 .p-crc-abstract{
-    width: 300px; /* Giới hạn chiều rộng */
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3; /* Giới hạn số dòng */
-    overflow: hidden;
-    text-overflow: ellipsis; /* Thêm dấu ba chấm khi tràn */
-    word-wrap: break-word; /* Tự động xuống hàng */
-    word-break: break-all; /* Tự động xuống hàng nếu cần */
+    width: 100%;
 }
 
 .p-crc-button{

@@ -73,7 +73,9 @@ class Entity {
         if (this.ModifiedTime != null){
             this.ModifiedTime = new MyDate(this.ModifiedTime);
         }
-        this.User = this.getUser();
+        if (this.User == null || this.User == undefined){
+            this.User = this.getUser();
+        }
         return this;
     }
 

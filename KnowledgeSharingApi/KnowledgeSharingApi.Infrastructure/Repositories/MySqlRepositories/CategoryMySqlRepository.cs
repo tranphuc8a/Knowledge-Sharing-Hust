@@ -38,7 +38,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .GroupBy(knowCate => knowCate.KnowledgeId)
                 .ToDictionaryAsync(group => group.Key, group => group.ToList());
 
-            return knowledgeIds.ToDictionary(
+            return knowledgeIds.Distinct().ToDictionary(
                 id => id,
                 id =>
                 {

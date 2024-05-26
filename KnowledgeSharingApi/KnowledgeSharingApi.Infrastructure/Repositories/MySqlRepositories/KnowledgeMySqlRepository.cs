@@ -65,14 +65,19 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             // public, owner : true
             if (lesson.Privacy == EPrivacy.Public || lesson.UserId == userId) return true;
 
-            // Kiểm tra xem người dùng có đăng ký cho bất kỳ khóa học nào có chứa bài học này không.
-            bool isRegistered = await DbContext.CourseLessons
-                .AnyAsync(cl => cl.LessonId == lessonId
-                    && DbContext.ViewCourseRegisters
-                        .Any(cr => cr.UserId == userId && cr.CourseId == cl.CourseId)
-                );
+            IQueryable<Guid> courseIds = DbContext.CourseLessons
+                .Where(crl => crl.LessonId == lessonId).Select(crl => crl.CourseId);
 
-            return isRegistered;
+            // Kiểm tra xem người dùng có đăng ký cho bất kỳ khóa học nào có chứa bài học này không.
+            bool isRegistered = await DbContext.CourseRegisters
+                .AnyAsync(cr => cr.UserId == userId && courseIds.Contains(cr.CourseId));
+            if (isRegistered) return true;
+
+            // Kiem tra xem user co phai la owner cua bat ky khoa hoc nao co chua bai hoc nay khong
+            bool isOwner = await DbContext.Courses
+                .AnyAsync(c => c.UserId == userId && courseIds.Contains(c.UserItemId));
+
+            return isOwner;
         }
 
         public virtual async Task<bool> CheckPostAccessible(Guid userId, Guid postId)
@@ -108,8 +113,13 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             // Kiểm tra xem người dùng có đăng ký khóa học chứa câu hỏi này không
             bool isRegistered = await DbContext.ViewCourseRegisters
                 .AnyAsync(cr => cr.UserId == userId && cr.CourseId == question.CourseId.Value);
+            if (isRegistered) return true;
 
-            return isRegistered;
+            // Kiem tra xem nguoi dung co phai la chu khoa hoc chua cau hoi nay khong
+            bool isOwnerOfCourse = await DbContext.Courses
+                .AnyAsync(c => c.UserId == userId && c.UserItemId == question.CourseId.Value);
+
+            return isOwnerOfCourse;
         }
 
         public virtual async Task<double?> GetAverageStar(Guid knowledgeId)
@@ -220,7 +230,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public override async Task<Dictionary<Guid, IResponseUserItemModel?>> GetExactlyResponseUserItemModel(List<Guid> knowledgeIds)
         {
-            Dictionary<Guid, IResponseUserItemModel?> res = knowledgeIds
+            Dictionary<Guid, IResponseUserItemModel?> res = knowledgeIds.Distinct()
                 .ToDictionary(id => id, id => (IResponseUserItemModel?)null);
 
             // Get List courseIds, lessonIds and questionsIds:

@@ -5,7 +5,7 @@
     <div class="p-course-register-card card">
         <div class="p-crc-top">
             <div class="p-crc-thumbnail">
-                <TooltipFrame ref="p-tooltip-course-thumbnail">
+                <TooltipFrame ref="p-tooltip-course-thumbnail" :style="tooltipStyle">
                     <template #tooltipMask>
                         <div class="p-crc-thumbnail" :style="{  
                             backgroundImage: `url(${courseThumbnail})`
@@ -49,10 +49,9 @@
                 <div class="p-crc-course-cost">
                     <VisualizedCurrency :money="course.Fee" />
                 </div>
-                <div class="p-crc-course-relation-button">
-                    <!-- Course Relation Button -->
+                <!-- <div class="p-crc-course-relation-button">
                     <CourseRelationButton />
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -68,7 +67,7 @@ import CourseRegisteredCardTooltip from './CourseRegisteredCardTooltip.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
 import MCancelButton from '@/components/base/buttons/MCancelButton.vue';
-import CourseRelationButton from '../course-relation-button/CourseRelationButton.vue';
+// import CourseRelationButton from '../course-relation-button/CourseRelationButton.vue';
 import Common from '@/js/utils/common';
 import { useRouter } from 'vue-router';
 import ResponseCourseCardModel from '@/js/models/api-response-models/response-course-card-model';
@@ -81,7 +80,8 @@ export default {
         TooltipFrame,
         CourseRegisteredCardTooltip,
         TooltipUserAvatar, TooltipUsername,
-        MCancelButton, CourseRelationButton,
+        MCancelButton, 
+        // CourseRelationButton,
         VisualizedCurrency
     },
     props: {
@@ -100,6 +100,7 @@ export default {
     },
     data(){
         return {
+            tooltipStyle: { boxShadow: '0px 0px 8px 4px rgba(var(--primary-color-rgb), .56)'},
             user: null,
             course: null,
             router: useRouter(),

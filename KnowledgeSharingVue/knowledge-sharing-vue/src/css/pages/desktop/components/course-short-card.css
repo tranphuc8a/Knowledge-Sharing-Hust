@@ -1,0 +1,120 @@
+
+
+
+.p-course-short-card{
+    width: 100%;
+    max-width: 100%;
+
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.p-course-short-card > div {
+    width: 100%;
+    position: relative;
+}
+
+.p-csc-top .p-tooltip-container{
+    width: 100%;
+}
+.p-csc-thumbnail{
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    position: relative;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center center;
+}
+
+.p-csc-thumbnail-overlay{
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.p-csc-thumbnail:hover .p-csc-thumbnail-overlay{
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.p-csc-thumbnail-button{
+    width: fit-content;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 16px;
+}
+
+
+.p-csc-bottom{
+    padding: 16px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.p-csc-bottom-devider{
+    width: 100%;
+    height: 1px;
+    background-color: var(--primary-color-200);
+}
+
+.p-csc-bottom-infor{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+}
+
+.p-csc-course-title{
+    width: 100%;
+    font-size: 18px;
+    font-family: 'ks-font-semibold';
+    cursor: pointer;
+    text-align: start;
+
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.p-csc-course-owner{
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 4px;
+}
+
+.p-csc-course-owner__username{
+    display: block;
+    /* overflow: hidden; */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.p-csc-bottom-relation{
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+}
+
+.p-csc-bottom-relation > div {
+    width: fit-content;
+}

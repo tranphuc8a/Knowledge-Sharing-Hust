@@ -1,8 +1,9 @@
 
 
 <template>
-    <div class="p-user-oriented-crb" v-if="isShow">
-        <InvitedUoCrb v-if="dCourseRoleType?.value == eCourseRoleType.Invited" />
+    <div class="p-user-oriented-crb" v-if="isLoaded">
+        <UserRelationButton v-if="isMyCourse === false" />
+        <InvitedUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Invited" />
         <MemberUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Member" />
         <RequestedUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Requesting" />
         <GuestUoCrb v-else />
@@ -14,6 +15,7 @@
 <script>
 
 import { GetRequest } from '@/js/services/request';
+import UserRelationButton from '../../../profile/components/user-relation-button/UserRelationButton.vue';
 import InvitedUoCrb from './InvitedUoCrb.vue';
 import MemberUoCrb from './MemberUoCrb.vue';
 import RequestedUoCrb from './RequestedUoCrb.vue';
@@ -28,6 +30,7 @@ export default {
         MemberUoCrb,
         RequestedUoCrb,
         GuestUoCrb,
+        UserRelationButton
     },
     props: {
         initCourseRoleType: {
@@ -37,8 +40,9 @@ export default {
     },
     data(){
         return {
-            isShow: false,
+            isLoaded: false,
             dCourse: null,
+            dUser: null,
             dCourseRoleType: {
                 value: null
             },
@@ -46,13 +50,22 @@ export default {
                 value: null
             },
             eCourseRoleType: myEnum.ECourseRoleType,
+            isMyCourse: false,
         }
     },
     async created(){
         try {
             this.dCourse = this.getCourse();
-            this.dCourseRoleType.value = this.initCourseRoleType;
-            this.refresh();
+            this.dUser = this.getUserCourse();
+            this.isMyCourse = await this.getIsMyCourse();
+            this.dCourseRoleType.value = this.dUser?.CourseRoleType;
+            this.dCourseRelationId.value = this.dUser?.CourseRelationId;
+
+            if (this.dCourseRoleType.value == null || this.dCourseRelationId.value == null){
+                await this.refresh();
+            } else {
+                this.isLoaded = true;
+            }
         } catch (error) {
             console.error(error);
         }
@@ -62,9 +75,11 @@ export default {
     methods: {
         async refresh(){
             try {
-                let courseId = this.getCourse?.()?.UserItemId;
-                let userId = this.getUserCourse?.()?.UserId;
+                this.isLoaded = false;
                 // get status between course and userid
+                let courseId = this.dCourse.UserItemId;
+                let userId = this.dUser.UserId;
+
                 let url = 'CourseRelations/course-user-status/' + courseId + '/' + userId;
                 let res = await new GetRequest(url)
                     .setParams({
@@ -73,6 +88,7 @@ export default {
                 let body = await Request.tryGetBody(res);
                 this.dCourseRoleType.value = body.CourseRoleType;
                 this.dCourseRelationId.value = body.CourseRelationId;
+                this.isLoaded = true;
             } catch (error) {
                 console.error(error);
             }
@@ -81,10 +97,6 @@ export default {
         async forceRender(){
             try {
                 await this.refresh();
-                this.isShow = false;
-                this.$nextTick(() => {
-                    this.isShow = true;
-                });
             } catch (e){
                 console.error(e);
             }
@@ -95,10 +107,12 @@ export default {
             forceUpdateUserOrientedCrb: this.forceRender,
             getCourseRelationId: () => this.dCourseRelationId,
             getCourseRoleType: () => this.dCourseRoleType,
+            getUser: () => this.dUser,
         }
     },
     inject: {
         getCourse: {},
+        getIsMyCourse: {},
         getUserCourse: {},
         getToastManager: {},
         getPopupManager: {},

@@ -3,9 +3,12 @@
 <template>
     <div class="p-home-feed-subpage">
         <PostSubpage 
-            :get-post="getPost"
-            :is-show-add-post="true"
-        />
+                :get-post="getPost"
+            >
+                <template #addpost>
+                    <AddPostFeedCard />
+                </template>
+        </PostSubpage>
     </div>
 </template>
 
@@ -15,11 +18,13 @@
 import PostSubpage from './PostSubpage.vue';
 import CurrentUser from '@/js/models/entities/current-user';
 import { GetRequest } from '@/js/services/request';
+import AddPostFeedCard from '../components/feed-subpage/postcard/AddPostFeedCard.vue';
 
 export default {
     name: 'HomeFeedSubpage',
     components: {
-        PostSubpage
+        PostSubpage,
+        AddPostFeedCard
     },
     props: {
     },

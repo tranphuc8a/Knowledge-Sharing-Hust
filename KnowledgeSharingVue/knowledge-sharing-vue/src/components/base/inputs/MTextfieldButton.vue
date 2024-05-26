@@ -8,7 +8,7 @@
                     :type="data.type" :placeholder="data.placeholder"  
                     @:input="resolveOnInput" @:change="resolveOnChange" 
                     @:focus="resolveOnFocus" @:blur="resolveOnBlur" 
-                    @:keyup.enter.prevent.stop="resolveOnPressEnter"
+                    @keydown.enter.stop="resolveOnclickIcon"
                     :readonly="inputFrame.state==='read-only'"/>
 
             <div class="p-textfield-button"

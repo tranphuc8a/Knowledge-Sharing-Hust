@@ -7,6 +7,7 @@
             <ProfileEditNavigationCard
                 :on-save="resolveOnSaveProfile"
                 :on-change-tab="resolveOnChangeTab"
+                :tab-index="tabIndex"
             />
         </div>
 
@@ -255,7 +256,7 @@ export default {
     flex-grow: 1;
 
     position: sticky;
-    bottom: 0;
+    top: 0;
 
     display: flex;
     flex-flow: column nowrap;

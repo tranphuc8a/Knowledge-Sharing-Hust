@@ -377,5 +377,116 @@ namespace KnowledgeSharingApi.Controllers
         #endregion
 
         #endregion
+
+
+        #region Search APIs
+
+
+        /// <summary>
+        /// Yêu cầu user tim kiem trong danh sách những người đã đăng ký tham gia khóa học
+        /// Owner hoặc member
+        /// </summary>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <param name="limit"> Số lượng phần tử trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/5/24)
+        /// Modified: None
+        [HttpGet("search/registers/{courseId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UserSearchRegisters(Guid courseId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserSearchRegisters(GetCurrentUserId(), courseId, search, pagination));
+        }
+
+
+        /// <summary>
+        /// Yêu cầu chủ khóa học tim kiem trong danh sách invite của một khóa học
+        /// Owner
+        /// </summary>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <param name="limit"> Số lượng phần tử trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/5/24)
+        /// Modified: None
+        [HttpGet("search/invites/{courseId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchCourseInvites(Guid courseId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserSearchCourseInvites(GetCurrentUserIdStrictly(), courseId, search, pagination));
+        }
+
+        /// <summary>
+        /// Yêu cầu chủ khóa học tim kiem trong danh sách request của một khóa học
+        /// Owner
+        /// </summary>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <param name="limit"> Số lượng phần tử trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/5/24)
+        /// Modified: None
+        [HttpGet("search/requests/{courseId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchCourseRequests(Guid courseId, string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserSearchCourseRequests(GetCurrentUserIdStrictly(), courseId, search, pagination));
+        }
+
+        /// <summary>
+        /// Yêu cầu user tim kiem trong danh sách invite của minh
+        /// Owner
+        /// </summary>
+        /// <param name="limit"> Số lượng phần tử trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/5/24)
+        /// Modified: None
+        [HttpGet("search/invites/my")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchMyCourseInvites(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserSearchMyCourseInvites(GetCurrentUserIdStrictly(), search, pagination));
+        }
+
+        /// <summary>
+        /// Yêu cầu user học tim kiem trong danh sách request của mình
+        /// Owner
+        /// </summary>
+        /// <param name="limit"> Số lượng phần tử trang </param>
+        /// <param name="offset"> Độ lệch trang </param>
+        /// <param name="filter"> Bo loc </param>
+        /// <param name="order"> Bo sap xep </param>
+        /// <param name="search"> Tu khoa tim kiem </param>
+        /// <returns></returns>
+        /// Created: PhucTV (23/5/24)
+        /// Modified: None
+        [HttpGet("search/requests/my")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public async Task<IActionResult> UserSearchMyCourseRequests(string? search, int? limit, int? offset, string? order, string? filter)
+        {
+            PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
+            return StatusCode(await CourseRelationService.UserSearchMyCourseRequests(GetCurrentUserIdStrictly(), search, pagination));
+        }
+
+
+        #endregion
     }
 }

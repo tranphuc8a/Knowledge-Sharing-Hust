@@ -66,6 +66,16 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.Decoration
         /// Modified: None
         Task<List<ResponseUserCardModel>> DecorateResponseUserCardModel(Guid? myUid, List<ResponseUserCardModel> responseUserCardModels);
 
+        /// <summary>
+        /// Them thong tin ve quan he ban be 
+        /// </summary>
+        /// <param name="myUid"> id chu the </param>
+        /// <param name="responseFriendCardModel"> Danh sach friendCardModel can decorate </param>
+        /// <returns></returns>
+        /// Created: PhucTV (24/5/24)
+        /// Modified: None
+        Task<List<ResponseFriendCardModel>> DecorateResponseFriendCardModel(Guid? myUid, List<ResponseFriendCardModel> responseFriendCardModel);
+
 
         /// <summary>
         /// Thêm các giá trị bổ sung cho mỗi comment của danh sách comment:
@@ -97,6 +107,19 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.Decoration
             bool isDecorateUser = false,
             bool isDecorateCourse = false);
 
+
+        /// <summary>
+        /// Trang tri va bo sung them thong tin cho ResponseCourseRegisterModel tu ViewCourseRegister
+        /// </summary>
+        /// <param name="myUid"> id cua user thuc hien </param>
+        /// <param name="registers"> Danh sach relation can trang tri </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/3/24)
+        /// Modified: None
+        Task<List<ResponseCourseRegisterModel>> DecorateResponseCourseRegisterModel(
+            Guid? myUid,
+            List<ViewCourseRegister> registers);
+
         /// <summary>
         /// Trang trí thêm thông tin cho ResponseStarModel
         /// </summary>
@@ -106,8 +129,8 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.Decoration
         /// <returns></returns>
         /// Created: PhucTV (7/5/24)
         /// Modified: None
-        Task<List<ResponseStarModel>> DecorateResponseStarModel
-            (List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false);
+        Task<List<ResponseStarModel>> DecorateResponseStarModel(Guid? myUid,
+            List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false);
 
         /// <summary>
         /// Thêm các trường thông tin bổ sung cho danh sách Post

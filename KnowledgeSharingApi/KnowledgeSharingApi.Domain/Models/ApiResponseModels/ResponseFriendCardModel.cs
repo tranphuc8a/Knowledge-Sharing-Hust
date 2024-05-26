@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Entities;
+﻿using KnowledgeSharingApi.Domains.Enums;
+using KnowledgeSharingApi.Domains.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,8 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         public bool IsActive { get; set; }
 
         public DateTime Time { get; set; }
+
+        public EUserRelationType? UserRelationType { get; set; }
 
         protected override ResponseFriendCardModel Init()
         {

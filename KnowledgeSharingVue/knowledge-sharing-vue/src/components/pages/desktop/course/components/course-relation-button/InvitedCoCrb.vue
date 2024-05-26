@@ -4,7 +4,7 @@
     <div class="p-invited-co-crb">
         <MMenuContextPopup :options="getOptions()">
             <MSecondaryButton 
-                label="Phản hổi lời mời"
+                label="Phản hồi lời mời"
                 :onclick="null"
                 :buttonStyle="buttonStyle"
                 fa="circle-question" family="fas" :iconStyle="iconStyle"
@@ -74,7 +74,8 @@ export default {
         },
 
         async resolveAcceptInvite(){
-            return await this.confirmInvite(true);
+            let res = await this.confirmInvite(true);
+            return res;
         },
 
 
@@ -94,6 +95,7 @@ export default {
         async confirmInvite(isAccept){
             if (this.isWorking) return;
             try {
+                this.$refs.button.loading();
                 this.isWorking = true;
                 let inviteId = this.dCourseRelationId;
                 await new PostRequest('CourseRelations/invite/confirm/' + inviteId + '/' + isAccept)
@@ -108,6 +110,7 @@ export default {
                 Request.resolveAxiosError(e);
             } finally {
                 this.isWorking = false;
+                this.$refs.button?.normal?.();
             }
         }
     },

@@ -13,10 +13,14 @@
 
         <div class="profile-question-subpage__right">
             <!-- ProfileQuestionFeedSubpage -->
+
             <PostSubpage 
-                :is-show-add-post="isMySelf"
                 :get-post="getPostCallback"
-            />
+            >
+                <template #addpost>
+                    <AddPostFeedCard v-show="isMySelf" />
+                </template>
+            </PostSubpage>
         </div>
     </div>
 </template>
@@ -30,12 +34,14 @@ import { Validator } from '@/js/utils/validator';
 import { myEnum } from '@/js/resources/enum';
 import { GetRequest } from '@/js/services/request';
 import CurrentUser from '@/js/models/entities/current-user';
+import AddPostFeedCard from '../../../home/components/feed-subpage/postcard/AddPostFeedCard.vue';
 
 export default {
     name: 'ProfileQuestionSubpage',
     components: {
         ProfileQuestionToolbar,
         PostSubpage,
+        AddPostFeedCard,
     },
     props: {
     },

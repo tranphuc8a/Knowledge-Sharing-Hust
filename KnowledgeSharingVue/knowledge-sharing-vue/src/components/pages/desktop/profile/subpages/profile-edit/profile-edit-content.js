@@ -45,7 +45,11 @@ export default {
                 for (let key of this.keys){
                     let value = user[key];
                     if (["Grade", "Cpa"].includes(key)){
-                        value = Number(value);
+                        if (Validator.isEmpty(value)) {
+                            value = '';
+                        } else {
+                            value = Number(value);
+                        }
                     }
                     await this.components[key].setValue?.(value);
                 }

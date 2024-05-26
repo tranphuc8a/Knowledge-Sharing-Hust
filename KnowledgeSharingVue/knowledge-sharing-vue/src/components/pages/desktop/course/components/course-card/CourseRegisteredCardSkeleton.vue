@@ -24,14 +24,14 @@
                 </div>
             </div>
             <div
-                style="display: flex; justify-content: space-between; margin-top: 16px; gap: 16px;"
+                style="display: flex; justify-content: flex-end; margin-top: 16px; gap: 16px;"
             >
-                <div class="skeleton"
+                <!-- <div class="skeleton"
                     style="width: 40%; height: 32px; flex: 1"
                 >
-                </div>
+                </div> -->
                 <div class="skeleton"
-                    style="width: 40%; height: 32px; flex: 1"
+                    style="width: 40%; height: 32px; flex-grow: 0"
                 >
                 </div>
             </div>

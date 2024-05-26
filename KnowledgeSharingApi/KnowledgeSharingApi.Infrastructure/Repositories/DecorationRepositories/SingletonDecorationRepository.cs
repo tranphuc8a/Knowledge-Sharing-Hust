@@ -125,7 +125,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             Dictionary<Guid, IResponseCourseModel?> mapCourse = [];
             List<ViewCourse> courses = await DbContext.ViewCourses.Where(c => courseIds.Contains(c.UserItemId)).ToListAsync();
             List<IResponseCourseModel> responseCourse = await DecorateResponseCourseModel(myUid, courses);
-            mapCourse = courseIds.ToDictionary(
+            mapCourse = courseIds.Distinct().ToDictionary(
                 id => id,
                 id => (IResponseCourseModel?)null
             );
@@ -140,7 +140,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             Dictionary<Guid, IResponseLessonModel?> mapLesson = [];
             List<ViewLesson> lessons = await DbContext.ViewLessons.Where(l => lessonids.Contains(l.UserItemId)).ToListAsync();
             List<IResponseLessonModel> responseLesson = await DecorateResponseLessonModel(myUid, lessons);
-            mapLesson = lessonids.ToDictionary(
+            mapLesson = lessonids.Distinct().ToDictionary(
                 id => id,
                 id => (IResponseLessonModel?)null
             );
@@ -308,7 +308,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             {
                 List<Guid> courseIds = relations.Select(r => r.CourseId).ToList();
                 Dictionary<Guid, IResponseCourseModel?> dictViewCourse = await GetMapCourse(myUid, courseIds);
-                dictCourse = courseIds.ToDictionary(
+                dictCourse = courseIds.Distinct().ToDictionary(
                     id => id,
                     id =>
                     {
@@ -359,7 +359,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             );
             return mapUsers;
         }
-        public virtual async Task<List<ResponseStarModel>> DecorateResponseStarModel(List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
+        public virtual async Task<List<ResponseStarModel>> DecorateResponseStarModel(Guid? myUid, List<Star> listStars, bool isDecorateUser = false, bool isDecorateItem = false)
         {
             Dictionary<Guid, ResponseUserCardModel?> mapUsers = [];
             Dictionary<Guid, IResponseUserItemModel?> mapItems = [];
@@ -437,6 +437,16 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositorie
             var decoratePromise = DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
             await decoratePromise;
             return res;
+        }
+
+        public Task<List<ResponseCourseRegisterModel>> DecorateResponseCourseRegisterModel(Guid? myUid, List<ViewCourseRegister> registers)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<ResponseFriendCardModel>> DecorateResponseFriendCardModel(Guid? myUid, List<ResponseFriendCardModel> responseFriendCardModel)
+        {
+            throw new NotImplementedException();
         }
     }
 }

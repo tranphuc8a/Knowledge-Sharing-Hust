@@ -23,6 +23,12 @@
                         </div>
                     </div>
                     <div class="p-course-member">
+                        <!-- Visualized Privacy of course -->
+                        <div class="p-course-privacy skeleton"
+                            style="width: 150px; height: 24px;"
+                        >
+                        </div>
+                        
                         <!-- CoursePanelMember -->
                         <CoursePanelMember />
                     </div>
@@ -41,7 +47,7 @@
             
             <div class="p-course-infor">
                 <div class="p-course-title">
-                    <EllipisText 
+                    <EllipsisText 
                         :text="dCourse?.Title"  
                         :max-line="2"
                         :style="titleStyle"
@@ -53,6 +59,14 @@
                         <TooltipUsername :user="owner" />
                     </div>
                     <div class="p-course-member">
+                        <!-- Visualized Privacy of course -->
+                        <div class="p-course-privacy">
+                            <VisualizedPrivacy :privacy="dCourse?.Privacy" :iconStyle="{fontSize: '16px'}"/>
+                            <span> {{ privacyText }}</span>
+                        </div>
+
+                        <MIcon fa="circle" :style="dotIconStyle"/>
+                        
                         <!-- CoursePanelMember -->
                         <CoursePanelMember />
                     </div>
@@ -70,21 +84,24 @@
 
 
 <script>
-import EllipisText from '@/components/base/text/EllipisText.vue';
+import EllipsisText from '@/components/base/text/EllipsisText.vue';
+import VisualizedPrivacy from '@/components/base/visualized-components/VisualizedPrivacy.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
 import CoursePanelMember from './CoursePanelMember.vue';
 import CoursePanelButton from './CoursePanelButton';
+import { myEnum } from '@/js/resources/enum';
 // import CoursePanelThumbnail from './CoursePanelThumbnail.vue';
 
 export default {
     name: 'CoursePanelInformation',
     components: {
-        EllipisText,
+        EllipsisText,
         TooltipUserAvatar,
         TooltipUsername,
         CoursePanelMember,
         CoursePanelButton,
+        VisualizedPrivacy,
         // CoursePanelThumbnail,
     },
     props: {
@@ -98,6 +115,8 @@ export default {
                 fontFamily: "'ks-font-bold'",
             },
             isLoaded: false,
+            privacyText: '',
+            dotIconStyle: {fontSize: '4.5px', color: 'var(--grey-color-600)'}
         }
     },
     mounted(){
@@ -105,6 +124,12 @@ export default {
             this.dCourse = this.getCourse() ?? {};
             this.owner = this.dCourse?.getUser?.();
             this.isLoaded = this.getCourse() != null;
+            let privacy = this.dCourse?.Privacy;
+            if (privacy == myEnum.EPrivacy.Private){
+                this.privacyText = 'Khóa học riêng tư';
+            } else {
+                this.privacyText = 'Khóa học công khai';
+            }
         } catch (e) {
             console.error(e);
         }
@@ -214,6 +239,33 @@ export default {
     gap: 8px;
 }
 
+.p-course-member{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    height: auto;
+    align-self: stretch;
+    gap: 8px;
+}
+
+.p-course-privacy{
+    flex-shrink: 0;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    height: auto;
+    gap: 8px;
+    font-size: 14.5px;
+    color: var(--grey-color-600);
+    font-family: 'ks-font-semibold';
+}
+
+.p-course-privacy > * {
+    flex-shrink: 0;
+    flex-grow: 0;
+}
 </style>
 
 

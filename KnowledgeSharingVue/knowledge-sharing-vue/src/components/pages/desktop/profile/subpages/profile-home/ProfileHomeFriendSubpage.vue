@@ -133,7 +133,7 @@ export default {
     font-size: 24px;
 }
 .pps-header__left :last-child{
-    font-family: 'ks-font-semibold';
+    font-family: 'ks-font-regular';
     font-size: 14px;
     color: var(--grey-color-500);
 }

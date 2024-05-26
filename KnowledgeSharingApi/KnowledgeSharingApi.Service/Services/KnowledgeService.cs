@@ -4,6 +4,7 @@ using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using System;
@@ -19,6 +20,7 @@ namespace KnowledgeSharingApi.Services.Services
         protected readonly IResourceFactory ResourceFactory;
         protected readonly IResponseResource ResponseResource;
         protected readonly IEntityResource EntityResource;
+        protected readonly IDecorationRepository DecorationRepository;
 
         protected readonly IMarkRepository MarkRepository;
         protected readonly IKnowledgeRepository KnowledgeRepository;
@@ -33,6 +35,7 @@ namespace KnowledgeSharingApi.Services.Services
         public KnowledgeService(
             IResourceFactory resourceFactory,
             IKnowledgeRepository knowledgeRepository,
+            IDecorationRepository decorationRepository,
             IUserRepository userRepository,
             IUserRelationRepository userRelationRepository,
             IMarkRepository markRepository
@@ -43,6 +46,7 @@ namespace KnowledgeSharingApi.Services.Services
             EntityResource = resourceFactory.GetEntityResource();
 
             UserRelationRepository = userRelationRepository;
+            DecorationRepository = decorationRepository;
             MarkRepository = markRepository;
             UserRepository = userRepository;
             KnowledgeRepository = knowledgeRepository;
@@ -52,15 +56,12 @@ namespace KnowledgeSharingApi.Services.Services
 
         protected virtual async Task<List<ResponseUserCardModel>> DecorateUser(Guid myUid, List<ViewUser> users)
         {
-            Dictionary<Guid, EUserRelationType> userRelationDict = 
-                await UserRelationRepository.GetUserRelationType(myUid, users.Select(user => user.UserId).ToList());
-            return users.Select(user =>
+            return await DecorationRepository.DecorateResponseUserCardModel(myUid, users.Select(u =>
             {
-                ResponseUserCardModel res = new();
-                res.Copy(user);
-                res.UserRelationType = userRelationDict[user.UserId];
-                return res;
-            }).ToList();
+                ResponseUserCardModel resUser = new();
+                resUser.Copy(u);
+                return resUser;
+            }).ToList());
         }
 
         public async Task<ServiceResult> GetListUserMarkKnowledge(Guid myUid, Guid knowledgeId, PaginationDto pagination)

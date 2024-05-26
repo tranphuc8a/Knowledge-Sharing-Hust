@@ -226,7 +226,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public virtual async Task<Dictionary<Guid, IResponseUserItemModel?>> GetExactlyResponseUserItemModel(List<Guid> userIds)
         {
             Dictionary<Guid, IResponseUserItemModel?> res = userIds
-                .ToDictionary(id => id, id => (IResponseUserItemModel?)null);
+                .Distinct().ToDictionary(id => id, id => (IResponseUserItemModel?)null);
 
             // Get List commentIds, courseIds, lessonIds and questionsIds:
             var userItems = await DbContext.UserItems.Where(uit => userIds.Contains(uit.UserItemId)).ToListAsync();

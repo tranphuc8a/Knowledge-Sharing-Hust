@@ -1,0 +1,87 @@
+
+
+.p-csc-tooltip{
+    width: 420px;
+    height: fit-content;
+}
+
+.p-csct-card{
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.p-csct-card > div{
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 50%;
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.p-csctc-thumbnail{
+    background-size: cover;
+    background-position: center center;
+    width: 100%;
+    aspect-ratio: 2 / 1;
+}
+
+.p-csctc-bottom{
+    padding: 16px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.p-csc-information{
+    flex-grow: 1;
+    flex-basis: 50%;
+
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.p-csc-title{
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'ks-font-semibold';
+
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.p-csc-title:hover{
+    text-decoration: underline;
+
+}
+
+.p-csc-abstract{
+    width: 100%;
+}
+
+.p-csc-button{
+    width: 100%;
+    flex-shrink: 0;
+    flex-grow: 0;
+    height: fit-content;
+    
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+}
+

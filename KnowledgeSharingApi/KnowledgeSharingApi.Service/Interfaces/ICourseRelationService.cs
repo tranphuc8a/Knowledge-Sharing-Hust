@@ -55,6 +55,18 @@ namespace KnowledgeSharingApi.Services.Interfaces
         Task<ServiceResult> UserGetRegisters(Guid? myUId, Guid courseId, PaginationDto page);
 
         /// <summary>
+        /// Yêu cầu user tim kiem trong danh sách những người đã đăng ký tham gia khóa học
+        /// Owner, invited hoặc member (cho khoa hoc private), Public cho every body
+        /// </summary>
+        /// <param name="myUId"> id của user muốn lấy </param>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <param name="page"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (29/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchRegisters(Guid? myUId, Guid courseId, string? search, PaginationDto page);
+
+        /// <summary>
         /// Yêu cầu chủ khóa học lấy về danh sách invite của một khóa học
         /// Owner
         /// </summary>
@@ -65,6 +77,18 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         Task<ServiceResult> UserGetCourseInvites(Guid myUid, Guid courseId, PaginationDto page);
+
+        /// <summary>
+        /// Yêu cầu chủ khóa học tim kiem trong danh sách invite của một khóa học
+        /// Owner
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <param name="page"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (29/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchCourseInvites(Guid myUid, Guid courseId, string? search, PaginationDto page);
 
         /// <summary>
         /// Yêu cầu chủ khóa học lấy về danh sách request của một khóa học
@@ -79,7 +103,19 @@ namespace KnowledgeSharingApi.Services.Interfaces
         Task<ServiceResult> UserGetCourseRequests(Guid myUid, Guid courseId, PaginationDto page);
 
         /// <summary>
-        /// Yêu cầu chủ khóa học lấy về danh sách invite của một khóa học
+        /// Yêu cầu chủ khóa học tim kiem trong danh sách request của một khóa học
+        /// Owner
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="courseId"> id của khóa học cần lấy </param>
+        /// <param name="page"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (29/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchCourseRequests(Guid myUid, Guid courseId, string? search, PaginationDto page);
+
+        /// <summary>
+        /// Yêu cầu user lay ve danh sach invite cua minh
         /// Owner
         /// </summary>
         /// <param name="myUid"> id của user muốn lấy </param>
@@ -90,7 +126,18 @@ namespace KnowledgeSharingApi.Services.Interfaces
         Task<ServiceResult> UserGetMyCourseInvites(Guid myUid, PaginationDto page);
 
         /// <summary>
-        /// Yêu cầu user học lấy về danh sách request của mình
+        /// Yêu cầu user tim kiem trong danh sach invite cua minh
+        /// Owner
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="page"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (29/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchMyCourseInvites(Guid myUid, string? search, PaginationDto page);
+
+        /// <summary>
+        /// Yêu cầu user lấy về danh sách request của mình
         /// Owner
         /// </summary>
         /// <param name="myUId"> id của user muốn lấy </param>
@@ -99,6 +146,17 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (29/3/24)
         /// Modified: None
         Task<ServiceResult> UserGetMyCourseRequests(Guid myUId, PaginationDto page);
+
+        /// <summary>
+        /// Yêu cầu user tim kiem trong danh sách request của mình
+        /// Owner
+        /// </summary>
+        /// <param name="myUId"> id của user muốn lấy </param>
+        /// <param name="page"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (29/3/24)
+        /// Modified: None
+        Task<ServiceResult> UserSearchMyCourseRequests(Guid myUId, string? search, PaginationDto page);
 
         /// <summary>
         /// Lay ve trang thai quan he giua user va course

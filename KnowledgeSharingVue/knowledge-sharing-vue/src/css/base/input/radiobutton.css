@@ -39,31 +39,39 @@
     display: inline-block;
     transition: all ease .5s;
     box-sizing: border-box;
+
+    flex-shrink: 0;
+    flex-grow: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .p-radio-button > label {
     cursor: pointer;
     display: block;
 }
 .p-radio-button .p-radio-button-mask{
-    width: 21px;
-    height: 21px;
+    width: 22px;
+    aspect-ratio: 1/1;
     box-sizing: border-box;
     background-color: rgba(0, 0, 0, 0);
     border-radius: 100%;
     border: solid #BBC1E1 1px;
     display: flex;
+    overflow: hidden;
     justify-content: center;
     align-items: center;
     /* transition: border ease 0.05s; */
 }
 
 .p-radio-button .p-radio-button-mask .p-radio-button-dot{
-    height: 15px;
-    width: 15px;
+    height: 100%;
+    width: 100%;
     flex-shrink: 0;
     flex-grow: 0;
     box-sizing: border-box;
-    background-color: var(--primary-color);
+    /* background-color: var(--primary-color); */
+    background-image: radial-gradient(var(--primary-color) 0%, var(--primary-color) 40%, transparent 60%);
     border-radius: 100%;
     opacity: 0;
     display: flex;

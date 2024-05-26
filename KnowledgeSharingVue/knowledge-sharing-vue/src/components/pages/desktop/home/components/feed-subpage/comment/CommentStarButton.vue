@@ -16,6 +16,7 @@
                     @:click="resolveClickStar(0)"
                     @:mouseenter="resolveMouseEnter(0)"
                     @:mouseleave="resolveMouseLeave(0)"
+                    title="0 sao"
                     >
                     <MIcon v-if="currentStar==0" fa="star" family="fas"
                         :style="selectZeroStarIconStyle"/>
@@ -27,6 +28,7 @@
                         @:click="resolveClickStar(index)"
                         @:mouseenter="resolveMouseEnter(index)"
                         @:mouseleave="resolveMouseLeave(index)"
+                        :title="index + ' sao'"
                         >
                         <MIcon v-if="currentStar >= index" fa="star" family="fas"
                             :style="selectStarIconStyle"/>
@@ -54,7 +56,7 @@ export default {
                 fontSize: '28px'
             },
             selectZeroStarIconStyle: {
-                color: 'var(--red-color)',
+                color: 'var(--grey-color)',
                 fontSize: '28px'
             },
             buttonStyle: {color: 'var(--grey-color-800)'},
@@ -66,6 +68,7 @@ export default {
     async mounted() {
         this.tooltip = this.$refs?.tooltip;
         this.myStar = this.getComment().MyStars;
+        this.currentStar = this.myStar;
         this.currentUser = await CurrentUser.getInstance();
     },
     components: {

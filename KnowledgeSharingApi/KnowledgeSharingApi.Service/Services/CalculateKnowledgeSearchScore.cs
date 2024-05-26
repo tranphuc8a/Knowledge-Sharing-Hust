@@ -15,15 +15,21 @@ namespace KnowledgeSharingApi.Services.Services
 
         public virtual Dictionary<Guid, double> Calculate(string search, List<(Guid UserItemId, string Title, string Fullname, string Content, string? Abstract)> listKnowledges)
         {
+            listKnowledges = listKnowledges
+                .GroupBy(item => item.UserItemId)
+                .Select(group => group.First())
+                .ToList();
+
             // init Weight:
             search = search.ToLower();
-            double titleWeight = 0.4, fullnameWeight = 0.25, contentWeight = 0.2, abstractWeight = 0.15;
+            double titleWeight = 0.4, fullnameWeight = 0.3, contentWeight = 0.2, abstractWeight = 0.1;
 
             // init list Items:
-            Dictionary<Guid, string> markdownConverted = listKnowledges.ToDictionary(
-                item => item.UserItemId,
-                item => MarkdownConverter.GetPureText(item.Content)
-            );
+            Dictionary<Guid, string> markdownConverted = listKnowledges
+                .ToDictionary(
+                    item => item.UserItemId,
+                    item => MarkdownConverter.GetPureText(item.Content)
+                );
             List<string> listTitle = listKnowledges.Select(kn => kn.Title).Distinct().ToList();
             List<string> listFullname = listKnowledges.Select(kn => kn.Fullname).Distinct().ToList();
             List<string> listContent = listKnowledges.Select(kn => markdownConverted[kn.UserItemId]).Distinct().ToList();

@@ -23,6 +23,8 @@ import ProfileAccountSubpage from '@/components/pages/desktop/profile/subpages/p
 import ProfileAccountChangePasswordContent from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountChangePasswordContent.vue';
 import ProfileAccountLogoutContent from '@/components/pages/desktop/profile/subpages/profile-account/ProfileAccountLogoutContent.vue';
 
+import ProfileCourseSubpage from '@/components/pages/desktop/profile/subpages/profile-course/ProfileCourseSubpage.vue';
+
 const profileRouter = [
     {
         path: '/profile/:username',
@@ -55,7 +57,7 @@ const profileRouter = [
             }, { // when /profile.../course
                 path: 'course',
                 name: 'profile-course-page',
-                component: null, 
+                component: ProfileCourseSubpage, 
             }, { // when /profile.../save
                 path: 'save',
                 name: 'profile-save-page',

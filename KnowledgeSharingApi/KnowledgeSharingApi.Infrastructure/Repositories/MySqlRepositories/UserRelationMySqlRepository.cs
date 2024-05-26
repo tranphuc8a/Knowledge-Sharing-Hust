@@ -100,13 +100,19 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         }
 
 
-        protected virtual UserRelationTypeDto GetUserRelationType(Guid myUid, List<ViewUserRelation> userRelations)
+        protected virtual UserRelationTypeDto GetUserRelationType(Guid myUid, Guid userId, List<ViewUserRelation> userRelations)
         {
             UserRelationTypeDto res = new()
             {
                 UserRelationType = EUserRelationType.NotInRelation,
                 UserRelationId = null
             };
+            if (myUid == userId)
+            {
+                res.UserRelationType = EUserRelationType.IsMySelf;
+                res.UserRelationId = null;
+                return res;
+            }
             if (userRelations.Count == 0) return res;
 
             // Check block:
@@ -178,7 +184,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     relation.SenderId == user2 && relation.ReceiverId == user1
                 )).ToListAsync();
 
-            return GetUserRelationType(user1, userRelations).UserRelationType;
+            return GetUserRelationType(user1, user2, userRelations).UserRelationType;
         }
 
         public virtual async Task<Dictionary<Guid, EUserRelationType>> GetUserRelationType(Guid user1, List<Guid> users2)
@@ -189,7 +195,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
 
             // Khởi tạo kết quả mặc định là NotInRelation
-            var results = users2.ToDictionary(user => user, user => EUserRelationType.NotInRelation);
+            var results = users2.Distinct().ToDictionary(user => user, user => EUserRelationType.NotInRelation);
 
             // Xác định loại quan hệ cho từng cặp người dùng
             foreach (Guid otherUser in users2)
@@ -197,7 +203,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 List<ViewUserRelation> relations = userRelations
                     .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser)
                     .ToList();
-                EUserRelationType relationType = GetUserRelationType(user1, relations).UserRelationType;
+                EUserRelationType relationType = GetUserRelationType(user1, otherUser, relations).UserRelationType;
                 results[otherUser] = relationType;
             }
 
@@ -212,7 +218,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
 
             // Khởi tạo kết quả mặc định là NotInRelation
-            var results = users2.ToDictionary(user => user, user => new UserRelationTypeDto()
+            var results = users2.Distinct().ToDictionary(user => user, user => new UserRelationTypeDto()
             {
                 UserRelationType = EUserRelationType.NotInRelation,
                 UserRelationId = null
@@ -224,7 +230,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 List<ViewUserRelation> relations = userRelations
                     .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser)
                     .ToList();
-                UserRelationTypeDto relationType = GetUserRelationType(user1, relations);
+                UserRelationTypeDto relationType = GetUserRelationType(user1, otherUser, relations);
                 results[otherUser] = relationType;
             }
 

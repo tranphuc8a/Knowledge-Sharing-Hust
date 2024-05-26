@@ -114,13 +114,13 @@ export default {
                     this.course = new ResponseCourseModel();
                     this.course.copy(body);
 
-                    if (this.currentUser != null){
-                        if (this.course?.UserId != this.currentUser?.UserId){
-                            this.isError = true;
-                            this.errorMessage = "Bạn không có quyền tạo bài thảo luận trong khóa học này";
-                            return;
-                        }
-                    }
+                    // if (this.currentUser != null){
+                    //     if (this.course?.UserId != this.currentUser?.UserId){
+                    //         this.isError = true;
+                    //         this.errorMessage = "Bạn không có quyền tạo bài thảo luận trong khóa học này";
+                    //         return;
+                    //     }
+                    // }
                     this.isError = false;
                 }
             } else {
