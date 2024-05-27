@@ -53,7 +53,7 @@
     visibility: hidden;
 }
 
-.p-csc-thumbnail:hover .p-csc-menu-context{
+.p-csc-top:hover .p-csc-menu-context{
     visibility: visible;
 }
 

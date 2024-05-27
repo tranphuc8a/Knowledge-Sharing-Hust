@@ -1,6 +1,6 @@
 <template>
     <div class="p-popup-context-container" tabindex="1" 
-        @:click="togglePopup" @:blur="hidePopup">
+        @:click.stop="togglePopup" @:blur="hidePopup">
         <div class="p-popup-context-mask" ref="popup-context-mask">
             <slot name="popupContextMask"></slot>
         </div>
