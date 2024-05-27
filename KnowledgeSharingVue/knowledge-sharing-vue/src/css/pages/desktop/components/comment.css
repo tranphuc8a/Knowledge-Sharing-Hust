@@ -86,10 +86,25 @@
 }
 
 .p-comment-info{
-    width: calc(100% - 40px);
+    max-width: 100%;
+    /* width: fit-content; */
+    /* width: 0;
+    flex-grow: 1; */
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.p-comment-info-justify-width{
+    flex-grow: 1;
+    flex-shrink: 0;
+    width: 0;
 }
 
 .p-comment-frame{
+    min-width: 150px;
     width: 50%;
     flex-grow: 1;
     max-width: 100%;

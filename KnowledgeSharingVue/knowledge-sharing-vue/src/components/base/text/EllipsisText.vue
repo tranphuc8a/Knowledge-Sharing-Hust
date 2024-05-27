@@ -8,7 +8,9 @@
             '-webkit-line-clamp': maxline,
             ...style
         }">
-        {{ normalizeWhitespace(text) }}
+        <span>
+            {{ normalizeWhitespace(text) }}
+        </span>
     </div>
 
 </template>

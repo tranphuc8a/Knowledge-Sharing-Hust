@@ -1,5 +1,11 @@
 <template>
-    <Avatar :src="user?.Avatar" :size="size" :title="user?.fullName" @:click="resolveClickUserAvatar" />
+    <div class="skeleton" :style="{
+        width: size + 'px',
+        height: size + 'px',
+        borderRadius: (size ?? 40) + 'px',
+    }" v-if="!isLoaded"></div>
+
+    <Avatar :src="user?.Avatar" :size="size" :title="user?.fullName" @:click="resolveClickUserAvatar" v-if="isLoaded" />
 </template>
 
 <script>
@@ -11,7 +17,8 @@ export default {
     name: 'UserAvatar',
     data() {
         return {
-            router: useRouter()
+            router: useRouter(),
+            isLoaded: this.user != null
         }
     },
     components: {
@@ -48,6 +55,14 @@ export default {
             default: 36
         },
     },
+    watch: {
+        user: {
+            handler: function(){
+                this.isLoaded = this.user != null;
+            },
+            immediate: true
+        }
+    }
 }
 </script>
 

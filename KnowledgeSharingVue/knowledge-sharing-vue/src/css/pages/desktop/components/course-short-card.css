@@ -44,6 +44,19 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 
+.p-csc-menu-context{
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 16px;
+    width: fit-content;
+    visibility: hidden;
+}
+
+.p-csc-thumbnail:hover .p-csc-menu-context{
+    visibility: visible;
+}
+
 .p-csc-thumbnail-button{
     width: fit-content;
     position: absolute;
@@ -78,7 +91,8 @@
 }
 
 .p-csc-course-title{
-    width: 100%;
+    max-width: 100%;
+    width: fit-content;
     font-size: 18px;
     font-family: 'ks-font-semibold';
     cursor: pointer;
@@ -96,7 +110,7 @@
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
 }
 
 .p-csc-course-owner__username{
@@ -109,12 +123,22 @@
 .p-csc-bottom-relation{
     width: 100%;
     display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-end;
+    flex-flow: row wrap;
+    justify-content: space-between;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
 }
 
 .p-csc-bottom-relation > div {
     width: fit-content;
+    flex-grow: 1;
+    flex-shrink: 0;
+}
+
+.p-csc-bottom-relation:first-child {
+    text-align: left;
+}
+
+.p-csc-bottom-relation:last-child {
+    text-align: right;
 }

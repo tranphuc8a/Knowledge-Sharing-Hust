@@ -1,5 +1,10 @@
 <template>
-    <div class="p-tooltip-username-frame">
+    <div class="p-tooltip-username-frame" v-if="!isLoaded">
+        <div class="p-tooltip-username skeleton" style="width: 150px; height: 24px;" >
+        </div>
+    </div>
+
+    <div class="p-tooltip-username-frame" v-if="isLoaded">
         <TooltipFrame>
             <template #tooltipMask>
                 <div class="p-tooltip-username" @:click="resolveClickUsername"
@@ -27,6 +32,7 @@ export default {
     data() {
         return {
             router: useRouter(),
+            isLoaded: this.user != null
         }
     },
     components: {
@@ -62,6 +68,14 @@ export default {
             default: {}
         }
     },
+    watch: {
+        user: {
+            handler: function(){
+                this.isLoaded = this.user != null;
+            },
+            immediate: true
+        }
+    }
 };
 </script>
 

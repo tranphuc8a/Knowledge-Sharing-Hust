@@ -146,18 +146,20 @@ export default {
 .p-tooltip-container {
     position: relative;
     width: 100%;
+    height: 100%;
 }
 
 .p-tooltip-mask {
     cursor: pointer;
     width: 100%;
+    height: 100%;
 }
 
 .p-tooltip-content {
     width: fit-content;
     box-sizing: border-box;
     position: absolute;
-    overflow: hidden;
+
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 0px 2px rgba(0, 0, 0, 0.56);
