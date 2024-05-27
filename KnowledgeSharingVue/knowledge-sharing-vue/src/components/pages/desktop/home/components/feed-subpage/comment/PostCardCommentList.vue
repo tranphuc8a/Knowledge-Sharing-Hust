@@ -20,7 +20,7 @@
             Hiện không có bình luận nào
         </div>
         <div class="p-pcl-enter-comment">
-            <PostCardEnterComment :useritem="getPost()" :on-comment-submitted="resolvePostedComment"/>
+            <PostCardEnterComment :useritem="getPost()" :on-comment-submitted="resolvePostedComment" ref="enter-comment"/>
         </div>
     </div>
 </template>
@@ -204,9 +204,15 @@ export default {
                     console.error(e);
                 }
             }
-        }
+        },
 
-        
+        async focus(){
+            try {
+                await this.$refs['enter-comment'].focus();
+            } catch (e) {
+                console.error(e);
+            }
+        }
     },
     inject: {
         getLanguage: {},

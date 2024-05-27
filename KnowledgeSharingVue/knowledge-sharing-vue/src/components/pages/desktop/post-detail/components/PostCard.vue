@@ -33,7 +33,7 @@
                 <div></div>
             </div>
             <div class="p-feedcard-lestion__comments" v-if="isShowComment">
-                <PostCardCommentList />
+                <PostCardCommentList ref="comment-list" />
             </div>
         </div>
     </FeedCardFrame>
@@ -98,6 +98,15 @@ export default {
             return this.defaultCategoriesList;
         },
         
+        async resolveOnClickComment(){
+            try {
+                if (this.$refs['comment-list'] != null){
+                    await this.$refs['comment-list'].focus();
+                }
+            } catch (e){
+                console.error(e);
+            }
+        }
     },
     inject: {
         getLanguage: {},
@@ -106,7 +115,8 @@ export default {
     },
     provide(){
         return {
-            getPost: () => this.dPost
+            getPost: () => this.dPost,
+            resolveClickComment: this.resolveOnClickComment,
         }
     },
     watch: {

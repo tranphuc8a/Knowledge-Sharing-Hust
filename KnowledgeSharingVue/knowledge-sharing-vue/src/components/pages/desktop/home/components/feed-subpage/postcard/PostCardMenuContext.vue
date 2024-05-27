@@ -94,8 +94,8 @@ export default {
         },
         async resolveComment(){
             try {
-                if (this.onComment != null){
-                    await this.onComment();
+                if (this.resolveClickComment){
+                    await this.resolveClickComment();
                 }
             } catch (e){
                 console.error(e);
@@ -435,6 +435,7 @@ export default {
     inject: {
         getLanguage: {},
         getPost: {},
+        resolveClickComment: { default: null, },
         getCourse: { default: () => null },
         getPopupManager: {},
         getToastManager: {},
