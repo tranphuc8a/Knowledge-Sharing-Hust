@@ -43,9 +43,7 @@ export default {
     },
     async mounted(){
         try {
-            this.post = this.getPost();
-            this.isLesson = this.getPost()?.PostType == myEnum.EPostType.Lesson;
-            this.postResource = this.isLesson ? "Bài giảng" : "Bài thảo luận";
+            this.course = this.getCourse();
             await this.updateOptions();
         } catch (error){
             console.error(error);
@@ -57,8 +55,24 @@ export default {
                 if (this.onEdit){
                     this.onEdit();
                 }
-                let url = this.isLesson ? '/lesson-edit/' : '/question-edit/';
-                this.router.push(url + this.getPost()?.UserItemId);
+                let courseId = this.getCourse()?.UserItemId;
+                if (courseId == null) return;
+                let url = '/course-edit/' + courseId;
+                this.router.push(url);
+            }
+            catch (error){
+                console.error(error);
+            }
+        },
+        async resolveUpdate(){
+            try {
+                if (this.onUpdate){
+                    this.onUpdate();
+                }
+                let courseId = this.getCourse()?.UserItemId;
+                if (courseId == null) return;
+                let url = '/course-update/' + courseId;
+                this.router.push(url);
             }
             catch (error){
                 console.error(error);
@@ -69,21 +83,22 @@ export default {
                 if (this.onDelete){
                     this.onDelete();
                 }
-                this.getPopupManager().inform(`Bạn có chắc chắn muốn xóa ${this.postResource} này không?`, this.submitDelete.bind(this));
+                this.getPopupManager().inform(`Bạn có chắc chắn muốn xóa khóa học này không?`, this.submitDelete.bind(this));
             } catch (e) {
                 console.error(e);
             }
         },
         async submitDelete(){
+            if (this.isWorking) return;
             try {
-                let url = 'Lessons/';
-                if (this.getPost()?.PostType == myEnum.EPostType.Question){
-                    url = 'Questions/';
-                }
-                await new DeleteRequest(url + this.getPost()?.UserItemId)
-                    .execute();
+                this.isWorking = true;
+                let courseId = this.getCourse()?.UserItemId;
+                if (courseId == null) return;
+                let url = 'Course/' + courseId;
+                await new DeleteRequest(url).execute();
+                
                 // delete success:
-                this.getToastManager().success(`Xóa ${this.postResource} thành công!`);
+                this.getToastManager().success(`Xóa khóa học thành công!`);
 
                 // push sang location hop ly hon
                 window.location.reload();
@@ -92,20 +107,11 @@ export default {
                 Request.resolveAxiosError(error);
             }
         },
-        async resolveComment(){
-            try {
-                if (this.onComment != null){
-                    await this.onComment();
-                }
-            } catch (e){
-                console.error(e);
-            }
-        },
         async resolveMark(){
             try {
-                await new PostRequest('Knowledges/mark/' + this.getPost()?.UserItemId)
+                await new PostRequest('Knowledges/mark/' + this.getCourse()?.UserItemId)
                     .execute();
-                this.getPost().IsMarked = true;
+                this.getCourse().IsMarked = true;
                 await this.updateOptions();
                 this.getToastManager().success(`Lưu thành công!`);
             } catch (error) {
@@ -115,9 +121,9 @@ export default {
         },
         async resolveUnmark(){
             try {
-                await new PostRequest('Knowledges/unmark/' + this.getPost()?.UserItemId)
+                await new PostRequest('Knowledges/unmark/' + this.getCourse()?.UserItemId)
                     .execute();
-                this.getPost().IsMarked = false;
+                this.getCourse().IsMarked = false;
                 await this.updateOptions();
                 this.getToastManager().success(`Đã bỏ lưu!`);
             } catch (error) {
@@ -132,42 +138,11 @@ export default {
                 console.error(e);
             }
         },
-        async resolveHistory(){
-            try {
-                this.getToastManager().inform("Tính năng đang được phát triển, vui lòng thử lại sau!");
-            } catch (e){
-                console.error(e);
-            }
-        },
-        async resolveComplete(){
-            try {
-                await new PostRequest('/Questions/confirm/' + this.getPost()?.UserItemId + '/true')
-                    .execute();
-                this.getPost().IsAcepted = true;
-                await this.updateOptions();
-                this.getToastManager().success(`Bài thảo luận đã hoàn thành!`);
-            } catch (error) {
-                console.error(error);
-                Request.resolveAxiosError(error);
-            }
-        },
-        async resolveUncomplete(){
-            try {
-                await new PostRequest('/Questions/confirm/' + this.getPost()?.UserItemId + '/false')
-                    .execute();
-                    this.getPost().IsAcepted = false;
-                await this.updateOptions();
-                this.getToastManager().success(`Bài thảo luận chưa hoàn thành!`);
-            } catch (error) {
-                console.error(error);
-                Request.resolveAxiosError(error);
-            }
-        },
         async resolveLockComment(){
             try {
-                await new PostRequest('Comments/block/' + this.getPost()?.UserItemId)
+                await new PostRequest('Comments/block/' + this.getCourse()?.UserItemId)
                     .execute();
-                this.getPost().IsBlockComment = true;
+                this.getCourse().IsBlockComment = true;
                 await this.updateOptions();
                 this.getToastManager().success(`Đã khóa bình luận!`);
             } catch (error) {
@@ -177,9 +152,9 @@ export default {
         },
         async resolveUnlockComment(){
             try {
-                await new PostRequest('Comments/unblock/' + this.getPost()?.UserItemId)
+                await new PostRequest('Comments/unblock/' + this.getCourse()?.UserItemId)
                     .execute();
-                this.getPost().IsBlockComment = false;
+                this.getCourse().IsBlockComment = false;
                 this.getToastManager().success(`Đã mở khóa bình luận!`);
                 await this.updateOptions();
             } catch (error) {
@@ -189,10 +164,10 @@ export default {
         },
         async resolveCopyUserItemId(){
             try {
-                let itemId = this.getPost()?.UserItemId;
+                let itemId = this.getCourse()?.UserItemId;
                 if (itemId != null){
                     navigator.clipboard.writeText(itemId.toString());
-                    this.getToastManager().success('Đã sao chép vào clipboard');
+                    this.getToastManager().success('Đã sao id khóa học chép vào clipboard');
                 }
             } catch (error) {
                 console.error(error);
@@ -200,7 +175,7 @@ export default {
         },
         async resolveGotoCourse(){
             try {
-                let courseId = this.getPost()?.CourseId;
+                let courseId = this.getCourse()?.UserItemId;
                 if (courseId == null) return;
                 this.router.push('/course/' + courseId);
             } catch (e){
@@ -210,33 +185,30 @@ export default {
 
         async updateOptions(){
             try {
-                // role of user for a post:
+                // role of user for a course:
                 // admin, anonymouse, owner, user, banned ( ~ anonymous )
-                // only question has more role is (owner of it's course)
                 this.currentUser = await CurrentUser.getInstance();
                 if (this.currentUser == null){ 
                     // Anonymous
                     this.listOptions = [
                         this.actions.Report,
-                        this.actions.Comment,
-                        this.actions.History,
                         this.actions.CopyUserItemId,
+                        this.actions.GotoCourse
                     ];
                 } else if (this.currentUser.Role == myEnum.EUserRole.Admin){
                     // Admin
                     this.listOptions = [
                         this.actions.Delete,
-                        this.actions.Comment,
                         this.actions.Report,
-                        this.actions.History,
                         this.actions.CopyUserItemId,
+                        this.actions.GotoCourse
                     ];
-                    if (this.getPost().IsMarked){
+                    if (this.getCourse().IsMarked){
                         this.listOptions.push(this.actions.Unmark);
                     } else {
                         this.listOptions.push(this.actions.Mark);
                     }
-                    if (this.getPost()?.IsBlockComment){
+                    if (this.getCourse()?.IsBlockComment){
                         this.listOptions.push(this.actions.UnlockComment);
                     } else {
                         this.listOptions.push(this.actions.LockComment);
@@ -245,67 +217,42 @@ export default {
                     // Banned
                     this.listOptions = [
                         this.actions.Report,
-                        this.actions.Comment,
-                        this.actions.History,
                         this.actions.CopyUserItemId,
+                        this.actions.GotoCourse
                     ];
                 } else {
                     // User:
-                    if (this.currentUser.UserId == this.getPost()?.UserId){
+                    if (this.currentUser.UserId == this.getCourse()?.UserId){
                         // Owner
                         this.listOptions = [
                             this.actions.Edit,
+                            this.actions.Update,
                             this.actions.Delete,
-                            this.actions.Comment,
                             this.actions.Report,
-                            this.actions.History,
                             this.actions.CopyUserItemId,
+                            this.actions.GotoCourse
                         ];
-                        if (this.getPost().IsMarked){
+                        if (this.getCourse().IsMarked){
                             this.listOptions.push(this.actions.Unmark);
                         } else {
                             this.listOptions.push(this.actions.Mark);
                         }
-                        if (this.getPost()?.IsBlockComment){
+                        if (this.getCourse()?.IsBlockComment){
                             this.listOptions.push(this.actions.UnlockComment);
                         } else {
                             this.listOptions.push(this.actions.LockComment);
                         }
-                        if (this.getPost()?.PostType === myEnum.EPostType.Question){
-                            if (this.getPost()?.IsAcepted){
-                                this.listOptions.push(this.actions.Uncomplete);
-                            } else {
-                                this.listOptions.push(this.actions.Complete);
-                            }
-                        }
                     } else {
                         // Not Owner
                         this.listOptions = [
-                            this.actions.Comment,
                             this.actions.Report,
-                            this.actions.History,
                             this.actions.CopyUserItemId,
+                            this.actions.GotoCourse
                         ];
-                        if (this.getPost().IsMarked){
+                        if (this.getCourse().IsMarked){
                             this.listOptions.push(this.actions.Unmark);
                         } else {
                             this.listOptions.push(this.actions.Mark);
-                        }
-                    }
-                }
-                let question = this.getPost();
-                let course = this.getCourse?.();
-                if (question?.PostType == myEnum.EPostType.Question 
-                    && question?.Privacy == myEnum.EPrivacy.Private
-                    && question?.CourseId != null){
-
-                    this.listOptions.push(this.actions.GotoCourse);
-                    
-                    if (question?.CourseId == course?.UserItemId && course?.UserId == this.currentUser?.UserId){
-                        if (question?.CourseId != null && course?.UserId != null){
-                            if (! this.listOptions.includes(this.actions.Delete)){
-                                this.listOptions.push(this.actions.Delete);
-                            }
                         }
                     }
                 }
@@ -317,13 +264,9 @@ export default {
     },
     data() {
         return {
-            // for listen the change of inject:
-            dCommentProvider: this.commentProvider,
-            post: null,
+            course: null,
             router: useRouter(),
-            isLesson: null,
             currentUser: null,
-            postResource: 'Bài giảng',
             iconStyle: {
                 fontSize: '18px',
                 color: 'var(--primary-color)'
@@ -335,13 +278,10 @@ export default {
             actions: {
                 Edit: 1,
                 Delete: 2,
-                Comment: 3,
+                Update: 3,
                 Mark: 4,
                 Unmark: 5,
                 Report: 6,
-                History: 7,
-                Complete: 8,
-                Uncomplete: 9,
                 LockComment: 10,
                 UnlockComment: 11,
                 CopyUserItemId: 12,
@@ -351,7 +291,7 @@ export default {
             options: {
                 [1]: {
                     id: 1,
-                    label: 'Chỉnh sửa',
+                    label: 'Chỉnh sửa thông tin',
                     fa: 'pencil',
                     onClick: this.resolveEdit
                 }, 
@@ -363,9 +303,9 @@ export default {
                 },
                 [3]: {
                     id: 3,
-                    label: 'Bình luận',
-                    fa: 'comment',
-                    onClick: this.resolveComment,
+                    label: 'Cập nhật bài giảng',
+                    fa: 'pencil',
+                    onClick: this.resolveUpdate,
                 },
                 [4]: {
                     id: 4,
@@ -385,25 +325,6 @@ export default {
                     label: 'Báo cáo',
                     fa: 'flag',
                     onClick: this.resolveReport,
-                },
-                [7]: {
-                    id: 7,
-                    label: 'Lịch sử chỉnh sửa',
-                    fa: 'history',
-                    onClick: this.resolveHistory,
-                }, [8]: {
-                    id: 8,
-                    label: 'Hoàn thành',
-                    fa: 'check-circle',
-                    family: 'far',
-                    onClick: this.resolveComplete,
-                },
-                [9]: {
-                    id: 9,
-                    label: 'Chưa hoàn thành',
-                    fa: 'times-circle',
-                    family: 'far',
-                    onClick: this.resolveUncomplete,
                 },
                 [10]: {
                     id: 10,
@@ -434,8 +355,7 @@ export default {
     },
     inject: {
         getLanguage: {},
-        getPost: {},
-        getCourse: { default: () => null },
+        getCourse: {},
         getPopupManager: {},
         getToastManager: {},
     }
