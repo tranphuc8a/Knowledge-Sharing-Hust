@@ -77,7 +77,7 @@ export default {
             try {
                 this.router.push('/lesson-create/');
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         },
 
@@ -85,7 +85,7 @@ export default {
             try {
                 this.router.push('/question-create/');
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
         

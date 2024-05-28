@@ -324,7 +324,7 @@ let selectOption = {
                     await this.resolveOnExpand();
                 }
             } catch (error){
-                console.log(error);
+                console.error(error);
             }
         },
 

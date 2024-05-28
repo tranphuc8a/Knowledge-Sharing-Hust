@@ -73,7 +73,7 @@ export default {
                     this.userAvatar = this.user.Avatar;
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         },
 
@@ -83,7 +83,7 @@ export default {
                     this.router.push(`/profile/${this.user.Username}`);
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
     },

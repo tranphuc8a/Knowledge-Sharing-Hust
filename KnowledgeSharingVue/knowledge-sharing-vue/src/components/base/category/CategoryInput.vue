@@ -506,7 +506,7 @@ export default {
                     this.blur();
                 }
             } catch (error){
-                console.log(error);
+                console.error(error);
             }
         }
     },

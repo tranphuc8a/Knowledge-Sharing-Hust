@@ -17,7 +17,7 @@
                         </div>
                     </div>
                     <div class="p-lsc-lesson-owner">
-                        <TooltipUserAvatarAndUsername :user="lessonOwner" :size="48" />
+                        <TooltipUserAvatarAndUsername :user="lessonOwner" :size="32" />
                     </div>
                     <div class="p-lsc-lesson-stars">
                         <div class="skeleton" style="width: 175px; height: 24px;">
@@ -167,7 +167,7 @@ export default {
                     this.lessonThumbnail = this.defaultLessonThumbnail;
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         },
     },
@@ -185,13 +185,14 @@ export default {
 
 <style scoped>
 
+
 .p-lesson-short-card{
     width: fit-content;
     max-width: 100%;
 }
 
 .p-lesson-short-card > .card{
-    height: 150px;
+    height: 120px;
     width: fit-content;
     display: flex;
     flex-flow: row nowrap;
@@ -205,6 +206,8 @@ export default {
     flex-grow: 0;
     flex-shrink: 0;
     cursor: pointer;
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
 }
 
 .p-lsc-thumbnail-image{
@@ -214,6 +217,8 @@ export default {
     background-position: center;
     position: relative;
     cursor: pointer;
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
 }
 
 .p-lsc-thumbnail-overlay{
@@ -225,6 +230,8 @@ export default {
     background-color: rgba(0, 0, 0, 0.5);
     opacity: 0;
     transition: opacity 0.3s;
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
 }
 
 .p-lsc-thumbnail-image:hover .p-lsc-thumbnail-overlay{
@@ -246,13 +253,11 @@ export default {
 
 .p-lsc-infor__left{
     width: 0;
-    height: 100%;
     flex-grow: 1;
     display: flex;
     flex-flow: column nowrap;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: stretch;
-    gap: 0px;
 }
 
 .p-lsc-lesson-title{
@@ -289,7 +294,6 @@ export default {
     width: fit-content;
     height: fit-content;
 }
-
 
 
 </style>

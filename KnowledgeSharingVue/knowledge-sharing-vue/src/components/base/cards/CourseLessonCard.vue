@@ -1,6 +1,8 @@
 
 
 <template>
+    <CourseLessonCardSkeleton v-if="!isLoaded" />
+    
     <div class="p-course-lesson-card" v-if="isLoaded">
         <div class="p-clc-header">
             <div class="p-clc-offset">
@@ -26,9 +28,10 @@
 
 <script>
 import LessonShortCard from './LessonShortCard.vue'
-import ResponseCourseLessonModel from '@/js/models/response/course/ResponseCourseLessonModel';
+import ResponseCourseLessonModel from '@/js/models/api-response-models/response-course-lesson-model';
 import MEmbeddedButton from './../buttons/MEmbeddedButton.vue'
 import CourseLessonMenuContext from './CourseLessonMenuContext.vue'
+import CourseLessonCardSkeleton from './CourseLessonCardSkeleton.vue';
 
 export default {
     name: 'CourseLessonCard',
@@ -36,6 +39,7 @@ export default {
         LessonShortCard,
         CourseLessonMenuContext,
         MEmbeddedButton,
+        CourseLessonCardSkeleton,
     },
     props: {
         responseCourseLessonModel: {

@@ -10,10 +10,13 @@ import CourseMemberContent from "@/components/pages/desktop/course/subpages/cour
 
 import CourseMemberSubpage from "@/components/pages/desktop/course/subpages/course-member/CourseMemberSubpage.vue";
 
+import CourseLessonSubpage from "@/components/pages/desktop/course/subpages/course-lesson/CourseLessonSubpage.vue";
 import CourseQuestionSubpage from "@/components/pages/desktop/course/subpages/course-question/CourseQuestionSubpage.vue";
 
 import CourseCreatePage from "@/components/pages/desktop/course/CourseCreatePage.vue";
-import CourseEditSubpage from './../../../components/pages/desktop/course/subpages/course-edit/CourseEditSubpage.vue'
+import CourseEditSubpage from './../../../components/pages/desktop/course/subpages/course-edit/CourseEditSubpage.vue';
+import CourseUpdateSubpage from './../../../components/pages/desktop/course/subpages/course-update/CourseUpdateSubpage.vue'
+
 
 export default [
     {
@@ -45,7 +48,7 @@ export default [
             {
                 path: 'lesson',
                 name: 'course-lesson-page',
-                component: null,
+                component: CourseLessonSubpage,
             },
             {
                 path: 'question',
@@ -97,7 +100,7 @@ export default [
             {
                 path: 'lesson-edit',
                 name: 'course-lesson-edit-page',
-                component: null,
+                component: CourseUpdateSubpage,
             }
         ]
     }

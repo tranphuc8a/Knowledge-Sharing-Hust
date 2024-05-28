@@ -25,14 +25,11 @@ export default {
     props: {
         user: {
             required: true,
-            type: Object,
         },
         size: {
-            type: Number,
             default: 36,
         },
         style: {
-            type: Object,
             default: null,
         }
     },
@@ -56,8 +53,6 @@ export default {
 
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
     },
     provide(){
         return{}

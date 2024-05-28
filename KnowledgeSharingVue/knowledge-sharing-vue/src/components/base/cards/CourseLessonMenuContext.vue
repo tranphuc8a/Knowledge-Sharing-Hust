@@ -276,7 +276,7 @@ export default {
     },
     inject: {
         forceUpdateCourseLessonCard: { default: () => null },
-        getCourseLesson: { default: () => null }
+        getCourseLesson: { default: () => null },
         getPost: {},
         getCourse: { default: () => null },
         getPopupManager: {},

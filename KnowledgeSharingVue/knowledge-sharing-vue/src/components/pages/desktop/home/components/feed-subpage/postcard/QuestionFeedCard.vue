@@ -95,7 +95,7 @@ export default {
                 let router = this.globalData.router;
                 router.push({name: 'add-lestion'});
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         },
 
@@ -104,7 +104,7 @@ export default {
                 let router = this.globalData.router;
                 router.push({name: 'add-lestion'});
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         },
 
