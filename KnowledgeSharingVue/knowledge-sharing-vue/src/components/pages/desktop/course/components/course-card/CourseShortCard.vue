@@ -38,7 +38,11 @@
         <div class="p-csc-bottom">
             <div class="p-csc-bottom-infor">
                 <div class="p-csc-course-title" :title="course?.Title ?? ''">
-                    {{ course?.Title ?? "" }}
+                    <router-link :to="courseDetailLink">
+                        <span>
+                            {{ course?.Title ?? "" }}
+                        </span>
+                    </router-link>
                 </div>
                 <div class="p-csc-course-owner">
                     <TooltipUserAvatar :user="user" />
@@ -120,7 +124,8 @@ export default {
             router: useRouter(),
             buttonStyle: {},
             courseThumbnail: null,
-            defaultCourseThumbnail: require('@/assets/default-thumbnail/course-image-icon.png')
+            defaultCourseThumbnail: require('@/assets/default-thumbnail/course-image-icon.png'),
+            courseDetailLink: '',
         }
     },
     async created(){
@@ -152,6 +157,7 @@ export default {
                 // update course card
                 this.dCourse = new ResponseCourseModel().copy(this.course);
                 this.user = this.dCourse?.getUser?.();
+                this.courseDetailLink = '/course/' + this.dCourse?.UserItemId;
                 
                 // update thumbnail
                 if (await Common.isValidImage(this.dCourse.Thumbnail)){

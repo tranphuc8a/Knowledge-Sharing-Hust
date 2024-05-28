@@ -3,7 +3,7 @@
         <div class="p-tooltip-mask" ref="tooltip-mask">
             <slot name="tooltipMask"></slot>
         </div>
-        <div v-show="isTooltipVisible" class="p-tooltip-content" :style="{ ...tooltipStyle, ...(style ?? {}) }" ref="tooltip-content">
+        <div v-show="isTooltipVisible" v-if="isTooltipCreated" class="p-tooltip-content" :style="{ ...tooltipStyle, ...(style ?? {}) }" ref="tooltip-content">
             <!-- Nội dung của tooltip -->
             <slot name="tooltipContent"></slot>
         </div>
@@ -14,6 +14,7 @@
 export default {
     data() {
         return {
+            isTooltipCreated: false,
             isTooltipVisible: false,
             isWaitingToShow: false,
             isWaitingToHide: false,
@@ -59,6 +60,8 @@ export default {
             if (!this.isWaitingToShow) return;
             
             this.isTooltipVisible = true;
+            if (!this.isTooltipCreated)
+                this.isTooltipCreated = true;
             let that = this;
             this.$nextTick(async () => {
                 try {
@@ -81,8 +84,8 @@ export default {
          * @Modified None
         */
         async verticalAlign(that, style){
-            const toolTipRect = that.tooltipContent.getBoundingClientRect();
-            const maskRect = that.tooltipMask.getBoundingClientRect();
+            const toolTipRect = that.$refs['tooltip-content'].getBoundingClientRect();
+            const maskRect = that.$refs['tooltip-mask'].getBoundingClientRect();
             
             if (that.position == that.tooltipPosition.top) {
                 style.bottom = `${that.padding_vertical + maskRect.height}px`;
@@ -109,8 +112,8 @@ export default {
          * @Modified None
          */
         async horizontalAlign(that, style){
-            const toolTipRect = that.tooltipContent.getBoundingClientRect();
-            const maskRect = that.tooltipMask.getBoundingClientRect();
+            const toolTipRect = that.$refs['tooltip-content'].getBoundingClientRect();
+            const maskRect = that.$refs['tooltip-mask'].getBoundingClientRect();
             
             // align tooltip follow horizontally
             const minLeftContent = maskRect.left + maskRect.width/2 - toolTipRect.width/2;

@@ -32,7 +32,7 @@
                         <VisualizedTotalStar :average-star="dLesson?.AverageStar" :total-star="dLesson?.TotalStar" />
                     </div>
                     <div class="p-lt-savebutton">
-                        <SaveButton :knowledgeId="dLesson?.UserItemId" :initValue="dLesson?.IsSave" />
+                        <SaveButton :knowledgeId="dLesson?.UserItemId" :initValue="dLesson?.IsMarked" />
                     </div>
                 </div>
             </div>

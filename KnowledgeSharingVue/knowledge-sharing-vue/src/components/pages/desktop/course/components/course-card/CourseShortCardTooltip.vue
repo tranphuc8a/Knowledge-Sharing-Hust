@@ -4,15 +4,17 @@
     <div class="p-csc-tooltip">
         <div class="p-csct-card card">
             <div class="p-csctc-top">
-                <div class="p-csctc-thumbnail"
-                    :click="resolveViewCourseDetail"
-                    :style="{
-                        'background-image': `url(${courseThumbnail})`
-                    }"    
-                >
-                    <div class="p-csc-thumbnail-overlay">
+                <router-link :to="courseDetailLink" class="router-link">
+                    <div class="p-csctc-thumbnail"
+                        :click="resolveViewCourseDetail"
+                        :style="{
+                            'background-image': `url(${courseThumbnail})`
+                        }"    
+                    >
+                        <div class="p-csc-thumbnail-overlay">
+                        </div>
                     </div>
-                </div>
+                </router-link>
             </div>
             <div class="p-csctc-bottom">
                 <div class="p-csc-information">
@@ -45,7 +47,7 @@
 
                     <!-- Save Button -->
                     <div class="p-csc-save-button">
-                        <SaveButton :knowledgeId="dCourse?.UserItemId" :initValue="dCourse?.IsSave" />
+                        <SaveButton :knowledgeId="dCourse?.UserItemId" :initValue="dCourse?.IsMarked" />
                     </div>
                 </div>
             </div>
@@ -87,6 +89,7 @@ export default {
             dCourse: this.course,
             isReloadCourse: false,
             privacyText: null,
+            courseDetailLink: '',
             router: useRouter(),
         }
     },
@@ -101,6 +104,7 @@ export default {
                 this.courseThumbnail = this.defaultThumbnail;
                 this.dCourse = this.course;
                 let courseThumbnail = this.dCourse?.Thumbnail;
+                this.courseDetailLink = '/course/' + this.dCourse?.UserItemId;
                 if (await Common.isValidImage(courseThumbnail)){
                     // console.log("thumbnail is valid");
                     this.courseThumbnail = courseThumbnail;

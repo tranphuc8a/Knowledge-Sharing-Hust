@@ -110,7 +110,7 @@ export default {
 
         getComment(){
             try {
-                let comment = Number(this.getPost()?.NumberComments ?? 0);
+                let comment = Number(this.getPost()?.TotalComment ?? 0);
                 let beautyNumber = Common.formatNumber(comment);
                 // return this.getLabel()?.numberComment(beautyNumber);
                 return beautyNumber;

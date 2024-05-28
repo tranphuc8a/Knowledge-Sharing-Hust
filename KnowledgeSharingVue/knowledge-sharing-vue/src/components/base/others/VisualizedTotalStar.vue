@@ -26,11 +26,9 @@ export default {
     },
     props: {
         averageStar: {
-            type: Number,
             required: true,
         },
         totalStar: {
-            type: Number,
             required: true,
         },
     },

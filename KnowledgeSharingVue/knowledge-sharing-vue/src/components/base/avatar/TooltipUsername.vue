@@ -14,7 +14,7 @@
             </template>
     
             <template #tooltipContent>
-                <TooltipUser :user="user" />
+                <TooltipUserV2 :user="user" />
             </template>
         </TooltipFrame>
     </div>
@@ -22,7 +22,7 @@
 
 
 <script>
-import TooltipUser from './TooltipUser.vue';
+import TooltipUserV2 from './TooltipUserV2.vue';
 import TooltipFrame from '../tooltip/TooltipFrame.vue';
 import { useRouter } from 'vue-router';
 import { Validator } from '@/js/utils/validator';
@@ -36,7 +36,7 @@ export default {
         }
     },
     components: {
-        TooltipUser, TooltipFrame
+        TooltipUserV2, TooltipFrame
     },
     methods: {
         /**

@@ -5,7 +5,7 @@
     <div class="p-ellipsis-text" :title="text"
         :style="
         {
-            '-webkit-line-clamp': maxline,
+            '-webkit-line-clamp': maxLine,
             ...style
         }">
         <span>
@@ -28,7 +28,7 @@ export default {
         text: {
             required: true,
         },
-        maxline: {},
+        maxLine: {},
         style: {}
     },
     data(){

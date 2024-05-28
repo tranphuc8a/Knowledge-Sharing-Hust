@@ -13,27 +13,30 @@
             </div>
         </div>
         <div class="p-header-right">
-            <PostCardMenuContext />
+            <PostCardMenuContext v-if="!isCourse" />
+            <CourseIntroductionMenuContext v-if="isCourse" />
         </div>
     </div>
 </template>
 
 <script>
 import PostCardMenuContext from './PostCardMenuContext.vue';
+import CourseIntroductionMenuContext from '@/components/pages/desktop/course/components/course-card/CourseIntroductionMenuContext.vue';
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import TooltipUsername from '@/components/base/avatar/TooltipUsername.vue';
 import VisualizedDatetime from '@/components/base/visualized-components/VisualizedDatetime.vue';
 import VisualizedPrivacy from '@/components/base/visualized-components/VisualizedPrivacy.vue';
+import { myEnum } from '@/js/resources/enum';
 
 export default {
     name: 'PostCardHeader',
     data(){
         return{
-            
+            isCourse: this.getPost()?.KnowledgeType == myEnum.EKnowledgeType.Course
         }
     },
     components: {
-        PostCardMenuContext,
+        PostCardMenuContext, CourseIntroductionMenuContext,
         TooltipUserAvatar, TooltipUsername, VisualizedDatetime, VisualizedPrivacy
     },
     methods: {

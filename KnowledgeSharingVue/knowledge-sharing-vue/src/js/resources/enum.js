@@ -138,6 +138,7 @@ let myEnum = {
         Split: 'split',
         Undo: 'undo',
         Redo:'redo',
+        SelectImage: 'selectimage',
 
         LaTeX: 'latex',
 

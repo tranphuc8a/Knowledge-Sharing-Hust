@@ -1,7 +1,7 @@
 
 
 
-.p-popup-content{
+.p-popup-manager-content{
     display: flex;
     justify-content: space-between;
     flex-flow: row nowrap;
@@ -13,7 +13,7 @@
     box-sizing: border-box;
 }
 
-.p-popup-content .p-popup-content-text{
+.p-popup-manager-content .p-popup-manager-content-text{
     width: 100%;
     text-align: start;
     overflow-wrap: normal;
