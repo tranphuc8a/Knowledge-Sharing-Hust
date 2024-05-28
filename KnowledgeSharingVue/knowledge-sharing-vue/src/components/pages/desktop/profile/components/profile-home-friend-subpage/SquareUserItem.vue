@@ -13,7 +13,7 @@
             </template>
     
             <template #tooltipContent>
-                <TooltipUser :user="user" />
+                <TooltipUserV2 :user="user" />
             </template>
         </TooltipFrame>
 
@@ -28,7 +28,7 @@
                 </template>
         
                 <template #tooltipContent>
-                    <TooltipUser :user="user" />
+                    <TooltipUserV2 :user="user" />
                 </template>
             </TooltipFrame>
         </div>
@@ -39,14 +39,14 @@
 
 <script>
 import Common from '@/js/utils/common';
-import TooltipUser from '@/components/base/avatar/TooltipUser.vue';
+import TooltipUserV2 from '@/components/base/avatar/TooltipUserV2.vue';
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 import { useRouter } from 'vue-router';
 
 export default {
     name: 'SquareUserItem',
     components: {
-        TooltipUser,
+        TooltipUserV2,
         TooltipFrame,
     },
     props: {
@@ -73,7 +73,7 @@ export default {
                     this.userAvatar = this.user.Avatar;
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         },
 
@@ -83,7 +83,7 @@ export default {
                     this.router.push(`/profile/${this.user.Username}`);
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
     },

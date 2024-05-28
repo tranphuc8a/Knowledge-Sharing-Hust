@@ -23,6 +23,10 @@
                 </div>
             </div>
         </div>
+        <SelectImagePopup  
+            ref="selectImagePopup"
+            :on-okay="insertImage"
+        />
     </div>
 
 </template>
@@ -36,6 +40,7 @@ import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.
 import markdownSyntax from '@/js/resources/markdown/markdown-syntax';
 import { Validator } from '@/js/utils/validator';
 import Debounce from '@/js/utils/debounce';
+import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
 
 class EditorState{
     constructor(content, cursorPointer){
@@ -87,7 +92,7 @@ class EditorHistory{
 export default {
     name: 'MarkdownEditor',
     components: {
-        MarkdownEditorToolbar, LatexMarkdownRender
+        MarkdownEditorToolbar, LatexMarkdownRender, SelectImagePopup
     },
     data() {
         return {
@@ -119,6 +124,7 @@ export default {
             this.pointerPotition = 0;
             this.history = new EditorHistory();
             this.history.addChange(new EditorState(this.dText, this.pointerPotition));
+            this.$refs.selectImagePopup?.hide?.();
         },
 
         async changeEditorViewMode(mode){
@@ -161,6 +167,9 @@ export default {
             try {
                 let textarea, cursorPosition, text, syntax, deltaCursor;
                 switch (command) {
+                    case this.editorCommandEnums.SelectImage:
+                        await this.resolveSelectImage();
+                        break;
                     case this.editorCommandEnums.Undo:
                         textarea = this.$refs['textarea'];
                         this.dText = this.history.undo().markdownText;
@@ -221,6 +230,35 @@ export default {
             }
         },
 
+        async resolveSelectImage(){
+            try {
+                this.$refs['selectImagePopup'].show();
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+        async insertImage(url){
+            try {
+                if (url == null) return;
+                let syntax = '![Tên ảnh](' + url + ')';
+                let delta = 2;
+
+                let textarea = this.$refs['textarea'];
+                let cursorPosition = this.pointerPotition;
+                let text = this.dText;
+
+                this.dText = text.slice(0, cursorPosition) + syntax + text.slice(cursorPosition);
+                this.pointerPotition = cursorPosition + delta;
+                this.setCursorPosition(this.pointerPotition);
+                this.history.addChange(new EditorState(this.dText, this.pointerPotition + 0));
+                textarea.focus();
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.$refs['selectImagePopup']?.hide?.();
+            }
+        },
 
         async getValue(){
             try {

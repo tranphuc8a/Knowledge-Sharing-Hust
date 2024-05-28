@@ -11,6 +11,7 @@
     flex-flow: column nowrap;
     justify-content: space-between;
     align-items: flex-start;
+    cursor: initial;
 }
 
 .p-csct-card > div{
@@ -27,9 +28,32 @@
 .p-csctc-thumbnail{
     background-size: cover;
     background-position: center center;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     width: 100%;
     aspect-ratio: 2 / 1;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
 }
+
+.p-csc-thumbnail-overlay{
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+
+.p-csc-thumbnail-overlay:hover{
+    opacity: 1;
+}
+
 
 .p-csctc-bottom{
     padding: 16px;
@@ -37,7 +61,7 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 16px;
+    gap: 8px;
 }
 
 .p-csc-information{
@@ -49,11 +73,12 @@
     flex-flow: column nowrap;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 16px;
+    gap: 8px;
 }
 
 .p-csc-title{
-    width: 100%;
+    width: fit-content;
+    max-width: 100%;
     text-align: left;
     cursor: pointer;
     font-size: 18px;
@@ -66,7 +91,15 @@
 }
 .p-csc-title:hover{
     text-decoration: underline;
+}
 
+.p-csc-privacy{
+    width: fit-content;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
 }
 
 .p-csc-abstract{
@@ -81,7 +114,13 @@
     
     display: flex;
     flex-flow: row nowrap;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+}
+
+.p-csc-button > div{
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: fit-content;
 }
 

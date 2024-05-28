@@ -112,10 +112,16 @@
                 @:click="emitCommand(commandType.Image)">
                 <MIcon fa="image" family="fas" :style="iconStyle"/>
             </div>
+            <div title="Select Image" class="p-editor-toolbar-item"
+                @:click="emitCommand(commandType.SelectImage)">
+                <MIcon fa="image" family="far" :style="iconStyle"/>
+            </div>
             <div title="Video" class="p-editor-toolbar-item">
-                <MMenuContextPopup :options="getVideoOptions()">
-                    <MIcon fa="photo-video" family="fas" :style="iconStyle"/>
-                </MMenuContextPopup>
+                <span>
+                    <MMenuContextPopup :options="getVideoOptions()">
+                        <MIcon fa="photo-video" family="fas" :style="iconStyle"/>
+                    </MMenuContextPopup>
+                </span>
             </div>
             <div title="Table" class="p-editor-toolbar-item"
                 @:click="emitCommand(commandType.Table)">

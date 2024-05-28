@@ -130,6 +130,7 @@ namespace KnowledgeSharingApi.Services.Services
                     Username = isActive ? fri.ReceiverUsername : fri.SenderUsername,
                     FullName = isActive ? fri.ReceiverName : fri.SenderName,
                     Avatar = isActive ? fri.ReceiverAvatar : fri.SenderAvatar,
+                    Cover = isActive ? fri.ReceiverCover : fri.SenderCover,
                     Time = fri.Time,
                     IsActive = isActive,
                     UserRelationType = EUserRelationType.Friend
@@ -183,6 +184,7 @@ namespace KnowledgeSharingApi.Services.Services
                     Username = isActive ? relation.ReceiverUsername : relation.SenderUsername,
                     FullName = isActive ? relation.ReceiverName : relation.SenderName,
                     Avatar = isActive ? relation.ReceiverAvatar : relation.SenderAvatar,
+                    Cover = isActive ? relation.ReceiverCover : relation.SenderCover,
                     Time = relation.Time,
                     IsActive = isActive,
                     UserRelationType = responseUserRelationType

@@ -4,13 +4,17 @@
     <div class="p-csc-tooltip">
         <div class="p-csct-card card">
             <div class="p-csctc-top">
-                <div class="p-csctc-thumbnail"
-                    :click="resolveViewCourseDetail"
-                    :style="{
-                        'background-image': `url(${courseThumbnail})`
-                    }"    
-                >
-                </div>
+                <router-link :to="courseDetailLink" class="router-link">
+                    <div class="p-csctc-thumbnail"
+                        :click="resolveViewCourseDetail"
+                        :style="{
+                            'background-image': `url(${courseThumbnail})`
+                        }"    
+                    >
+                        <div class="p-csc-thumbnail-overlay">
+                        </div>
+                    </div>
+                </router-link>
             </div>
             <div class="p-csctc-bottom">
                 <div class="p-csc-information">
@@ -20,6 +24,10 @@
                     <!-- <div class="p-csc-abstract" v-if="dCourse?.Abstract != null">
                         {{ dCourse?.Abstract ?? "" }}
                     </div> -->
+                    <div class="p-csc-privacy">
+                        <VisualizedPrivacy :privacy="dCourse?.Privacy" :iconStyle="{fontSize: '16px'}"/>
+                        {{ privacyText }}
+                    </div>
 
                     <div class="p-csc-abstract" v-if="dCourse?.Abstract != null">
                         <EllipsisText 
@@ -28,9 +36,19 @@
                             :style="{}"/>
                     </div>
                 </div>
+
+                <div class="p-devide" />
+
                 <div class="p-csc-button">
                     <!-- Course Relation Button -->
-                    <CourseRelationButton />
+                    <div class="p-csc-relation-button">
+                        <CourseRelationButton />
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="p-csc-save-button">
+                        <SaveButton :knowledgeId="dCourse?.UserItemId" :initValue="dCourse?.IsMarked" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,12 +64,17 @@ import ResponseCourseModel from '@/js/models/api-response-models/response-course
 import { useRouter } from 'vue-router';
 import CourseRelationButton from '../course-relation-button/CourseRelationButton.vue';
 import EllipsisText from '@/components/base/text/EllipsisText.vue';
+import VisualizedPrivacy from '@/components/base/visualized-components/VisualizedPrivacy.vue';
+import SaveButton from '@/components/base/others/SaveButton.vue';
+import { myEnum } from '@/js/resources/enum';
 
 export default {
     name: 'CourseShortCardTooltip',
     components: {
         CourseRelationButton,
         EllipsisText,  
+        SaveButton,
+        VisualizedPrivacy,
     },
     props: {
         course: {
@@ -65,6 +88,8 @@ export default {
             defaultThumbnail: require('@/assets/default-thumbnail/course-image-icon.png'),
             dCourse: this.course,
             isReloadCourse: false,
+            privacyText: null,
+            courseDetailLink: '',
             router: useRouter(),
         }
     },
@@ -79,10 +104,12 @@ export default {
                 this.courseThumbnail = this.defaultThumbnail;
                 this.dCourse = this.course;
                 let courseThumbnail = this.dCourse?.Thumbnail;
+                this.courseDetailLink = '/course/' + this.dCourse?.UserItemId;
                 if (await Common.isValidImage(courseThumbnail)){
                     // console.log("thumbnail is valid");
                     this.courseThumbnail = courseThumbnail;
                 }
+                this.privacyText = (this.dCourse?.Privacy == myEnum.EPrivacy.Public) ? 'Công khai' : 'Riêng tư';
                 if (this.isReloadCourse){
                     let courseId = this.dCourse?.UserItemId;
                     if (courseId == null) return;

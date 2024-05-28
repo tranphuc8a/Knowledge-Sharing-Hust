@@ -1,10 +1,10 @@
 <template>
     <div class="p-popup-context-container" tabindex="1" 
-        @:click="togglePopup" @:blur="hidePopup">
+        @:click.stop="togglePopup" @:blur="hidePopup">
         <div class="p-popup-context-mask" ref="popup-context-mask">
             <slot name="popupContextMask"></slot>
         </div>
-        <div v-show="isPopupContextVisible" class="p-popup-context-content" 
+        <div v-show="isPopupContextVisible" v-if="isPopupCreated" class="p-popup-context-content" 
             :style="popupContextStyle" ref="popup-context-content">
             <!-- Nội dung của popupContext -->
             <slot name="popupContextContent"></slot>
@@ -16,6 +16,7 @@
     export default {
         data() {
             return {
+                isPopupCreated: false,
                 isPopupContextVisible: false,
                 isWaitingToShow: false,
                 isWaitingToHide: false,
@@ -86,6 +87,9 @@
                 if (!this.isWaitingToShow) return;
 
                 this.isPopupContextVisible = true;
+                if (!this.isPopupCreated) {
+                    this.isPopupCreated = true;
+                }
                 let that = this;
                 this.$nextTick(async () => {
                     try {
@@ -108,8 +112,8 @@
              * @Modified None
             */
             async verticalAlign(that, style){
-                const popupRect = that.popupContextContent.getBoundingClientRect();
-                const maskRect = that.popupContextMask.getBoundingClientRect();
+                const popupRect = that.$refs['popup-context-content'].getBoundingClientRect();
+                const maskRect = that.$refs['popup-context-mask'].getBoundingClientRect();
                 
                 if (that.position == that.popupPosition.top) {
                     style.bottom = `${that.padding_vertical + maskRect.height}px`;
@@ -136,8 +140,8 @@
              * @Modified None
              */
             async horizontalAlign(that, style){
-                const popupRect = that.popupContextContent.getBoundingClientRect();
-                const maskRect = that.popupContextMask.getBoundingClientRect();
+                const popupRect = that.$refs['popup-context-content'].getBoundingClientRect();
+                const maskRect = that.$refs['popup-context-mask'].getBoundingClientRect();
                 
                 // align popup follow horizontally
                 const minLeftContent = maskRect.left + maskRect.width/2 - popupRect.width/2;
@@ -161,11 +165,13 @@
 .p-popup-context-container {
     position: relative;
     width: 100%;
+    height: 100%;
 }
 
 .p-popup-context-mask {
     cursor: pointer;
     width: 100%;
+    height: 100%;
 }
 
 .p-popup-context-content {

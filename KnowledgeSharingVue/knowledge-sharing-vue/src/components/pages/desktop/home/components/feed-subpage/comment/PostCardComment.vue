@@ -20,16 +20,20 @@
                             </div>
                         </div>
                         <div class="p-comment-menu-context" ref="comment-menu-context">
-                            <CommentMenuContext 
-                                :on-edit="resolveEditComment"
-                                :on-delete="resolveDeleteComment"
-                                :on-reply="resolveReplyComment"
-                                :on-toggle-information="resolveToggleInformation"
-                            />
+                            <span>
+                                <CommentMenuContext 
+                                    :on-edit="resolveEditComment"
+                                    :on-delete="resolveDeleteComment"
+                                    :on-reply="resolveReplyComment"
+                                    :on-toggle-information="resolveToggleInformation"
+                                />
+                            </span>
                         </div>
                     </div>
                     <div class="p-comment-info" v-if="dComment?.isHideCommentInformation === false">
-                        <CommentInformationBar :on-reply="resolveReplyComment" />
+                        <div class="p-comment-info-justify-width">
+                            <CommentInformationBar :on-reply="resolveReplyComment" />
+                        </div>
                     </div>
                 </div>
             </div>

@@ -22,6 +22,8 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
         public string? Avatar { get; set; }
 
+        public string? Cover { get; set; }
+
         public bool IsActive { get; set; }
 
         public DateTime Time { get; set; }

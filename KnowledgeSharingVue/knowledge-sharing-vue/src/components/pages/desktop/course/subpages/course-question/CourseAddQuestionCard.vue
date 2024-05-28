@@ -58,7 +58,7 @@ export default {
                 if (courseId == null) return;
                 this.router.push('/question-create?courseId=' + courseId);
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
         

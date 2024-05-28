@@ -17,7 +17,7 @@
             :cancelButtonLabel="lang?.cancelButtonLabel"
             :okayButtonLabel="lang?.okayButtonLabel"
     >
-        <div class="p-popup-content">
+        <div class="p-popup-manager-content">
             <div class="p-popup-icon">
                 <MIcon v-if="['info', 'infor', 'inform', 'information'].includes(popup.type)"
                     fa="circle-info" :style="{color: 'blue', fontSize: fontSize}"
@@ -32,7 +32,7 @@
                     fa="circle-xmark" :style="{color: 'var(--red-color)', fontSize: fontSize}"             
                 />
             </div>
-            <div class="p-popup-content-text">
+            <div class="p-popup-manager-content-text">
                 {{ popup.content }}
             </div>
         </div>

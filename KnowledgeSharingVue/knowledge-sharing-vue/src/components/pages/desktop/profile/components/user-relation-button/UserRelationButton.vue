@@ -14,7 +14,13 @@
         <RequesteeButton v-else-if="userRelation === userRelationType.Requestee" />
         <RequesterButton v-else-if="userRelation === userRelationType.Requester" />
         <NotRelationButton v-else-if="userRelation === userRelationType.NotInRelation" />
-        <div v-show="false" v-else-if="userRelation === userRelationType.IsMySelf"></div>
+        <MButton 
+            v-else-if="userRelation === userRelationType.IsMySelf"
+            label="Chỉnh sửa trang cá nhân"
+            :onclick="resolveClickButton"
+            :buttonStyle="buttonStyle"
+            fa="pencil" family="fas" :iconStyle="iconStyle"
+        />
         <NotRelationButton v-else />
     </div>
 </template>
@@ -22,6 +28,7 @@
 
 
 <script>
+import MButton from './../../../../../base/buttons/MButton.vue'
 import NotRelationButton from './NotRelationButton.vue';
 import FolloweeButton from './FolloweeButton.vue';
 import FollowerButton from './FollowerButton.vue';
@@ -33,12 +40,14 @@ import ResponseUserCardModel from '@/js/models/api-response-models/response-user
 import CurrentUser from '@/js/models/entities/current-user';
 import { myEnum } from '@/js/resources/enum';
 import { GetRequest, Request } from '@/js/services/request';
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'UserRelationButton',
     components: {
         NotRelationButton, FolloweeButton, FollowerButton,
         RequesteeButton, RequesterButton, FriendButton,
+        MButton
     },
     props: {
         isCallApiWhenCreate: {
@@ -54,6 +63,13 @@ export default {
             userRelation: null,
             userCard: null,
             userRelationType: myEnum.EUserRelationType,
+            iconStyle: {
+                fontSize: '18px'
+            },
+            buttonStyle: {
+                padding: '16px'
+            },
+            router: useRouter(),
         }
     },
     async created(){
@@ -99,7 +115,19 @@ export default {
             } catch (e) {
                 console.error(e);
             }
-        }
+        },
+
+        async resolveClickButton(){
+            try {
+                let currentUser = await CurrentUser.getInstance();
+                let username = currentUser?.Username ?? currentUser?.UserId;
+                if (currentUser == null) return;
+                let path = '/profile/' + username + '/profile-edit';
+                this.router.push(path);
+            } catch (e) {
+                console.error(e);
+            }
+        },
     },
     provide(){
         return {

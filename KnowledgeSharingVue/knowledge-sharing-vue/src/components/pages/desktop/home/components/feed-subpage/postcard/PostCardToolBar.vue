@@ -31,7 +31,7 @@
             <div class="p-pct-comment">
                 <MEmbeddedButton fa="comment" iconFamily="far"
                     :label="getLabel()?.comment" 
-                    :onclick="resolveClickComment" 
+                    :onclick="resolveOnClickComment" 
                     :iconStyle="iconStyle"
                     :buttonStyle="buttonStyle"/>
             </div>
@@ -110,7 +110,7 @@ export default {
 
         getComment(){
             try {
-                let comment = Number(this.getPost()?.NumberComments ?? 0);
+                let comment = Number(this.getPost()?.TotalComment ?? 0);
                 let beautyNumber = Common.formatNumber(comment);
                 // return this.getLabel()?.numberComment(beautyNumber);
                 return beautyNumber;
@@ -134,8 +134,14 @@ export default {
 
         },
 
-        async resolveClickComment(){
-
+        async resolveOnClickComment(){
+            try {
+                if (this.resolveClickComment != null){
+                    await this.resolveClickComment();
+                }
+            } catch (error){
+                console.error(error);
+            }
         },
 
         async resolveClickViewDetail(){
@@ -171,7 +177,8 @@ export default {
     },
     inject: {
         getLanguage: {},
-        getPost: {}
+        getPost: {},
+        resolveClickComment: { default: null, }
     }
 }
 

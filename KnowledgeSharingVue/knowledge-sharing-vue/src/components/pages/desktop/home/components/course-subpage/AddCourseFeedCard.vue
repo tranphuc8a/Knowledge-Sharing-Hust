@@ -57,7 +57,7 @@ export default {
             try {
                 this.router.push('/course-create/');
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         },
         

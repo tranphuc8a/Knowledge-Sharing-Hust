@@ -241,7 +241,7 @@ export default {
     flex-flow: row nowrap;
     justify-self: space-between;
     align-items: flex-start;
-    gap: 4px;
+    gap: 8px;
 }
 
 .p-enter-comment > :first-child,

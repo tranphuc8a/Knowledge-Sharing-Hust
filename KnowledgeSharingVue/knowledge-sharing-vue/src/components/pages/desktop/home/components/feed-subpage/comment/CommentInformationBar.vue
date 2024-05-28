@@ -122,11 +122,12 @@ export default {
 
 .p-comment-information-bar{
     display: flex;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 0px;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
     width: 100%;
+    max-width: 100%;
 }
 
 .p-comment-infor{
@@ -135,7 +136,9 @@ export default {
     align-items: center;
     justify-content: flex-start;
     gap: 8px;
-    width: 100%;
+    flex-shrink: 0;
+    flex-grow: 1;
+    width: fit-content;
 }
 
 .p-comment-infor > * {
@@ -159,12 +162,15 @@ export default {
 
 
 .p-comment-star-actions{
+    padding-right: 42px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-end;
     align-items: center;
     gap: 8px;
-    width: 100%;
+    width: fit-content;
+    flex-shrink: 0;
+    flex-grow: 1;
 }
 
 .p-comment-star-actions > * {

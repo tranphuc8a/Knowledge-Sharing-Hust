@@ -30,7 +30,11 @@
                         v-for="(course, index) in listFilteredCourses"
                         :key="(course.UserItemId ?? index)"
                     >
-                        <CourseShortCard :course="course"/>
+                        <CourseShortCard :course="course">
+                            <template #courseMenuContext>
+                                <CourseShortCardMenuContext/>
+                            </template>
+                        </CourseShortCard>
                     </div>
                 </div>
             </transition>
@@ -50,6 +54,7 @@
 <script>
 import CourseShortCardSkeleton from '../../../course/components/course-card/CourseShortCardSkeleton.vue';
 import CourseShortCard from '../../../course/components/course-card/CourseShortCard.vue';
+import CourseShortCardMenuContext from '../../../course/components/course-card/CourseShortCardMenuContext.vue';
 import { MyRandom } from '@/js/utils/myrandom';
 
 
@@ -57,7 +62,8 @@ export default {
     name: 'ProfileCourseContentSubpage',
     components: {
         CourseShortCard,
-        CourseShortCardSkeleton
+        CourseShortCardSkeleton,
+        CourseShortCardMenuContext
     },
     props: {
         listCourses: {

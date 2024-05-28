@@ -23,7 +23,11 @@
             <CourseShortCard 
                 v-for="item in listCourses" 
                 :key="item?.UserItemId"
-                :course="item" />
+                :course="item" >
+                <template #courseMenuContext>
+                    <CourseShortCardMenuContext/>
+                </template>
+            </CourseShortCard>
     
             <CourseShortCardSkeleton v-if="!isOutOfCourse" />
             <CourseShortCardSkeleton v-if="!isOutOfCourse" />
@@ -40,6 +44,7 @@
 import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 import CourseShortCard from '../../../course/components/course-card/CourseShortCard.vue';
 import CourseShortCardSkeleton from '../../../course/components/course-card/CourseShortCardSkeleton.vue';
+import CourseShortCardMenuContext from '../../../course/components/course-card/CourseShortCardMenuContext.vue';
 
 import ResponseCourseModel from '@/js/models/api-response-models/response-course-model';
 
@@ -50,6 +55,7 @@ export default {
     name: 'PostSubpage',
     components: {
         CourseShortCard,
+        CourseShortCardMenuContext,
         CourseShortCardSkeleton,
         NotFoundPanel,
     },

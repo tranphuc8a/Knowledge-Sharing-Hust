@@ -29,12 +29,20 @@
                     :buttonStyle="buttonStyle"
                 />
             </div>
+
+            <div class="p-csc-menu-context">
+                <slot name="courseMenuContext" />
+            </div>
         </div>
 
         <div class="p-csc-bottom">
             <div class="p-csc-bottom-infor">
                 <div class="p-csc-course-title" :title="course?.Title ?? ''">
-                    {{ course?.Title ?? "" }}
+                    <router-link :to="courseDetailLink">
+                        <span>
+                            {{ course?.Title ?? "" }}
+                        </span>
+                    </router-link>
                 </div>
                 <div class="p-csc-course-owner">
                     <TooltipUserAvatar :user="user" />
@@ -46,8 +54,15 @@
             <div class="p-csc-bottom-devider">
             </div>
             <div class="p-csc-bottom-relation">
+                <div class="p-csc-course-totalstar">
+                    <span>
+                        <VisualizedTotalStar :average-star="course?.AverageStar" :total-star="course?.TotalStar" />
+                    </span>
+                </div>
                 <div class="p-csc-course-cost">
-                    <VisualizedCurrency :money="course?.Fee" />
+                    <span>
+                        <VisualizedCurrency :money="course?.Fee" />
+                    </span>
                 </div>
                 <!-- <div class="p-csc-course-relation-button">
                     <CourseRelationButton />
@@ -74,6 +89,7 @@ import { useRouter } from 'vue-router';
 // import { myEnum } from '@/js/resources/enum';
 import VisualizedCurrency from '../course-cost/VisualizedCurrency.vue';
 import ResponseCourseModel from '@/js/models/api-response-models/response-course-model';
+import VisualizedTotalStar from '@/components/base/others/VisualizedTotalStar.vue';
 
 export default {
     name: 'CourseShortCard',
@@ -83,7 +99,8 @@ export default {
         TooltipUserAvatar, TooltipUsername,
         MCancelButton, 
         // CourseRelationButton,
-        VisualizedCurrency
+        VisualizedCurrency,
+        VisualizedTotalStar
     },
     props: {
         course: {
@@ -107,7 +124,8 @@ export default {
             router: useRouter(),
             buttonStyle: {},
             courseThumbnail: null,
-            defaultCourseThumbnail: require('@/assets/default-thumbnail/course-image-icon.png')
+            defaultCourseThumbnail: require('@/assets/default-thumbnail/course-image-icon.png'),
+            courseDetailLink: '',
         }
     },
     async created(){
@@ -139,6 +157,7 @@ export default {
                 // update course card
                 this.dCourse = new ResponseCourseModel().copy(this.course);
                 this.user = this.dCourse?.getUser?.();
+                this.courseDetailLink = '/course/' + this.dCourse?.UserItemId;
                 
                 // update thumbnail
                 if (await Common.isValidImage(this.dCourse.Thumbnail)){

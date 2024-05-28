@@ -5,10 +5,12 @@
     <div class="p-ellipsis-text" :title="text"
         :style="
         {
-            '-webkit-line-clamp': maxline,
+            '-webkit-line-clamp': maxLine,
             ...style
         }">
-        {{ normalizeWhitespace(text) }}
+        <span>
+            {{ normalizeWhitespace(text) }}
+        </span>
     </div>
 
 </template>
@@ -26,7 +28,7 @@ export default {
         text: {
             required: true,
         },
-        maxline: {},
+        maxLine: {},
         style: {}
     },
     data(){

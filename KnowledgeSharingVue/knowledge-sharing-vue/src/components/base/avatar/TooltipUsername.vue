@@ -1,5 +1,10 @@
 <template>
-    <div class="p-tooltip-username-frame">
+    <div class="p-tooltip-username-frame" v-if="!isLoaded">
+        <div class="p-tooltip-username skeleton" style="width: 150px; height: 24px;" >
+        </div>
+    </div>
+
+    <div class="p-tooltip-username-frame" v-if="isLoaded">
         <TooltipFrame>
             <template #tooltipMask>
                 <div class="p-tooltip-username" @:click="resolveClickUsername"
@@ -9,7 +14,7 @@
             </template>
     
             <template #tooltipContent>
-                <TooltipUser :user="user" />
+                <TooltipUserV2 :user="user" />
             </template>
         </TooltipFrame>
     </div>
@@ -17,7 +22,7 @@
 
 
 <script>
-import TooltipUser from './TooltipUser.vue';
+import TooltipUserV2 from './TooltipUserV2.vue';
 import TooltipFrame from '../tooltip/TooltipFrame.vue';
 import { useRouter } from 'vue-router';
 import { Validator } from '@/js/utils/validator';
@@ -27,10 +32,11 @@ export default {
     data() {
         return {
             router: useRouter(),
+            isLoaded: this.user != null
         }
     },
     components: {
-        TooltipUser, TooltipFrame
+        TooltipUserV2, TooltipFrame
     },
     methods: {
         /**
@@ -62,6 +68,14 @@ export default {
             default: {}
         }
     },
+    watch: {
+        user: {
+            handler: function(){
+                this.isLoaded = this.user != null;
+            },
+            immediate: true
+        }
+    }
 };
 </script>
 

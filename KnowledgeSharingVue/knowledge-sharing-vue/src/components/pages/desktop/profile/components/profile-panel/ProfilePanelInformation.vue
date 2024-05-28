@@ -1,7 +1,32 @@
 
 
 <template>
-    <div class="p-user-information">
+    <div class="p-user-information" v-if="!isLoaded">
+        <div class="p-user-information__left">
+            <div class="p-user-avatar">
+                <!-- ProfilePanelUserAvatar -->
+                <ProfilePanelUserAvatar />
+            </div>
+            <div class="p-user-infor">
+                <div class="p-user-name">
+                    <div class="skeleton"
+                        style="width: 250px; height: 28px; border-radius: 8px;"
+                    >
+                    </div>
+                </div>
+                <div class="p-user-friend">
+                    <!-- ProfilePaneUserlFriends -->
+                    <ProfilePanelUserFriend />
+                </div>
+            </div>
+        </div>
+        <div class="p-user-information__right">
+            <!-- ProfilePanelUserButtons -->
+            <ProfilePanelButton />
+        </div>
+    </div>
+
+    <div class="p-user-information" v-if="isLoaded">
         <div class="p-user-information__left">
             <div class="p-user-avatar">
                 <!-- ProfilePanelUserAvatar -->
@@ -42,12 +67,14 @@ export default {
     },
     data(){
         return {
-            dUser: {}
+            dUser: {},
+            isLoaded: false,
         }
     },
     mounted(){
         try {
             this.dUser = this.getUser() ?? {};
+            this.isLoaded = this.getUser() != null;
         } catch (e) {
             console.error(e);
         }

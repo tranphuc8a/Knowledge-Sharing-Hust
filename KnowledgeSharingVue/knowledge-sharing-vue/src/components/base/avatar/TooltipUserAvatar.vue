@@ -6,7 +6,7 @@
             </template>
     
             <template #tooltipContent>
-                <TooltipUser :user="user" />
+                <TooltipUserV2 :user="user" />
             </template>
         </TooltipFrame>
     </div>
@@ -15,7 +15,7 @@
 
 <script>
 import UserAvatar from './UserAvatar.vue';
-import TooltipUser from './TooltipUser.vue';
+import TooltipUserV2 from './TooltipUserV2.vue';
 import TooltipFrame from '../tooltip/TooltipFrame.vue';
 export default {
     name: "TooltipUserAvatar",
@@ -23,7 +23,7 @@ export default {
         return {}
     },
     components: {
-        UserAvatar, TooltipFrame, TooltipUser
+        UserAvatar, TooltipFrame, TooltipUserV2
     },
     methods: {
         

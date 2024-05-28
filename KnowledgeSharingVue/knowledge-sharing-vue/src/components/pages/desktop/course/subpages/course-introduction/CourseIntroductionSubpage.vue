@@ -17,7 +17,7 @@
 
         <div class="p-cis-content" v-if="isLoaded">
             <div class="p-cis-item">
-                <LessonCard :post="dLesson" />
+                <CourseIntroductionCard :course="dCourse" />
             </div>
         </div>
     </div>
@@ -28,21 +28,20 @@
 <script>
 import ResponseLessonModel from '@/js/models/api-response-models/response-lesson-model';
 import ResponseCourseModel from '@/js/models/api-response-models/response-course-model';
-import LessonCard from '../../../post-detail/components/LessonCard.vue';
+import CourseIntroductionCard from '../../components/course-card/CourseIntroductionCard.vue';
 import { myEnum } from '@/js/resources/enum';
 
 
 export default {
     name: 'CourseIntroductionSubpage',
     components: {
-        LessonCard
+        CourseIntroductionCard,
     },
     props: {
     },
     data(){
         return {
             dCourse: null,
-            dLesson: null,
             isLoaded: false,
         }
     },
@@ -52,10 +51,11 @@ export default {
     methods: {
         async initPost(){
             try {
-                this.dLesson = await this.convertToLesson();
-                if (this.dLesson == null){
-                    return;
-                }
+                this.dCourse = this.getCourse();
+                // this.dLesson = await this.convertToLesson();
+                // if (this.dLesson == null){
+                //     return;
+                // }
                 this.isLoaded = true;
             } catch (e){
                 console.error(e);
@@ -95,6 +95,16 @@ export default {
 
 .p-cis-content{
     width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.p-cis-item{
+    max-width: 100%;
+    width: fit-content;
+    min-width: 600px;
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;

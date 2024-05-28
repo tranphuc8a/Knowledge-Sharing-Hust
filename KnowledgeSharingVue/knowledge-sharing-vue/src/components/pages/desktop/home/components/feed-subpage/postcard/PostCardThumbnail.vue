@@ -71,7 +71,7 @@ export default {
             try {
                 this.$refs.preview.show();
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
     },
