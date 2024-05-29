@@ -4,7 +4,7 @@
     <div class="p-lesson-tooltip">
         <div class="card">
             <div class="p-lt-thumbnail">
-                <RouterLink :to="dDetailLink">
+                <RouterLink :to="dDetailLink" class="router-link">
                     <div class="p-lt-thumbnail-image"
                         :style="{ backgroundImage: 'url(' + dThumbnail + ')' }"
                     >
@@ -75,8 +75,8 @@ export default {
         return {
             dLesson: this.lesson,
             defaultLink: '/lesson/' + this.lesson?.UserItemId,
-            dDetailLink: null,
-            defaultThumbnail: '/images/default-thumbnail.png',
+            dDetailLink: '',
+            defaultThumbnail: require('@/assets/default-thumbnail/lesson-image-icon.png'),
             dThumbnail: null,
             titleStyle: {
                 fontSize: '1.2rem',
@@ -137,6 +137,12 @@ export default {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     cursor: pointer;
+}
+
+.p-lt-thumbnail > a{
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .p-lt-thumbnail-image{

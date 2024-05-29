@@ -1,45 +1,14 @@
 
 
 <template>
-    <div class="p-lesson-short-card" v-if="!isLoaded">
-        <div class="card">
-            <div class="p-lsc-thumbnail">
-                <div class="p-lsc-thumbnail-image">
-                    <div class="skeleton" style="width: 100%; height: 100%; padding: 16px;">
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-lsc-information">
-                <div class="p-lsc-infor__left">
-                    <div class="p-lsc-lesson-title">
-                        <div class="skeleton" style="width: 150px; height: 24px;">
-                        </div>
-                    </div>
-                    <div class="p-lsc-lesson-owner">
-                        <TooltipUserAvatarAndUsername :user="lessonOwner" :size="32" />
-                    </div>
-                    <div class="p-lsc-lesson-stars">
-                        <div class="skeleton" style="width: 175px; height: 24px;">
-                        </div>
-                    </div>
-                </div>
-                <div class="p-lsc-infor__right">
-                    <div class="skeleton"
-                        style="width: 50px; height: 50px; border-radius: 50%;"
-                    >
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <LessonShortCardSkeleton v-if="!isLoaded" />
 
     <div class="p-lesson-short-card" v-if="isLoaded">
         <div class="card">
             <div class="p-lsc-thumbnail">
                 <TooltipFrame :style="tooltipStyle">
                     <template #tooltipMask>
-                        <router-link :to="lessonDetailLink">
+                        <router-link :to="lessonDetailLink" class="router-link">
                             <div class="p-lsc-thumbnail-image"
                                 :style="{backgroundImage: `url(${lessonThumbnail})`}"
                             >
@@ -60,7 +29,7 @@
                         <TooltipFrame :style="tooltipStyle">
                             <template #tooltipMask>
                                 <router-link :to="lessonDetailLink">
-                                    <EllipsisText :text="dLesson?.Title" :style="titleLessonStyle" :max-line="2"/>
+                                    <EllipsisText :text="dLesson?.Title" :style="titleLessonStyle" :max-line="1"/>
                                 </router-link>
                             </template>
                             
@@ -70,7 +39,7 @@
                         </TooltipFrame>
                     </div>
                     <div class="p-lsc-lesson-owner">
-                        <TooltipUserAvatarAndUsername :user="lessonOwner" :size="48" />
+                        <TooltipUserAvatarAndUsername :user="lessonOwner" :size="32" />
                     </div>
                     <div class="p-lsc-lesson-stars">
                         <VisualizedTotalStar 
@@ -83,7 +52,7 @@
                     <div class="p-lcs-menu-context">
                         <slot name="lessonMenuContext"></slot>
                     </div>
-                    <SaveButton :lesson="dLesson" />
+                    <SaveButton :knowledge-id="dLesson?.UserItemId" :init-value="dLesson?.IsMarked" />
                 </div>
             </div>
         </div>
@@ -100,7 +69,7 @@ import SaveButton from './../others/SaveButton.vue';
 import VisualizedTotalStar from '../others/VisualizedTotalStar.vue';
 import EllipsisText from '../text/EllipsisText.vue';
 import TooltipUserAvatarAndUsername from '../avatar/TooltipUserAvatarAndUsername.vue';
-
+import LessonShortCardSkeleton from './LessonShortCardSkeleton.vue';
 
 export default {
     name: 'LessonShortCard',
@@ -111,6 +80,7 @@ export default {
         TooltipUserAvatarAndUsername,
         TooltipFrame,
         LessonTooltip,
+        LessonShortCardSkeleton,
     },
     props: {
         lesson: {
@@ -123,25 +93,24 @@ export default {
     },
     watch: {
         lesson(){
-            this.dLesson = this.lesson;
+            this.refreshNewlesson();
         }
     },
     data(){
         return {
             tooltipStyle: { boxShadow: '0px 0px 8px 4px rgba(var(--primary-color-rgb), .56)'},
             dLesson: this.lesson,
-            defaultLessonThumbnail: 'require(@/assets/default-thumbnail/lesson-image-icon.png)',
+            defaultLessonThumbnail: require('@/assets/default-thumbnail/lesson-image-icon.png'),
             lessonThumbnail: null,
-            lessonDetailLink: null,
+            lessonDetailLink: '',
             titleLessonStyle: {
-                fontSize: '1.2rem',
-                fontWeight: 'bold',
-                color: 'var(--text-color)',
-                cursor: 'pointer',
             },
             lessonOwner: null,
             isLoaded: false,
         }
+    },
+    async created(){
+        this.refreshNewlesson();
     },
     async mounted(){
     },
@@ -260,12 +229,28 @@ export default {
     align-items: stretch;
 }
 
+.p-lsc-infor__left > *{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+}
+
+
 .p-lsc-lesson-title{
-    width: 100%;
+    max-width: 100%;
+    width: fit-content;
     height: fit-content;
-    font-size: 24px;
+    text-align: left;
+    font-size: 18px;
     font-family: 'ks-font-semibold';
     cursor: pointer;
+}
+
+.p-lsc-lesson-title a {
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .p-lsc-lesson-owner{

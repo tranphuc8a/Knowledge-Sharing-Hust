@@ -10,7 +10,7 @@ let myEnum = {
     buttonState: {
         LOADING: "loading",
         NORMAL: "normal",
-        DISABLED: "diable"
+        DISABLED: "disabled"
     },
 
     inputState: {

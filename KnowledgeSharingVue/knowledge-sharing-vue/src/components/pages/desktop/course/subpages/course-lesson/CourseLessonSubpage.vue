@@ -156,6 +156,7 @@ export default {
             try {
                 this.dCourse = await this.getCourse();
                 this.isMySelf = await this.getIsMyCourse();
+                this.loadMoreLesson();
             } catch (error) {
                 console.error(error);
             }

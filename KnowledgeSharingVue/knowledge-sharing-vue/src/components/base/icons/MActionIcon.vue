@@ -66,6 +66,14 @@ let icon = {
             default: 'normal'
         }
     },
+    watch: {
+        state: {
+            handler: function(){
+                this.dState = this.state;
+            },
+            immediate: true
+        }
+    },
 };
 export default icon;
 </script>

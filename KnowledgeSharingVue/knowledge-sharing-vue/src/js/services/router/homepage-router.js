@@ -34,6 +34,14 @@ const homepageRouter = [
             path: 'questions',
             name: 'questions-page',
             component: HomeQuestionSubpage
+        }, { // when /search-by-text
+            path: 'search-by-text',
+            name: 'search-by-text-page',
+            component: null
+        }, { // when /search-by-category
+            path: 'search-by-category',
+            name: 'search-by-category-page',
+            component: null
         }],
     },
 ];

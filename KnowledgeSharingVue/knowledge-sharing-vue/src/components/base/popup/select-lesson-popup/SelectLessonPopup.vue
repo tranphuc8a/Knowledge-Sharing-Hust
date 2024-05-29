@@ -6,7 +6,7 @@
             :isShowPreviousButton="false"
             :isShowCancelButton="true"
             :isShowOkayButton="true"
-            ::is-show-previous-button="true"
+            :is-show-previous-button="true"
             :isAutoHide="false"
             v-show="dIsShow"
         
@@ -16,6 +16,7 @@
             :on-previous="callbacks.onPrevious"
 
             header="Chọn bài giảng thêm vào khóa học"
+            description="Chọn bài giảng mà bạn muốn thêm vào khóa học. Bạn cũng có thể tạo bài giảng mới nếu cần."
             cancelButtonLabel="Thôi không chọn nữa"
             okayButtonLabel="Chốt lấy cái này"
             previousButtonLabel="Tạo bài giảng mới"
@@ -35,6 +36,12 @@
                         state="normal"
                     />
                 </span>
+                <span>
+                    <MActionIcon
+                        fa="rotate-left"
+                        :onclick="resolveClickReload"
+                    />
+                </span>
             </div>
             <div class="p-devide"></div>
             <div class="p-lpc-content" v-if="isCreated" ref="scroll-container"
@@ -46,8 +53,8 @@
 
                 <div class="p-lps-lesson-list">
                     <div class="p-lps-lesson-item p-radio-button"
-                        v-for="(lesson, index) in listLesson"
-                        :key="lesson?.UserItemId ?? index"
+                        v-for="lesson in listLesson"
+                        :key="lesson?.UserItemId"
                     >
                         <label>
                             <div class="p-lps-lesson-item-mask">
@@ -56,13 +63,32 @@
                                     <LessonShortCard :lesson="lesson" />
                                 </div>
                             </div>
-                            <input :name="data.group" :value="item.value" 
-                                @:change="resolveOnChange"
-                                v-model="data.value" type="radio" class="p-radio-button-org" />
+                            <input name="select-lesson-to-course" :value="lesson" 
+                                v-model="value" type="radio" class="p-radio-button-org" />
                         </label>
                     </div>
 
                     <!-- Skeleton -->
+                    <div class="p-lps-lesson-item p-radio-button" v-show="!isOutOfLesson">
+                        <label>
+                            <div class="p-lps-lesson-item-mask">
+                                <div class="p-radio-button-mask"> <div class="p-radio-button-dot"> </div> </div>
+                                <div class="p-lps-lesson-card">
+                                    <LessonShortCardSkeleton />
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="p-lps-lesson-item p-radio-button" v-show="!isOutOfLesson">
+                        <label>
+                            <div class="p-lps-lesson-item-mask">
+                                <div class="p-radio-button-mask"> <div class="p-radio-button-dot"> </div> </div>
+                                <div class="p-lps-lesson-card">
+                                    <LessonShortCardSkeleton />
+                                </div>
+                            </div>
+                        </label>
+                    </div>
                     <div class="p-lps-lesson-item p-radio-button" v-show="!isOutOfLesson">
                         <label>
                             <div class="p-lps-lesson-item-mask">
@@ -223,6 +249,17 @@ export default {
             }
         },
 
+        async resolveClickReload(){
+            try {
+                this.listLesson = [];
+                this.isOutOfLesson = false;
+                this.isCreated = true;
+                this.loadMoreLesson();
+            } catch (e){
+                console.error(e);
+            }
+        },
+
         async resolveClickOkay(){
             try {
                 if (this.value == null) {
@@ -255,10 +292,11 @@ export default {
 .p-lesson-popup-content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    min-width: 800px;
     width: 100%;
-    height: 450px;
+    height: 600px;
     gap: 16px;
 }
 
@@ -266,7 +304,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
 }
 
@@ -274,11 +312,13 @@ export default {
 .p-lpc-content {
     width: 100%;
     height: 100%;
+    padding-top: 32px;
+    padding-bottom: 32px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     gap: 16px;
 }
 
@@ -293,18 +333,23 @@ export default {
 .p-lps-lesson-list {
     width: 100%;
     display: flex;
-    flex-wrap: wrap;
+    flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
     gap: 16px;
 }
 
 .p-lps-lesson-item {
-    width: calc((100% - 16px)/2);
+    width: 100%;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
     gap: 16px;
+}
+
+.p-lps-lesson-item label {
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .p-lps-lesson-item-mask{

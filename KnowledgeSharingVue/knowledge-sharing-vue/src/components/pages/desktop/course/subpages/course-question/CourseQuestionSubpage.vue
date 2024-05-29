@@ -159,6 +159,9 @@ export default {
     flex-shrink: 1;
     flex-grow: 2;
 
+    position: sticky;
+    top: 16px;
+
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;

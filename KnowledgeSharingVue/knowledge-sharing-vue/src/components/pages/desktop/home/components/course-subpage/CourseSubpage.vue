@@ -137,6 +137,7 @@ export default {
 
             } catch (e){
                 Request.resolveAxiosError(e);
+                this.isOutOfCourse = true;
             } finally {
                 this.isLoadingMore = false;
             }

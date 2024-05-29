@@ -99,22 +99,84 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public async Task<int> DeleteLessonFromCourse(Guid participantId)
         {
-            IQueryable<CourseLesson> courseLessons = DbContext.CourseLessons.Where(cl => cl.CourseLessonId == participantId);
-            DbContext.CourseLessons.RemoveRange(courseLessons);
-            return await DbContext.SaveChangesAsync();
+            var transaction = await DbContext.BeginTransaction();
+            try
+            {
+                // Lay ve bai giang participantId
+                CourseLesson? courseLesson = await DbContext.CourseLessons.FindAsync(participantId);
+                if (courseLesson == null) return 0;
+                Guid courseId = courseLesson.CourseId;
+
+                // lay ve toan bo bai giang, sap xep theo chieu tang dan offset
+                List<CourseLesson> listLesson = await DbContext.CourseLessons
+                    .Where(cl => cl.CourseId == courseId && cl.CourseLessonId != participantId)
+                    .OrderBy(cl => cl.Offset)
+                    .ToListAsync();
+
+                // Xoa bai giang
+                DbContext.CourseLessons.Remove(courseLesson);
+
+                // Update lai Offset cac bai giang
+                for (int i = 0; i < listLesson.Count; i++)
+                {
+                    listLesson[i].Offset = i + 1;
+                }
+
+                // Luu thay doi
+                int res = await DbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return res;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return 0;
+            }
         }
 
         public async Task<int> DeleteListLessonFromCourse(List<Guid> listParticipantIds)
         {
-            IQueryable<CourseLesson> courseLessons = DbContext.CourseLessons
-                .Where(cl => listParticipantIds.Contains(cl.CourseLessonId));
-            DbContext.CourseLessons.RemoveRange(courseLessons);
-            return await DbContext.SaveChangesAsync();
+            var transaction = await DbContext.BeginTransaction();
+            try
+            {
+                // Lay ve danh sach bai giang listParticipantId
+                List<CourseLesson> courseLesson = await DbContext.CourseLessons
+                    .Where(cl => listParticipantIds.Contains(cl.CourseLessonId))
+                    .ToListAsync();
+                if (courseLesson.Count <= 0) return 0;
+                Guid courseId = courseLesson.First()!.CourseId;
+
+                // lay ve toan bo bai giang, sap xep theo chieu tang dan offset
+                List<CourseLesson> listLesson = await DbContext.CourseLessons
+                    .Where(cl => cl.CourseId == courseId && !listParticipantIds.Contains(cl.CourseLessonId))
+                    .OrderBy(cl => cl.Offset)
+                    .ToListAsync();
+
+                // Xoa bai giang
+                DbContext.CourseLessons.RemoveRange(courseLesson);
+
+                // Update lai Offset cac bai giang
+                for (int i = 0; i < listLesson.Count; i++)
+                {
+                    listLesson[i].Offset = i + 1;
+                }
+
+                // Luu thay doi
+                int res = await DbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return res;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                return 0;
+            }
         }
 
         public async Task<List<CourseLesson>> GetCourseParticipant(Guid courseId)
         {
-            return await DbContext.CourseLessons.Where(cl => cl.CourseId == courseId)
+            return await DbContext.CourseLessons
+                .Where(cl => cl.CourseId == courseId)
                 .OrderBy(cl => cl.Offset)
                 .ToListAsync();
         }
@@ -167,6 +229,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             using var transaction = await DbContext.BeginTransaction();
             try
             {
+                listParticipantIds = listParticipantIds.Distinct().ToArray();
+
                 // Check existed
                 List<CourseLesson> courseLessons = await DbContext.CourseLessons
                     .Where(cl => listParticipantIds.Contains(cl.CourseLessonId))
@@ -184,7 +248,10 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 // Update:
                 foreach (CourseLesson cl in courseLessons)
                 {
-                    cl.Offset = mapGuidToOffsets[cl.CourseLessonId];
+                    if (mapGuidToOffsets.TryGetValue(cl.CourseLessonId, out int offset))
+                    {
+                        cl.Offset = offset;
+                    }
                 }
                 int rows = await DbContext.SaveChangesAsync();
                 if (rows <= 0) throw new Exception();

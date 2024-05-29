@@ -17,7 +17,7 @@
                 :errorMessage="getLabel()?.invalidVerificationCode"
                 />
         </form>
-       
+
         <div class="pr-links">
             <router-link class="pa-link" to="/login" >
                 {{ getLabel()?.login }}

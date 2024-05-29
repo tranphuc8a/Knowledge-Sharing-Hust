@@ -18,7 +18,7 @@
         </div>
         <div class="p-clc-content">
             <LessonShortCard :lesson="dCourseLesson.Lesson" :detail-link="detailLink" > 
-                <CourseLessonMenuContext />
+                <CourseLessonMenuContext v-if="isShowMenuContext" />
             </LessonShortCard>
         </div>
     </div>
@@ -45,6 +45,9 @@ export default {
         responseCourseLessonModel: {
             required: true,
         },
+        isShowMenuContext: {
+            default: true,
+        }
     },
     watch: {
         responseCourseLessonModel(){
@@ -56,10 +59,11 @@ export default {
             dCourseLesson: null,
             offsetText: null,
             isLoaded: false,
-            detailLink: null,
+            detailLink: '',
         }
     },
     async mounted(){
+        this.refreshCourseLesson();
     },
     methods: {
         refreshCourseLesson(){

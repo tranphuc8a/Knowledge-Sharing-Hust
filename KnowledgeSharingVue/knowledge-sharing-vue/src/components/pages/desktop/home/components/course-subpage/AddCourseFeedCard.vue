@@ -1,5 +1,5 @@
 <template>
-    <FeedCardFrame>
+    <FeedCardFrame v-show="currentUser != null">
         <div class="p-feedcard-addcourse">
             <div class="p-feedcard-addcourse__header">
                 <TooltipUserAvatar :user="currentUser" :size="36" />

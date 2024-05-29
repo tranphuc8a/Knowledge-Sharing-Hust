@@ -127,6 +127,14 @@ export default {
     align-items: stretch;
 }
 
+.p-lsc-infor__left > *{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+}
+
 .p-lsc-lesson-title{
     width: 100%;
     height: fit-content;

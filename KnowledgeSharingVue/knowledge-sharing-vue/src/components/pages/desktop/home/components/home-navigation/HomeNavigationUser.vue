@@ -2,7 +2,7 @@
 
 <template>
     <div class="d-navigation-item" @:click="resolveClickItem">
-        <div class="d-item-icon">
+        <div class="d-item-icon" v-show="user != null">
             <UserAvatar :user="user" :size="32" />
         </div>
         <div class="d-item-label">

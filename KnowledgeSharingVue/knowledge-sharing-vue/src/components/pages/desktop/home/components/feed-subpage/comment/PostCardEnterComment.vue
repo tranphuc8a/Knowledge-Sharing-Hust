@@ -1,6 +1,6 @@
 <template>
 
-    <div class="p-enter-comment"  @keydown.shift.enter.prevent.stop="resolvePressShiftEnter">
+    <div class="p-enter-comment"  @keydown.shift.enter.prevent.stop="resolvePressShiftEnter" v-show="currentUser != null">
         <div class="p-enter-comment-avatar">
             <UserAvatar :user="currentUser" :size="36" />
         </div>

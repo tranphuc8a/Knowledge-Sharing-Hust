@@ -62,8 +62,6 @@ export default {
         }
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
     },
     provide(){
         return{}
