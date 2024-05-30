@@ -3,19 +3,21 @@
     <div class="d-leftbar">
         <div class="d-leftbar__logo" @:click="resolveClickLogo">
         </div>
-        <MTextfield 
+        <MTextfieldButton 
             :placeholder="getLabel()?.searchPlaceholder"
             :is-show-icon="true" :is-show-title="false" :is-show-error="false" :is-obligate="false"
             :onclick-icon="resolveClickSearch" 
             :validator="null" ref="textfield"
-            state="normal"/>
+            state="normal"
+            />
     </div>
 </template>
 
 <script>
-import MTextfield from '@/components/base/inputs/MTextfield';
+import MTextfieldButton from '@/components/base/inputs/MTextfieldButton';
 import { Validator } from '@/js/utils/validator';
 import { useRouter } from 'vue-router';
+
 export default {
     name: "LeftDesktopBar",
     data() {
@@ -29,7 +31,7 @@ export default {
         this.textfield = this.$refs.textfield;
     },
     components: {
-        MTextfield
+        MTextfieldButton
     },
     methods: {
         /**
@@ -61,7 +63,7 @@ export default {
                     return;
                 }
                 // navigate to search page with search text
-                // this.router.push({name: 'search', query: {text: text}});
+                this.router.push('/search-text/post?search=' + text);
             } catch (error) {
                 console.error(error);
             }

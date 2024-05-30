@@ -4,8 +4,8 @@ import { myEnum } from "@/js/resources/enum";
 import Common from "./js/utils/common";
 
 // const defaultBackendUrl = 'https://tranphuc8a.somee.com/api/v1';
-// const defaultBackendUrl = 'http://localhost:5000/api/v1';
-const defaultBackendUrl = 'https://localhost:7277/api/v1';
+const defaultBackendUrl = 'http://localhost:5000/api/v1';
+// const defaultBackendUrl = 'https://localhost:7277/api/v1';
 const defaultHomepageUrl = 'http://localhost:8080';
 const defaultCapchaSiteKey = '6Leu3-wpAAAAAK-gFpFCjbSOTBXl_q1nCqLe6XDR';
 

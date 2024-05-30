@@ -163,6 +163,7 @@ export default {
                 let body = await Request.tryGetBody(res);
                 let imageUrl = body?.ImageUrl;
                 this.isListImageCreated = false;
+                this.getToastManager().success('Upload ảnh thành công');
                 return imageUrl;
             } catch (error){
                 Request.resolveAxiosError(error);
