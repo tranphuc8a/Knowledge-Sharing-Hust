@@ -20,12 +20,15 @@ namespace KnowledgeSharingApi.Infrastructures.UnitOfWorks
         public UnitOfWork(IDbContext dbContext, IResourceFactory resourceFactory)
         {
             _DbContext = dbContext;
-            dbContext.Connection.Open();
             _ResourceFactory = resourceFactory;
         }
 
         public virtual void BeginTransaction()
         {
+            if (_DbContext.Connection.State != ConnectionState.Open)
+            {
+                _DbContext.Connection.Open();
+            }
             if (Transaction != null)
             {
                 throw new NullReferenceException(_ResourceFactory.GetResponseResource().TransactionNotOpen());
@@ -51,7 +54,10 @@ namespace KnowledgeSharingApi.Infrastructures.UnitOfWorks
         public virtual void Dispose()
         {
             Transaction?.Dispose();
-            _DbContext.Connection.Close();
+            if (_DbContext.Connection.State == ConnectionState.Open)
+            {
+                _DbContext.Connection.Close();
+            }
             Transaction = null;
         }
 

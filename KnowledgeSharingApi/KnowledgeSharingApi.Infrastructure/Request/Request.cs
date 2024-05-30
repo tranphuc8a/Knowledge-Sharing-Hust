@@ -19,6 +19,11 @@ namespace KnowledgeSharingApi.Infrastructures.Request
         protected object? _body = null;
         protected object? _param = null;
 
+        public const string ApplicationJson = "application/json";
+        public const string TextPlain = "text/plain";
+        public const string FormData = "multipart/form-data";
+
+
         public virtual async Task<T?> Execute<T>()
         {
             try
@@ -75,9 +80,9 @@ namespace KnowledgeSharingApi.Infrastructures.Request
             if (!string.IsNullOrEmpty(contentType))
             {
                 // Kiểm tra tính hợp lệ của contentType
-                if (contentType.StartsWith("application/json") ||
-                    contentType.StartsWith("text/plain") ||
-                    contentType.StartsWith("multipart/form-data"))
+                if (contentType.StartsWith(ApplicationJson) ||
+                    contentType.StartsWith(TextPlain) ||
+                    contentType.StartsWith(FormData))
                 {
                     _contentType = contentType;
                 }

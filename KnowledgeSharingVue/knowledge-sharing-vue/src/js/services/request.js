@@ -72,6 +72,34 @@ class Request {
         return this;
     }
 
+
+    /**
+     * Đặt header cho request
+     * @param {*} key - Tên của header
+     * @param {*} value - Giá trị của header
+     * @returns this
+     * @Created PhucTV (31/5/24)
+     * @Modified None
+     */
+    setHeader(key, value) {
+        if (this.config.headers == null || this.config.headers == undefined) 
+            this.config.headers = {};
+        this.config.headers[key] = value;
+        return this;
+    }
+
+    /**
+     * Đặt recaptcha token cho request
+     * @param {*} token - token của recaptcha
+     * @returns this
+     * @Created PhucTV (31/5/24)
+     * @Modified None
+     */
+    setRecaptchaResponseToken(token){
+        this.setHeader('captcha-response-token', token);
+        return this;
+    }
+
     /**
      * Đặt access token cho request
      * @param {*} token 

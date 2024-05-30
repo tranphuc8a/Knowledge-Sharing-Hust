@@ -28,7 +28,7 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
             {
                 return false;
             }
-            return date > DateTime.Now;
+            return date > DateTime.UtcNow;
         }
 
 
@@ -42,6 +42,18 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
         public static bool CheckFormatEmail(string? email)
         {
             return email == null || Regex.IsMatch(email, RegexValidator.EMAIL_REGEX_PATTERN);
+        }
+
+        /// <summary>
+        /// Kiểm tra đúng định dạng url
+        /// </summary>
+        /// <param name="url"> chuỗi url cần kiểm tra </param>
+        /// <returns> true - đúng format, false - sai format </returns>
+        /// Created: PhucTV (30/5/24)
+        /// Modified: None
+        public static bool CheckFormatUrl(string? url)
+        {
+            return url == null || Regex.IsMatch(url, RegexValidator.URL_REGEX_PATTERN);
         }
 
 

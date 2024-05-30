@@ -20,6 +20,7 @@ import PopupManager from '@/components/base/popup/MPopupManager.vue';
 import ToastManager from '@/components/base/toast/MToastManager.vue';
 import { language } from '@/js/resources/language';
 import resolveAxiosResponse from '@/js/services/resolve-axios-response';
+// import Common from './js/utils/common';
 
 export default {
     name: 'KSEmptyPage',
@@ -38,6 +39,7 @@ export default {
         resolveAxiosResponse.updateManager(this.toastManager, this.popupManager);
 
         this.registerLoadingPanel();
+        // Common.loadRecaptchaScript();
     },
     methods: {
         /**

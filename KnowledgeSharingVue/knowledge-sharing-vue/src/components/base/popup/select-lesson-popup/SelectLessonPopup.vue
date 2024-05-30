@@ -40,6 +40,10 @@
                     <MActionIcon
                         fa="rotate-left"
                         :onclick="resolveClickReload"
+                        :containerStyle="{
+                            width: '36px',
+                            height: '36px'
+                        }"
                     />
                 </span>
             </div>
@@ -167,6 +171,7 @@ export default {
             this.dIsShow = true;
             if (!this.isCreated) {
                 this.isCreated = true;
+                this.loadMoreLesson();
             }
         },
         async hide(){
@@ -177,9 +182,10 @@ export default {
             try {
                 let scrollContainer = this.$refs['scroll-container'];
                 if (scrollContainer == null) return;
-                if (this.isOutOfLesson || this.isLoadingMore || !(this.isShow === true)){
+                if (this.isOutOfLesson || this.isLoadingMore || !(this.dIsShow === true)){
                     return;
                 }
+                console.log("scroll handle");
 
                 let scrollHeight = scrollContainer.scrollHeight;
                 let scrollTop = scrollContainer.scrollTop;
@@ -254,7 +260,7 @@ export default {
                 this.listLesson = [];
                 this.isOutOfLesson = false;
                 this.isCreated = true;
-                this.loadMoreLesson();
+                await this.loadMoreLesson();
             } catch (e){
                 console.error(e);
             }
@@ -294,7 +300,8 @@ export default {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    min-width: 800px;
+    min-width: 50vw;
+    max-width: 100%;
     width: 100%;
     height: 600px;
     gap: 16px;
@@ -312,8 +319,6 @@ export default {
 .p-lpc-content {
     width: 100%;
     height: 100%;
-    padding-top: 32px;
-    padding-bottom: 32px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -336,7 +341,7 @@ export default {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 16px;
+    gap: 4px;
 }
 
 .p-lps-lesson-item {
@@ -344,12 +349,28 @@ export default {
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 16px;
+    gap: 4px;
+    cursor: initial;
 }
 
+
+
 .p-lps-lesson-item label {
+    width: 100%;
+    height: 100%;
     max-width: 100%;
     max-height: 100%;
+    padding: 16px 12px;
+    padding-right: 16px;
+    border-radius: 8px;
+}
+
+.p-lps-lesson-item label:hover{
+    background-color: var(--primary-color-50);
+}
+
+.p-lps-lesson-item label:has(:checked){
+    background-color: var(--primary-color-100);
 }
 
 .p-lps-lesson-item-mask{
@@ -361,7 +382,8 @@ export default {
 }
 
 .p-lps-lesson-card {
-    width: fit-content;
+    width: 0;
+    flex-grow: 1;
     height: fit-content;
     max-width: 100%;
     max-height: 100%;

@@ -1,6 +1,7 @@
 ﻿using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UserProfileModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
@@ -59,13 +60,26 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        [HttpPatch("me/update-avatar")]
+        [HttpPatch("me/update-avatar-file")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> UpdateMeProfile([FromBody] IFormFile avatar)
+        public virtual async Task<IActionResult> UpdateMeAvatarByFile([FromForm] UploadImageModel avatar)
         {
-            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.UpdateMyAvatarImage(Guid.Parse(userId), avatar);
+            ServiceResult service = await UserService.UpdateMyAvatarImage(GetCurrentUserIdStrictly(), avatar);
+            return StatusCode(service);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu cập nhật ảnh đại diện
+        /// </summary
+        /// <param name="avatar"> string - url ảnh đại điện được upload lên </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPatch("me/update-avatar-url")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> UpdateMeProfile([FromBody] string? avatar)
+        {
+            ServiceResult service = await UserService.UpdateMyAvatarUrl(GetCurrentUserIdStrictly(), avatar);
             return StatusCode(service);
         }
 
@@ -76,13 +90,56 @@ namespace KnowledgeSharingApi.Controllers
         /// <returns></returns>
         /// Created: PhucTV (17/3/24)
         /// Modified: None
-        [HttpPatch("me/update-cover")]
+        [HttpPatch("me/update-cover-file")]
         [CustomAuthorization(Roles: "User, Admin")]
-        public virtual async Task<IActionResult> UpdateMeAvatar([FromBody] IFormFile cover)
+        public virtual async Task<IActionResult> UpdateMeAvatar([FromForm] UploadImageModel cover)
         {
-            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.UpdateMyCoverImage(Guid.Parse(userId), cover);
+            ServiceResult service = await UserService.UpdateMyCoverImage(GetCurrentUserIdStrictly(), cover);
+            return StatusCode(service);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu cập nhật ảnh bìa
+        /// </summary>
+        /// <param name="cover"> string - url nội dung file ảnh bìa </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPatch("me/update-cover-url")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> UpdateMeCover([FromBody] string? cover)
+        {
+            ServiceResult service = await UserService.UpdateMyCoverUrl(GetCurrentUserIdStrictly(), cover);
+            return StatusCode(service);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu cập nhật tên hiển thị
+        /// </summary>
+        /// <param name="fullname"> string - tên mới </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPatch("me/update-fullname")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> UpdateMeFullname([FromBody] string? fullname)
+        {
+            ServiceResult service = await UserService.UpdateMyFullname(GetCurrentUserIdStrictly(), fullname);
+            return StatusCode(service);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu cập nhật thông tin chung
+        /// </summary>
+        /// <param name="generalInfor"> thông tin chung (url avatar, url cover, fullname) cần cập nhật </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPatch("me/update-general-info")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> UpdateMeGeneralInfor([FromBody] UpdateGeneralInforModel model)
+        {
+            ServiceResult service = await UserService.UpdateMyGeneralInfo(GetCurrentUserIdStrictly(), model);
             return StatusCode(service);
         }
 
@@ -97,9 +154,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> UpdateMeBio([FromBody] string? bio)
         {
-            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.UpdateMyBio(Guid.Parse(userId), bio);
+            ServiceResult service = await UserService.UpdateMyBio(GetCurrentUserIdStrictly(), bio);
             return StatusCode(service);
         }
 
@@ -114,9 +169,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> UpdateMeProfile([FromBody] UpdateProfileModel model)
         {
-            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.UpdateMyUserProfile(Guid.Parse(userId), model);
+            ServiceResult service = await UserService.UpdateMyUserProfile(GetCurrentUserIdStrictly(), model);
             return StatusCode(service);
         }
 
@@ -131,9 +184,7 @@ namespace KnowledgeSharingApi.Controllers
         [CustomAuthorization(Roles: "User, Admin")]
         public virtual async Task<IActionResult> GetMeUserDetail(string unOruid)
         {
-            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.GetUserDetail(Guid.Parse(userId), unOruid);
+            ServiceResult service = await UserService.GetUserDetail(GetCurrentUserIdStrictly(), unOruid);
             return StatusCode(service);
         }
 
@@ -152,9 +203,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> SearchMe(string searchKey, int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
-            string? userId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.NameIdentifier);
-            if (userId == null) return FailedAuthentication(HttpContext.User);
-            ServiceResult service = await UserService.SearchUser(Guid.Parse(userId), searchKey, pagination);
+            ServiceResult service = await UserService.SearchUser(GetCurrentUserIdStrictly(), searchKey, pagination);
             return StatusCode(service);
         }
 

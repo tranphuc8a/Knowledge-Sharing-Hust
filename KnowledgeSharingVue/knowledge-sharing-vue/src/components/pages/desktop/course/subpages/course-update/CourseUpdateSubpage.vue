@@ -24,13 +24,13 @@
                     <span title="Khôi phục thay đổi">
                         <MActionIcon 
                             fa="rotate-left" family="fas"
-                            :iconStyle="movingIconStyle" :containerStyle="movingContainerStyle"
+                            :iconStyle="{fontSize: '20px'}" :containerStyle="{width: '36px', height: '36px'}"
                             :onclick="resolveClickReset"
                             />
                     </span>
                     <span>
                         <MButton 
-                            fa="floppy-disk" label="Lưu danh sách"
+                            fa="check" label="Lưu danh sách"
                             :onclick="resolveClickSaveLesson" />
                     </span>
                     <span>
@@ -47,50 +47,59 @@
 
             <div class="p-devide"></div>
 
+            <!-- <div>
+                <div class="g-recaptcha" :data-sitekey="siteKey"></div>
+            </div>
+            <MButton label="Show Captcha" :onclick="resolveOnClickCaptcha" /> -->
+
             <!-- Card content -->
             <div class="p-cus-content">
                 <div class="p-cus-not-found" v-show="!(listCourseLesson.length > 0)">
                     <NotFoundPanel text="Không tìm thấy bài giảng nào" />
                 </div>
 
-                <div class="p-cus-course-lesson-item"
-                    v-for="(courseLesson, index) in listCourseLesson"
-                    :key="courseLesson.CourseLessonId ?? index"
-                >
-                    <div class="p-course-lesson-moving-button">
-                        <div class="p-clmb-up" title="Chuyển lên trên">
-                            <MActionIcon 
-                                fa="sort-up" family="fas"
-                                :iconStyle="movingIconStyle" :containerStyle="movingContainerStyle"
-                                :onclick="resolveClickMoveUp(index)"
-                                :state="index > 0 ? iconStateEnum.NORMAL : iconStateEnum.DISABLED"
+                <transition-group name="list">
+                    <div class="p-cus-course-lesson-item"
+                        v-for="(courseLesson, index) in listCourseLesson"
+                        :key="courseLesson.CourseLessonId"
+                    >
+                        <div class="p-course-lesson-moving-button">
+                            <div class="p-clmb-up" title="Chuyển lên trên">
+                                <MActionIcon 
+                                    :key="index"
+                                    fa="caret-up" family="fas"
+                                    :iconStyle="movingIconStyle" :containerStyle="movingContainerStyle"
+                                    :onclick="resolveClickMoveUp(index)"
+                                    :state="index > 0 ? iconStateEnum.NORMAL : iconStateEnum.DISABLED"
+                                    />
+                            </div>
+                            <div class="p-clmb-down" title="Chuyển xuống dưới">
+                                <MActionIcon 
+                                    :key="index"
+                                    fa="caret-down" family="fas"
+                                    :iconStyle="movingIconStyle" :containerStyle="movingContainerStyle"
+                                    :onclick="resolveClickMoveDown(index)"
+                                    :state="index < listCourseLesson.length - 1 ? iconStateEnum.NORMAL : iconStateEnum.DISABLED"
+                                    />
+                            </div>
+                        </div>
+    
+                        <div class="p-course-lesson-card">
+                            <CourseLessonCard 
+                                :responseCourseLessonModel="courseLesson" 
+                                :isShowMenuContext="false" />
+                        </div>
+    
+                        <div class="p-course-lesson-delete-button">
+                            <MActionIcon title="Xóa bài giảng khỏi khóa học"
+                                fa="trash-can" family="far"
+                                :iconStyle="deleteIconStyle" :containerStyle="deleteContainerStyle"
+                                :onclick="resolveClickDeleteLesson(index)"
+                                :state="iconStateEnum.NORMAL"
                                 />
                         </div>
-                        <div class="p-clmb-down" title="Chuyển xuống dưới">
-                            <MActionIcon 
-                                fa="sort-down" family="fas"
-                                :iconStyle="movingIconStyle" :containerStyle="movingContainerStyle"
-                                :onclick="resolveClickMoveDown(index)"
-                                :state="index < listCourseLesson.length - 1 ? iconStateEnum.NORMAL : iconStateEnum.DISABLED"
-                                />
-                        </div>
                     </div>
-
-                    <div class="p-course-lesson-card">
-                        <CourseLessonCard 
-                            :responseCourseLessonModel="courseLesson" 
-                            :isShowMenuContext="false" />
-                    </div>
-
-                    <div class="p-course-lesson-delete-button">
-                        <MActionIcon title="Xóa bài giảng khỏi khóa học"
-                            fa="trash-can" family="far"
-                            :iconStyle="deleteIconStyle" :containerStyle="deleteContainerStyle"
-                            :onclick="resolveClickDeleteLesson(index)"
-                            :state="iconStateEnum.NORMAL"
-                            />
-                    </div>
-                </div>
+                </transition-group>
             </div>
 
             <div class="p-devide"></div>
@@ -104,7 +113,7 @@
                     <span>
                         <MActionIcon 
                             fa="rotate-left" family="fas"
-                            :iconStyle="movingIconStyle" :containerStyle="movingContainerStyle"
+                            :iconStyle="{fontSize: '20px'}" :containerStyle="{width: '36px', height: '36px'}"
                             :onclick="resolveClickReset"
                             />
                     </span>
@@ -122,14 +131,14 @@
             </div>
         </div>
 
-        <SelectLessonPopup ref="popup" :isShow="true" :onOkay="resolveAddLesson"/>
+        <SelectLessonPopup ref="popup" :isShow="false" :onOkay="resolveAddLesson"/>
     </div>
 </template>
 
 
 
 <script>
-
+/* global grecaptcha */
 import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue';
 import MButton from './../../../../../base/buttons/MButton.vue'
 import { myEnum } from '@/js/resources/enum';
@@ -139,7 +148,8 @@ import ResponseCourseLessonModel from '@/js/models/api-response-models/response-
 import CourseLessonCard from '@/components/base/cards/CourseLessonCard.vue';
 // import CourseLessonCardSkeleton from '@/components/base/cards/CourseLessonCardSkeleton.vue';
 import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
-
+import appConfig from '@/app-config';
+// import Common from '@/js/utils/common';
 
 
 export default {
@@ -156,30 +166,21 @@ export default {
     },
     data(){
         return {
+            siteKey: appConfig.getCaptchaSiteKey(),
             iconStateEnum: myEnum.iconState,
             movingIconStyle: {
-                color: 'green',
-                fontSize: '1.5em',
+                fontSize: '28px'
             },
             movingContainerStyle: {
-                width: '50px',
-                height: '50px',
-                display: 'flex',
-                flexFlow: 'row nowrap',
-                justifyContent: 'center',
-                alignItems: 'center',
+                width: '32px',
+                height: '32px'
             },
             deleteIconStyle: {
                 color: 'red',
-                fontSize: '1.5em',
             },
             deleteContainerStyle: {
-                width: '50px',
-                height: '50px',
-                display: 'flex',
-                flexFlow: 'row nowrap',
-                justifyContent: 'center',
-                alignItems: 'center',
+                width: '36px',
+                height: '36px'
             },
             isWorking: false,
             listCourseLesson: [],
@@ -197,6 +198,7 @@ export default {
         }
     },
     async mounted(){
+        // Common.loadRecaptchaScript();
     },
     methods: {
         async loadAllCourseLesson(){
@@ -355,6 +357,14 @@ export default {
                     this.isWorking = false;
                 }
             }.bind(this);
+        },
+
+        async resolveOnClickCaptcha(){
+            try {
+                console.log(grecaptcha.getResponse());
+            } catch (error) {
+                console.error(error);
+            }
         },
 
         resolveClickDeleteLesson(index){
@@ -537,13 +547,16 @@ export default {
 }
 
 .p-course-update-subpage .p-cus-content{
-    width: 100%;
+    width: 85%;
+    max-width: 100%;
     height: 100%;
     display: flex;
     flex-flow: row wrap;
     justify-content: flex-start;
+    padding: 32px;
     align-items: stretch;
-    gap: 16px;
+    align-self: center;
+    gap: 8px;
 }
 
 .p-course-update-subpage .p-cus-course-lesson-item{
@@ -553,8 +566,22 @@ export default {
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: stretch;
+    padding: 16px 16px 32px 16px;
+    border-radius: 8px;
     gap: 16px;
 }
+
+.p-course-update-subpage .p-cus-course-lesson-item:hover{
+    background-color: rgba(var(--primary-color-50-rgb), 0.56);
+}
+
+.p-course-update-subpage .p-cus-course-lesson-item > div {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
 
 .p-course-update-subpage .p-course-lesson-moving-button{
     width: 50px;
@@ -609,6 +636,9 @@ export default {
     align-items: center;
 }
 
+.list-move {
+    transition: transform 0.5s;
+}
 
 
 </style>

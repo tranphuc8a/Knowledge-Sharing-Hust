@@ -15,9 +15,9 @@ using System.Security.Claims;
 
 namespace KnowledgeSharingApi.Controllers
 {
-    public abstract class BaseController: ControllerBase
+    public abstract class BaseController : ControllerBase
     {
-        protected string[] BanFields = ["Password", "HashPassword", ];
+        protected string[] BanFields = ["Password", "HashPassword",];
 
         protected virtual Guid? GetCurrentUserId()
         {
@@ -47,7 +47,7 @@ namespace KnowledgeSharingApi.Controllers
 
         protected virtual List<OrderDto> ParseOrder(string? sort)
         {
-            if (string.IsNullOrEmpty(sort)) return []; 
+            if (string.IsNullOrEmpty(sort)) return [];
 
             var sortFields = new List<OrderDto>();
             // example of sort: https://....?...&sort=field1[:asc],field2[:desc]
@@ -56,7 +56,7 @@ namespace KnowledgeSharingApi.Controllers
             {
                 var fieldInfo = part.Split(':');
                 if (fieldInfo.Length >= 1)
-                { 
+                {
                     var field = fieldInfo[0];
                     if (BanFields.Contains(field)) continue;
 
@@ -139,5 +139,28 @@ namespace KnowledgeSharingApi.Controllers
             return FilterOperations.Equal;
         }
 
+        protected virtual string? GetRecaptchaResponseToken()
+        {
+            try
+            {
+                // Đọc giá trị của header "CaptchaResponseToken"
+                var captchaResponseToken = HttpContext.Request.Headers["Captcha-Response-Token"].ToString();
+
+                // Kiểm tra xem token có tồn tại hay không
+                if (string.IsNullOrEmpty(captchaResponseToken))
+                    return null;
+
+                return captchaResponseToken;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        protected virtual async Task CheckRecaptchaToken(IGoogleRecaptchaService service)
+        {
+            await service.CheckRecaptchaResponse(GetRecaptchaResponseToken());
+        }
     }
 }

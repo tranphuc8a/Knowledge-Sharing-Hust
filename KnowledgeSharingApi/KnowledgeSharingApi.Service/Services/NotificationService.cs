@@ -7,11 +7,13 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityReposito
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.VisualBasic;
 using Mysqlx.Crud;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace KnowledgeSharingApi.Services.Services
 {
@@ -148,6 +150,8 @@ namespace KnowledgeSharingApi.Services.Services
             if (noti.IsRead)
                 return ServiceResult.BadRequest("Bạn đã đọc thông báo này rồi");
             noti.IsRead = true;
+            noti.ModifiedTime = DateTime.UtcNow;
+            noti.ModifiedBy = user.Username;
             int res = await NotificationRepository.Update(notiId, noti);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
             return ServiceResult.Success(ResponseResource.UpdateSuccess());

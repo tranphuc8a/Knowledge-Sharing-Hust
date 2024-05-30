@@ -78,6 +78,7 @@ export default {
     width: fit-content;
     gap: 4px; 
     height: 100%;
+    border-radius: 8px;
 }
 
 .p-visualized-stars{
@@ -87,6 +88,7 @@ export default {
     justify-content: flex-start;
     width: fit-content;
     gap: 2px; 
+    border-radius: 8px;
 }
 
 .p-visualized-star-numbers{
@@ -94,6 +96,7 @@ export default {
     font-size: 16px;
     font-weight: 600;
     color: var(--primary-color-600);
+    border-radius: 8px;
     background-color: white;
 }
 

@@ -59,7 +59,7 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 CategoryId = Guid.NewGuid(),
                 CategoryName = catName,
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 CreatedBy = "Knowledge Sharing admin"
             };
             Guid? catId = await CategoryRepository.Insert(category.CategoryId, category);
@@ -161,6 +161,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Cập nhật
             cat.CategoryName = catName;
+            cat.ModifiedBy = "PhucTV";
+            cat.ModifiedTime = DateTime.UtcNow;
             int res = await CategoryRepository.Update(catId, cat);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(CategoryResource));
 

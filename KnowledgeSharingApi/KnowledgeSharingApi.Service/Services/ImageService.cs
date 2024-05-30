@@ -64,7 +64,7 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 // Entity:
                 CreatedBy = myUid.ToString(),
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 // Image:
                 ImageId = Guid.NewGuid(),
                 UserId = myUid,

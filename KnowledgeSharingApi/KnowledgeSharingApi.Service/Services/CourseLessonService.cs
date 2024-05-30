@@ -193,7 +193,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Update
             courseLesson.LessonTitle = model.LessonTitle!;
             courseLesson.ModifiedBy = myUid.ToString();
-            courseLesson.ModifiedTime = DateTime.Now;
+            courseLesson.ModifiedTime = DateTime.UtcNow;
             int updated = await CourseLessonRepository.Update(courseLesson.CourseLessonId, courseLesson);
             if (updated <= 0)
                 return ServiceResult.ServerError(ResponseResource.UpdateFailure(ParticipantResource));
@@ -235,7 +235,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async Task<ServiceResult> UpdateOffsetOfListLessonInCourse(Guid myUId, Guid[] listParticipantIds)
         {
             // Kiem tra danh sach khong duoc trong:
-            if (listParticipantIds == null || listParticipantIds.Count() <= 0)
+            if (listParticipantIds == null || listParticipantIds.Length <= 0)
                 return ServiceResult.BadRequest("Danh sách bài giảng không được trống");
 
             // Kiểm tra toàn bộ participant phải tồn tại và chung 1 khóa học

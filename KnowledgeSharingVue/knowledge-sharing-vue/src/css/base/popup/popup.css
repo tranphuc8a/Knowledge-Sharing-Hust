@@ -40,7 +40,7 @@
     /* max-width: 80%; */
     overflow: visible;
     font-family: 'ks-font-regular';
-    border-radius: 4px;
+    border-radius: 8px;
     box-sizing: border-box;
     box-shadow: 0px 4px 16px rgba(23, 27, 42, 0.24);
 }
@@ -52,6 +52,14 @@
     justify-content: flex-start;
     align-items: flex-start;
     gap: 16px;
+}
+
+.p-popup-content .p-popup-description{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .p-popup-header{

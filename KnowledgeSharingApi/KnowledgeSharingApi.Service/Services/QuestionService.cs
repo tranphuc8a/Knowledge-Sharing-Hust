@@ -15,6 +15,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Mysqlx.Crud;
+using SixLabors.ImageSharp.Processing.Processors.Quantization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,7 +88,7 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 // Entity:
                 CreatedBy = user.FullName,
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 // UserItem:
                 UserItemId = newId,
                 UserId = user.UserId,
@@ -232,6 +233,8 @@ namespace KnowledgeSharingApi.Services.Services
             Question question = new();
             question.Copy(ques);
             question.IsAccept = isConfirm;
+            question.ModifiedBy = myUid.ToString();
+            question.ModifiedTime = DateTime.UtcNow;
             
             await QuestionRepository.Update(questionId, question);
             return ServiceResult.Success(ResponseResource.UpdateSuccess());
@@ -302,6 +305,8 @@ namespace KnowledgeSharingApi.Services.Services
             Question toUpdate = new();
             toUpdate.Copy(question);
             toUpdate.Copy(updateModel);
+            toUpdate.ModifiedBy = myUid.ToString();
+            toUpdate.ModifiedTime = DateTime.UtcNow;
             if (thumbnail != null) toUpdate.Thumbnail = thumbnail;
             int res1 = await QuestionRepository.Update(postId, toUpdate);
             int res2 = 0;

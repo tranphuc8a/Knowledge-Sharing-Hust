@@ -1,7 +1,7 @@
 <template>
     <DesktopHomeFrame>
         
-        <div class="d-content p-lestion-detail">
+        <div class="d-content p-lestion-detail" v-if="isLoaded">
             <div class="d-empty-panel" v-show="isLessonExisted === false">
                 <not-found-panel :text="errorMessage" />
             </div>
@@ -79,7 +79,8 @@ export default {
             courselesson: null,
             iconStyle: {
                 fontSize: '14px'
-            }
+            },
+            isLoaded: false,
         }
     },
     components: {
@@ -103,12 +104,12 @@ export default {
                 let res = await new GetRequest('CourseLessons/' + this.courseId)
                     .setParams({
                         limit: 1,
-                        offset: this.lessonOffset
+                        offset: this.lessonOffset - 1
                     })
                     .execute();
                 let body = await Request.tryGetBody(res);
-                this.isHasPrevious = this.lessonOffset > 0;
-                this.isHasNext = this.lessonOffset < body.Total - 1;
+                this.isHasPrevious = this.lessonOffset > 1;
+                this.isHasNext = this.lessonOffset < body.Total;
                 // get lessons detail
                 let tempLesson = body.Results?.[0];
                 if (tempLesson == null){
@@ -149,6 +150,18 @@ export default {
                 let body = await Request.tryGetBody(res);
                 let tempLesson = new ResponseLessonModel().copy(body);
                 this.lesson = tempLesson;
+                this.forceRender();
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+        async forceRender(){
+            try {
+                this.isLoaded = false;
+                this.$nextTick(() => {
+                    this.isLoaded = true;
+                });
             } catch (e) {
                 console.error(e);
             }
@@ -156,7 +169,7 @@ export default {
 
         async resolveBackToCourse(){
             try {
-                this.router.push({name: 'course-detail', params: {courseId: this.courseId}});
+                this.router.push('/course/' + this.courseId);
             } catch (e) {
                 console.error(e);
             }

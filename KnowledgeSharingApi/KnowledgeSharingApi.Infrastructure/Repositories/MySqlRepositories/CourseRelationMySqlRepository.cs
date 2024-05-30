@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             {
                 // Entity:
                 CreatedBy = user.Username,
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 // CourseRegister:
                 CourseRegisterId = Guid.NewGuid(),
                 UserId = user.UserId,

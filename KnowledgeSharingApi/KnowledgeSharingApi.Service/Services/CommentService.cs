@@ -80,7 +80,7 @@ namespace KnowledgeSharingApi.Services.Services
             Comment comment = new()
             {
                 // Entity:
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 ModifiedBy = myUid.ToString(),
                 // UserItem:
                 UserItemId = newId,
@@ -108,7 +108,7 @@ namespace KnowledgeSharingApi.Services.Services
             Comment comment = new()
             {
                 // Entity:
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 ModifiedBy = myUid.ToString(),
                 // UserItem:
                 UserItemId = newId,
@@ -151,6 +151,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Update block
             knowledge.IsBlockComment = isBlock;
+            knowledge.ModifiedBy = "PhucTV";
+            knowledge.ModifiedTime = DateTime.UtcNow;
             await KnowledgeRepository.Update(knowledge.UserItemId, knowledge);
 
             // Trả về thành công
@@ -282,6 +284,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Cập nhật block, trả về thành công
             knowledge.IsBlockComment = isBlock;
+            knowledge.ModifiedTime = DateTime.UtcNow;
+            knowledge.ModifiedBy = "PhucTV";
             await KnowledgeRepository.Update(knowledge.UserItemId, knowledge);
             return ServiceResult.Success(ResponseResource.UpdateSuccess(KnowledgeResource));
         }
@@ -415,7 +419,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Update
             editableComment.Content = commentModel.Content!;
             editableComment.ModifiedBy = myUid.ToString();
-            editableComment.ModifiedTime = DateTime.Now;
+            editableComment.ModifiedTime = DateTime.UtcNow;
             Comment commentToUpdate = new();
             commentToUpdate.Copy(editableComment);
             int res = await CommentRepository.Update(editableComment.UserItemId, commentToUpdate);

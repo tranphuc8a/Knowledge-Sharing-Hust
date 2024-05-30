@@ -2,7 +2,9 @@
 
 <template>
     <div class="profile-home-subpage p-profile-main-subpage">
-        <div class="profile-home-subpage__left">
+        <div class="profile-home-subpage__left"
+            ref="left"
+        >
             <!-- ProfileHomeResumeSubpage -->
             <ProfileHomeResumeSubpage />
 
@@ -41,19 +43,46 @@ export default {
     data(){
         return {
             isMySelf: false,
+            stickyTop: 'auto',
+            stickyBottom: '16px',
+            stickyAlignSelf: 'flex-start',
+            lastScrollTop: 0,
         }
     },
     async mounted(){
         try {
             this.isMySelf = await this.getIsMySelf();
+            // this.registerScrollHandler(this.resolveOnScroll.bind(this));
         } catch (error){
             console.error(error);
         }
     },
     methods: {
+        async resolveOnScroll(scrollContainer){
+            try {
+                const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+                if (2 < 1 && scrollHeight && clientHeight) return;
+                // const isScrollDown = scrollTop > this.lastScrollTop;
+                this.lastScrollTop = scrollTop;
+                //  console.log(this.$refs['left'].getBoundingClientRect());
+
+                // if(isScrollDown){
+                //     this.stickyTop = 'auto';
+                //     this.stickyBottom = '16px';
+                //     this.stickyAlignSelf = 'flex-end';
+                // } else {
+                //     this.stickyTop = '16px';
+                //     this.stickyBottom = 'auto';
+                //     this.stickyAlignSelf = 'flex-start';
+                // }
+            } catch (error) {
+                console.error(error);
+            }
+        }
     },
     inject: {
-        getIsMySelf: {}
+        getIsMySelf: {},
+        registerScrollHandler: {},
     }
 }
 
@@ -82,9 +111,8 @@ export default {
     width: 0;
     flex-shrink: 1;
     flex-grow: 2;
+    padding-bottom: 32px;
 
-    position: sticky;
-    bottom: 0;
 
     display: flex;
     flex-flow: column nowrap;

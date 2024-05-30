@@ -280,6 +280,8 @@ namespace KnowledgeSharingApi.Services.Services
             if (model.Privacy == null)
                 return ServiceResult.BadRequest(ViConstantResource.PRIVACY_EMPTY);
             lesson.Privacy = model.Privacy.Value;
+            lesson.ModifiedTime = DateTime.UtcNow;
+            lesson.ModifiedBy = myUid.ToString();
             int res = await LessonRepository.Update(lesson.UserItemId, lesson);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(LessonResource));
 
@@ -353,6 +355,8 @@ namespace KnowledgeSharingApi.Services.Services
             Lesson lessonToUpdate = new();
             lessonToUpdate.Copy(lesson);
             lessonToUpdate.Copy(lessonModel);
+            lessonToUpdate.ModifiedBy = myUid.ToString();
+            lessonToUpdate.ModifiedTime = DateTime.UtcNow;
             if (thumbnail != null) lessonToUpdate.Thumbnail = thumbnail;
             int updated1 = await LessonRepository.Update(postId, lessonToUpdate);
             int updated2 = 0;

@@ -106,7 +106,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             {
                 ConversationId = Guid.NewGuid(),
                 ConversationName = $"{user1.FullName} và {user2.FullName}",
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 CreatedBy = user1.FullName
             };
         }
@@ -121,7 +121,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         /// Modified: None
         private static List<UserConversation> CreateUserConversations(Conversation conversation, Profile user1, Profile user2)
         {
-            DateTime currentTime = DateTime.Now;
+            DateTime currentTime = DateTime.UtcNow;
             return [
                 new() {
                     UserConversationId = Guid.NewGuid(),

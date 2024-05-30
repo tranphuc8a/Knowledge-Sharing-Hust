@@ -13,7 +13,7 @@ namespace KnowledgeSharingApi.Infrastructures.Request
 
         public IPostRequest PrepareFormData()
         {
-            _contentType = "multipart/form-data";
+            _contentType = FormData;
             return this;
         }
 
@@ -25,7 +25,7 @@ namespace KnowledgeSharingApi.Infrastructures.Request
 
         protected override async Task<HttpResponseMessage> SendRequest(HttpClient httpClient, string urlWithParams, StringContent content)
         {
-            if (_formData != null)
+            if (_formData.Count > 0)
             {
                 // Chuyển đổi FormData thành List<KeyValuePair<string, string>>
                 List<KeyValuePair<string, string>> formDataList = [];
@@ -47,7 +47,7 @@ namespace KnowledgeSharingApi.Infrastructures.Request
             }
             else
             {
-                throw new ArgumentException("No FormData to send.");
+                return await httpClient.PostAsync(urlWithParams, content);
             }
         }
     }

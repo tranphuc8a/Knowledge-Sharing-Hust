@@ -5,11 +5,13 @@ using KnowledgeSharingApi.Infrastructures.Captcha;
 using KnowledgeSharingApi.Infrastructures.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Emails;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
+using KnowledgeSharingApi.Infrastructures.GoogleRecaptchaApi;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Caches;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Captcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Emails;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
+using KnowledgeSharingApi.Infrastructures.Interfaces.GoogleRecaptcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Markdown;
 using KnowledgeSharingApi.Infrastructures.Interfaces.OAuth2;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
@@ -120,6 +122,7 @@ builder.Services.AddSingleton<IEmail, Email>();
 builder.Services.AddSingleton<IStorage, FirebaseStorage>();
 builder.Services.AddSingleton<IEncrypt, KSEncrypt>();
 builder.Services.AddSingleton<ICaptcha, KSCaptcha>();
+builder.Services.AddSingleton<IGoogleRecaptchaApi, GoogleRecaptchaApi>();
 builder.Services.AddScoped<IDbContext, MySqlDbContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //builder.Services.AddSingleton<ISocketSessionManager, SocketSessionManager>();
@@ -163,6 +166,7 @@ builder.Services.AddScoped<IAdministrationRepository, AdministrationRepository>(
 //
 //
 // Injection Services
+builder.Services.AddScoped<IGoogleRecaptchaService, GoogleRecaptchaService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IForgotPasswordService, ForgotPasswordService>();
 builder.Services.AddScoped<IRegisterNewUserService, RegisterNewUserService>();

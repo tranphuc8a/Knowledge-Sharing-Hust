@@ -35,7 +35,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 {
                     // Entity:
                     CreatedBy = "Knowledge Sharing Admin",
-                    CreatedTime = DateTime.Now,
+                    CreatedTime = DateTime.UtcNow,
                     // Course Lesson:
                     CourseLessonId = Guid.NewGuid(),
                     LessonId = model.LessonId!.Value,
@@ -69,7 +69,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
                 // Create list CourseLesson
                 Guid courseId = model.CourseId!.Value;
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 string createdBy = "Knowledge Sharing Admin";
                 List<CourseLesson> courseLessons = model.ListLessonModel!
                     .Select(lesson => new CourseLesson
@@ -185,7 +185,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         {
             IQueryable<CourseLesson> courseLessons = DbContext.CourseLessons
                 .Where(cl => cl.CourseLessonId == model.ParticipantId!.Value);
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             string modifiedBy = "Knowledge Sharing Admin";
             foreach (CourseLesson cl in courseLessons)
             {
@@ -204,7 +204,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .Where(cl => participantIds.Contains(cl.CourseLessonId));
 
             // Chuan bi update
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             string modifiedBy = "Knowledge Sharing Admin";
             Dictionary<Guid, UpdateLessonInCourseModel> mapGuidToUpdate = model
                 .GroupBy(item => item.ParticipantId!.Value)
@@ -246,11 +246,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 }
 
                 // Update:
+                string modifiedBy = "PhucTV";
+                DateTime modifiedTime = DateTime.UtcNow;
                 foreach (CourseLesson cl in courseLessons)
                 {
                     if (mapGuidToOffsets.TryGetValue(cl.CourseLessonId, out int offset))
                     {
                         cl.Offset = offset;
+                        cl.ModifiedBy = modifiedBy;
+                        cl.ModifiedTime = modifiedTime;
                     }
                 }
                 int rows = await DbContext.SaveChangesAsync();

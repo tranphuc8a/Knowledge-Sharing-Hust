@@ -36,10 +36,15 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             try
             {
                 // Chuyển tất cả reply comment về reply null
+                DateTime now = DateTime.UtcNow;
+                string adminName = "PhucTV";
+
                 var commentsToUpdate = DbContext.Comments.Where(c => c.ReplyId == commentId);
                 foreach (var comment in commentsToUpdate)
                 {
                     comment.ReplyId = null;
+                    comment.ModifiedTime = now;
+                    comment.ModifiedBy = adminName;
                 }
                 int rows1 = await DbContext.SaveChangesAsync();
 

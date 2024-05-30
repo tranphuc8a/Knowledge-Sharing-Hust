@@ -25,7 +25,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 Image imageToAdd = new()
                 {
                     CreatedBy = userId.ToString(),
-                    CreatedTime = DateTime.Now,
+                    CreatedTime = DateTime.UtcNow,
                     UserId = userId,
                     ImageId = Guid.NewGuid(),
                     ImageUrl = imageUrl

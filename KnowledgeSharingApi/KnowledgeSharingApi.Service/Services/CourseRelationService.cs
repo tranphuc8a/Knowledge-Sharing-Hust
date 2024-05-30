@@ -357,7 +357,7 @@ namespace KnowledgeSharingApi.Services.Services
             CourseRelation request = new()
             {
                 // Entity:
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 CreatedBy = myUid.ToString(),
                 // CourseRelation
                 CourseRelationId = Guid.NewGuid(),
@@ -457,7 +457,7 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 // Entity:
                 CreatedBy = myUid.ToString(),
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 // CourseRelation:
                 CourseRelationId = Guid.NewGuid(),
                 SenderId = myUid,
@@ -564,7 +564,7 @@ namespace KnowledgeSharingApi.Services.Services
             CourseRegister courseRegister = new()
             {
                 // Entity:
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 CreatedBy = myUid.ToString(),
                 // Course Register:
                 CourseRegisterId = Guid.NewGuid(),

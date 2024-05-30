@@ -107,10 +107,10 @@ namespace KnowledgeSharingApi.Services.Services
             VerifyCodeCacheDto? beforeCode = CacheGetStepOne(email!);
             if (beforeCode != null && beforeCode.VerifyCodeType == VerifyCodeType)
             {
-                if (beforeCode.Expired > DateTime.Now)
+                if (beforeCode.Expired > DateTime.UtcNow)
                 {
                     // Tính số giây còn phải đợi nữa
-                    int waitInSeconds = (int)beforeCode.Expired.Subtract(DateTime.Now).TotalSeconds;
+                    int waitInSeconds = (int)beforeCode.Expired.Subtract(DateTime.UtcNow).TotalSeconds;
                     return ServiceResult.BadRequest(ResponseResource.WaitInSecond(waitInSeconds));
                 }
             }
@@ -121,7 +121,7 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 AccessCode = accessCode,
                 Code = Random.Next(0, 999999).ToString("D6"),
-                Expired = DateTime.Now.AddMinutes(VerifyCodeExpiredInMinutes),
+                Expired = DateTime.UtcNow.AddMinutes(VerifyCodeExpiredInMinutes),
                 VerifyCodeType = VerifyCodeType,
                 RemainAttemptNumber = MaxNumberAttempts
             };
@@ -159,7 +159,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (codeModel.RemainAttemptNumber <= 0) return expiredCode;
 
             // Step 4. Kiểm tra code chưa hết hạn, nếu hết hạn, xóa khỏi Cache
-            if (codeModel.Expired < DateTime.Now)
+            if (codeModel.Expired < DateTime.UtcNow)
             {
                 Cache.Remove(model.Email!);
                 return expiredCode;
@@ -182,7 +182,7 @@ namespace KnowledgeSharingApi.Services.Services
             ActiveCodeCacheDto activeCodeCacheDto = new()
             {
                 Email = model.Email!,
-                Expired = DateTime.Now.AddMinutes(ActiveCodeExpiredInMinutes),
+                Expired = DateTime.UtcNow.AddMinutes(ActiveCodeExpiredInMinutes),
                 ActiveCode = ActiveCode,
                 VerifyCodeType = VerifyCodeType
             };
@@ -207,7 +207,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (dto.VerifyCodeType != VerifyCodeType) throw invalidActiveCode;
 
             // Step 3. Kiểm tra chưa expired
-            if (DateTime.Now >= dto.Expired) throw invalidActiveCode;
+            if (DateTime.UtcNow >= dto.Expired) throw invalidActiveCode;
 
             // Step 4. Kiểm tra đúng Active Code
             if (model.ActiveCode != dto.ActiveCode) throw invalidActiveCode;

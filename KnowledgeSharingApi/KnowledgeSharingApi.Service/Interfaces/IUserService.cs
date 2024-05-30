@@ -1,4 +1,5 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UserProfileModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
 using Microsoft.AspNetCore.Http;
@@ -58,7 +59,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> UpdateMyAvatarImage(Guid uid, IFormFile avatar);
+        Task<ServiceResult> UpdateMyAvatarImage(Guid uid, UploadImageModel imageModel);
 
         /// <summary>
         /// Cập nhật ảnh bìa
@@ -66,7 +67,39 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> UpdateMyCoverImage(Guid uid, IFormFile cover);
+        Task<ServiceResult> UpdateMyCoverImage(Guid uid, UploadImageModel imageModel);
+
+        /// <summary>
+        /// Cập nhật ảnh dai dien
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (15/3/24)
+        /// Modified: None
+        Task<ServiceResult> UpdateMyAvatarUrl(Guid uid, string? url);
+
+        /// <summary>
+        /// Cập nhật ảnh bìa
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (15/3/24)
+        /// Modified: None
+        Task<ServiceResult> UpdateMyCoverUrl(Guid uid, string? url);
+
+        /// <summary>
+        /// Cập nhật fullname
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (15/3/24)
+        /// Modified: None
+        Task<ServiceResult> UpdateMyFullname(Guid uid, string? fullname);
+
+        /// <summary>
+        /// Cập nhật avatar, anh bia va fullname
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (15/3/24)
+        /// Modified: None
+        Task<ServiceResult> UpdateMyGeneralInfo(Guid uid, UpdateGeneralInforModel model);
 
         /// <summary>
         /// Cập nhật Bio

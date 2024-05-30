@@ -1,12 +1,15 @@
 ﻿using KnowledgeSharingApi.Domains.Algorithms;
+using KnowledgeSharingApi.Domains.Annotations.Validators;
 using KnowledgeSharingApi.Domains.Common;
 using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UserProfileModels;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
+using KnowledgeSharingApi.Domains.Resources.Vietnamese;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
@@ -16,8 +19,10 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using ZstdSharp.Unsafe;
 
 namespace KnowledgeSharingApi.Services.Services
 {
@@ -46,7 +51,7 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         #region ForAdmin
-        public async Task<ServiceResult> AdminBlockUser(Guid uid)
+        public virtual async Task<ServiceResult> AdminBlockUser(Guid uid)
         {
             // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu
             User? user = await UserRepository.Get(uid);
@@ -64,6 +69,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Block user
             user.Role = UserRoles.Banned;
+            user.ModifiedBy = "PhucTV";
+            user.ModifiedTime = DateTime.UtcNow;
             int res = await UserRepository.Update(uid, user);
 
             // Kiểm tra update thành công
@@ -77,7 +84,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminDeleteUser(Guid uid)
+        public virtual async Task<ServiceResult> AdminDeleteUser(Guid uid)
         {
             User? user = await UserRepository.Get(uid);
             if (user == null)
@@ -101,7 +108,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.ServerError(ResponseResource.DeleteSuccess(ResponseTableName));
         }
 
-        public async Task<ServiceResult> AdminGetUserProfile(string unOruid)
+        public virtual async Task<ServiceResult> AdminGetUserProfile(string unOruid)
         {
             // Lấy về profile
             ViewUser? profile = await UserRepository.GetDetailByUsernameOrUserId(unOruid);
@@ -117,7 +124,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminSearchUser(string searchKey, PaginationDto pagination)
+        public virtual async Task<ServiceResult> AdminSearchUser(string searchKey, PaginationDto pagination)
         {
             // Format search key
             searchKey = Unicode.RemoveVietnameseTone(searchKey).ToLower();
@@ -168,7 +175,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> AdminUnblockUser(Guid uid)
+        public virtual async Task<ServiceResult> AdminUnblockUser(Guid uid)
         {
             // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu
             User? user = await UserRepository.Get(uid);
@@ -186,6 +193,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Unblock user
             user.Role = UserRoles.User;
+            user.ModifiedTime = DateTime.UtcNow;
+            user.ModifiedBy = "PhucTV";
             int res = await UserRepository.Update(uid, user);
 
             // Kiểm tra update thành công
@@ -199,7 +208,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminUpdateUserInfo(Guid uid, UpdateUserModel model)
+        public virtual async Task<ServiceResult> AdminUpdateUserInfo(Guid uid, UpdateUserModel model)
         {
             // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu
             User? user = await UserRepository.Get(uid);
@@ -218,6 +227,8 @@ namespace KnowledgeSharingApi.Services.Services
             // Copy dữ liệu từ model vào profile rồi update
             User userToUpdate = (User)user.Clone();
             userToUpdate.Copy(model);
+            userToUpdate.ModifiedTime = DateTime.UtcNow;
+            userToUpdate.ModifiedBy = "PhucTV";
             int res = await UserRepository.Update(uid, userToUpdate);
 
             // Kiểm tra update thành công
@@ -231,7 +242,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> AdminGetListUser(PaginationDto pagination)
+        public virtual async Task<ServiceResult> AdminGetListUser(PaginationDto pagination)
         {
             List<ViewUser> listed = await UserRepository.GetDetail();
 
@@ -251,7 +262,7 @@ namespace KnowledgeSharingApi.Services.Services
 
 
         #region For User
-        public async Task<ServiceResult> GetMyUserProfile(Guid myuid)
+        public virtual async Task<ServiceResult> GetMyUserProfile(Guid myuid)
         {
             // Lấy về profile
             ViewUser? profile = await UserRepository.GetDetail(myuid);
@@ -266,7 +277,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> GetUserDetail(Guid myuid, string unOruid)
+        public virtual async Task<ServiceResult> GetUserDetail(Guid myuid, string unOruid)
         {
             // Kiểm tra profile phải tồn tại
             ViewUser? profile = await UserRepository.GetDetailByUsernameOrUserId(unOruid);
@@ -298,7 +309,7 @@ namespace KnowledgeSharingApi.Services.Services
         //    return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
         //}
 
-        public async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto pagination)
+        public virtual async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto pagination)
         {
             // Format search key
             searchKey = Unicode.RemoveVietnameseTone(searchKey).ToLower();
@@ -359,15 +370,17 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.Success(), string.Empty, res);
         }
 
-        public async Task<ServiceResult> UpdateMyAvatarImage(Guid uid, IFormFile avatar)
+        public virtual async Task<ServiceResult> UpdateMyAvatarImage(Guid uid, UploadImageModel avatar)
         {
             // Kiểm tra uid tồn tại trong database
             ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
             Profile profile = new();
             profile.Copy(user);
+            profile.ModifiedBy = user.Username;
+            profile.ModifiedTime = DateTime.UtcNow;
 
             // Upload ảnh lên storage lấy về image url
-            string? avatarUrl = await Storage.SaveImage(avatar);
+            string? avatarUrl = await Storage.SaveImage(avatar.Image);
             if (avatarUrl == null) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
 
             _ = await ImageRepository.TryInsertImage(uid, avatarUrl);
@@ -381,15 +394,17 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, profile);
         }
 
-        public async Task<ServiceResult> UpdateMyCoverImage(Guid uid, IFormFile cover)
+        public virtual async Task<ServiceResult> UpdateMyCoverImage(Guid uid, UploadImageModel cover)
         {
             // Kiểm tra uid tồn tại trong database
             ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
             Profile profile = new();
             profile.Copy(user);
+            profile.ModifiedTime = DateTime.UtcNow;
+            profile.ModifiedBy = user.Username;
 
             // Upload file ảnh ra storage và lấy về url của ảnh
-            string? coverUrl = await Storage.SaveImage(cover);
+            string? coverUrl = await Storage.SaveImage(cover.Image);
             if (coverUrl == null) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
 
             _ = await ImageRepository.TryInsertImage(uid, coverUrl);
@@ -403,7 +418,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, profile);
         }
 
-        public async Task<ServiceResult> UpdateMyUserProfile(Guid uid, UpdateProfileModel updateModel)
+        public virtual async Task<ServiceResult> UpdateMyUserProfile(Guid uid, UpdateProfileModel updateModel)
         {
             // Kiểm tra uid tồn tại trong database
             ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
@@ -412,6 +427,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Copy dữ liệu từ updateModel vào profile rồi update
             profile.Copy(updateModel);
+            profile.ModifiedBy = user.Username;
+            profile.ModifiedTime = DateTime.UtcNow;
             int res = await ProfileRepository.Update(user.ProfileId, profile);
 
             // Kiểm tra update thành công
@@ -425,7 +442,7 @@ namespace KnowledgeSharingApi.Services.Services
             );
         }
 
-        public async Task<ServiceResult> UpdateMyBio(Guid uid, string? newBio)
+        public virtual async Task<ServiceResult> UpdateMyBio(Guid uid, string? newBio)
         {
             if (newBio == null)
                 return ServiceResult.BadRequest("Bio không được trống");
@@ -437,10 +454,118 @@ namespace KnowledgeSharingApi.Services.Services
             Profile pro = new();
             pro.Copy(user);
             pro.Bio = newBio;
+            pro.ModifiedTime = DateTime.UtcNow;
+            pro.ModifiedBy = user.Username;
             int raws = await ProfileRepository.Update(user.ProfileId, pro);
             if (raws <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
             return ServiceResult.Success(ResponseResource.UpdateSuccess(), string.Empty, pro);
         }
+
+
+        public virtual async Task<ServiceResult> UpdateMyAvatarUrl(Guid uid, string? url)
+        {
+            if (string.IsNullOrEmpty(url)) return ServiceResult.BadRequest(ViConstantResource.URL_EMPTY);
+            if (!PropertyValidator.CheckFormatUrl(url)) return ServiceResult.BadRequest(ViConstantResource.URL_FORMAT);
+            
+            // Kiểm tra uid tồn tại trong database
+            ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
+            Profile profile = new();
+            profile.Copy(user);
+
+            // Copy dữ liệu từ updateModel vào profile rồi update
+            profile.Avatar = url;
+            profile.ModifiedBy = user.Username;
+            profile.ModifiedTime = DateTime.UtcNow;
+            int res = await ProfileRepository.Update(user.ProfileId, profile);
+
+            // Kiểm tra update thành công
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
+
+            // Trả về thành công
+            return ServiceResult.Success(
+                ResponseResource.UpdateSuccess(),
+                string.Empty,
+                profile
+            );
+        }
+
+        public virtual async Task<ServiceResult> UpdateMyCoverUrl(Guid uid, string? url)
+        {
+            if (string.IsNullOrEmpty(url)) return ServiceResult.BadRequest(ViConstantResource.URL_EMPTY);
+            if (!PropertyValidator.CheckFormatUrl(url)) return ServiceResult.BadRequest(ViConstantResource.URL_FORMAT);
+
+            // Kiểm tra uid tồn tại trong database
+            ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
+            Profile profile = new();
+            profile.Copy(user);
+
+            // Copy dữ liệu từ updateModel vào profile rồi update
+            profile.Cover = url;
+            profile.ModifiedBy = user.Username;
+            profile.ModifiedTime = DateTime.UtcNow;
+            int res = await ProfileRepository.Update(user.ProfileId, profile);
+
+            // Kiểm tra update thành công
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
+
+            // Trả về thành công
+            return ServiceResult.Success(
+                ResponseResource.UpdateSuccess(),
+                string.Empty,
+                profile
+            );
+        }
+
+        public virtual async Task<ServiceResult> UpdateMyFullname(Guid uid, string? fullname)
+        {
+            if (string.IsNullOrEmpty(fullname)) return ServiceResult.BadRequest(ViConstantResource.NAME_EMPTY);
+
+            // Kiểm tra uid tồn tại trong database
+            ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
+            Profile profile = new();
+            profile.Copy(user);
+
+            // Copy dữ liệu từ updateModel vào profile rồi update
+            profile.FullName = fullname;
+            profile.ModifiedBy = user.Username;
+            profile.ModifiedTime = DateTime.UtcNow;
+            int res = await ProfileRepository.Update(user.ProfileId, profile);
+
+            // Kiểm tra update thành công
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
+
+            // Trả về thành công
+            return ServiceResult.Success(
+                ResponseResource.UpdateSuccess(),
+                string.Empty,
+                profile
+            );
+        }
+
+        public virtual async Task<ServiceResult> UpdateMyGeneralInfo(Guid uid, UpdateGeneralInforModel model)
+        {
+            // Kiểm tra uid tồn tại trong database
+            ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
+            Profile profile = new();
+            profile.Copy(user);
+
+            // Copy dữ liệu từ updateModel vào profile rồi update
+            profile.Copy(model);
+            profile.ModifiedBy = user.Username;
+            profile.ModifiedTime = DateTime.UtcNow;
+            int res = await ProfileRepository.Update(user.ProfileId, profile);
+
+            // Kiểm tra update thành công
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
+
+            // Trả về thành công
+            return ServiceResult.Success(
+                ResponseResource.UpdateSuccess(),
+                string.Empty,
+                profile
+            );
+        }
+
 
         #endregion
     }

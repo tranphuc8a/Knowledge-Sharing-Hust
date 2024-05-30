@@ -107,7 +107,7 @@ namespace KnowledgeSharingApi.Services.Services
                     MarkId = Guid.NewGuid(),
                     UserId = myUid,
                     KnowledgeId = knowledgeId,
-                    CreatedTime = DateTime.Now,
+                    CreatedTime = DateTime.UtcNow,
                     CreatedBy = myUid.ToString()
                 };
                 Guid? res = await MarkRepository.Insert(mark.MarkId, mark);

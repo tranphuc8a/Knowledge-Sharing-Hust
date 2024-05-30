@@ -11,14 +11,19 @@
                 state="normal" ref="imageInput"
             />
         </div>
+        <div class="p-uic-captcha">
+            <div class="g-recaptcha" :data-sitekey="siteKey"></div>
+        </div>
     </div>
 </template>
 
 
 
 <script>
-import MImageInput from './../../inputs/MImageInput.vue'
-
+/* global grecaptcha */
+import MImageInput from './../../inputs/MImageInput.vue';
+import Common from '@/js/utils/common';
+import appConfig from '@/app-config';
 
 export default {
     name: 'UploadImageContent',
@@ -30,18 +35,21 @@ export default {
     data(){
         return {
             inputImageStyle: { 
-                width: '350px', 
-                height: '350px',
-            }
+                width: '300px', 
+                height: '300px',
+            },
+            siteKey: appConfig.getCaptchaSiteKey()
         }
     },
     async mounted(){
+        Common.loadRecaptchaScript();
     },
     methods: {
         async getSelectedImage(){
             try {
                 let image = await this.$refs.imageInput.getValue();
-                return image;
+                let captcha = grecaptcha.getResponse();
+                return { image, captcha };
             } catch (error) {
                 console.error(error);
                 return null;
@@ -64,7 +72,7 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     width: 100%;
     height: 450px;
 }
@@ -76,6 +84,14 @@ export default {
     justify-content: center;
     width: fit-content;
     height: 100%;
+}
+
+.p-uic-captcha{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 </style>
