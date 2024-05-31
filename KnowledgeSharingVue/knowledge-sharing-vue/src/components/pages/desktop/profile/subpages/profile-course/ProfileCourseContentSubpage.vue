@@ -22,6 +22,10 @@
                 v-model:pageSize="pageSize"
                 :total="total" />
         </div>
+
+        <div class="p-feed-notfound" v-show="!(listCourses.length > 0)">
+            <NotFoundPanel text="Không tìm thấy mục nào" />
+        </div>
         
         <div class="p-pccs-list-course">
             <transition :name="transitionName">
@@ -56,6 +60,7 @@ import CourseShortCardSkeleton from '../../../course/components/course-card/Cour
 import CourseShortCard from '../../../course/components/course-card/CourseShortCard.vue';
 import CourseShortCardMenuContext from '../../../course/components/course-card/CourseShortCardMenuContext.vue';
 import { MyRandom } from '@/js/utils/myrandom';
+import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 
 
 export default {
@@ -63,7 +68,8 @@ export default {
     components: {
         CourseShortCard,
         CourseShortCardSkeleton,
-        CourseShortCardMenuContext
+        CourseShortCardMenuContext,
+        NotFoundPanel,
     },
     props: {
         listCourses: {
@@ -146,6 +152,16 @@ export default {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+}
+
+.p-feed-notfound{
+    width: 100%;
+    display: flex;
+    height: 350px;
+    flex-flow: column nowrap;
+    justify-content: center;
     align-items: center;
     gap: 16px;
 }

@@ -184,7 +184,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     relation.SenderId == user2 && relation.ReceiverId == user1
                 )).ToListAsync();
 
-            return GetUserRelationType(user1, user2, userRelations).UserRelationType;
+            return GetUserRelationType(user1, user2, userRelations).UserRelationType!.Value;
         }
 
         public virtual async Task<Dictionary<Guid, EUserRelationType>> GetUserRelationType(Guid user1, List<Guid> users2)
@@ -203,7 +203,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 List<ViewUserRelation> relations = userRelations
                     .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser)
                     .ToList();
-                EUserRelationType relationType = GetUserRelationType(user1, otherUser, relations).UserRelationType;
+                EUserRelationType relationType = GetUserRelationType(user1, otherUser, relations).UserRelationType!.Value;
                 results[otherUser] = relationType;
             }
 

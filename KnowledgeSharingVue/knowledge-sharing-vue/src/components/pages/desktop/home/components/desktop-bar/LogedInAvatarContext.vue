@@ -85,6 +85,7 @@ export default {
             username: null,
             menuItems: [],
             detailUserLink: '',
+            iconStyle: {},
         }
     },
     async created(){

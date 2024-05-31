@@ -16,13 +16,15 @@
         <div class="p-edit-cover-image-button" v-if="isMySelf">
             <MCancelButton 
                 label="Chỉnh sửa ảnh bìa"
-                :onclick="resolveClickButton"
+                :onclick="resolveClickChangeCoverImage"
                 :buttonStyle="buttonStyle"
                 fa="camera" family="fas" :iconStyle="iconStyle"
             />
         </div>
         <PreviewImage :src="coverImage" ref="preview" />
     </div>
+    <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitCoverImage" :isShow="false"/>
+
 </template>
 
 
@@ -32,11 +34,15 @@ import CurrentUser from '@/js/models/entities/current-user';
 import MCancelButton from '@/components/base/buttons/MCancelButton';
 import Common from '@/js/utils/common';
 import PreviewImage from '@/components/base/image/PreviewImage.vue';
+import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
+import { PatchRequest, Request } from '@/js/services/request';
+import { Validator } from '@/js/utils/validator';
 
 export default {
     name: 'ProfilePanelCoverImage',
     components: {
-        MCancelButton, PreviewImage
+        MCancelButton, PreviewImage,
+        SelectImagePopup
     },
     props: {
     },
@@ -73,11 +79,29 @@ export default {
 
     },
     methods: {
-        async resolveClickButton(){
+        async resolveClickChangeCoverImage(){
             try {
-                console.log("click edit cover image button");
+                this.$refs['select-image-popup'].show();
             } catch (e) {
                 console.error(e);
+            }
+        },
+
+        async resolveSubmitCoverImage(image){
+            try {
+                this.$refs['select-image-popup'].hide();
+                if (Validator.isEmpty(image)){
+                    return;
+                }
+                await new PatchRequest('Users/me/update-cover-url')
+                    .setBody(image)
+                    .execute();
+                this.getToastManager().success('Cập nhật ảnh bìa thành công');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } catch (e) {
+                Request.resolveAxiosError(e);
             }
         },
 
@@ -91,7 +115,8 @@ export default {
     },
     inject: {
         getUser: {},
-        forceUpdateProfilePanel: {}
+        forceUpdateProfilePanel: {},
+        getToastManager: {},
     }
 }
 

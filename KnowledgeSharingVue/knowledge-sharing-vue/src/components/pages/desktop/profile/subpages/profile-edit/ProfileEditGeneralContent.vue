@@ -70,7 +70,7 @@
                         Tên hiển thị
                     </div>
                     <div class="p-peg-button">
-                        <MEmbeddedButton 
+                        <MEmbeddedButton v-show="true"
                             label="Chỉnh sửa"
                             :onclick="resolveOnChangeFullName"
                         />
@@ -83,6 +83,8 @@
                 </div>
             </div>
         </div>
+        <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitImage" :isShow="false"/>
+        <ChangeFullnamePopup ref="change-fullname-popup" :isShow="false"/>
     </div>
 </template>
 
@@ -95,12 +97,18 @@ import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue
 import MEmbeddedButton from './../../../../../base/buttons/MEmbeddedButton.vue'
 import Common from '@/js/utils/common';
 import CurrentUser from '@/js/models/entities/current-user';
+import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
+import { Validator } from '@/js/utils/validator';
+import { PatchRequest } from '@/js/services/request';
+import ChangeFullnamePopup from './ChangeFullnamePopup.vue';
 
 export default {
     name: 'ProfileEditGeneralContent',
     components: {
         ProfilePanelUserAvatar, PreviewImage,
+        SelectImagePopup,
         MEmbeddedButton, MSecondaryButton,
+        ChangeFullnamePopup
     },
     props: {
     },
@@ -115,6 +123,11 @@ export default {
             buttonStyle: {
                 padding: '16px'
             },
+            imageEnum: {
+                AVATAR: 0,
+                COVER: 1
+            },
+            focusImage: -1,
         }
     },
     async mounted(){
@@ -157,7 +170,8 @@ export default {
 
         async resolveOnChangeAvatar(){
             try {
-                console.log("Click change Avatar");
+                this.focusImage = this.imageEnum.AVATAR;
+                this.$refs['select-image-popup'].show();
             } catch (e){
                 console.error(e);
             }
@@ -165,15 +179,45 @@ export default {
 
         async resolveOnChangeCover(){
             try {
-                console.log("Click change Cover");
+                this.focusImage = this.imageEnum.COVER;
+                this.$refs['select-image-popup'].show();
             } catch (e){
                 console.error(e);
             }
         },
 
+        async resolveSubmitImage(image){
+            try {
+                this.$refs['select-image-popup'].hide();
+                if (Validator.isEmpty(image)){
+                    return;
+                }
+                let currentUser = await CurrentUser.getInstance();
+                if (this.focusImage == this.imageEnum.AVATAR){
+                    await new PatchRequest('Users/me/update-avatar-url')
+                        .setBody(image)
+                        .execute();
+                    this.getToastManager().success('Cập nhật ảnh đại diện thành công');
+                    currentUser.Avatar = image;
+                } else if (this.focusImage == this.imageEnum.COVER){
+                    await new PatchRequest('Users/me/update-cover-url')
+                        .setBody(image)
+                        .execute();
+                    this.getToastManager().success('Cập nhật ảnh bìa thành công');
+                    currentUser.Cover = image;
+                }
+                await CurrentUser.setInstance(currentUser);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } catch (e){
+                Request.resolveAxiosError(e);
+            }
+        },
+
         async resolveOnChangeFullName(){
             try {
-                console.log("Click change Fullname");
+                this.$refs['change-fullname-popup'].show();
             } catch (e){
                 console.error(e);
             }
@@ -187,6 +231,7 @@ export default {
         }
     },
     inject: {
+        getToastManager: {},
     },
     provide(){
         return{}

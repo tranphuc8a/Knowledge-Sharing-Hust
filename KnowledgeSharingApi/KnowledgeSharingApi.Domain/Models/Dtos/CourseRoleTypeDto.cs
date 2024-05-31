@@ -9,7 +9,7 @@ namespace KnowledgeSharingApi.Domains.Models.Dtos
 {
     public class CourseRoleTypeDto
     {
-        public ECourseRoleType CourseRoleType { get; set; }
+        public ECourseRoleType? CourseRoleType { get; set; }
 
         public Guid? CourseRelationId { get; set; }
     }

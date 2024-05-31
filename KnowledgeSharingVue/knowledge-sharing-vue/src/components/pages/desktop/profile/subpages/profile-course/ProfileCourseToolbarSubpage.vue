@@ -6,10 +6,10 @@
         <div class="p-pcts-card card">
             <div class="p-pcts-card__header">
                 <div class="p-pcts-header">
-                    Các khóa học của bạn
+                    Các khóa học của {{ isMySelf ? 'bạn' : 'người dùng'}}
                 </div>
                 <div class="p-pcts-button">
-                    <MButton 
+                    <MButton v-show="isMySelf"
                         label="Tạo khóa học mới"
                         :onclick="resolveClickCreateCourse"
                         :buttonStyle="buttonStyle"
@@ -78,20 +78,33 @@ export default {
             description: 'Bạn đang có 2 khóa học. Bạn có thể tạo hoặc khám phá các khóa học khác tại đây.',
             debouncedFunction: null,
             router: useRouter(),
+            isMySelf: false,
         }
     },
     mounted(){
         this.refresh();
     },
+    inject: {
+        getIsMySelf: {},
+    },
     methods: {
 
         async refresh(){
             try {
+                this.isMySelf = await this.getIsMySelf();
                 let numberCourse = this.listCourses?.length ?? 0;
                 if (numberCourse > 0){
-                    this.description = `Bạn đang có ${numberCourse} khóa học. Bạn có thể tạo hoặc khám phá các khóa học khác tại đây.`;
+                    if (this.isMySelf){
+                        this.description = `Bạn đang có ${numberCourse} khóa học. Bạn có thể tạo một khóa học khác tại đây.`;
+                    } else {
+                        this.description = `Có ${numberCourse} khóa học.`;
+                    }
                 } else {
-                    this.description = 'Bạn chưa có khóa học nào. Hãy tạo một khóa học mới.';
+                    if (this.isMySelf){
+                        this.description = 'Bạn chưa có khóa học nào. Hãy tạo một khóa học mới.';
+                    } else {
+                        this.description = 'Chưa có khóa học nào.';
+                    }
                 }
                 this.debouncedFunction = Debounce.throttle(this.resolveChangeConfig.bind(this), 1000);
                 

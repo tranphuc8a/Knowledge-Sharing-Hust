@@ -9,17 +9,26 @@
                 </div>
                 <div class="p-pfh-search-button">
                     <!-- Textfield Button -->
-                    <MTextfieldButton 
-                        placeholder="Tìm kiếm người dùng"
-                        :is-show-icon="true" 
-                        :is-show-title="false" 
-                        :is-show-error="false" 
-                        :is-obligate="false"
-                        :onclick-icon="resolveOnClickSearch" 
-                        :validator="null"
-                        state="normal"
-                        ref="textfield"
-                    />
+                    <span>
+                        <MButton 
+                            label="Mời người tham gia"
+                            :onclick="resolveClickInvite"
+                            fa="user-plus"
+                        />
+                    </span>
+                    <span>
+                        <MTextfieldButton 
+                            placeholder="Tìm kiếm người dùng"
+                            :is-show-icon="true" 
+                            :is-show-title="false" 
+                            :is-show-error="false" 
+                            :is-obligate="false"
+                            :onclick-icon="resolveOnClickSearch" 
+                            :validator="null"
+                            state="normal"
+                            ref="textfield"
+                        />
+                    </span>
                 </div>
             </div>
 
@@ -32,6 +41,12 @@
                 <router-view />
             </div>
         </div>
+
+        <CourseInvitationPopup 
+            :is-show="false"
+            ref="invitationPopup"
+            :on-okay="resolveOkayInvitation"
+        />
     </div>
 </template>
 
@@ -41,13 +56,14 @@
 // import { Validator } from '@/js/utils/validator';
 import MTextfieldButton from './../../../../../base/inputs/MTextfieldButton.vue';
 import CourseRevitationNavigation from './CourseRevitationNavigation.vue';
-
+import CourseInvitationPopup from '@/components/base/popup/course-invitation-popup/CourseInvitationPopup.vue';
 
 export default {
     name: 'CourseRevitationSubpage',
     components: {
         MTextfieldButton,
-        CourseRevitationNavigation
+        CourseRevitationNavigation,
+        CourseInvitationPopup
     },
     props: {
     },
@@ -77,6 +93,23 @@ export default {
                 if (this.onClickSearch != null){
                     await this.onClickSearch(searchText);
                 }
+            } catch (e){
+                console.error(e);
+            }
+        },
+
+        async resolveClickInvite(){
+            try {
+                await this.$refs.invitationPopup.show();
+            } catch (e){
+                console.error(e);
+            }
+        },
+
+
+        async resolveOkayInvitation(){
+            try {
+                await this.$refs.invitationPopup.hide();
             } catch (e){
                 console.error(e);
             }
@@ -134,6 +167,14 @@ export default {
 .p-course-revitation-subpage .p-pfh-heading{
     font-family: 'ks-font-semibold';
     font-size: 24px;
+}
+
+.p-pfh-search-button{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
 }
 
 </style>

@@ -18,7 +18,7 @@
             </div>
         </div>
         
-        <div class="p-avatar-camera" @:click="resolveClickIcon"
+        <div class="p-avatar-camera" @:click="resolveClickEditAvatar"
             v-if="isMySelf"
         >
             <MIcon 
@@ -27,6 +27,9 @@
             />
         </div>
         <PreviewImage :src="imageSrc" ref="preview"/>
+        <div>
+            <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitAvatar" :isShow="false"/>
+        </div>
     </div>
 </template>
 
@@ -36,11 +39,15 @@
 import Common from '@/js/utils/common';
 import CurrentUser from '@/js/models/entities/current-user';
 import PreviewImage from '@/components/base/image/PreviewImage.vue';
+import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
+import { Validator } from '@/js/utils/validator';
+import { PatchRequest, Request } from '@/js/services/request';
 
 export default {
     name: 'ProfilePanelUserAvatar',
     components: {
-        PreviewImage
+        PreviewImage,
+        SelectImagePopup
     },
     props: {
     },
@@ -57,6 +64,7 @@ export default {
     },
     async mounted(){
         try {
+            this.$refs['select-image-popup'].hide();
             this.imageSrc = this.defaultImageSrc;
             let avatar = this.getUser()?.Avatar;
             if (await Common.isValidImage(avatar)){
@@ -71,9 +79,9 @@ export default {
         }
     },
     methods: {
-        async resolveClickIcon(){
+        async resolveClickEditAvatar(){
             try {
-                console.log("click avatar icon");
+                this.$refs['select-image-popup'].show();
             } catch (e) {
                 console.error(e);
             }
@@ -86,9 +94,29 @@ export default {
                 console.error(e);
             }
         },
+
+        async resolveSubmitAvatar(image){
+            try {
+                this.$refs['select-image-popup'].hide();
+                if (Validator.isEmpty(image)){
+                    return;
+                }
+                // update image:
+                await new PatchRequest('Users/me/update-avatar-url')
+                    .setBody(image).execute();
+                // success:
+                this.getToastManager().success('Cập nhật ảnh đại diện thành công');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } catch (e) {
+                Request.resolveAxiosError(e);
+            }
+        }
     },
     inject: {
         getUser: {},
+        getToastManager: {},
     }
 }
 

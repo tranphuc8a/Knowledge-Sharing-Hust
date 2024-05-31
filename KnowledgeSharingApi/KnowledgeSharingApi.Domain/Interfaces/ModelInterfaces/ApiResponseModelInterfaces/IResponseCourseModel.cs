@@ -13,7 +13,7 @@ namespace KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseMode
     [JsonConverter(typeof(ResponseCourseConverter))]
     public interface IResponseCourseModel : IResponseKnowledgeModel
     {
-        ECourseRoleType CourseRoleType { get; set; }
+        ECourseRoleType? CourseRoleType { get; set; }
         Guid? CourseRelationId { get; set; }
     }
 }

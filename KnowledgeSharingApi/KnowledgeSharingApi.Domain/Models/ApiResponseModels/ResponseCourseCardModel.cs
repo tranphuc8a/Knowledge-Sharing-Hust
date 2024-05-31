@@ -30,7 +30,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
 
 
-        public ECourseRoleType CourseRoleType { get; set; }
+        public ECourseRoleType? CourseRoleType { get; set; }
 
         public Guid? CourseRelationId { get; set; }
 
