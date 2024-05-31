@@ -69,11 +69,9 @@ export default {
     },
     props: {
         onOkay: {
-            type: Function,
             default: () => {}
         },
         isShow: {
-            type: Boolean,
             default: false
         },
     },
