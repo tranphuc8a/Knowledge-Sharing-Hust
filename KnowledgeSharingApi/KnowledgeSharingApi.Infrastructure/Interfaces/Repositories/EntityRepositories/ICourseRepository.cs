@@ -202,7 +202,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (30/03/24)
         /// Modified: None
-        Task<List<ViewCourse>> GetMarkedCoursesOfUse(Guid userId, PaginationDto pagination);
+        Task<List<ViewCourse>> GetMarkedCoursesOfUser(Guid userId, PaginationDto pagination);
 
         #endregion
 

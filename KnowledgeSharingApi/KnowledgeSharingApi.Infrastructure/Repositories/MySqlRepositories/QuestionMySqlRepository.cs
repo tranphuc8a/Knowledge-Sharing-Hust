@@ -257,25 +257,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task<List<ViewQuestion>> GetMarkedPosts(Guid userId)
         {
-            // Lấy danh sách UserItemId mà User đã đăng ký
-            var registeredCourseIds = new HashSet<Guid>(
-                DbContext.CourseRegisters
-                    .Where(c => c.UserId == userId)
-                    .Select(c => c.CourseId)
-                    .Distinct()
-            );
-
-            // Định nghĩa truy vấn để lấy danh sách các ViewQuestion
             var query =
                 from post in DbContext.ViewQuestions
                 join mark in DbContext.Marks
                     on post.UserItemId equals mark.KnowledgeId
-                where mark.UserId == userId && (
-                    post.Privacy == EPrivacy.Public || // Question là public
-                    post.UserId == userId || // Hoặc question là của user
-                    (post.CourseId.HasValue && registeredCourseIds.Contains(post.CourseId.Value)) // Hoặc trong course đã đăng ký
-                    // hoac la chu cua course chua post
-                )
+                where mark.UserId == userId
                 orderby mark.CreatedTime descending
                 select post;
 
@@ -285,24 +271,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task<List<ViewQuestion>> GetMarkedPosts(Guid userId, PaginationDto pagination)
         {
-            // Lấy danh sách UserItemId mà User đã đăng ký
-            var registeredCourseIds = new HashSet<Guid>(
-                DbContext.CourseRegisters
-                    .Where(c => c.UserId == userId)
-                    .Select(c => c.CourseId)
-                    .Distinct()
-            );
-
-            // Định nghĩa truy vấn để lấy danh sách các ViewQuestion
             var query =
                 from post in DbContext.ViewQuestions
                 join mark in DbContext.Marks
                     on post.UserItemId equals mark.KnowledgeId
-                where mark.UserId == userId && (
-                    post.Privacy == EPrivacy.Public || // Question là public
-                    post.UserId == userId || // Hoặc question là của user
-                    (post.CourseId.HasValue && registeredCourseIds.Contains(post.CourseId.Value)) // Hoặc trong course đã đăng ký
-                )
+                where mark.UserId == userId
                 orderby mark.CreatedTime descending
                 select post;
 

@@ -438,7 +438,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> UserGetMarkedCourses(Guid myUid, PaginationDto pagination)
         {
             List<ViewCourse> lsCourses = 
-                await CourseRepository.GetMarkedCoursesOfUse(myUid, pagination);
+                await CourseRepository.GetMarkedCoursesOfUser(myUid, pagination);
 
             List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses);
 

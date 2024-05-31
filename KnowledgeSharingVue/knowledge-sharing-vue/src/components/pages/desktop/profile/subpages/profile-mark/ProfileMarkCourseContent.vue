@@ -67,6 +67,7 @@ export default {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: center;
+    padding-bottom: 64px;
     gap: 16px;
 }
 

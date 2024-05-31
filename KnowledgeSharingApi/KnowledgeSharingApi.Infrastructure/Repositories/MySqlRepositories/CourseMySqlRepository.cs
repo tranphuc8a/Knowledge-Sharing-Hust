@@ -61,14 +61,17 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
-        public virtual async Task<List<ViewCourse>> GetMarkedCoursesOfUse(Guid userId, PaginationDto pagination)
+        public virtual async Task<List<ViewCourse>> GetMarkedCoursesOfUser(Guid userId, PaginationDto pagination)
         {
-            IQueryable<Guid> listMarkedKnowledgeIds = DbContext.Marks
-                .Where(m => m.UserId == userId).Select(m => m.KnowledgeId);
+            IQueryable<ViewCourse> listCourse =
+                from viewCourse in DbContext.ViewCourses
+                join mark in DbContext.Marks on viewCourse.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId
+                orderby mark.CreatedTime descending
+                select viewCourse;
+            
             return await ApplyPagination(
-                    DbContext.ViewCourses
-                    .Where(c => listMarkedKnowledgeIds.Contains(c.UserItemId))
-                    .OrderByDescending(c => c.CreatedTime),
+                    listCourse,
                     pagination)
                 .ToListAsync();
         }

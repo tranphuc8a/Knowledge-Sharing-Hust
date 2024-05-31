@@ -71,23 +71,27 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
         public virtual async Task<List<ViewLesson>> GetMarkedPosts(Guid userId)
         {
-            IQueryable<Guid> listMarkedItemId = DbContext.Marks
-                .Where(mark => mark.UserId == userId).Select(mark => mark.KnowledgeId);
-            return await DbContext.ViewLessons
-                .Where(les => listMarkedItemId.Contains(les.UserItemId))
-                .OrderByDescending(les => les.CreatedTime)
-                .ToListAsync();
+            IQueryable<ViewLesson> query =
+                from lesson in DbContext.ViewLessons
+                join mark in DbContext.Marks
+                    on lesson.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId
+                orderby mark.CreatedTime descending
+                select lesson;
+            return await query.ToListAsync();
         }
 
         public virtual async Task<List<ViewLesson>> GetMarkedPosts(Guid userId, PaginationDto pagination)
         {
-            IQueryable<Guid> listMarkedItemId = DbContext.Marks
-                .Where(mark => mark.UserId == userId).Select(mark => mark.KnowledgeId);
-            return await ApplyPagination(
-                DbContext.ViewLessons
-                .Where(les => listMarkedItemId.Contains(les.UserItemId))
-                .OrderByDescending(les => les.CreatedTime), pagination)
-                .ToListAsync();
+            IQueryable<ViewLesson> query =
+                from lesson in DbContext.ViewLessons
+                join mark in DbContext.Marks
+                    on lesson.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId
+                orderby mark.CreatedTime descending
+                select lesson;
+            query = ApplyPagination(query, pagination);
+            return await query.ToListAsync();
         }
 
         public virtual async Task<List<ViewLesson>> GetPostsOfCategory(string catName, PaginationDto pagination)
