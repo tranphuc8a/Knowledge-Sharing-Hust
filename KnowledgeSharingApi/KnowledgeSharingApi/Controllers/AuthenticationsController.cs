@@ -19,13 +19,15 @@ namespace KnowledgeSharingApi.Controllers
             IForgotPasswordService forgotPasswordService,
             IAuthenticationService authenticationService,
             IResourceFactory resourceFactory,
-            IOAuth2Service OAuth2Service
+            IOAuth2Service OAuth2Service,
+            IGoogleRecaptchaService googleRecaptchaService
         ) : BaseController
     {
         protected readonly IRegisterNewUserService registerNewUserService = registerNewUserService;
         protected readonly IOAuth2Service OAuth2Service = OAuth2Service;
         protected readonly IForgotPasswordService forgotPasswordService = forgotPasswordService;
         protected readonly IAuthenticationService authenticationService = authenticationService;
+        protected readonly IGoogleRecaptchaService GoogleRecaptchaService = googleRecaptchaService;
         protected readonly IResourceFactory resourceFactory = resourceFactory;
         protected readonly IResponseResource responseResource = resourceFactory.GetResponseResource();
 
@@ -41,7 +43,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> SendRegisterAccountVerifyCode(string? email)
         {
             ServiceResult res = await registerNewUserService.SendVerifyCode(email);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -56,7 +58,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> CheckRegisterAccountVerifyCode(VerifyCodeModel codeModel)
         {
             ServiceResult res = await registerNewUserService.CheckVerifyCode(codeModel);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -71,7 +73,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> RegisterAccount(ActiveCodeRegisterModel codeModel)
         {
             ServiceResult res = await registerNewUserService.Action(codeModel);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
         #endregion
 
@@ -87,7 +89,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> SendResetPasswordVerifyCode(string? email)
         {
             ServiceResult res = await forgotPasswordService.SendVerifyCode(email);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -102,7 +104,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> CheckResetPasswordVerifyCode(VerifyCodeModel codeModel)
         {
             ServiceResult res = await forgotPasswordService.CheckVerifyCode(codeModel);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -117,7 +119,7 @@ namespace KnowledgeSharingApi.Controllers
         public virtual async Task<IActionResult> ResetPassword(ActiveCodeForgotPasswordModel codeModel)
         {
             ServiceResult res = await forgotPasswordService.Action(codeModel);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
         #endregion
 
@@ -136,7 +138,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> GoogleLogin(string token)
         {
             ServiceResult res = await OAuth2Service.LoginByGoogle(token);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -184,7 +186,23 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             ServiceResult res = await authenticationService.Login(model);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
+        }
+
+        /// <summary>
+        /// Xử lý yêu cầu đăng nhập tài khoản su dung Google Recaptcha v2
+        /// </summary>
+        /// <param name="model"> username và password đăng nhập </param>
+        /// <returns></returns>
+        /// Created: PhucTV (22/2/24)
+        /// Modified: None
+        [HttpPost]
+        [Route("login-recaptcha")]
+        public async Task<IActionResult> LoginRecaptcha([FromBody] LoginModel model)
+        {
+            await CheckRecaptchaToken(GoogleRecaptchaService);
+            ServiceResult res = await authenticationService.Login(model);
+            return StatusCode(res);
         }
 
         /// <summary>
@@ -199,7 +217,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> Login([FromBody] LoginWithCaptchaModel model)
         {
             ServiceResult res = await authenticationService.LoginWithCaptcha(model);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -214,7 +232,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> RefreshCaptcha()
         {
             ServiceResult res = await authenticationService.GenerateNewCaptcha();
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -240,7 +258,7 @@ namespace KnowledgeSharingApi.Controllers
             {
                 res = await authenticationService.ChangePassword(changePasswordModel);
             }
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -256,7 +274,7 @@ namespace KnowledgeSharingApi.Controllers
         public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
         {
             ServiceResult res = await authenticationService.RefreshToken(tokenModel);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -273,7 +291,7 @@ namespace KnowledgeSharingApi.Controllers
         {
             string sessionId = KSEncrypt.GetClaimValue(HttpContext.User, ClaimTypes.Sid) ?? string.Empty;
             ServiceResult res = await authenticationService.Logout(Guid.Parse(sessionId));
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
 
 
@@ -291,7 +309,7 @@ namespace KnowledgeSharingApi.Controllers
         {
             string username = HttpContext.User.Identity?.Name!;
             ServiceResult res = await authenticationService.LogoutAll(username);
-            return StatusCode((int) res.StatusCode, new ApiResponse(res));
+            return StatusCode(res);
         }
     }
 } 

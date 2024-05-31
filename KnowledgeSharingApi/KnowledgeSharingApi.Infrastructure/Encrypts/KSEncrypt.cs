@@ -103,7 +103,7 @@ namespace KnowledgeSharingApi.Infrastructures.Encrypts
                 JwtSecurityToken token = new(
                     issuer: _jwtIssuer,
                     audience: _jwtAudience,
-                    expires: DateTime.Now.AddMinutes(tokenValidityInMinutes),
+                    expires: DateTime.UtcNow.AddMinutes(tokenValidityInMinutes),
                     claims: claims,
                     signingCredentials: signingCredentials
                 );

@@ -4,6 +4,22 @@ import { Validator } from "./validator";
 
 class Common {  
     /**
+     * Load recaptcha script from google api to the head of the document
+     * @Created PhucTV (22/2/24)
+     * @Modified None
+     * @param void
+     * @returns void
+     * @example Common.loadRecaptchaScript();
+     */
+    static loadRecaptchaScript() {
+        let script = document.createElement('script');
+        script.src = 'https://www.google.com/recaptcha/api.js';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+
+    /**
      * Xóa những dấu / ở cuối liên kết
      * @param {*} url - liên kết cần xóa
      * @returns liên kết sau khi được xóa splash

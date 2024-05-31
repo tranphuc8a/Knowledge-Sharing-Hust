@@ -33,7 +33,7 @@ namespace KnowledgeSharingApi.Domains.Annotations.Validators
             if (DateTime.TryParse(value.ToString(), out DateTime date))
             {
                 // compare date with today
-                if (DateTime.Now < date)
+                if (DateTime.UtcNow < date)
                 {
                     throw new GreaterThanTodayException(ErrorMessage ?? GetType().Name);
                 }

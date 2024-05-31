@@ -156,6 +156,7 @@ export default {
             try {
                 this.dCourse = await this.getCourse();
                 this.isMySelf = await this.getIsMyCourse();
+                this.loadMoreLesson();
             } catch (error) {
                 console.error(error);
             }
@@ -205,6 +206,7 @@ export default {
     justify-content: flex-start;
     align-items: stretch;
     padding: 16px;
+    padding-bottom: 98px;
     gap: 16px;
 }
 
@@ -234,13 +236,16 @@ export default {
 }
 
 .p-course-lesson-subpage .p-pls-content{
-    width: 100%;
+    padding-top: 32px;
+    width: 80%;
+    max-width: 100%;
     height: 100%;
     display: flex;
     flex-flow: row wrap;
+    align-self: center;
     justify-content: flex-start;
     align-items: stretch;
-    gap: 16px;
+    gap: 8px;
 }
 
 .p-course-lesson-subpage .p-pls-course-lesson-item{
@@ -250,6 +255,12 @@ export default {
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: stretch;
+    border-radius: 8px;
+    padding: 16px 32px 32px 32px;
+}
+
+.p-course-lesson-subpage .p-pls-course-lesson-item:hover{
+    background-color: var(--primary-color-100);
 }
 
 .p-course-lesson-subpage .p-pls-not-found{

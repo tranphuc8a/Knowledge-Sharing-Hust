@@ -14,8 +14,8 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
         public Guid SessionId { get; set; } = Guid.Empty;
         public Guid UserId { get; set; } = Guid.Empty;
         public string RefreshToken { get; set; } = string.Empty;
-        public DateTime Expired { get; set; } = DateTime.Now;
-        public DateTime Time { get; set; } = DateTime.Now;
+        public DateTime Expired { get; set; } = DateTime.UtcNow;
+        public DateTime Time { get; set; } = DateTime.UtcNow;
         public string? Place { get; set; }
         public string? Device { get; set; }
 

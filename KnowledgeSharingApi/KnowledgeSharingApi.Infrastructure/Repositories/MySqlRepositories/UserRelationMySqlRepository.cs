@@ -253,7 +253,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
                 // Them block
                 Guid idToInsert = Guid.NewGuid();
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 UserRelation blockObject = new() {
                     // Entity:
                     CreatedBy = blockerId.ToString(),
@@ -293,7 +293,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 
                 // Them friend
                 Guid idToInsert = Guid.NewGuid();
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 UserRelation friendObject = new()
                 {
                     // Entity:

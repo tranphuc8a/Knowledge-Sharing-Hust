@@ -56,6 +56,16 @@ namespace KnowledgeSharingApi.Services.Interfaces
         Task<ServiceResult> UserPutScores(Guid myUid, PutScoreModel scoreModel);
 
         /// <summary>
+        /// User đánh giá star cho một item
+        /// </summary>
+        /// <param name="myUid"> id của user đánh giá </param>
+        /// <param name="userItemId"> id item can xoa </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/5/24)
+        /// Modified: None
+        Task<ServiceResult> UserDeleteScores(Guid myUid, Guid userItemId);
+
+        /// <summary>
         /// Admin lấy về danh sách star của một user item
         /// </summary>
         /// <param name="userItemId"> id của item cần lấy </param>

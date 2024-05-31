@@ -371,10 +371,10 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 SenderId = myuid,
                 ReceiverId = uid,
-                Time = DateTime.Now,
+                Time = DateTime.UtcNow,
                 UserRelationType = EUserRelationType.Follow,
                 UserRelationId = Guid.NewGuid(),
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 CreatedBy = myuid.ToString()
             };
             Guid? id = await UserRelationRepository.Insert(userRelation.UserRelationId, userRelation);
@@ -488,8 +488,8 @@ namespace KnowledgeSharingApi.Services.Services
                 SenderId = myuid,
                 ReceiverId = uid,
                 UserRelationType = EUserRelationType.FriendRequest,
-                Time = DateTime.Now,
-                CreatedTime = DateTime.Now,
+                Time = DateTime.UtcNow,
+                CreatedTime = DateTime.UtcNow,
                 CreatedBy = uid.ToString()
             };
             Guid? id = await UserRelationRepository.Insert(relation.UserRelationId, relation);

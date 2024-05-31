@@ -1,16 +1,13 @@
 
 
 <template>
-
     <div class="p-ellipsis-text" :title="text"
         :style="
         {
             '-webkit-line-clamp': maxLine,
             ...style
         }">
-        <span>
             {{ normalizeWhitespace(text) }}
-        </span>
     </div>
 
 </template>
@@ -63,13 +60,14 @@ export default {
 
 
 <style scoped>
+
 .p-ellipsis-text{
     width: 100%;
     text-align: left;
 
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
 
     white-space: break-spaces;

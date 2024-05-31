@@ -12,9 +12,10 @@ namespace KnowledgeSharingApi.Controllers
     [CustomAuthorization(Roles: "User, Admin")]
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class ImagesController(IImageService imageService) : BaseController
+    public class ImagesController(IImageService imageService, IGoogleRecaptchaService googleRecaptchaService) : BaseController
     {
         protected readonly IImageService ImageService = imageService;
+        protected readonly IGoogleRecaptchaService GoogleRecaptchaService = googleRecaptchaService;
 
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace KnowledgeSharingApi.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadImage([FromForm] UploadImageModel model)
         {
+            await CheckRecaptchaToken(GoogleRecaptchaService);
             ServiceResult res = await ImageService.UploadImage(GetCurrentUserIdStrictly(), model);
             return StatusCode(res);
         }

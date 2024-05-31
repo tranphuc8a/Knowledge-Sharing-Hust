@@ -162,6 +162,7 @@ export default {
 
         async requiredLogin(){
             try {
+                let that = this;
                 let currentPath = this.router.currentRoute.path;
                 if (currentPath != null){
                     localStorage.setItem("redirect-to", currentPath);
@@ -171,6 +172,7 @@ export default {
                 let router = this.router;
                 this.inform("Bạn cần đăng nhập để thực hiện chức năng này!",
                     async function(){
+                        that.listPopup = [];
                         // window.location.href = homepage + "/login";
                         router.push("/login");
                     }

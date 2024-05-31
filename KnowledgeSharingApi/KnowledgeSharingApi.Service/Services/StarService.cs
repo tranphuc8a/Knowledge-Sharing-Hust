@@ -266,7 +266,7 @@ namespace KnowledgeSharingApi.Services.Services
                 {
                     // Entity:
                     CreatedBy = myUid.ToString(),
-                    CreatedTime = DateTime.Now,
+                    CreatedTime = DateTime.UtcNow,
                     // Star:
                     StarId = Guid.NewGuid(),
                     UserId = myUid,
@@ -280,10 +280,28 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 // Rồi: Update
                 star.Stars = scoreModel.Score ?? 0;
+                star.ModifiedTime = DateTime.UtcNow;
+                star.ModifiedBy = myUid.ToString();
                 await StarRepository.Update(star.StarId, star);
             }
 
             // Trả về thành công
+            return ServiceResult.Success(ResponseResource.Success());
+        }
+
+        public async Task<ServiceResult> UserDeleteScores(Guid myUid, Guid userItemId)
+        {
+            // Get ve Star
+            Star? stared = await StarRepository.GetStarOfUserAndUserItem(myUid, userItemId);
+
+            // Neu null, tra ve thanh cong luon
+            if (stared == null) return ServiceResult.Success(ResponseResource.Success());
+
+            // Neu khac null, thuc hien delete
+            int res = await StarRepository.Delete(stared.StarId);
+            if (res <= 0) return ServiceResult.ServerError(ResponseResource.ServerError());
+
+            // Tra ve thanh cong
             return ServiceResult.Success(ResponseResource.Success());
         }
     }

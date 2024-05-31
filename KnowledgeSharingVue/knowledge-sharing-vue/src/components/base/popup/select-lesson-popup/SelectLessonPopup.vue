@@ -6,7 +6,7 @@
             :isShowPreviousButton="false"
             :isShowCancelButton="true"
             :isShowOkayButton="true"
-            ::is-show-previous-button="true"
+            :is-show-previous-button="true"
             :isAutoHide="false"
             v-show="dIsShow"
         
@@ -16,6 +16,7 @@
             :on-previous="callbacks.onPrevious"
 
             header="Chọn bài giảng thêm vào khóa học"
+            description="Chọn bài giảng mà bạn muốn thêm vào khóa học. Bạn cũng có thể tạo bài giảng mới nếu cần."
             cancelButtonLabel="Thôi không chọn nữa"
             okayButtonLabel="Chốt lấy cái này"
             previousButtonLabel="Tạo bài giảng mới"
@@ -35,6 +36,16 @@
                         state="normal"
                     />
                 </span>
+                <span>
+                    <MActionIcon
+                        fa="rotate-left"
+                        :onclick="resolveClickReload"
+                        :containerStyle="{
+                            width: '36px',
+                            height: '36px'
+                        }"
+                    />
+                </span>
             </div>
             <div class="p-devide"></div>
             <div class="p-lpc-content" v-if="isCreated" ref="scroll-container"
@@ -46,8 +57,8 @@
 
                 <div class="p-lps-lesson-list">
                     <div class="p-lps-lesson-item p-radio-button"
-                        v-for="(lesson, index) in listLesson"
-                        :key="lesson?.UserItemId ?? index"
+                        v-for="lesson in listLesson"
+                        :key="lesson?.UserItemId"
                     >
                         <label>
                             <div class="p-lps-lesson-item-mask">
@@ -56,13 +67,32 @@
                                     <LessonShortCard :lesson="lesson" />
                                 </div>
                             </div>
-                            <input :name="data.group" :value="item.value" 
-                                @:change="resolveOnChange"
-                                v-model="data.value" type="radio" class="p-radio-button-org" />
+                            <input name="select-lesson-to-course" :value="lesson" 
+                                v-model="value" type="radio" class="p-radio-button-org" />
                         </label>
                     </div>
 
                     <!-- Skeleton -->
+                    <div class="p-lps-lesson-item p-radio-button" v-show="!isOutOfLesson">
+                        <label>
+                            <div class="p-lps-lesson-item-mask">
+                                <div class="p-radio-button-mask"> <div class="p-radio-button-dot"> </div> </div>
+                                <div class="p-lps-lesson-card">
+                                    <LessonShortCardSkeleton />
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="p-lps-lesson-item p-radio-button" v-show="!isOutOfLesson">
+                        <label>
+                            <div class="p-lps-lesson-item-mask">
+                                <div class="p-radio-button-mask"> <div class="p-radio-button-dot"> </div> </div>
+                                <div class="p-lps-lesson-card">
+                                    <LessonShortCardSkeleton />
+                                </div>
+                            </div>
+                        </label>
+                    </div>
                     <div class="p-lps-lesson-item p-radio-button" v-show="!isOutOfLesson">
                         <label>
                             <div class="p-lps-lesson-item-mask">
@@ -141,6 +171,7 @@ export default {
             this.dIsShow = true;
             if (!this.isCreated) {
                 this.isCreated = true;
+                this.loadMoreLesson();
             }
         },
         async hide(){
@@ -151,9 +182,10 @@ export default {
             try {
                 let scrollContainer = this.$refs['scroll-container'];
                 if (scrollContainer == null) return;
-                if (this.isOutOfLesson || this.isLoadingMore || !(this.isShow === true)){
+                if (this.isOutOfLesson || this.isLoadingMore || !(this.dIsShow === true)){
                     return;
                 }
+                console.log("scroll handle");
 
                 let scrollHeight = scrollContainer.scrollHeight;
                 let scrollTop = scrollContainer.scrollTop;
@@ -223,6 +255,17 @@ export default {
             }
         },
 
+        async resolveClickReload(){
+            try {
+                this.listLesson = [];
+                this.isOutOfLesson = false;
+                this.isCreated = true;
+                await this.loadMoreLesson();
+            } catch (e){
+                console.error(e);
+            }
+        },
+
         async resolveClickOkay(){
             try {
                 if (this.value == null) {
@@ -255,10 +298,12 @@ export default {
 .p-lesson-popup-content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
+    min-width: 50vw;
+    max-width: 100%;
     width: 100%;
-    height: 450px;
+    height: 600px;
     gap: 16px;
 }
 
@@ -266,7 +311,7 @@ export default {
     width: 100%;
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
 }
 
@@ -277,8 +322,8 @@ export default {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     gap: 16px;
 }
 
@@ -293,18 +338,39 @@ export default {
 .p-lps-lesson-list {
     width: 100%;
     display: flex;
-    flex-wrap: wrap;
+    flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 16px;
+    gap: 4px;
 }
 
 .p-lps-lesson-item {
-    width: calc((100% - 16px)/2);
+    width: 100%;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 16px;
+    gap: 4px;
+    cursor: initial;
+}
+
+
+
+.p-lps-lesson-item label {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    padding: 16px 12px;
+    padding-right: 16px;
+    border-radius: 8px;
+}
+
+.p-lps-lesson-item label:hover{
+    background-color: var(--primary-color-50);
+}
+
+.p-lps-lesson-item label:has(:checked){
+    background-color: var(--primary-color-100);
 }
 
 .p-lps-lesson-item-mask{
@@ -316,7 +382,8 @@ export default {
 }
 
 .p-lps-lesson-card {
-    width: fit-content;
+    width: 0;
+    flex-grow: 1;
     height: fit-content;
     max-width: 100%;
     max-height: 100%;

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MimeKit;
 using KnowledgeSharingApi.Domains.Models.Entities;
+using Org.BouncyCastle.Crypto.Engines;
 
 namespace KnowledgeSharingApi.Infrastructures.Emails
 {
@@ -34,7 +35,7 @@ namespace KnowledgeSharingApi.Infrastructures.Emails
         protected readonly MailAddress From;
 
         // Smtp Async
-        protected readonly MailKit.Net.Smtp.SmtpClient SmtpClientAsync;
+        //protected readonly MailKit.Net.Smtp.SmtpClient SmtpClientAsync;
         protected readonly MailboxAddress FromMailboxAddress;
         #endregion
 
@@ -60,9 +61,8 @@ namespace KnowledgeSharingApi.Infrastructures.Emails
 
             // For Smtp Async
             FromMailboxAddress = new(FromName, FromEmail);
-            SmtpClientAsync = new MailKit.Net.Smtp.SmtpClient();
-            SmtpClientAsync.Connect(HostAddress, HostPort, !isEnableSsl);
-            SmtpClientAsync.Authenticate(FromEmail, FromPassword);
+            //SmtpClientAsync = new MailKit.Net.Smtp.SmtpClient();
+
         }
 
         public virtual void Send(string toEmail, string subject, string content)
@@ -79,6 +79,12 @@ namespace KnowledgeSharingApi.Infrastructures.Emails
 
         public virtual async Task SendAsync(string toEmail, string subject, string content)
         {
+            var SmtpClientAsync = new MailKit.Net.Smtp.SmtpClient();
+            await SmtpClientAsync.ConnectAsync(HostAddress, HostPort, !isEnableSsl);
+            await SmtpClientAsync.AuthenticateAsync(FromEmail, FromPassword);
+            //SmtpClientAsync.Connect(HostAddress, HostPort, !isEnableSsl);
+            //SmtpClientAsync.Authenticate(FromEmail, FromPassword);
+
             MimeMessage message = new(
                 from: [FromMailboxAddress],
                 to: [new MailboxAddress(ReceiverName, toEmail)],
@@ -89,6 +95,7 @@ namespace KnowledgeSharingApi.Infrastructures.Emails
                 }
             );
             await SmtpClientAsync.SendAsync(message);
+            await SmtpClientAsync.DisconnectAsync(true);
         }
     }
 }

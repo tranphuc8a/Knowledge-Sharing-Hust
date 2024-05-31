@@ -99,7 +99,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     .ToListAsync();
 
                 var existingSet = new HashSet<string>(existingCatNames.Select(c => c.CategoryName));
-                var currentTime = DateTime.Now;
+                var currentTime = DateTime.UtcNow;
 
                 // Tìm ra những CategoryName mới và thêm chúng vào database
                 var newCategories = catNames.Except(existingSet).Select(cn => new Category
@@ -130,7 +130,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 int res = res1 + await DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return res;
+                return res + 1;
             }
             catch (Exception)
             {

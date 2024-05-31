@@ -236,9 +236,11 @@ namespace KnowledgeSharingApi.Services.Services
                 ?? throw new ValidatorException("Bạn chưa tham gia cuộc hội thoại này");
 
             // Update Last Delete
-            userConversation.LastDeleteTime = DateTime.Now;
+            userConversation.LastDeleteTime = DateTime.UtcNow;
             UserConversation toUpdate = new();
             toUpdate.Copy(userConversation);
+            toUpdate.ModifiedTime = DateTime.UtcNow;
+            toUpdate.ModifiedBy = myUid.ToString();
             int res = await UserConversationRepository.Update(userConversation.UserConversationId, toUpdate);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure());
 
@@ -268,7 +270,7 @@ namespace KnowledgeSharingApi.Services.Services
             }
 
             // Trả về thành công
-            conv.ModifiedTime = DateTime.Now;
+            conv.ModifiedTime = DateTime.UtcNow;
             conv.ModifiedBy = user.FullName;
             int res = await ConversationRepository.Update(conv.ConversationId, conv);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure(ConversationResource));
@@ -289,7 +291,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Update nick name
             participant.Nickname = updateModel.NickName;
-            participant.ModifiedTime = DateTime.Now;
+            participant.ModifiedTime = DateTime.UtcNow;
             participant.ModifiedBy = user.FullName;
             int res = await UserConversationRepository.Update(participant.UserConversationId, participant);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.UpdateFailure());
@@ -308,9 +310,11 @@ namespace KnowledgeSharingApi.Services.Services
                 ?? throw new ValidatorException("Bạn chưa tham gia cuộc hội thoại này");
 
             // Update Last Read
-            userConversation.LastReadTime = DateTime.Now;
+            userConversation.LastReadTime = DateTime.UtcNow;
             UserConversation toUpdate = new();
             toUpdate.Copy(userConversation);
+            toUpdate.ModifiedTime = DateTime.UtcNow;
+            toUpdate.ModifiedBy = myUid.ToString();
             int res = await UserConversationRepository.Update(userConversation.UserConversationId, toUpdate);
             if (res <= 0) return ServiceResult.ServerError(ResponseResource.Failure());
 
@@ -360,8 +364,8 @@ namespace KnowledgeSharingApi.Services.Services
                 MessageId = Guid.NewGuid(),
                 UserConversationId = participant.UserConversationId,
                 Content = model.Content!,
-                Time = DateTime.Now,
-                CreatedTime = DateTime.Now,
+                Time = DateTime.UtcNow,
+                CreatedTime = DateTime.UtcNow,
                 CreatedBy = profile.FullName,
                 IsEdited = false,
                 ReplyId = null
@@ -409,7 +413,7 @@ namespace KnowledgeSharingApi.Services.Services
             message1.Copy(message);
             message1.MessageId = message.MessageId;
             message1.Content = model.Content!;
-            message1.ModifiedTime = DateTime.Now;
+            message1.ModifiedTime = DateTime.UtcNow;
             message1.ModifiedBy = profile.FullName;
             message1.IsEdited = true;
             int rows = await MessageRepository.Update(message1.MessageId, message1);
@@ -445,8 +449,8 @@ namespace KnowledgeSharingApi.Services.Services
                 MessageId = Guid.NewGuid(),
                 UserConversationId = participant.UserConversationId,
                 Content = model.Content!,
-                Time = DateTime.Now,
-                CreatedTime = DateTime.Now,
+                Time = DateTime.UtcNow,
+                CreatedTime = DateTime.UtcNow,
                 CreatedBy = profile.FullName,
                 IsEdited = false,
                 ReplyId = message.MessageId

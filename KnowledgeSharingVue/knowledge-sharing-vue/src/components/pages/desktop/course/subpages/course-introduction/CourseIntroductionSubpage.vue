@@ -93,6 +93,10 @@ export default {
 
 <style scoped>
 
+.p-course-introduction-subpage{
+    padding-bottom: 32px;
+}
+
 .p-cis-content{
     width: 100%;
     display: flex;

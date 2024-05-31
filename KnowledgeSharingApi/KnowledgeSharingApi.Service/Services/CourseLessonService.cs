@@ -100,6 +100,10 @@ namespace KnowledgeSharingApi.Services.Services
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden(NotBeCourseOwner);
 
+            // Kiem tra danh sach khong duoc trong:
+            if (model.ListLessonModel == null || model.ListLessonModel.Count <= 0)
+                return ServiceResult.BadRequest("Danh sách bài giảng không được trống");
+
             // Kiem tra danh sach bai giang ton tai va la chu cua danh sach bai giang nay
             List<Lesson?> listLesson = await LessonRepository.Get(
                 model.ListLessonModel!.Select(lesson => lesson.LessonId ?? Guid.Empty).ToArray()
@@ -189,17 +193,21 @@ namespace KnowledgeSharingApi.Services.Services
             // Update
             courseLesson.LessonTitle = model.LessonTitle!;
             courseLesson.ModifiedBy = myUid.ToString();
-            courseLesson.ModifiedTime = DateTime.Now;
+            courseLesson.ModifiedTime = DateTime.UtcNow;
             int updated = await CourseLessonRepository.Update(courseLesson.CourseLessonId, courseLesson);
             if (updated <= 0)
                 return ServiceResult.ServerError(ResponseResource.UpdateFailure(ParticipantResource));
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.UpdateSuccess(ParticipantResource));
+            return ServiceResult.Success(ResponseResource.UpdateSuccess(ParticipantResource), string.Empty, updated);
         }
 
         public async Task<ServiceResult> UpdateListLessonInCourse(Guid myUid, List<UpdateLessonInCourseModel> model)
         {
+            // Kiem tra danh sach khong duoc trong:
+            if (model == null || model.Count <= 0)
+                return ServiceResult.BadRequest("Danh sách bài giảng không được trống");
+
             // Kiểm tra toàn bộ participant phải tồn tại và chung 1 khóa học
             List<CourseLesson?> listParticipants = await CourseLessonRepository
                 .Get(model.Select(part => part.ParticipantId ?? Guid.Empty).ToArray());
@@ -221,11 +229,15 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.ServerError(ResponseResource.UpdateMultiFailure(ParticipantResource));
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.UpdateMultiSuccess(ParticipantResource));
+            return ServiceResult.Success(ResponseResource.UpdateMultiSuccess(ParticipantResource), string.Empty, updated);
         }
 
         public async Task<ServiceResult> UpdateOffsetOfListLessonInCourse(Guid myUId, Guid[] listParticipantIds)
         {
+            // Kiem tra danh sach khong duoc trong:
+            if (listParticipantIds == null || listParticipantIds.Length <= 0)
+                return ServiceResult.BadRequest("Danh sách bài giảng không được trống");
+
             // Kiểm tra toàn bộ participant phải tồn tại và chung 1 khóa học
             List<CourseLesson?> listParticipants = await CourseLessonRepository.Get(listParticipantIds);
             if (listParticipants.Count == 0 || listParticipants.Any(p => p == null))
@@ -251,7 +263,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.ServerError(ResponseResource.UpdateMultiFailure(ParticipantResource));
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.UpdateMultiSuccess(ParticipantResource));
+            return ServiceResult.Success(ResponseResource.UpdateMultiSuccess(ParticipantResource), string.Empty, updated);
         }
 
         #endregion
@@ -283,7 +295,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Kiem tra khoa hoc ton tai
             Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
-            // Kiem tra role == user hoặc owner
+            // Kiem tra role == member hoặc owner
             ECourseRoleType role = await CourseRelationRepository.GetRole(myUid, course.UserItemId);
             if (role != ECourseRoleType.Owner && role != ECourseRoleType.Member)
                 return ServiceResult.Forbidden("Bạn không phải là thành viên của khóa học này");

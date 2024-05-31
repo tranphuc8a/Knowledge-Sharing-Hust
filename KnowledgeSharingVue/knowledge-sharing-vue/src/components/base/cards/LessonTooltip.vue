@@ -4,7 +4,7 @@
     <div class="p-lesson-tooltip">
         <div class="card">
             <div class="p-lt-thumbnail">
-                <RouterLink :to="dDetailLink">
+                <RouterLink :to="dDetailLink" class="router-link">
                     <div class="p-lt-thumbnail-image"
                         :style="{ backgroundImage: 'url(' + dThumbnail + ')' }"
                     >
@@ -13,16 +13,16 @@
                 </RouterLink>
             </div>
             <div class="p-lt-information">
-                <div class="p-lt-title">
-                    <RouterLink :to="dDetailLink">
+                <div class="p-lt-title card-subheading">
+                    <RouterLink :to="dDetailLink" class="router-link">
                         <EllipsisText :text="dLesson?.Title" :titleStyle="titleStyle" :max-line="1" />
                     </RouterLink>
                 </div>
                 <div class="p-lt-privacy">
-                    <VisualizedPrivacy :privacy="dLesson?.Privacy" />
+                    <VisualizedPrivacy :privacy="dLesson?.Privacy" :icon-style="{fontSize: '16px'}" />
                     {{ privacyText }}
                 </div>
-                <div class="p-lt-abstract">
+                <div class="p-lt-abstract" v-show="dLesson?.Abstract != null">
                     <EllipsisText :text="dLesson?.Abstract" :max-line="3" />
                 </div>
                 <div class="p-devide">
@@ -75,18 +75,15 @@ export default {
         return {
             dLesson: this.lesson,
             defaultLink: '/lesson/' + this.lesson?.UserItemId,
-            dDetailLink: null,
-            defaultThumbnail: '/images/default-thumbnail.png',
+            dDetailLink: '',
+            defaultThumbnail: require('@/assets/default-thumbnail/lesson-image-icon.png'),
             dThumbnail: null,
-            titleStyle: {
-                fontSize: '1.2rem',
-                fontWeight: 'bold',
-                color: 'var(--primary-color)',
-            },
+            titleStyle: {},
             privacyText: null,
         }
     },
     async mounted(){
+        this.refreshLesson();
     },
     methods: {
         async refreshLesson(){
@@ -119,7 +116,10 @@ export default {
 <style scoped>
 
 .p-lesson-tooltip{
+    min-width: 350px;
     width: 100%;
+    cursor: pointer;
+    font-size: initial;
 }
 
 .p-lesson-tooltip .card{
@@ -137,6 +137,12 @@ export default {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
     cursor: pointer;
+}
+
+.p-lt-thumbnail > a{
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .p-lt-thumbnail-image{
@@ -168,12 +174,14 @@ export default {
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    gap: 16px;
+    gap: 8px;
 }
 
 .p-lt-title{
-    width: 100%;
+    max-width: 100%;
+    width: fit-content;
     cursor: pointer;
+    text-align: left;
 }
 
 .p-lt-privacy{
@@ -181,13 +189,16 @@ export default {
     display: flex;
     gap: 8px;
     align-items: center;
+    font-size: 14.5px;
     justify-content: flex-start;
     color: var(--grey-color-600);
-    font-family: 'ks-font-semibold';
 }
 
 .p-lt-abstract{
-    width: 100%;
+    max-width: 100%;
+    width: fit-content;
+    font-size: 14px;
+    font-family: 'ks-font-regular';
 }
 
 .p-lt-actions{
@@ -201,6 +212,7 @@ export default {
 
 .p-lt-stars{
     width: fit-content;
+    font-size: 14px;
 }
 
 .p-lt-savebutton{

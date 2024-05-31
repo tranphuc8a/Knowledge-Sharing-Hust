@@ -42,7 +42,7 @@ export default {
 
 .p-course-lesson-card{
     max-width: 100%;
-    width: fit-content;
+    width: 100%;
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -67,7 +67,7 @@ export default {
 }
 
 .p-clc-content{
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
 }
 

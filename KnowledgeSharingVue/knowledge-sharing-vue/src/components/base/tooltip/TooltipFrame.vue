@@ -84,8 +84,9 @@ export default {
          * @Modified None
         */
         async verticalAlign(that, style){
-            const toolTipRect = that.$refs['tooltip-content'].getBoundingClientRect();
-            const maskRect = that.$refs['tooltip-mask'].getBoundingClientRect();
+            const toolTipRect = that.$refs['tooltip-content']?.getBoundingClientRect?.();
+            const maskRect = that.$refs['tooltip-mask']?.getBoundingClientRect?.();
+            if (toolTipRect == null || maskRect == null) return;
             
             if (that.position == that.tooltipPosition.top) {
                 style.bottom = `${that.padding_vertical + maskRect.height}px`;
@@ -112,8 +113,9 @@ export default {
          * @Modified None
          */
         async horizontalAlign(that, style){
-            const toolTipRect = that.$refs['tooltip-content'].getBoundingClientRect();
-            const maskRect = that.$refs['tooltip-mask'].getBoundingClientRect();
+            const toolTipRect = that.$refs['tooltip-content']?.getBoundingClientRect?.();
+            const maskRect = that.$refs['tooltip-mask']?.getBoundingClientRect?.();
+            if (toolTipRect == null || maskRect == null) return;
             
             // align tooltip follow horizontally
             const minLeftContent = maskRect.left + maskRect.width/2 - toolTipRect.width/2;
@@ -150,12 +152,16 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .p-tooltip-mask {
     cursor: pointer;
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .p-tooltip-content {

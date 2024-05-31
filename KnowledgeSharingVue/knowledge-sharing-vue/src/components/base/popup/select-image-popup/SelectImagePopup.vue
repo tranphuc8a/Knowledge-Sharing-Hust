@@ -131,12 +131,12 @@ export default {
                 }
                 await this.onOkay(result);
             } else if (this.tabIndex === this.tabEnum.Upload){
-                result = await this.$refs.uploadImageContent.getSelectedImage();
-                if (result == null){
+                let { image, captcha } = await this.$refs.uploadImageContent.getSelectedImage();
+                if (image == null){
                     await this.resolveImageInvalid();
                     return;
                 }
-                let imageUrl = await this.resolveUploadImage(result);
+                let imageUrl = await this.resolveUploadImage(image, captcha);
                 if (imageUrl == null){
                     await this.resolveImageInvalid();
                     return;
@@ -147,15 +147,16 @@ export default {
 
         async resolveImageInvalid(){
             try {
-                this.getToastManager().error('Ảnh không hợp lệ');
+                this.getToastManager().error('Upload ảnh không thành công. Vui lòng thử lại.');
             } catch (error){
                 console.error(error);
             }
         },
 
-        async resolveUploadImage(image){
+        async resolveUploadImage(image, recaptchaToken){
             try {
                 let res = await new PostRequest('Images')
+                    .setRecaptchaResponseToken(recaptchaToken)
                     .prepareFormData()
                     .addFormData('Image', image)
                     .execute();
@@ -165,6 +166,7 @@ export default {
                 return imageUrl;
             } catch (error){
                 Request.resolveAxiosError(error);
+                return null;
             }
         }
     },

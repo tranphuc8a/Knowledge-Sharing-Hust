@@ -18,7 +18,7 @@
 
 
 <script>
-
+import CurrentUser from '@/js/models/entities/current-user';
 import HomeNavigationItem from '../components/home-navigation/HomeNavigationItem.vue';
 import HomeNavigationUser from '../components/home-navigation/HomeNavigationUser.vue';
 
@@ -26,51 +26,36 @@ export default {
     name: 'HomeNavigationSubpage',
     data() {
         return {
-            items: [
-                {
-                    fa: 'home',
-                    label: 'Trang chủ',
-                    destination: '/'
-                },
-                {
-                    fa: 'book-reader',
-                    label: 'Đang học',
-                    destination: '/learning'
-                },
-                {
-                    fa: 'layer-group',
-                    label: 'Khóa học của tôi',
-                    destination: '/my-courses'
-                },
-                {
-                    fa: 'book-open',
-                    label: 'Bài giảng của tôi',
-                    destination: '/my-lessons'
-                },
-                {
-                    fa: 'comments',
-                    label: 'Bài thảo luận của tôi',
-                    destination: '/my-questions'
-                },
-                {
-                    fa: 'user-friends',
-                    label: 'Bạn bè',
-                    destination: '/friends'
-                },
-                {
-                    fa: 'bookmark',
-                    label: 'Đã lưu',
-                    destination: '/bookmarks'
-                }
-            ]
+            items: [],
+            currentUser: null,
         }
     },
     methods: {
         goBack() {
             this.$router.go(-1)
+        },
+        
+        async initItems(){
+            let currentUser = await CurrentUser.getInstance();
+            let username = currentUser?.Username;
+            let postfix = '/profile/' + String(username);
+            let fa = ['home', 'book-reader', 'layer-group', 'book-open', 'comments', 'user-friends', 'bookmark'];
+            let label = ['Trang chủ', 'Đang học', 'Khóa học của tôi', 'Bài giảng của tôi', 'Bài thảo luận của tôi', 'Bạn bè', 'Đã lưu'];
+            let destination = ['/', postfix + '/learn', postfix + '/course', 
+                                postfix + '/lesson', postfix + '/question', 
+                                postfix + '/friend', postfix + '/save'];
+            this.items = [];
+            for (let i = 0; i < fa.length; i++) {
+                this.items.push({
+                    fa: fa[i],
+                    label: label[i],
+                    destination: destination[i]
+                });
+            }
         }
     },
     mounted() {
+        this.initItems();
     },
     components: {
         HomeNavigationItem, HomeNavigationUser

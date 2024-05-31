@@ -35,8 +35,8 @@ namespace KnowledgeSharingApi.Services.Services
         //            {
         //                UserConversationId = messageFromClient.UserConversationId,
         //                Content = messageFromClient.Content,
-        //                Time = DateTime.Now,
-        //                CreatedTime = DateTime.Now,
+        //                Time = DateTime.UtcNow,
+        //                CreatedTime = DateTime.UtcNow,
         //                CreatedBy = socket.Username,
         //                IsEdited = false,
         //                ReplyId = messageFromClient.ReplyId

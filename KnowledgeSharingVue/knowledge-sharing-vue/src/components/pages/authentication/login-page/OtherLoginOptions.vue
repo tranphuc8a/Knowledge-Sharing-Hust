@@ -51,8 +51,8 @@ export default {
                 const response_type = 'token';
                 const state = 'knowledgesharinghusttoken22042001';
                 const url = `${googleOAuthUrl}?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}&state=${state}`;
-                // window.location.href = url;
-                this.router.push(url);
+                window.location.href = url;
+                // this.router.push(url);
             } catch (error) {
                 console.error(error);
             }
@@ -77,8 +77,8 @@ export default {
                 const response_type = 'token';
                 const state = 'knowledgesharinghusttoken22042001';
                 const url = `${googleOAuthUrl}?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}&state=${state}`;
-                // window.location.href = url;
-                this.router.push(url);
+                window.location.href = url;
+                // this.router.push(url);
             } catch (error) {
                 console.error(error);
             }
@@ -102,8 +102,8 @@ export default {
                 const response_type = 'token';
                 const state = 'knowledgesharinghusttoken22042001';
                 const url = `${googleOAuthUrl}?client_id=${client_id}&redirect_uri=${redirect_uri}&scope=${scope}&response_type=${response_type}&state=${state}`;
-                // window.location.href = url;
-                this.router.push(url);
+                window.location.href = url;
+                // this.router.push(url);
             } catch (error) {
                 console.error(error);
             }

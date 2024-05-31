@@ -120,6 +120,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
             T? item = await GetDbSet().FindAsync(id);
             if (item == null) return 0;
             entity.UserItemId = id;
+            entity.ModifiedTime = DateTime.UtcNow;
             item.Copy(entity);
             return await DbContext.SaveChangesAsync();
         }

@@ -14,7 +14,7 @@
 
 
 <script>
-
+import CurrentUser from '@/js/models/entities/current-user';
 import { useRouter } from 'vue-router';
 
 export default {
@@ -42,20 +42,31 @@ export default {
             iconStyle: {
                 width: '24px',
                 height: '24px'
-            }
+            },
+            currentUser: null
         }
     },
-    mounted(){
-
+    async mounted(){
+        this.currentUser = await CurrentUser.getInstance();
     },
     methods: {
         async resolveClickItem(){
             try {
+                this.currentUser = await CurrentUser.getInstance();
+                if (this.currentUser == null){
+                    this.getPopupManager().requiredLogin();
+                    return;
+                }
                 this.router.push(this.destination);
             } catch (e) {
                 console.error(e);
             }
         }
+    },
+    inject: {
+        getLanguage: {},
+        getToastManager: {},
+        getPopupManager: {}
     }
 }
 

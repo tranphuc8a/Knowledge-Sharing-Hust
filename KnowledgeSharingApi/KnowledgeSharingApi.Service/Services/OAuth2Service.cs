@@ -102,7 +102,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (int.TryParse(Configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays))
             {
                 // Insert new Session
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 Session session = new()
                 {
                     SessionId = sessionId,
@@ -179,7 +179,7 @@ namespace KnowledgeSharingApi.Services.Services
             User user = new()
             {
                 CreatedBy = model.Username!,
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 UserId = Guid.NewGuid(),
                 Email = model.Email!,
                 Username = model.Username!,

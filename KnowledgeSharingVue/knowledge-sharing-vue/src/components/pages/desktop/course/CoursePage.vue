@@ -162,7 +162,7 @@ export default {
         async isMyCourse(){
             let currentUser = await CurrentUser.getInstance();
             if (currentUser?.UserId != null){
-                return currentUser.UserId === this.course?.UserId;
+                return currentUser.UserId == this.course?.UserId;
             }
             return false;
         },

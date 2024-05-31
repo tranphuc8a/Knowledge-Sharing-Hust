@@ -72,6 +72,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 ?? throw new Exception("Question not found.");
 
             updatedQuestion.UserItemId = questionId;
+            updatedQuestion.ModifiedTime = DateTime.UtcNow;
 
             DbContext.Entry(questionToUpdate).CurrentValues.SetValues(updatedQuestion);
 

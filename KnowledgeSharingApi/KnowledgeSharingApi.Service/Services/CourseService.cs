@@ -112,7 +112,7 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 // Entity:
                 CreatedBy = user.FullName,
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 // UserItem:
                 UserId = user.UserId,
                 UserItemId = Guid.NewGuid(),
@@ -300,6 +300,8 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Update privacy 
             course.Privacy = model.Privacy!.Value;
+            course.ModifiedBy = myUid.ToString();
+            course.ModifiedTime = DateTime.UtcNow;
             await CourseRepository.Update(course.UserId, course);
 
             // Trả về thành công
@@ -370,6 +372,8 @@ namespace KnowledgeSharingApi.Services.Services
             Course courseToUpdate = new();
             courseToUpdate.Copy(course);
             courseToUpdate.Copy(model);
+            courseToUpdate.ModifiedTime = DateTime.UtcNow;
+            courseToUpdate.ModifiedBy = myUid.ToString();
             if (thumbnail != null) courseToUpdate.Thumbnail = thumbnail;
             int effects1 = await CourseRepository.Update(courseId, courseToUpdate);
             int effects2 = 0;

@@ -137,7 +137,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Insert Entity
             entity.CreatedBy = AuthorName;
-            entity.CreatedTime = DateTime.Now;
+            entity.CreatedTime = DateTime.UtcNow;
             Guid? insertedId = await repository.Insert(entity);
             if (insertedId == null)
             {
@@ -165,7 +165,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Update entity infor
             entity.ModifiedBy = ModifierName;
-            entity.ModifiedTime = DateTime.Now;
+            entity.ModifiedTime = DateTime.UtcNow;
             int res = await repository.Update(id, entity);
             if (res > 0)
             {

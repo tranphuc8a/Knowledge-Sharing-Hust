@@ -38,8 +38,11 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public virtual async Task<int> UpdatePassword(string username, string newPassword)
         {
             string hashPassword = encrypt.Sha256HashPassword(username, newPassword);
-            string sqlCommand = "update User set HashPassword = @hashPassword where Username = @username;";
-            int res = await Connection.ExecuteAsync(sqlCommand, new { username, hashPassword }, Transaction);
+            DateTime currentTime = DateTime.UtcNow;
+            string modifiedBy = username;
+            string sqlCommand = "update User set HashPassword = @hashPassword, ModifiedTime = @currentTime, ModifiedBy = @modifiedBy " +
+                                "where Username = @username;";
+            int res = await Connection.ExecuteAsync(sqlCommand, new { username, hashPassword, currentTime, modifiedBy }, Transaction);
             return res;
         }
 
@@ -156,7 +159,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 Profile profile = new()
                 {
                     CreatedBy = fullName,
-                    CreatedTime = DateTime.Now,
+                    CreatedTime = DateTime.UtcNow,
                     ProfileId = Guid.NewGuid(),
                     UserId = userId,
                     FullName = fullName,

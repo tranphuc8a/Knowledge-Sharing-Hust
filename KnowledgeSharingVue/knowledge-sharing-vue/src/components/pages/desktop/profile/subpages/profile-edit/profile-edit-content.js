@@ -29,7 +29,8 @@ export default {
                 for (let key of this.keys){
                     let value = await this.components[key].getValue?.();
                     if (value != null && key == "Grade"){
-                        value = String(value);
+                        if (isNaN(value)) value = '';
+                        else value = String(value);
                     }
                     result[key] = value;
                 }

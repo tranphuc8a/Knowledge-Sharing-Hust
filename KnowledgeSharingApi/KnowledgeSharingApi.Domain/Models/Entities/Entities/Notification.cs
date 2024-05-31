@@ -17,7 +17,7 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
         public string ReferenceLink { get; set; } = string.Empty;
-        public DateTime Time { get; set; } = DateTime.Now;
+        public DateTime Time { get; set; } = DateTime.UtcNow;
         public bool IsRead { get; set; } = false;
 
         protected override Notification Init()

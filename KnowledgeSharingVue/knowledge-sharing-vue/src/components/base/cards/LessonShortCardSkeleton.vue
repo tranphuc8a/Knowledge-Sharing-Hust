@@ -54,13 +54,13 @@ export default {
 <style scoped>
 
 .p-lesson-short-card{
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
 }
 
 .p-lesson-short-card > .card{
     height: 120px;
-    width: fit-content;
+    width: 100%;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
@@ -106,8 +106,8 @@ export default {
 }
 
 .p-lsc-information{
-    min-width: 400px;
-    width: fit-content;
+    min-width: 300px;
+    width: 100%;
     max-width: calc(100% - 200px);
     height: 100%;
     padding: 16px;
@@ -125,6 +125,14 @@ export default {
     flex-flow: column nowrap;
     justify-content: space-between;
     align-items: stretch;
+}
+
+.p-lsc-infor__left > *{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
 }
 
 .p-lsc-lesson-title{

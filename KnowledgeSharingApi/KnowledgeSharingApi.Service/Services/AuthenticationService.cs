@@ -83,7 +83,7 @@ namespace KnowledgeSharingApi.Services.Services
                 cacheModel = new CheckLoginAttackCacheDto()
                 {
                     Username = username,
-                    LastAccessTime = DateTime.Now,
+                    LastAccessTime = DateTime.UtcNow,
                     NumberFailedAttempt = 0
                 };
                 CacheSet(cacheModel);
@@ -92,11 +92,11 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 // Kiểm tra Yêu cầu đăng nhập sai quá nhiều lần trong khoảng thời gian ngắn hơn Threshold
                 bool isFasterThanTimeThreshold =
-                     cacheModel.LastAccessTime.AddMinutes(TimeThresholdOnMinutes) >= DateTime.Now;
+                     cacheModel.LastAccessTime.AddMinutes(TimeThresholdOnMinutes) >= DateTime.UtcNow;
                 bool isOverMaxFailedAccess = cacheModel.NumberFailedAttempt >= MaxFailedLoginAttempts;
 
                 // Cập nhật lại lần đăng nhập cuối
-                cacheModel.LastAccessTime = DateTime.Now;
+                cacheModel.LastAccessTime = DateTime.UtcNow;
                 CacheSet(cacheModel);
 
                 if (isFasterThanTimeThreshold && isOverMaxFailedAccess)
@@ -139,7 +139,7 @@ namespace KnowledgeSharingApi.Services.Services
                 // Cập nhật lại Check login model trong Cache, đảm bảo đã có trong Cache
                 CheckLoginAttackCacheDto checkLogin = CacheGet(user.Username)!;
                 checkLogin.NumberFailedAttempt++;
-                checkLogin.LastAccessTime = DateTime.Now;
+                checkLogin.LastAccessTime = DateTime.UtcNow;
                 CacheSet(checkLogin);
 
                 return loginFailed;
@@ -180,7 +180,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Step 3. Cập nhật lần cuối đăng nhập
             CheckLoginAttackCacheDto checkLogin = CacheGet(user.Username)!;
-            checkLogin.LastAccessTime = DateTime.Now;
+            checkLogin.LastAccessTime = DateTime.UtcNow;
             CacheSet(checkLogin);
 
             // Step 4. Kiểm tra password hợp lệ
@@ -221,7 +221,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Step 2. Kiểm tra Refresh token khớp và còn thời hạn
             Session? session = await sessionRepository.Get(jwtTokenDto.SessionId);
-            if (session == null || session.RefreshToken != tokenModel.RefreshToken || session.Expired <= DateTime.Now)
+            if (session == null || session.RefreshToken != tokenModel.RefreshToken || session.Expired <= DateTime.UtcNow)
                 return invalidToken;
         
             // Refresh token hợp lệ, sinh refresh token mới
@@ -232,7 +232,9 @@ namespace KnowledgeSharingApi.Services.Services
             {
                 // Cập nhật refresh token vào db
                 session.RefreshToken = newRefreshToken;
-                session.Expired = DateTime.Now.AddDays(refreshTokenValidityInDays);
+                session.Expired = DateTime.UtcNow.AddDays(refreshTokenValidityInDays);
+                session.ModifiedTime = DateTime.UtcNow;
+                session.ModifiedBy = jwtTokenDto.Username;
                 int rows = await sessionRepository.Update(session.SessionId, session);
 
                 // Lỗi không thêm được vào db
@@ -320,7 +322,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (int.TryParse(configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays))
             {
                 // Insert new Session
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.UtcNow;
                 Session session = new()
                 {
                     SessionId = sessionId,

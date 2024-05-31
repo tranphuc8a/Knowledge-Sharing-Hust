@@ -2,7 +2,7 @@
     <div class="p-tooltip-user-info card">
 
         <div class="p-tui-cover">
-            <router-link :to="userDetailLink">
+            <router-link :to="userDetailLink" class="router-link">
                 <div class="p-tui-cover-image"
                     :style="{ backgroundImage: `url(${coverImage})` }"
                 >

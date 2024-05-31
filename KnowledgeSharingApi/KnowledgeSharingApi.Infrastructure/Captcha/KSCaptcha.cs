@@ -18,7 +18,7 @@ namespace KnowledgeSharingApi.Infrastructures.Captcha
         private const int Width = 170;
         private const int Height = 50;
         readonly IEncrypt JwtService = jwtService;
-        readonly Random random = new(DateTime.Now.Second);
+        readonly Random random = new(DateTime.UtcNow.Second);
         readonly string CAPTCHA_KEY = "Captcha";
         readonly string EXPIRED_KEY = "Expired";
 
@@ -48,7 +48,7 @@ namespace KnowledgeSharingApi.Infrastructures.Captcha
             bool isDateTime = DateTime.TryParse(expired.Value, out DateTime dateTime);
             if (isDateTime)
             {
-                if (dateTime < DateTime.Now) return null;
+                if (dateTime < DateTime.UtcNow) return null;
 
                 // Step 4. Lấy ra trường CAPTCHA
                 Claim? captcha = listClaims.FirstOrDefault(claim => claim.Type == CAPTCHA_KEY);
@@ -73,7 +73,7 @@ namespace KnowledgeSharingApi.Infrastructures.Captcha
         {
             List<Claim> claims = [
                 new Claim(CAPTCHA_KEY, captcha),
-                new Claim(EXPIRED_KEY, DateTime.Now.AddMinutes(expiredInMinutes).ToString())
+                new Claim(EXPIRED_KEY, DateTime.UtcNow.AddMinutes(expiredInMinutes).ToString())
             ];
             return JwtService.JwtEncrypt(claims);
         }

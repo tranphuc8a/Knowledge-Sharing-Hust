@@ -58,7 +58,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             {
                 // Entity:
                 CreatedBy = user.FullName,
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 // CourseRegister:
                 CourseRegisterId = Guid.NewGuid(),
                 UserId = user.UserId,
@@ -80,7 +80,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             {
                 // Entity:
                 CreatedBy = user.FullName,
-                CreatedTime = DateTime.Now,
+                CreatedTime = DateTime.UtcNow,
                 // CoursePayment:
                 CoursePaymentId = Guid.NewGuid(),
                 UserId = user.UserId,

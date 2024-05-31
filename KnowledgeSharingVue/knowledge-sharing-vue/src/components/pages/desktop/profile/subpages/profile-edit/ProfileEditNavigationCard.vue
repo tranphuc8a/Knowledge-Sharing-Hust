@@ -60,15 +60,12 @@ export default {
     },
     props: {
         onChangeTab: {
-            type: Function,
             required: true,
         },
         onSave: {
-            type: Function,
             required: true,
         },
         tabIndex: {
-            type: String,
             required: true,
         },
     },

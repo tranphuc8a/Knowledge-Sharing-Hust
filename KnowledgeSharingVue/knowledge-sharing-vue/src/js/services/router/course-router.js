@@ -98,8 +98,23 @@ export default [
                 component: CourseEditSubpage,
             },
             {
+                path: 'course-edit',
+                name: 'course-edit-page-2',
+                component: CourseEditSubpage,
+            },
+            {
                 path: 'lesson-edit',
                 name: 'course-lesson-edit-page',
+                component: CourseUpdateSubpage,
+            },
+            {
+                path: 'update',
+                name: 'course-lesson-edit-page-2',
+                component: CourseUpdateSubpage,
+            },
+            {
+                path: 'course-update',
+                name: 'course-lesson-edit-page-3',
                 component: CourseUpdateSubpage,
             }
         ]

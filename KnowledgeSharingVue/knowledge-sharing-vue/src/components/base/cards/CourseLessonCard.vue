@@ -5,11 +5,11 @@
     
     <div class="p-course-lesson-card" v-if="isLoaded">
         <div class="p-clc-header">
-            <div class="p-clc-offset">
-                {{ offsetText }}
+            <div class="p-clc-offset card-subheading">
+                <EllipsisText :text="offsetText" :max-line="1" />
             </div>
             <div class="p-clc-button">
-                <router-link :to="detailLink">
+                <router-link :to="detailLink" class="router-link">
                     <MEmbeddedButton 
                         label="Xem bài giảng"
                     />
@@ -18,7 +18,9 @@
         </div>
         <div class="p-clc-content">
             <LessonShortCard :lesson="dCourseLesson.Lesson" :detail-link="detailLink" > 
-                <CourseLessonMenuContext />
+                <template #lessonMenuContext>
+                    <CourseLessonMenuContext v-if="isShowMenuContext" />
+                </template>
             </LessonShortCard>
         </div>
     </div>
@@ -32,6 +34,7 @@ import ResponseCourseLessonModel from '@/js/models/api-response-models/response-
 import MEmbeddedButton from './../buttons/MEmbeddedButton.vue'
 import CourseLessonMenuContext from './CourseLessonMenuContext.vue'
 import CourseLessonCardSkeleton from './CourseLessonCardSkeleton.vue';
+import EllipsisText from '../text/EllipsisText.vue';
 
 export default {
     name: 'CourseLessonCard',
@@ -39,12 +42,16 @@ export default {
         LessonShortCard,
         CourseLessonMenuContext,
         MEmbeddedButton,
+        EllipsisText,
         CourseLessonCardSkeleton,
     },
     props: {
         responseCourseLessonModel: {
             required: true,
         },
+        isShowMenuContext: {
+            default: true,
+        }
     },
     watch: {
         responseCourseLessonModel(){
@@ -56,10 +63,11 @@ export default {
             dCourseLesson: null,
             offsetText: null,
             isLoaded: false,
-            detailLink: null,
+            detailLink: '',
         }
     },
     async mounted(){
+        this.refreshCourseLesson();
     },
     methods: {
         refreshCourseLesson(){
@@ -67,7 +75,7 @@ export default {
                 if (this.responseCourseLessonModel == null) return;
                 this.dCourseLesson = new ResponseCourseLessonModel().copy(this.responseCourseLessonModel);
                 this.isLoaded = true;
-                this.offsetText = `Bài ${this.dCourseLesson.Offset}`;
+                this.offsetText = `Bài ${this.dCourseLesson.Offset}. ${this.dCourseLesson.LessonTitle}`;
                 let courseId = this.dCourseLesson.CourseId;
                 this.detailLink = `/course-lesson/` + courseId + `/` + this.dCourseLesson.Offset;
             } catch (error) {
@@ -76,8 +84,6 @@ export default {
         }
     },
     inject: {
-        getIsMySelf: {},
-        getUser: {},
     },
     provide(){
         return {
@@ -93,7 +99,7 @@ export default {
 
 .p-course-lesson-card{
     max-width: 100%;
-    width: fit-content;
+    width: 100%;
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
@@ -118,8 +124,19 @@ export default {
 }
 
 .p-clc-content{
+    width: 100%;
+    max-width: 100%;
+}
+
+.p-clc-offset{
+    max-width: 100%;
+}
+
+.p-clc-button{
     width: fit-content;
     max-width: 100%;
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 </style>

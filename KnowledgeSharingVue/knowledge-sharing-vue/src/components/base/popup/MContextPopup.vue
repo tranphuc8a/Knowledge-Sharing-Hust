@@ -166,12 +166,16 @@
     position: relative;
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .p-popup-context-mask {
     cursor: pointer;
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .p-popup-context-content {

@@ -205,6 +205,21 @@ namespace KnowledgeSharingApi.Controllers
             return StatusCode(res);
         }
 
+        /// <summary>
+        /// Yêu cầu xoa đánh giá sao cho một item của user
+        /// </summary>
+        /// <param name="userItemId"> id cua item can xoa </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/5/24)
+        /// Modified: None
+        [HttpDelete("{userItemId}")]
+        [CustomAuthorization(Roles: "User, Admin")]
+        public virtual async Task<IActionResult> DeleteStarAnUserItem(Guid userItemId)
+        {
+            ServiceResult res = await StarService.UserDeleteScores(GetCurrentUserIdStrictly(), userItemId);
+            return StatusCode(res);
+        }
+
         #endregion
     }
 }
