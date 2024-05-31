@@ -2,7 +2,7 @@
 
 <template>
     <div class="p-search-course-by-category-content">
-        <CourseSubpage :get-course="getCourseCallback" />
+        <CourseSubpage :get-course="getCourseCallback" :rowCount="2" />
     </div>
 </template>
 
@@ -24,29 +24,29 @@ export default {
     data(){
         return {
             getCourseCallback: null,
-            searchKey: '',
+            category: '',
         }
     },
     async mounted(){
     },
     methods: {
-        async resolveChangeSearchKey(){
+        async resolveChangeCategory(){
             try {
-                this.searchKey = this.$route.query.search;
+                this.category = this.$route.query.category;
                 this.getCourseCallback = async function(limit, offset){
                     // preapre request
-                    // have: limit, offset, searchKey
-                    if (Validator.isEmpty(this.searchKey)) return {
+                    // have: limit, offset, category
+                    if (Validator.isEmpty(this.category)) return {
                         Body: [],
                     }
-                    let url = 'Categories/courses/' + this.searchKey;
+                    let url = 'Categories/courses/' + this.category;
                     let currentUser = await this.getCurrentUser();
                     if (currentUser == null){
-                        url = 'Categories/anonymous/courses/' + this.searchKey;
+                        url = 'Categories/anonymous/courses/' + this.category;
                     }
 
                     // call request
-                    let res = await new Request(url)
+                    let res = await new GetRequest(url)
                         .setParams({ limit: limit, offset: offset })
                         .execute();
                     return res;
@@ -57,8 +57,8 @@ export default {
         },
     },
     watch: {
-        '$route.query.search': {
-            handler: 'resolveChangeSearchKey',
+        '$route.query.category': {
+            handler: 'resolveChangeCategory',
             immediate: true,
         },
     },

@@ -1,16 +1,15 @@
 
 
 <template>
-    <div class="p-search-course-by-text-content">
-        <CourseSubpage :get-course="getCourseCallback" :rowCount="2" />
+    <div class="p-profile-mark-course-content">
+        <CourseSubpage :get-course="getCourseCallback" :rowCount="3" />
     </div>
 </template>
 
 
 
 <script>
-import CourseSubpage from '../../components/course-subpage/CourseSubpage.vue';
-import { Validator } from '@/js/utils/validator';
+import CourseSubpage from '@/components/pages/desktop/home/components/course-subpage/CourseSubpage.vue';
 import { GetRequest } from '@/js/services/request';
 
 
@@ -24,25 +23,21 @@ export default {
     data(){
         return {
             getCourseCallback: null,
-            searchKey: '',
         }
     },
     async mounted(){
+        await this.initContent();
     },
     methods: {
-        async resolveChangeSearchKey(){
+        async initContent(){
             try {
-                this.searchKey = this.$route.query.search;
                 this.getCourseCallback = async function(limit, offset){
                     // preapre request
-                    // have: limit, offset, searchKey
-                    if (Validator.isEmpty(this.searchKey)) return {
-                        Body: [],
-                    }
+                    // have: limit, offset
 
                     // call request
-                    let res = await new GetRequest('Courses/search')
-                        .setParams({search: this.searchKey, limit: limit, offset: offset})
+                    let res = await new GetRequest('Marks/my/courses')
+                        .setParams({ limit: limit, offset: offset})
                         .execute();
                     return res;
                 }.bind(this);
@@ -52,10 +47,6 @@ export default {
         },
     },
     watch: {
-        '$route.query.search': {
-            handler: 'resolveChangeSearchKey',
-            immediate: true,
-        },
     },
     inject: {
     },
@@ -69,7 +60,7 @@ export default {
 
 <style scoped>
 
-.p-search-course-by-text-content{
+.p-profile-mark-course-content{
     width: 100%;
     max-width: 100%;
     display: flex;

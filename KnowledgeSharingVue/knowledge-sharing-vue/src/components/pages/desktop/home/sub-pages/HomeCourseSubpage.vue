@@ -4,6 +4,7 @@
     <div class="p-home-course-subpage">
         <CourseSubpage 
                 :get-course="getCourse"
+                :rowCount="2"
             >
                 <template #addcourse>
                     <AddCourseFeedCard />
