@@ -30,7 +30,7 @@
 .d-content-subpage__left_content,
 .d-content-subpage__right_content{
     position: sticky;
-    overflow: auto;
+    overflow: visible;
     top: 0;
 }
 
