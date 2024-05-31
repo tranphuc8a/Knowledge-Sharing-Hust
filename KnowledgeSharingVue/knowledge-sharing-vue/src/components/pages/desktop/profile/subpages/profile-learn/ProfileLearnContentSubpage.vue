@@ -22,6 +22,10 @@
                 v-model:pageSize="pageSize"
                 :total="total" />
         </div>
+
+        <div class="p-feed-notfound" v-show="!(listCourses.length > 0)">
+            <NotFoundPanel text="Không tìm thấy mục nào" />
+        </div>
         
         <div class="p-plcs-list-course">
             <transition :name="transitionName">
@@ -51,13 +55,14 @@
 import CourseRegisteredCardSkeleton from '../../../course/components/course-card/CourseRegisteredCardSkeleton.vue';
 import CourseRegisteredCard from '../../../course/components/course-card/CourseRegisteredCard.vue';
 import { MyRandom } from '@/js/utils/myrandom';
-
+import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 
 export default {
     name: 'ProfileLearnContentSubpage',
     components: {
         CourseRegisteredCard,
-        CourseRegisteredCardSkeleton
+        CourseRegisteredCardSkeleton,
+        NotFoundPanel
     },
     props: {
         listCourses: {
@@ -140,6 +145,16 @@ export default {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+}
+
+.p-feed-notfound{
+    width: 100%;
+    display: flex;
+    height: 350px;
+    flex-flow: column nowrap;
+    justify-content: center;
     align-items: center;
     gap: 16px;
 }

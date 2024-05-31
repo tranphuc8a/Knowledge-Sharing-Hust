@@ -296,7 +296,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Get course status (tuong tu o tren)
             Dictionary<Guid, CourseRoleTypeDto> dictRole = await CourseRelationRepository.GetCourseRoleType(userId, [courseId]);
-            if (dictRole.TryGetValue(userId, out CourseRoleTypeDto? value))
+            if (dictRole.TryGetValue(courseId, out CourseRoleTypeDto? value))
             {
                 if (isFocusCourse == false)
                 {

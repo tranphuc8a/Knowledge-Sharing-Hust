@@ -28,11 +28,11 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
         public string? Bio { get; set; }
 
-        public EUserRelationType UserRelationType { get; set; }
+        public EUserRelationType? UserRelationType { get; set; }
 
         public Guid? UserRelationId { get; set; }
 
-        public ECourseRoleType CourseRoleType { get; set; }
+        public ECourseRoleType? CourseRoleType { get; set; }
 
         public Guid? CourseRelationId { get; set; }
 

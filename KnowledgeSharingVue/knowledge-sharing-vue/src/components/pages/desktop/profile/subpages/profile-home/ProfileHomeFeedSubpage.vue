@@ -21,6 +21,10 @@
         >
         <AddPostFeedCard v-if="isMySelf" />
 
+        <div class="p-feed-notfound" v-show="isOutOfPost && !(listPosts.length > 0)">
+            <NotFoundPanel text="Không tìm thấy mục nào" />
+        </div>
+
         <component v-for="item in listPosts" 
             :key="item?.UserItemId"
             :is="getComponent(item)"
@@ -52,6 +56,7 @@ import CurrentUser from '@/js/models/entities/current-user';
 import ResponseLessonModel from '@/js/models/api-response-models/response-lesson-model';
 import { GetRequest, Request } from '@/js/services/request';
 import ResponseQuestionModel from '@/js/models/api-response-models/response-question-model';
+import NotFoundPanel from '@/components/base/popup/NotFoundPanel.vue';
 
 export default {
     name: 'ProfileHomeFeedSubpage',
@@ -59,6 +64,7 @@ export default {
         AddPostFeedCard,
         LessonFeedCard,
         QuestionFeedCard,
+        NotFoundPanel,
     },
     props: {
     },
@@ -190,6 +196,16 @@ export default {
     align-items: flex-start;
 }
 
+
+.p-feed-notfound{
+    width: 100%;
+    display: flex;
+    height: 350px;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
 
 
 </style>

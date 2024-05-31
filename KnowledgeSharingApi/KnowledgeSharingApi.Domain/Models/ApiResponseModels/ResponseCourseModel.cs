@@ -18,9 +18,9 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         public double? AverageStars { get; set; }
         public double? MyStars { get; set; }
         public int TotalStars { get; set; }
-        public ECourseRoleType Role { get; set; }
+        public ECourseRoleType? Role { get; set; }
         public List<Category> Categories { get; set; } = [];
-        public ECourseRoleType CourseRoleType { get; set; }
+        public ECourseRoleType? CourseRoleType { get; set; }
         public Guid? CourseRelationId { get; set; }
     }
 }

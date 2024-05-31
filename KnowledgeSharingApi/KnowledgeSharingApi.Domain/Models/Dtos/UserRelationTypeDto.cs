@@ -9,7 +9,7 @@ namespace KnowledgeSharingApi.Domains.Models.Dtos
 {
     public class UserRelationTypeDto
     {
-        public EUserRelationType UserRelationType { get; set; }
+        public EUserRelationType? UserRelationType { get; set; }
 
         public Guid? UserRelationId { get; set; }
     }

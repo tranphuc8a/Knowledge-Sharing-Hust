@@ -6,6 +6,7 @@
         <InvitedUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Invited" />
         <MemberUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Member" />
         <RequestedUoCrb v-else-if="dCourseRoleType?.value == eCourseRoleType.Requesting" />
+        <div v-show="false" v-else-if="dCourseRoleType?.value == eCourseRoleType.Owner"></div>
         <GuestUoCrb v-else />
     </div>
 </template>
@@ -14,7 +15,7 @@
 
 <script>
 
-import { GetRequest } from '@/js/services/request';
+import { GetRequest, Request } from '@/js/services/request';
 import UserRelationButton from '../../../profile/components/user-relation-button/UserRelationButton.vue';
 import InvitedUoCrb from './InvitedUoCrb.vue';
 import MemberUoCrb from './MemberUoCrb.vue';

@@ -80,7 +80,7 @@ export default {
             }
         );
         this.throttleResolveOnScroll = this.throttle(
-            this.resolveOnScroll, 
+            this.resolveOnScroll.bind(this), 
             1000
         );
     },
