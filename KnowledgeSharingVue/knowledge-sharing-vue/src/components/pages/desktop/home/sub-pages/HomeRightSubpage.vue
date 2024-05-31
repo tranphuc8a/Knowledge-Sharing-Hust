@@ -90,10 +90,21 @@ export default {
     width: 100%;
     height: 100%;
     overflow-y: auto;
+    overflow-x: visible;
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
     align-items: stretch;
+    gap: 16px;
+}
+
+.p-his-content{
+    width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 0px 16px;
     gap: 16px;
 }
 

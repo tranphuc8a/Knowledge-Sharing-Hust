@@ -28,7 +28,7 @@ export default {
                 bottom: "bottom",
             },
             barHeight: 56,
-            padding_horizontal: 0,
+            padding_horizontal: 8,
             padding_vertical: 8,
         };
     },
@@ -66,8 +66,8 @@ export default {
             this.$nextTick(async () => {
                 try {
                     const tempStyle = {};
-                    await that.horizontalAlign(that, tempStyle);
-                    await that.verticalAlign(that, tempStyle);
+                    await that.horizontalAlignFixed(that, tempStyle);
+                    await that.verticalAlignFixed(that, tempStyle);
                     that.tooltipStyle = tempStyle;
                 } catch (e) {
                     console.error(e);
@@ -129,6 +129,62 @@ export default {
                     style.right = `${-window.innerWidth + maskRect.right + that.padding_horizontal}px`;
                 }
             }
+        },
+
+        /**
+         * Hàm xử lý can chinh tooltip theo chieu doc
+         * @param {*} that this pointer
+         * @param {*} style style cua tooltip
+         * @returns none
+         * @Created PhucTV (15/04/24)
+         * @Modified None
+        */
+        async verticalAlignFixed(that, style){
+            const toolTipRect = that.$refs['tooltip-content']?.getBoundingClientRect?.();
+            const maskRect = that.$refs['tooltip-mask']?.getBoundingClientRect?.();
+            if (toolTipRect == null || maskRect == null) return;
+            
+            if (that.position == that.tooltipPosition.top) {
+                style.bottom = `${-that.padding_vertical -toolTipRect.height + maskRect.top}px`;
+            } else if (that.position == that.tooltipPosition.bottom) {
+                style.top = `${that.padding_vertical + maskRect.bottom}px`;
+            } else {
+                const minTopContent = maskRect.top - that.padding_vertical - toolTipRect.height - that.barHeight;
+                const maxBottomContent = maskRect.bottom + that.padding_vertical + toolTipRect.height;
+                if (minTopContent < 0 && maxBottomContent <= window.innerHeight) {
+                    style.top = `${that.padding_vertical + maskRect.bottom}px`;
+                } else {
+                    style.top = `${-that.padding_vertical -toolTipRect.height + maskRect.top}px`;
+                    // alert(style.bottom);
+                }
+            }
+        },
+
+        /**
+         * Hàm xử lý can chinh tooltip theo chieu ngang
+         * @param {*} that this pointer
+         * @param {*} style style cua tooltip
+         * @returns none
+         * @Created PhucTV (15/04/24)
+         * @Modified None
+         */
+        async horizontalAlignFixed(that, style){
+            const toolTipRect = that.$refs['tooltip-content']?.getBoundingClientRect?.();
+            const maskRect = that.$refs['tooltip-mask']?.getBoundingClientRect?.();
+            if (toolTipRect == null || maskRect == null) return;
+            
+            // align tooltip follow horizontally
+            const minLeftContent = maskRect.left + maskRect.width/2 - toolTipRect.width/2;
+            const maxRightContent = maskRect.left + maskRect.width/2 + toolTipRect.width/2;
+            if (minLeftContent < 0) {
+                style.left = `${that.padding_horizontal}px`;
+            } else {
+                if (maxRightContent <= window.innerWidth){
+                    style.left = `${maskRect.left + maskRect.width/2 - toolTipRect.width/2}px`;
+                } else {
+                    style.right = `${that.padding_horizontal}px`;
+                }
+            }
         }
     },
     props: {
@@ -167,7 +223,7 @@ export default {
 .p-tooltip-content {
     width: fit-content;
     box-sizing: border-box;
-    position: absolute;
+    position: fixed;
 
     background-color: #fff;
     border-radius: 8px;
