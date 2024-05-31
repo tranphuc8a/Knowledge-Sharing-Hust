@@ -518,7 +518,7 @@ namespace KnowledgeSharingApi.Services.Services
         #region Search APIs
 
 
-        public virtual async Task<ServiceResult> UserSearchCourse(Guid myUid, string? search, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserSearchCourse(Guid? myUid, string? search, PaginationDto pagination)
         {
             // normalized search key
             if (string.IsNullOrWhiteSpace(search))

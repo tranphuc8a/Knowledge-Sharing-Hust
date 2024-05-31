@@ -393,11 +393,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (19/5/24)
         /// Modified: None
         [HttpGet("search")]
-        [CustomAuthorization(Roles: "User, Admin")]
+        [AllowAnonymous]
         public async Task<IActionResult> UserSearchCourses(string? search, int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
-            ServiceResult res = await CourseService.UserSearchCourse(GetCurrentUserIdStrictly(), search, pagination);
+            ServiceResult res = await CourseService.UserSearchCourse(GetCurrentUserId(), search, pagination);
             return StatusCode(res);
         }
 

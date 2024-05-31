@@ -99,7 +99,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created PhucTV (19/5/24)
         /// Modified None
-        Task<ServiceResult> UserSearchPost(Guid myUid, string? search, PaginationDto pagination);
+        Task<ServiceResult> UserSearchPost(Guid? myUid, string? search, PaginationDto pagination);
 
         /// <summary>
         /// User tim kiem bai dang cua chinh minh

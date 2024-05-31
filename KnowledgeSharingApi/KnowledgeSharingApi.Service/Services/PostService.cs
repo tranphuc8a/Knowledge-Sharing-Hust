@@ -267,7 +267,7 @@ namespace KnowledgeSharingApi.Services.Services
 
         #region Search APIes
 
-        public async Task<ServiceResult> UserSearchPost(Guid myUid, string? search, PaginationDto pagination)
+        public async Task<ServiceResult> UserSearchPost(Guid? myUid, string? search, PaginationDto pagination)
         {
             // normalized search key
             if (string.IsNullOrWhiteSpace(search))

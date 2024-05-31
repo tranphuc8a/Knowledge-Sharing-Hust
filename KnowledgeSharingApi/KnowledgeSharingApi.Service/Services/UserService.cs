@@ -309,23 +309,31 @@ namespace KnowledgeSharingApi.Services.Services
         //    return Algorithm.LongestCommonSubsequenceContinuous(searchKey, user.FullName);
         //}
 
-        public virtual async Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto pagination)
+        public virtual async Task<ServiceResult> SearchUser(Guid? myuid, string searchKey, PaginationDto pagination)
         {
             // Format search key
             searchKey = Unicode.RemoveVietnameseTone(searchKey).ToLower();
 
             // Lấy về toàn bộ user và Thực hiện truy vấn
             List<ViewUser> lsUser = await UserRepository.GetDetail();
+            List<ViewUser> filteredUser;
 
             // Loc khong chan, khong bi banned...
-            List<ViewUserRelation> myBlockee = await UserRelationRepository.GetByUserIdAndType(myuid, isActive: false, EUserRelationType.Block);
-            List<ViewUserRelation> myBlocker = await UserRelationRepository.GetByUserIdAndType(myuid, isActive: true, EUserRelationType.Block);
-            List<Guid> myBlockeeId = myBlockee.Select(mb => mb.SenderId).ToList();
-            List<Guid> myBlockerId = myBlocker.Select(mb => mb.ReceiverId).ToList();
-            List<Guid> exceptId = myBlockeeId.Union(myBlockerId).Distinct().ToList();
-            List<ViewUser> filteredUser = lsUser
-                .Where(lsUser => lsUser.Role != UserRoles.Banned && !exceptId.Contains(lsUser.UserId))
-                .ToList();
+            if (myuid != null)
+            {
+                List<ViewUserRelation> myBlockee = await UserRelationRepository.GetByUserIdAndType(myuid.Value, isActive: false, EUserRelationType.Block);
+                List<ViewUserRelation> myBlocker = await UserRelationRepository.GetByUserIdAndType(myuid.Value, isActive: true, EUserRelationType.Block);
+                List<Guid> myBlockeeId = myBlockee.Select(mb => mb.SenderId).ToList();
+                List<Guid> myBlockerId = myBlocker.Select(mb => mb.ReceiverId).ToList();
+                List<Guid> exceptId = myBlockeeId.Union(myBlockerId).Distinct().ToList();
+                filteredUser = lsUser
+                    .Where(lsUser => lsUser.Role != UserRoles.Banned && !exceptId.Contains(lsUser.UserId))
+                    .ToList();
+            }
+            else
+            {
+                filteredUser = lsUser;
+            }
             filteredUser = filteredUser.GroupBy(f => f.UserId).Select(g => g.First()).ToList();
 
             // Tinh toan similiarity Score
@@ -343,9 +351,9 @@ namespace KnowledgeSharingApi.Services.Services
 
             Dictionary<Guid, double> scored = filteredUser.ToDictionary(
                 u => u.UserId,
-                u =>    fullnameWeight * scoreFullName[u.FullName] + 
-                        usernameWeight * scoreUsername[u.Username] + 
-                        emailWeight * scoreEmail[u.Email] + 
+                u => fullnameWeight * scoreFullName[u.FullName] +
+                        usernameWeight * scoreUsername[u.Username] +
+                        emailWeight * scoreEmail[u.Email] +
                         phoneWeight * scorePhone[u.PhoneNumber ?? ""]
             );
 
@@ -466,7 +474,7 @@ namespace KnowledgeSharingApi.Services.Services
         {
             if (string.IsNullOrEmpty(url)) return ServiceResult.BadRequest(ViConstantResource.URL_EMPTY);
             if (!PropertyValidator.CheckFormatUrl(url)) return ServiceResult.BadRequest(ViConstantResource.URL_FORMAT);
-            
+
             // Kiểm tra uid tồn tại trong database
             ViewUser user = await UserRepository.CheckExistedUser(uid, ResponseResource.NotExistUser());
             Profile profile = new();

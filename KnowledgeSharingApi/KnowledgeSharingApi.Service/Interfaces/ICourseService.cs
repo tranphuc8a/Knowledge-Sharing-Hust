@@ -260,7 +260,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns></returns>
         /// Created PhucTV (19/5/24)
         /// Modified None
-        Task<ServiceResult> UserSearchCourse(Guid myUid, string? search, PaginationDto pagination);
+        Task<ServiceResult> UserSearchCourse(Guid? myUid, string? search, PaginationDto pagination);
 
         /// <summary>
         /// User tim kiem course cua chinh minh
