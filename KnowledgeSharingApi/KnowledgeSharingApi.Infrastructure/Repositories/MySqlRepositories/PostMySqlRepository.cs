@@ -18,15 +18,40 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
 {
-    public class PostMySqlRepository(IDbContext dbContext)
+    public class PostMySqlRepository(IDbContext dbContext, ILessonRepository lessonRepository, IQuestionRepository questionRepository)
         : BaseMySqlUserItemRepository<Post>(dbContext), IPostRepository
     {
+        protected readonly ILessonRepository LessonRepository = lessonRepository;
+        protected readonly IQuestionRepository QuestionRepository = questionRepository;
+
         public virtual async Task<List<ViewPost>> GetViewPost(PaginationDto pagination)
         {
             List<ViewPost> posts = await ApplyPagination(
                 DbContext.ViewPosts, pagination)
                 .ToListAsync();
             return posts;
+        }
+
+        public virtual async Task<List<ViewPost>> GetViewPost(Guid userId, PaginationDto pagination)
+        {
+            List<ViewPost> listLesson = (await LessonRepository.GetViewPost(userId, pagination)).Select(lesson =>
+            {
+                ViewPost p = new();
+                p.Copy(lesson);
+                return p;
+            }).ToList();
+            List<ViewPost> listQuestion = (await QuestionRepository.GetViewPost(userId, pagination)).Select(question =>
+            {
+                ViewPost p = new();
+                p.Copy(question);
+                return p;
+            }).ToList();
+            return ApplyLimitOffset(
+                        listLesson.Concat(listQuestion)
+                            .OrderByDescending(p => p.CreatedTime).ToList(), 
+                        pagination.Limit, 
+                        pagination.Offset
+                    );
         }
 
         public virtual async Task<List<ViewPost>> GetByUserId(Guid userId)
@@ -132,9 +157,28 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             return posts;
         }
 
-        public Task<List<ViewPost>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination)
+        public virtual async Task<List<ViewPost>> GetPostsOfCategory(Guid myUId, string catName, PaginationDto pagination)
         {
-            return GetPublicPostsOfCategory(catName, pagination);
+            List<ViewPost> listLesson = (await LessonRepository.GetPostsOfCategory(myUId, catName, pagination))
+                .Select(lesson =>
+                {
+                    ViewPost p = new();
+                    p.Copy(lesson);
+                    return p;
+                }).ToList();
+            List<ViewPost> listQuestion = (await QuestionRepository.GetPostsOfCategory(myUId, catName, pagination))
+                .Select(question =>
+                {
+                    ViewPost p = new();
+                    p.Copy(question);
+                    return p;
+                }).ToList();
+            return ApplyLimitOffset(
+                        listLesson.Concat(listQuestion)
+                            .OrderByDescending(p => p.CreatedTime).ToList(),
+                        pagination.Limit,
+                        pagination.Offset
+                    );
         }
 
         public virtual async Task<List<ViewPost>> GetMarkedPosts(Guid userId)

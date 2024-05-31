@@ -4,6 +4,9 @@
     <div class="p-search-by-category-top-card">
         <div class="card">
             <div class="p-card-top">
+                <div class="card-subheading">
+                    Tìm kiếm theo danh mục
+                </div>
                 <div class="p-sbctc-textfield-frame">
                     <MTextfieldButton 
                         placeholder="Nhập tên danh mục cần tìm kiếm"
@@ -115,6 +118,7 @@ export default {
         },
         async resolveClickSearch(){
             try {
+                this.category = await this.$refs.textfield.getValue();
                 let query = { ...this.route.query };
                 query.category = this.category;
                 this.router.replace({ query });
@@ -165,10 +169,15 @@ export default {
 .p-card-top{
     width: 100%;
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: column nowrap;
     justify-content: center;
+    gap: 8px;
     padding: 8px 0px;
     align-items: center;
+}
+
+.p-card-top > :first-child{
+    align-self: flex-start;
 }
 
 .p-card-bottom{

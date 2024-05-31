@@ -19,7 +19,17 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         /// Modified: None
         Task<List<ReturnType>> GetViewPost(PaginationDto pagination);
 
-        /// <summary
+        /// <summary>
+        /// Lấy về danh sách View Post cho mot userId cu the
+        /// </summary>
+        /// <param name="userId"> id user thuc hien </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns> Danh sách bài đăng </returns>
+        /// Created: PhucTV (23/3/24)
+        /// Modified: None
+        Task<List<ReturnType>> GetViewPost(Guid userId, PaginationDto pagination);
+
+        /// <summary>
         /// Lấy về danh sách bài đăng của một user
         /// </summary>
         /// <param name="userId"> Id của user cần lấy </param>

@@ -8,8 +8,6 @@
         <div class="p-sbcs-content">
             <router-view />
         </div>
-
-        <div style="width: 100%; height: 2000px; background: red;"> </div>
     </div>
 </template>
 
@@ -53,7 +51,19 @@ export default {
     width: 100%;
     max-width: 100%;
     position: sticky;
+    z-index: 1;
     top: 0;
+}
+
+.p-sbcs-content{
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    position: relative;
 }
 
 </style>

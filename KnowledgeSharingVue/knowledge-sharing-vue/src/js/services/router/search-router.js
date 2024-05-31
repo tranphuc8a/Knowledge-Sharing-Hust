@@ -2,6 +2,18 @@
 import SearchByTextSubpage from "@/components/pages/desktop/home/sub-pages/search-by-text-subpages/SearchByTextSubpage.vue";
 import SearchByCategorySubpage from "@/components/pages/desktop/home/sub-pages/search-by-category-subpages/SearchByCategorySubpage.vue";
 
+import SearchUserByTextContent from "@/components/pages/desktop/home/sub-pages/search-by-text-subpages/SearchUserByTextContent.vue";
+import SearchPostByTextContent from "@/components/pages/desktop/home/sub-pages/search-by-text-subpages/SearchPostByTextContent.vue";
+import SearchLessonByTextContent from "@/components/pages/desktop/home/sub-pages/search-by-text-subpages/SearchLessonByTextContent.vue";
+import SearchQuestionByTextContent from "@/components/pages/desktop/home/sub-pages/search-by-text-subpages/SearchQuestionByTextContent.vue";
+import SearchCourseByTextContent from "@/components/pages/desktop/home/sub-pages/search-by-text-subpages/SearchCourseByTextContent.vue";
+
+import SearchPostByCategoryContent from "@/components/pages/desktop/home/sub-pages/search-by-category-subpages/SearchPostByCategoryContent.vue";
+import SearchLessonByCategoryContent from "@/components/pages/desktop/home/sub-pages/search-by-category-subpages/SearchLessonByCategoryContent.vue";
+import SearchQuestionByCategoryContent from "@/components/pages/desktop/home/sub-pages/search-by-category-subpages/SearchQuestionByCategoryContent.vue";
+import SearchCourseByCategoryContent from "@/components/pages/desktop/home/sub-pages/search-by-category-subpages/SearchCourseByCategoryContent.vue";
+
+
 export default [
     {
         path: '/search-text',
@@ -14,32 +26,32 @@ export default [
             {
                 path: '',
                 name: 'search-text-home',
-                component: null
+                component: SearchPostByTextContent,
             },
             {
                 path: 'user',
                 name: 'search-text-user',
-                component: null
+                component: SearchUserByTextContent,
             },
             {
                 path: 'post',
                 name: 'search-text-post',
-                component: null
+                component: SearchPostByTextContent,
             },
             {
                 path: 'lesson',
                 name: 'search-text-lesson',
-                component: null
+                component: SearchLessonByTextContent
             },
             {
                 path: 'course',
                 name: 'search-text-course',
-                component: null
+                component: SearchCourseByTextContent
             },
             {
                 path: 'question',
                 name: 'search-text-question',
-                component: null
+                component: SearchQuestionByTextContent
             },
         ]
     },
@@ -54,27 +66,27 @@ export default [
             {
                 path: '',
                 name: 'search-category-home',
-                component: null
+                component: SearchPostByCategoryContent
             },
             {
                 path: 'post',
                 name: 'search-category-post',
-                component: null
+                component: SearchPostByCategoryContent
             },
             {
                 path: 'lesson',
                 name: 'search-category-lesson',
-                component: null
+                component: SearchLessonByCategoryContent
             },
             {
                 path: 'course',
                 name: 'search-category-course',
-                component: null
+                component: SearchCourseByCategoryContent
             },
             {
                 path: 'question',
                 name: 'search-category-question',
-                component: null
+                component: SearchQuestionByCategoryContent
             },
         ]
     }

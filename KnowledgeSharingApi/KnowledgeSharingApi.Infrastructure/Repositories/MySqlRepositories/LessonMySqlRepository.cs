@@ -201,6 +201,34 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
+        public async Task<List<ViewLesson>> GetViewPost(Guid userId, PaginationDto pagination)
+        {
+            // Lấy danh sách id các khóa học mà myUid đang học
+            IQueryable<Guid> listCoursesId = DbContext.CourseRegisters
+                .Where(cr => cr.UserId == userId).Select(cr => cr.CourseId).Distinct();
+
+            // Lấy danh sách id của các bài học trong các khóa học này
+            IQueryable<Guid> listViewableLessonsId = DbContext.CourseLessons
+                .Where(cl => listCoursesId.Contains(cl.CourseId))
+                .Select(cl => cl.LessonId).Distinct();
+
+            // Lấy danh sách các Lesson thỏa mãn:
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les => (
+                            // userId phải Xem được:
+                            // Là chủ
+                            (les.UserId == userId) ||
+                            // public
+                            (les.Privacy == EPrivacy.Public) ||
+                            // Trong các khóa học đã đăng ký
+                            (listViewableLessonsId.Contains(les.UserItemId)
+                    )))
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).ToListAsync();
+        }
+
         public async Task<List<Tuple<CourseLesson, ViewCourse>>> GetListCoursesOfLesson(Guid lessonId)
         {
             List<CourseLesson> courseLessons = await DbContext.CourseLessons

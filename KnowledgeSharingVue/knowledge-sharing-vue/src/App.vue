@@ -20,6 +20,7 @@ import PopupManager from '@/components/base/popup/MPopupManager.vue';
 import ToastManager from '@/components/base/toast/MToastManager.vue';
 import { language } from '@/js/resources/language';
 import resolveAxiosResponse from '@/js/services/resolve-axios-response';
+import CurrentUser from './js/models/entities/current-user';
 // import Common from './js/utils/common';
 
 export default {
@@ -95,6 +96,15 @@ export default {
             } catch (e) {
                 console.error(e);
             }
+        },
+
+
+        async getCurrentUser(){
+            try {
+                return await CurrentUser.getInstance();
+            } catch (e){
+                return null;
+            }
         }
     },
     provide(){
@@ -103,6 +113,7 @@ export default {
             getToastManager: this.getToastManager,
             getPopupManager: this.getPopupManager,
             getLoadingPanel: this.getLoadingPanel,
+            getCurrentUser: this.getCurrentUser,
             getLanguage: () => this.globalData.lang,
             changeLanguage: this.changeLanguage
         }

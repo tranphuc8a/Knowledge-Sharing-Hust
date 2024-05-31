@@ -116,6 +116,7 @@ export default {
         },
         async resolveClickSearch(){
             try {
+                this.searchText = this.$refs.textfield.getValue();
                 let query = { ...this.$route.query }; // Tạo một bản sao của query hiện tại
                 query.search = this.searchText; // Cập nhật query mới
                 this.$router.replace({ query }); // Thay thế URL với query mới

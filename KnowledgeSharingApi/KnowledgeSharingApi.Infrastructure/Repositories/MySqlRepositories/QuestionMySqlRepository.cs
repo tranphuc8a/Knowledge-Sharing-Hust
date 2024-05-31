@@ -160,6 +160,34 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 .ToListAsync();
         }
 
+        public virtual async Task<List<ViewQuestion>> GetViewPost(Guid userId, PaginationDto pagination)
+        {
+            // Lấy danh sách CourseId mà User đã đăng ký
+            var registeredCourseIds = DbContext.CourseRegisters
+                .Where(c => c.UserId == userId)
+                .Select(c => c.CourseId)
+                .Distinct()
+                .ToList(); // Dùng ToList để tải kết quả về và tránh query lại nhiều lần
+
+            var posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post =>
+                        (   // myUid có thể truy cập post:
+                            // post là bài thảo luận của chính mình
+                            (post.UserId == userId) ||
+                            // hoặc post là bài thảo luận public
+                            (post.Privacy == EPrivacy.Public) ||
+                            // hoặc post là câu hỏi trong khóa học mà myUid có tham gia
+                            (post.CourseId != null && registeredCourseIds.Contains(post.CourseId.Value))
+                        )
+                    )
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination)
+                .ToListAsync();
+
+            return posts;
+        }
+
         public virtual async Task<List<ViewQuestion>> GetPublicPostsOfCategory(string catName, PaginationDto pagination)
         {
             var knowledgesId = DbContext.ViewKnowledgeCategories
