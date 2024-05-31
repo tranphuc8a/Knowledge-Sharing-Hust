@@ -56,7 +56,7 @@ export default {
                 textarea: this.$refs.textarea,
                 submit: this.$refs.submit
             }
-            this.components.textarea.setValue(this.value);
+            this.components.textarea?.setValue?.(this.value);
         }
         catch (error) {
             console.error(error);

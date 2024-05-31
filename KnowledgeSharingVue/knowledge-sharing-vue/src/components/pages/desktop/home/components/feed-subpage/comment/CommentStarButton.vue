@@ -43,7 +43,7 @@
 
 <script>
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
-import { PutRequest } from '@/js/services/request';
+import { DeleteRequest, PutRequest } from '@/js/services/request';
 import CurrentUser from '@/js/models/entities/current-user';
 
 export default {
@@ -138,8 +138,35 @@ export default {
                 this.myStar = null;
                 this.currentStar = null;
                 this.tooltip.hideTooltip(0);
+                await this.submitUnstar();
             } catch (e){
                 console.error(e);
+            }
+        },
+
+        async submitUnstar(){
+            try {
+                let comment = this.getComment();
+                if (comment?.MyStars == null) return;
+                
+                let numStars = this.getComment().TotalStar ?? 0;
+                if (numStars <= 0) return;
+                let averageStars = this.getComment().AverageStar ?? 0;
+                
+                // update star
+                let myStar = Number(this.getComment().MyStars);
+                averageStars = (averageStars * numStars - myStar) / (numStars - 1);
+                if (isNaN(averageStars)) averageStars = null;
+                numStars -= 1;
+                this.getComment().TotalStar = numStars;
+                this.getComment().AverageStar = averageStars;                
+                this.getComment().MyStars = null;
+                this.forceUpdateInformationBar?.();
+
+                await new DeleteRequest('Stars/' + comment.UserItemId).execute();
+            } catch (error) {
+                console.error(error);
+                Request.resolveAxiosError(error);
             }
         },
 
@@ -168,13 +195,15 @@ export default {
                 if (comment != null){
                     let numStars = this.getComment().TotalStar ?? 0;
                     let averageStars = this.getComment().AverageStar ?? 0;
-                    if (this.getComment().MyStars == null){
+                    if (this.getComment().MyStars === null || 
+                        this.getComment().MyStars === undefined){ // add new star
                         averageStars = (averageStars * numStars + star) / (numStars + 1);
                         numStars += 1;
                         this.getComment().TotalStar = numStars;
                         this.getComment().AverageStar = averageStars;
-                    } else if (numStars > 0) {
-                        averageStars = (averageStars * numStars + star - this.getComment().MyStars) / numStars;
+                    } else { // update star
+                        let myStar = Number(this.getComment().MyStars);
+                        averageStars = (averageStars * numStars + star - myStar) / numStars;
                         this.getComment().AverageStar = averageStars;
                     }  
                     this.forceUpdateInformationBar?.();

@@ -47,6 +47,8 @@ import PostCardThumbnail from '../../home/components/feed-subpage/postcard/PostC
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
 import PostCardHeader from '../../home/components/feed-subpage/postcard/PostCardHeader.vue';
 import FeedCardFrame from '../../home/components/feed-subpage/postcard/FeedCardFrame.vue';
+import postcard from '@/js/components/base/postcard';
+
 
 export default {
     name: "PostCard",
@@ -63,6 +65,7 @@ export default {
             content: '',
             dPost: this.post,
             compiledCategories: [],
+            isShowComment: this.isViewComment
         }
     },
     mounted() {
@@ -89,24 +92,7 @@ export default {
             return this.label;
         },
 
-        getCategories() {
-            if (this.dPost?.Categories != null
-                && this.dPost.Categories.length > 0){
-                return this.dPost.Categories
-                    .map(cate => cate.CategoryName);
-            }
-            return this.defaultCategoriesList;
-        },
-        
-        async resolveOnClickComment(){
-            try {
-                if (this.$refs['comment-list'] != null){
-                    await this.$refs['comment-list'].focus();
-                }
-            } catch (e){
-                console.error(e);
-            }
-        }
+        ...postcard.methods,
     },
     inject: {
         getLanguage: {},
@@ -117,12 +103,16 @@ export default {
         return {
             getPost: () => this.dPost,
             resolveClickComment: this.resolveOnClickComment,
+            forceUpdateCommentList: this.forceUpdateCommentList,
         }
     },
     watch: {
         post(newValue) {
             this.dPost = newValue;
             this.compiledCategories = this.getCategories();
+        },
+        isViewComment(newValue) {
+            this.isShowComment = newValue;
         }
     },
     props: {
@@ -130,10 +120,10 @@ export default {
             required: true
         },
 
-        isShowComment: {
+        isViewComment: {
             default: true
         }
-    }
+    },
 }
 </script>
 

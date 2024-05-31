@@ -32,7 +32,7 @@
             <div class="p-feedcard-lestion__devide">
                 <div></div>
             </div>
-            <div class="p-feedcard-lestion__comments">
+            <div class="p-feedcard-lestion__comments" v-if="isShowComment">
                 <PostCardCommentList ref="comment-list" />
             </div>
         </div>
@@ -47,6 +47,7 @@ import PostCardThumbnail from '../../home/components/feed-subpage/postcard/PostC
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
 import PostCardHeader from '../../home/components/feed-subpage/postcard/PostCardHeader.vue';
 import FeedCardFrame from '../../home/components/feed-subpage/postcard/FeedCardFrame.vue';
+import postcard from '@/js/components/base/postcard';
 
 export default {
     name: "QuestionCard",
@@ -63,6 +64,7 @@ export default {
             content: '',
             question: this.post,
             compiledCategories: [],
+            isShowComment: true
         }
     },
     mounted() {
@@ -89,25 +91,7 @@ export default {
             return this.label;
         },
 
-        getCategories() {
-            if (this.question?.Categories != null
-                && this.question.Categories.length > 0){
-                return this.question.Categories
-                    .map(cate => cate.CategoryName);
-            }
-            return this.defaultCategoriesList;
-        },
-        
-
-        async resolveOnClickComment(){
-            try {
-                if (this.$refs['comment-list'] != null){
-                    await this.$refs['comment-list'].focus();
-                }
-            } catch (e){
-                console.error(e);
-            }
-        }
+        ...postcard.methods
     },
     inject: {
         getLanguage: {},
@@ -117,7 +101,8 @@ export default {
     provide(){
         return {
             getPost: () => this.question,
-            resolveClickComment : this.resolveOnClickComment
+            resolveClickComment : this.resolveOnClickComment,
+            forceUpdateCommentList: this.forceUpdateCommentList,
         }
     },
     watch: {

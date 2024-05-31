@@ -46,7 +46,7 @@
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 import MEmbeddedButton from '@/components/base/buttons/MEmbeddedButton';
 import CurrentUser from '@/js/models/entities/current-user';
-import { PutRequest } from '@/js/services/request';
+import { DeleteRequest, PutRequest } from '@/js/services/request';
 
 export default {
     name: 'PostCardStarButton',
@@ -169,7 +169,32 @@ export default {
                 }
                 this.myStar = null;
                 this.currentStar = null;
+                this.submitUnstar();
                 this.tooltip.hideTooltip(0);
+            } catch (e){
+                console.error(e);
+            }
+        },
+
+        async submitUnstar(){
+            try {
+                let post = this.getPost();
+                if (post?.MyStars == null || post.TotalStar <= 0){
+                    return;
+                }
+                let myStar = post.MyStars;
+                let numStars = post.TotalStar;
+                let averageStars = post.AverageStar;
+                averageStars = (averageStars * numStars - myStar) / (numStars - 1);
+                if (isNaN(averageStars)){
+                    averageStars = null;
+                }
+                numStars -= 1;
+                post.TotalStar = numStars;
+                post.AverageStar = averageStars;
+                post.MyStars = null;
+                this.forceUpdateToolbar();
+                await new DeleteRequest('Stars/' + post.UserItemId).execute();
             } catch (e){
                 console.error(e);
             }
@@ -204,11 +229,18 @@ export default {
                 let averageStars = this.getPost().AverageStar ?? 0;
                 if (this.getPost().MyStars == null){
                     averageStars = (averageStars * numStars + star) / (numStars + 1);
+                    if (isNaN(averageStars)){
+                        averageStars = null;
+                    }
                     numStars += 1;
                     this.getPost().TotalStar = numStars;
                     this.getPost().AverageStar = averageStars;
-                } else if (numStars > 0) {
-                    averageStars = (averageStars * numStars + star - this.getPost().MyStars) / numStars;
+                } else {
+                    let myStar = Number(this.getPost().MyStars);
+                    averageStars = (averageStars * numStars + star - myStar) / numStars;
+                    if (isNaN(averageStars)){
+                        averageStars = null;
+                    }
                     this.getPost().AverageStar = averageStars;
                 }  
                 this.getPost().MyStars = star;

@@ -162,7 +162,7 @@ export default {
                     redirectTo = appConfig.getHomePageUrl();
                 }
                 // window.location.href = redirectTo;
-                this.router.push(redirectTo);
+                this.router.push('/');
             } catch (error){
                 console.error(error);
             }

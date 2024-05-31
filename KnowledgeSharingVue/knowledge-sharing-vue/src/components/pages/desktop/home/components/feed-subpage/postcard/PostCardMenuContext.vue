@@ -169,6 +169,7 @@ export default {
                     .execute();
                 this.getPost().IsBlockComment = true;
                 await this.updateOptions();
+                this.forceUpdateCommentList?.();
                 this.getToastManager().success(`Đã khóa bình luận!`);
             } catch (error) {
                 console.error(error);
@@ -181,6 +182,7 @@ export default {
                     .execute();
                 this.getPost().IsBlockComment = false;
                 this.getToastManager().success(`Đã mở khóa bình luận!`);
+                this.forceUpdateCommentList?.();
                 await this.updateOptions();
             } catch (error) {
                 console.error(error);
@@ -436,6 +438,7 @@ export default {
         getLanguage: {},
         getPost: {},
         resolveClickComment: { default: null, },
+        forceUpdateCommentList: { default: null, },
         getCourse: { default: () => null },
         getPopupManager: {},
         getToastManager: {},

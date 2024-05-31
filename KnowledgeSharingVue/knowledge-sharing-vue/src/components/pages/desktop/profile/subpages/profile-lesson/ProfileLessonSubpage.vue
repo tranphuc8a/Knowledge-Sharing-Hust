@@ -1,7 +1,11 @@
 
 
 <template>
-    <div class="profile-lesson-subpage p-profile-main-subpage">
+    <div class="profile-lesson-subpage p-profile-main-subpage"
+        :style="{
+            justifyContent: isMySelf ? 'space-between' : 'center',
+        }"
+    >
         <div class="profile-lesson-subpage__left"
             v-show="isMySelf"
         >
@@ -17,7 +21,7 @@
                 :get-post="getPostCallback"
             >
                 <template #addpost >
-                    <AddPostFeedCard v-show="isMySelf" />
+                    <AddPostFeedCard v-if="isMySelf" />
                 </template>
             </PostSubpage>
         </div>
@@ -208,6 +212,7 @@ export default {
     width: 0;
     flex-shrink: 1;
     flex-grow: 3;
+    max-width: 750px;
 }
 
 </style>

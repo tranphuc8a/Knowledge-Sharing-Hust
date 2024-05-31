@@ -24,7 +24,7 @@
             <div class="p-feedcard-lestion__devide">
                 <div></div>
             </div>
-            <div class="p-feedcard-lestion__comments">
+            <div class="p-feedcard-lestion__comments" v-if="isShowComment">
                 <PostCardCommentList ref="comment-list" />
             </div>
         </div>
@@ -39,6 +39,7 @@ import PostCardThumbnail from './PostCardThumbnail.vue';
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
 import PostCardHeader from './PostCardHeader.vue';
 import FeedCardFrame from './FeedCardFrame.vue';
+import postcard from '@/js/components/base/postcard';
 
 export default {
     name: "lessonFeedCard",
@@ -55,6 +56,7 @@ export default {
             content: '',
             lesson: this.post,
             compiledCategories: [],
+            isShowComment: true,
         }
 
     },
@@ -81,25 +83,7 @@ export default {
             }
             return this.label;
         },
-
-        getCategories() {
-            if (this.lesson?.Categories != null
-                && this.lesson.Categories.length > 0){
-                return this.lesson.Categories
-                    .map(cate => cate.CategoryName);
-            }
-            return this.defaultCategoriesList;
-        },
-
-        async resolveOnClickComment(){
-            try {
-                if (this.$refs['comment-list'] != null){
-                    await this.$refs['comment-list'].focus();
-                }
-            } catch (e){
-                console.error(e);
-            }
-        }
+        ...postcard.methods
     },
     inject: {
         getLanguage: {},
@@ -109,7 +93,8 @@ export default {
     provide(){
         return {
             getPost: () => this.lesson,
-            resolveClickComment: this.resolveOnClickComment
+            resolveClickComment: this.resolveOnClickComment,
+            forceUpdateCommentList: this.forceUpdateCommentList,
         }
     },
     watch: {
