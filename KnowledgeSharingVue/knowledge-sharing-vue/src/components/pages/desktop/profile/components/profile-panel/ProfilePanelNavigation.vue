@@ -92,7 +92,7 @@ export default {
                 
                 let link = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
                             'star', 'friend', 'comment', 'payment', 'image', 'message', 
-                            'notification', 'block', 'invitation', 'account'];
+                            'notification', 'friend/blocker', 'invitation', 'account'];
                 
                 let totalItems = 16;
                 for (let i = 0; i < totalItems; i++){

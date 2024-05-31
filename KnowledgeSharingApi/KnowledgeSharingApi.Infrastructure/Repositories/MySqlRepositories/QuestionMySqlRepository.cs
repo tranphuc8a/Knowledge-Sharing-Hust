@@ -61,6 +61,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         public override async Task<Guid?> Insert(Guid questionId, Question question)
         {
             question.UserItemId = questionId;
+            question.CreatedTime ??= DateTime.UtcNow;
             DbContext.Questions.Add(question);
             int rows = await DbContext.SaveChangesAsync();
             return rows > 0 ? questionId : null;

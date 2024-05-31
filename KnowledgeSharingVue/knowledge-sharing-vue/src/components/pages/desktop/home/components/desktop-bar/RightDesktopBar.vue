@@ -11,14 +11,14 @@
                 :iconStyle="iconStyle" :containerStyle="containerStyle"/>
         </div>
         <div class="d-rightbar__avatar">
-            <AvatarMenuContext />
+            <DesktopBarAvatarMenuContext />
         </div>
     </div>
 </template>
 
 <script>
-import MActionIcon from '@/components/base/icons/MActionIcon'
-import AvatarMenuContext from './AvatarMenuContext.vue';
+import MActionIcon from '@/components/base/icons/MActionIcon';
+import DesktopBarAvatarMenuContext from './DesktopBarAvatarMenuContext.vue';
 import { useRouter } from 'vue-router';
 export default {
     name: "RightDesktopBar",
@@ -40,7 +40,7 @@ export default {
         this.textfield = this.$refs.textfield;
     },
     components: {
-        AvatarMenuContext, MActionIcon
+        DesktopBarAvatarMenuContext, MActionIcon
     },
     methods: {
         /**

@@ -71,6 +71,9 @@
                                     :iconStyle="movingIconStyle" :containerStyle="movingContainerStyle"
                                     :onclick="resolveClickMoveUp(index)"
                                     :state="index > 0 ? iconStateEnum.NORMAL : iconStateEnum.DISABLED"
+                                    :style="{
+                                        visibility: index > 0 ? 'visible' : 'hidden'
+                                    }"
                                     />
                             </div>
                             <div class="p-clmb-down" title="Chuyển xuống dưới">
@@ -80,6 +83,9 @@
                                     :iconStyle="movingIconStyle" :containerStyle="movingContainerStyle"
                                     :onclick="resolveClickMoveDown(index)"
                                     :state="index < listCourseLesson.length - 1 ? iconStateEnum.NORMAL : iconStateEnum.DISABLED"
+                                    :style="{
+                                        visibility: index < listCourseLesson.length - 1 ? 'visible' : 'hidden'
+                                    }"
                                     />
                             </div>
                         </div>
@@ -110,7 +116,7 @@
                     <!-- Footer has not heading -->
                 </div>
                 <div class="p-cus-footer-button">
-                    <span>
+                    <span title="Khôi phục thay đổi">
                         <MActionIcon 
                             fa="rotate-left" family="fas"
                             :iconStyle="{fontSize: '20px'}" :containerStyle="{width: '36px', height: '36px'}"
@@ -119,7 +125,7 @@
                     </span>
                     <span>
                         <MButton 
-                            fa="floppy-disk" label="Lưu danh sách"
+                            fa="check" label="Lưu danh sách"
                             :onclick="resolveClickSaveLesson" />
                     </span>
                     <span>

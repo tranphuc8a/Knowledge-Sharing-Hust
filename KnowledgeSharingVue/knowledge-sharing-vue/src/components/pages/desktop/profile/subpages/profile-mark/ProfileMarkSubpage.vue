@@ -117,6 +117,9 @@ export default {
     justify-content: flex-start;
     padding: 16px 16px 0 16px;
     gap: 16px;
+    z-index: 1;
+    position: sticky;
+    top: 16px;
 }
 
 .p-profile-mark-header {

@@ -33,7 +33,9 @@
     "postcss": "^8.4.38",
     "primevue": "^3.50.0",
     "vue": "^3.2.13",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue-scrollto": "^2.20.0",
+    "vue2-smooth-scroll": "^1.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

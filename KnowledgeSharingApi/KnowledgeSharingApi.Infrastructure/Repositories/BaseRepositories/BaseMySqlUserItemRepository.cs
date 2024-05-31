@@ -78,6 +78,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public override async Task<Guid?> Insert(Guid id, T value)
         {
             value.UserItemId = id;
+            value.CreatedTime = DateTime.UtcNow;
             GetDbSet().Add(value);
             int res = await DbContext.SaveChangesAsync();
             return res > 0 ? id : null;
@@ -86,6 +87,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         public override async Task<Guid?> Insert(T value)
         {
             Guid id = Guid.NewGuid();
+            value.CreatedTime = DateTime.UtcNow;
             value.UserItemId = id;
             GetDbSet().Add(value);
             int res = await DbContext.SaveChangesAsync();

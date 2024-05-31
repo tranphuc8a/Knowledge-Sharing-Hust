@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="pl-button-right">
-                <p> {{ isEnglish ? getLabel()?.english : getLabel()?.vietnamese }} </p>
+                {{ isEnglish ? getLabel()?.english : getLabel()?.vietnamese }}
             </div>
         </div>
         <div class="pl-menu-context" v-show="isFocus">
