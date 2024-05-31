@@ -83,9 +83,9 @@
                 </div>
             </div>
         </div>
+        <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitImage" :isShow="false"/>
+        <ChangeFullnamePopup ref="change-fullname-popup" :isShow="false"/>
     </div>
-    <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitImage" :isShow="false"/>
-    <ChangeFullnamePopup ref="change-fullname-popup" :isShow="false"/>
 </template>
 
 
