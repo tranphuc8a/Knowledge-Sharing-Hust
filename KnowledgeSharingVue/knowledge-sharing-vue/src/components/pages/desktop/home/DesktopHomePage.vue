@@ -36,8 +36,9 @@
                     </template> 
                 </TooltipFrame>
             </div>
+
+            <ScrollToTopPopupButton :onclick="scrollToTop" />
         </div>
-        
         
     </DesktopHomeFrame>
 </template>
@@ -47,6 +48,8 @@ import HomeNavigationSubpage from './sub-pages/HomeNavigationSubpage.vue';
 import TooltipFrame from '@/components/base/tooltip/TooltipFrame.vue';
 import DesktopHomeFrame from './DesktopHomeFrame.vue';
 import Debounce from '@/js/utils/debounce';
+import ScrollToTopPopupButton from '@/components/base/popup/ScrollToTopPopupButton.vue';
+
 export default {
     name: "DesktopHomePage",
     data() {
@@ -57,7 +60,8 @@ export default {
         }
     },
     components: {
-        DesktopHomeFrame, TooltipFrame, HomeNavigationSubpage
+        DesktopHomeFrame, TooltipFrame, HomeNavigationSubpage,
+        ScrollToTopPopupButton
     },
     methods: {
         registerScrollHandler(handler){
@@ -66,6 +70,31 @@ export default {
         async resolveOnScroll(){
             try {
                 await Promise.all(this.handler.map(handler => handler(this.$refs.page)));
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
+        async scrollToTop(){
+            try {
+                /* Manual */
+                this.$refs.page.scrollTop = 0; // Set the scrollTop of the element to 0
+
+                // If the above does not work, try using scrollIntoView
+                this.$refs.page.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                /* First lib */
+                // this.$scrollTo(this.$refs.page, 0, {
+                //     duration: 500,
+                //     // easing: 'easeInOutQuad',
+                // })
+
+                /* Second Lib */
+                // this.$smoothScroll({
+                //     scrollTo: this.$refs.page,
+                //     duration: 1000,
+                //     offset: 16,
+                // });
             } catch (error) {
                 console.error(error);
             }

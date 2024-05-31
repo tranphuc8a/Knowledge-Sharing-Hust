@@ -43,7 +43,7 @@ export default {
     methods: {
         async resolveClickItem(){
             try {
-                this.router.push('profile/' + this.user?.Username);
+                this.router.push('/profile/' + this.user?.Username);
             } catch (e) {
                 console.error(e);
             }

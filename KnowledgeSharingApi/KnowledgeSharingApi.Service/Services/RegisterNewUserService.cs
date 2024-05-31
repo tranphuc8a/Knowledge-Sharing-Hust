@@ -60,6 +60,11 @@ namespace KnowledgeSharingApi.Services.Services
             // cast codemodel to ActiveCodeRegisterModel
             if (codeModel is ActiveCodeRegisterModel model)
             {
+                // Kiểm tra username chưa được đăng ký
+                tempUser = await UserRepository.GetByUsername(model.Username!);
+                if (tempUser != null)
+                    return ServiceResult.BadRequest(ResponseResource.ExistedUser());
+
                 // Create new user to add
                 User user = new()
                 {
@@ -108,7 +113,9 @@ namespace KnowledgeSharingApi.Services.Services
                 Guid? profileId = await profileRepository.Insert(new Profile()
                 {
                     UserId = user.UserId,
-                    FullName = fullName
+                    FullName = fullName,
+                    CreatedBy = fullName,
+                    CreatedTime = DateTime.UtcNow
                 }) ?? throw insertFailedException;
 
                 // Step 4: Commit

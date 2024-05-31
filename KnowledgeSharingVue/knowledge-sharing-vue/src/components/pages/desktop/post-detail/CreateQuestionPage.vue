@@ -108,6 +108,7 @@ export default {
         try {
             this.courseId = this.route.query.courseId;
             if (this.courseId != null){
+                this.getLoadingPanel().show();
                 let res = await new GetRequest('Courses/' + this.courseId).execute();
                 let body = await Request.tryGetBody(res);
                 if (body != null){
@@ -135,6 +136,8 @@ export default {
             } catch (e){
                 console.error(e);
             }
+        } finally {
+            this.getLoadingPanel().hide();
         }
     },
     methods: {
@@ -265,6 +268,7 @@ export default {
 
     },
     inject: {
+        getLoadingPanel: {},
         getToastManager: {},
         getPopupManager: {}
     },

@@ -491,6 +491,45 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.BaseRepositories
         #endregion
 
 
+        #region Apply Limit Offset
+
+        public virtual List<T> ApplyLimitOffset(List<T> beforeList, int? limit, int? offset)
+        {
+            // Apply Offset:
+            beforeList = beforeList.Skip(offset ?? 0).ToList();
+            // Apply Limit:
+            beforeList = beforeList.Take(limit ?? DefaultLimit).ToList();
+            return beforeList;
+        }
+        public virtual IQueryable<T> ApplyLimitOffset(IQueryable<T> beforeQuery, int? limit, int? offset)
+        {
+          
+            // Apply Offset:
+            beforeQuery = beforeQuery.Skip(offset ?? 0);
+            // Apply Limit:
+            beforeQuery = beforeQuery.Take(limit ?? DefaultLimit);
+            return beforeQuery;
+        }
+        public virtual List<Q> ApplyLimitOffset<Q>(List<Q> beforeList, int? limit, int? offset)
+        {
+            // Apply Offset:
+            beforeList = beforeList.Skip(offset ?? 0).ToList();
+            // Apply Limit:
+            beforeList = beforeList.Take(limit ?? DefaultLimit).ToList();
+            return beforeList;
+        }
+        public virtual IQueryable<Q> ApplyLimitOffset<Q>(IQueryable<Q> beforeQuery, int? limit, int? offset)
+        {
+          
+            // Apply Offset:
+            beforeQuery = beforeQuery.Skip(offset ?? 0);
+            // Apply Limit:
+            beforeQuery = beforeQuery.Take(limit ?? DefaultLimit);
+            return beforeQuery;
+        }
+
+        #endregion
+
         #region Apply Pagination
 
         public virtual List<T> ApplyPagination(List<T> beforeList, PaginationDto? pagination)

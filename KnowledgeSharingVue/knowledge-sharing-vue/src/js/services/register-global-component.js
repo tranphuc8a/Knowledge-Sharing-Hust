@@ -9,7 +9,8 @@ import Antd from 'ant-design-vue';
 
 import MIcon from '@/components/base/icons/MIcon.vue';
 import MSpinner from '@/components/base/icons/MSpinner';
-import MActionIcon from '@/components/base/icons/MActionIcon'
+import MActionIcon from '@/components/base/icons/MActionIcon';
+import MButton from '@/components/base/buttons/MButton.vue';
 
 // Thêm tất cả các icons trong thư viện fas vào thư viện mà chúng ta sẽ sử dụng.
 library.add(fas, far);
@@ -21,6 +22,7 @@ function registerComponets(app){
     app.component('MIcon', MIcon);
     app.component('MActionIcon', MActionIcon);
     app.component('MSpinner', MSpinner);
+    app.component('MButton', MButton);
     app.use(Antd);
 }
 

@@ -5,9 +5,24 @@
         <slot name="addcourse"></slot>
 
         <div class="p-list-course-card">
-            <CourseShortCardSkeleton />
-            <CourseShortCardSkeleton />
-            <CourseShortCardSkeleton />
+            <div :style="{
+                    width: `calc((100% - ${(rowCount - 1)*16}px)/${rowCount})`,
+                }"
+            >
+                <CourseShortCardSkeleton />
+            </div>
+            <div :style="{
+                    width: `calc((100% - ${(rowCount - 1)*16}px)/${rowCount})`,
+                }"
+            >
+                <CourseShortCardSkeleton />
+            </div>
+            <div :style="{
+                    width: `calc((100% - ${(rowCount - 1)*16}px)/${rowCount})`,
+                }"
+            >
+                <CourseShortCardSkeleton />
+            </div>
         </div>
     </div>
 
@@ -20,18 +35,40 @@
         </div>
 
         <div class="p-list-course-card">
-            <CourseShortCard 
-                v-for="item in listCourses" 
-                :key="item?.UserItemId"
-                :course="item" >
-                <template #courseMenuContext>
-                    <CourseShortCardMenuContext/>
-                </template>
-            </CourseShortCard>
-    
-            <CourseShortCardSkeleton v-if="!isOutOfCourse" />
-            <CourseShortCardSkeleton v-if="!isOutOfCourse" />
-            <CourseShortCardSkeleton v-if="!isOutOfCourse" />
+            <div v-for="item in listCourses" :key="item?.UserItemId"
+                :style="{
+                    width: `calc((100% - ${(rowCount - 1)*16}px)/${rowCount})`,
+                }"
+            >
+                <CourseShortCard :course="item">
+                    <template #courseMenuContext>
+                        <CourseShortCardMenuContext/>
+                    </template>
+                </CourseShortCard>
+            </div>
+            
+            <div v-if="!isOutOfCourse"
+                :style="{
+                    width: `calc((100% - ${(rowCount - 1)*16}px)/${rowCount})`,
+                }"
+            >
+                <CourseShortCardSkeleton />
+            </div>
+            <div v-if="!isOutOfCourse"
+                :style="{
+                    width: `calc((100% - ${(rowCount - 1)*16}px)/${rowCount})`,
+                }"
+            >
+                <CourseShortCardSkeleton />
+            </div>
+            <div v-if="!isOutOfCourse"
+                :style="{
+                    width: `calc((100% - ${(rowCount - 1)*16}px)/${rowCount})`,
+                }"
+            >
+                <CourseShortCardSkeleton />
+            </div>
+
         </div>
     </div>
 
@@ -66,6 +103,9 @@ export default {
                 return [];
             }
         },
+        rowCount: {
+            default: 3,
+        }
     },
     data(){
         return {
@@ -199,7 +239,6 @@ export default {
 }
 
 .p-list-course-card > *{
-    width: calc((100% - 16px)/2);
     flex-shrink: 0;
     flex-grow: 0;
 }

@@ -41,7 +41,7 @@ export default {
             if (this.isEditing){
                 return await this.resolveClickClose();
             }
-            console.log("Clicked category: " + this.category);
+            this.router.push('/search-category/post?category=' + this.category);
         },
 
         async resolveClickClose(){

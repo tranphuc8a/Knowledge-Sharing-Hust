@@ -438,7 +438,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> UserGetMarkedCourses(Guid myUid, PaginationDto pagination)
         {
             List<ViewCourse> lsCourses = 
-                await CourseRepository.GetMarkedCoursesOfUse(myUid, pagination);
+                await CourseRepository.GetMarkedCoursesOfUser(myUid, pagination);
 
             List<IResponseCourseModel> res = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses);
 
@@ -518,7 +518,7 @@ namespace KnowledgeSharingApi.Services.Services
         #region Search APIs
 
 
-        public virtual async Task<ServiceResult> UserSearchCourse(Guid myUid, string? search, PaginationDto pagination)
+        public virtual async Task<ServiceResult> UserSearchCourse(Guid? myUid, string? search, PaginationDto pagination)
         {
             // normalized search key
             if (string.IsNullOrWhiteSpace(search))

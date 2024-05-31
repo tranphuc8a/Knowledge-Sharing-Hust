@@ -34,7 +34,7 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// <returns> Danh sách User tìm được </returns>
         /// Created: PhucTV (15/3/24)
         /// Modified: None
-        Task<ServiceResult> SearchUser(Guid myuid, string searchKey, PaginationDto page);
+        Task<ServiceResult> SearchUser(Guid? myuid, string searchKey, PaginationDto page);
 
         /// <summary>
         /// Lấy về chi tiết Profile của chính user

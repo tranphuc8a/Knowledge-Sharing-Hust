@@ -9,6 +9,7 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityReposito
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces;
 using KnowledgeSharingApi.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
@@ -199,11 +200,11 @@ namespace KnowledgeSharingApi.Controllers
         /// Created: PhucTV (17/3/24)
         /// Modified: None
         [HttpGet("search")]
-        [CustomAuthorization(Roles: "User, Admin")]
+        [AllowAnonymous]
         public virtual async Task<IActionResult> SearchMe(string searchKey, int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
-            ServiceResult service = await UserService.SearchUser(GetCurrentUserIdStrictly(), searchKey, pagination);
+            ServiceResult service = await UserService.SearchUser(GetCurrentUserId(), searchKey, pagination);
             return StatusCode(service);
         }
 

@@ -15,6 +15,12 @@ import ProfileRequesteeContent from '@/components/pages/desktop/profile/subpages
 import ProfileBlockerContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileBlockerContent.vue';
 import ProfileBlockeeContent from '@/components/pages/desktop/profile/subpages/profile-friend/ProfileBlockeeContent.vue';
 
+import ProfileMarkSubpage from '@/components/pages/desktop/profile/subpages/profile-mark/ProfileMarkSubpage.vue';
+import ProfileMarkPostContent from '@/components/pages/desktop/profile/subpages/profile-mark/ProfileMarkPostContent.vue';
+import ProfileMarkQuestionContent from '@/components/pages/desktop/profile/subpages/profile-mark/ProfileMarkQuestionContent.vue';
+import ProfileMarkLessonContent from '@/components/pages/desktop/profile/subpages/profile-mark/ProfileMarkLessonContent.vue';
+import ProfileMarkCourseContent from '@/components/pages/desktop/profile/subpages/profile-mark/ProfileMarkCourseContent.vue';
+
 
 import ProfileImageSubpage from '@/components/pages/desktop/profile/subpages/profile-image/ProfileImageSubpage.vue';
 import ProfileEditSubpage from '@/components/pages/desktop/profile/subpages/profile-edit/ProfileEditSubpage.vue';
@@ -61,7 +67,30 @@ const profileRouter = [
             }, { // when /profile.../save
                 path: 'save',
                 name: 'profile-save-page',
-                component: null, 
+                component: ProfileMarkSubpage,
+                children: [
+                    {
+                        path: '',
+                        name: 'profile-save-home',
+                        component: ProfileMarkPostContent,
+                    }, {
+                        path: 'post',
+                        name: 'profile-save-post',
+                        component: ProfileMarkPostContent,
+                    }, {
+                        path: 'question',
+                        name: 'profile-save-question',
+                        component: ProfileMarkQuestionContent,
+                    }, {
+                        path: 'lesson',
+                        name: 'profile-save-lesson',
+                        component: ProfileMarkLessonContent,
+                    }, {
+                        path: 'course',
+                        name: 'profile-save-course',
+                        component: ProfileMarkCourseContent,
+                    },
+                ],
             }, { // when /profile.../friend
                 path: 'friend',
                 name: 'profile-friend-page',

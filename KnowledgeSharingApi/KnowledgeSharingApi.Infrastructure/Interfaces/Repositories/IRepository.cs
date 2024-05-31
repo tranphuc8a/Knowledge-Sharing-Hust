@@ -175,6 +175,20 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories
         List<Q> ApplyFilter<Q>(List<Q> beforeList, List<FilterDto> filter);
         List<Q> ApplyFilter<Q>(List<Q> beforeList, FilterDto filter);
 
+
+        /// <summary>
+        /// Ap dung Limit offset
+        /// </summary>
+        /// <param name="beforeList"> Danh sach truoc khi ap dung</param>
+        /// <param name="limit"> Gia tri so luong ban ghi </param>
+        /// <param name="offset"> Gia tri do lech ban ghi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (16/5/24)
+        /// Modified: None
+        List<T> ApplyLimitOffset(List<T> beforeList, int? limit, int? offset);
+        List<Q> ApplyLimitOffset<Q>(List<Q> beforeList, int? limit, int? offset);
+
+
         /// <summary>
         /// Ap dung pagination
         /// </summary>
