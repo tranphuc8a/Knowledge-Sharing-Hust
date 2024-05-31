@@ -1,7 +1,11 @@
 
 
 <template>
-    <div class="profile-question-subpage p-profile-main-subpage">
+    <div class="profile-question-subpage p-profile-main-subpage"
+        :style="{
+            justifyContent: isMySelf ? 'space-between' : 'center',
+        }"
+    >
         <div class="profile-question-subpage__left"
             v-show="isMySelf"
         >
@@ -18,7 +22,7 @@
                 :get-post="getPostCallback"
             >
                 <template #addpost>
-                    <AddPostFeedCard v-show="isMySelf" />
+                    <AddPostFeedCard v-if="isMySelf" />
                 </template>
             </PostSubpage>
         </div>
@@ -206,6 +210,7 @@ export default {
 }
 
 .profile-question-subpage__right{
+    max-width: 750px;
     width: 0;
     flex-shrink: 1;
     flex-grow: 3;

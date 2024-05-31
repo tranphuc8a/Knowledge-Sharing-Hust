@@ -80,6 +80,7 @@ class Common {
      */
     static formatNumber(num) {
         if (Validator.isEmpty(num)) return 0;
+        if (isNaN(num)) return 0;
 
         if (num < 1000) {
             return num.toString();

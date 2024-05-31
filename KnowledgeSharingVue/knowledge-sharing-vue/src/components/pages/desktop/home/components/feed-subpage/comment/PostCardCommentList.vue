@@ -1,5 +1,5 @@
 <template>
-    <div class="p-postcard-comment-list" v-if="isLoaded">
+    <div class="p-postcard-comment-list" v-if="isLoaded && !isBlockComment">
         <div class="p-pcl-filter-button" v-show="false">
             <CommentFilterButton :on-change="resolveOnchangeFilter" />
         </div>
@@ -23,6 +23,11 @@
             <PostCardEnterComment :useritem="getPost()" :on-comment-submitted="resolvePostedComment" ref="enter-comment"/>
         </div>
     </div>
+    <div class="p-postcard-comment-list" v-if="isLoaded && isBlockComment">
+        <div class="p-pcl-empty-comment">
+            Bài viết đã bị khóa bình luận
+        </div>
+    </div>
 </template>
 
 <script>
@@ -41,6 +46,7 @@ export default {
     data(){
         return {
             isLoaded: true,
+            isBlockComment: false,
             buttonStyle: { padding: '0px', fontSize: '13px', height: '24px' },
             label: null,
             listComments: [],
@@ -61,6 +67,7 @@ export default {
                 return com;
             });
         }
+        this.isBlockComment = this.getPost()?.IsBlockComment ?? false;
         // console.log(this.listComments);
         this.currentUser = await CurrentUser.getInstance();
         this.getLabel();
@@ -208,7 +215,7 @@ export default {
 
         async focus(){
             try {
-                await this.$refs['enter-comment'].focus();
+                await this.$refs['enter-comment']?.focus?.();
             } catch (e) {
                 console.error(e);
             }

@@ -29,7 +29,7 @@ export default {
                 for (let key of this.keys){
                     let value = await this.components[key].getValue?.();
                     if (value != null && key == "Grade"){
-                        if (isNaN(value)) value = '';
+                        if (isNaN(value)) value = null;
                         else value = String(value);
                     }
                     result[key] = value;
@@ -47,7 +47,7 @@ export default {
                     let value = user[key];
                     if (["Grade", "Cpa"].includes(key)){
                         if (Validator.isEmpty(value)) {
-                            value = '';
+                            value = null;
                         } else {
                             value = Number(value);
                         }
