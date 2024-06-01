@@ -1,5 +1,5 @@
 
-import Entity from './entity';
+import Entity from "../entity";
 
 class Conversation extends Entity {
     constructor() {

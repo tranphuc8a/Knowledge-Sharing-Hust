@@ -1,5 +1,6 @@
 ﻿using KnowledgeSharingApi.Domains.Models.ApiRequestModels.ConversationModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,6 +111,16 @@ namespace KnowledgeSharingApi.Services.Interfaces
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         Task<ServiceResult> SendMessage(Guid myUId, SendMessageModel model);
+
+        /// <summary>
+        /// Gửi tin nhắn mới
+        /// </summary>
+        /// <param name="myUId"> Id của người muốn gửi </param>
+        /// <param name="model"> Nội dung tin nhắn muốn gửi </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        Task<(bool, ViewMessage?, List<string>)> SendMessageBySocket(Guid myUId, SendMessageSocketModel model);
 
         /// <summary>
         /// Xóa tin nhắn

@@ -66,7 +66,7 @@ export default {
                 fontWeight: 'bold',
                 color: '#333'
             },
-            isMySelf: null,
+            isMySelf: true,
             userDetailLink: '',
         }
     },
@@ -82,15 +82,16 @@ export default {
     methods: {
         async refreshUser(){
             try {
+                let currentUser = await CurrentUser.getInstance();
+                this.isMySelf = (currentUser != null) && (currentUser.UserId == this.user?.UserId);
+                this.userDetailLink = `/profile/${this.user?.Username}`;
+                
                 let userCover = this.user?.Cover;
                 if (await Common.isValidImage(userCover)) {
                     this.coverImage = userCover;
                 } else {
                     this.coverImage = this.defaultCoverImage;
                 }
-                let currentUser = await CurrentUser.getInstance();
-                this.isMySelf = (currentUser != null) && (currentUser.UserId == this.user?.UserId);
-                this.userDetailLink = `/profile/${this.user?.Username}`;
             } catch (e) {
                 console.error(e);
             }

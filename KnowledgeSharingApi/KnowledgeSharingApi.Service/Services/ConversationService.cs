@@ -61,22 +61,22 @@ namespace KnowledgeSharingApi.Services.Services
                 .ToList();
 
             // Lấy về top tin nhắn
-            List<ResponseMessageModel> topMessages =
-                (await ConversationRepository.GetMessages(myUid, conversationId, new PaginationDto()
-                {
-                    Limit = DefaultLimit,
-                    Offset = 0,
-                    Orders = null,
-                    Filters = null
-                }))
-                .Select(message => (new ResponseMessageModel().Copy(message) as ResponseMessageModel)!)
-                .ToList();
+            //List<ResponseMessageModel> topMessages =
+            //    (await ConversationRepository.GetMessages(myUid, conversationId, new PaginationDto()
+            //    {
+            //        Limit = DefaultLimit,
+            //        Offset = 0,
+            //        Orders = null,
+            //        Filters = null
+            //    }))
+            //    .Select(message => (new ResponseMessageModel().Copy(message) as ResponseMessageModel)!)
+            //    .ToList();
 
 
             ResponseConversationModel model = new();
             model.Copy(conv);
             model.Participants = listParticipants;
-            model.Messages = topMessages;
+            model.Messages = [];
 
             return model;
         }
@@ -128,17 +128,17 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<ServiceResult> CreateNewConversation(ViewUser user_1, ViewUser user_2)
+        protected virtual async Task<ServiceResult> CreateNewConversation(Guid user_1, Guid user_2)
         {
-            Profile user1 = new(); user1.Copy(user_1);
-            Profile user2 = new(); user2.Copy(user_2);
-            Conversation conversation = await ConversationRepository.CreateConversation(user1, user2);
+            Conversation? conversation = await ConversationRepository.CreateConversation(user_1, user_2);
+            if (conversation == null)
+                return ServiceResult.BadRequest(ResponseResource.Failure());
 
             // Trả về cuộc trò chuyện
             return ServiceResult.Success(
                 ResponseResource.Success(),
                 string.Empty,
-                await GetConversationDetail(user_1.UserId, conversation.ConversationId)
+                await GetConversationDetail(user_1, conversation.ConversationId)
             );
         }
 
@@ -149,7 +149,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> GetConversation(Guid myUId, Guid conversationId)
         {
             // Kiểm tra userId phải tồn tại
-            ViewUser user = await CheckExistedUser(myUId);
+            //ViewUser user = await CheckExistedUser(myUId);
 
             // Kiểm tra conversation phải tồn tại
             Conversation conversation = await CheckExistedConversation(conversationId);
@@ -169,7 +169,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> GetConversations(Guid myUid, PaginationDto pagination)
         {
             // Kiểm tra user tồn tại
-            await CheckExistedUser(myUid);
+            //await CheckExistedUser(myUid);
 
             // Lấy về danh sách cuộc trò chuyện
             List<Conversation> conversations = await ConversationRepository.GetListConversationByUserId(myUid);
@@ -192,7 +192,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> GetConversationWith(Guid myUid, Guid uid)
         {
             //ViewUser user_1 = await CheckExistedUser(myUid);
-            ViewUser _ = await CheckExistedUser(uid);
+            _ = await CheckExistedUser(uid);
 
             Conversation? conversation = await ConversationRepository.GetConversationWithUser(myUid, uid);
             if (conversation == null)
@@ -210,8 +210,8 @@ namespace KnowledgeSharingApi.Services.Services
         #region Conversation Operations
         public virtual async Task<ServiceResult> StartConversation(Guid myUid, Guid uid)
         {
-            ViewUser user_1 = await CheckExistedUser(myUid);
-            ViewUser user_2 = await CheckExistedUser(uid);
+            //ViewUser user_1 = await CheckExistedUser(myUid);
+            //ViewUser user_2 = await CheckExistedUser(uid);
 
             Conversation? conversation = await ConversationRepository.GetConversationWithUser(myUid, uid);
             if (conversation != null)
@@ -223,7 +223,7 @@ namespace KnowledgeSharingApi.Services.Services
                 );
             }
 
-            return await CreateNewConversation(user_1, user_2);
+            return await CreateNewConversation(myUid, uid);
         }
 
         public virtual async Task<ServiceResult> DeleteConversation(Guid myUid, Guid conversationId)
@@ -377,7 +377,7 @@ namespace KnowledgeSharingApi.Services.Services
             // Làm sau...
 
             // Trả về thành công
-            return ServiceResult.Success(ResponseResource.Success());
+            return ServiceResult.Success(ResponseResource.Success(), string.Empty, msg);
         }
 
         public virtual async Task<ServiceResult> DeleteMessage(Guid myUid, Guid messageId)
@@ -463,6 +463,46 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.Success());
+        }
+
+        public virtual async Task<(bool, ViewMessage?, List<string>)> SendMessageBySocket(Guid myUId, SendMessageSocketModel model)
+        {
+            try
+            {
+                ViewUser profile = await CheckExistedUser(myUId);
+                // Check Conversation phù hợp
+                _ = await CheckExistedConversation(model.ConversationId);
+                // Check participant
+                List<ViewUserConversation> participants = await ConversationRepository.GetParticipants(model.ConversationId);
+                ViewUserConversation? participant = participants.Where(p => p.UserId == myUId).FirstOrDefault();
+                if (participant == null) return (false, null, []);
+
+                // Thêm message
+                Message msg = new()
+                {
+                    MessageId = Guid.NewGuid(),
+                    UserConversationId = participant.UserConversationId,
+                    Content = model.Content!,
+                    Time = DateTime.UtcNow,
+                    CreatedTime = DateTime.UtcNow,
+                    CreatedBy = profile.FullName,
+                    IsEdited = false,
+                    ReplyId = null
+                };
+                Guid? id = await MessageRepository.Insert(msg.MessageId, msg);
+                if (id == null) return (false, null, []);
+
+                ViewMessage res = new();
+                res.Copy(msg);
+                res.Copy(participant);
+                res.Copy(profile);
+
+                return (true, res, participants.Select(p => p.Username).ToList());
+            }
+            catch (Exception)
+            {
+                return (false, null, []);
+            }
         }
         #endregion
     }

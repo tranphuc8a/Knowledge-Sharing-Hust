@@ -73,9 +73,10 @@ export default {
     methods: {
         async forceRender(){
             try {
+                let that = this;
                 this.isLoaded = false;
                 this.$nextTick(() => {
-                    this.isLoaded = true;
+                    that.isLoaded = true;
                 });
             } catch (e) {
                 console.error(e);

@@ -152,8 +152,9 @@ export default {
         async forceRender(){
             try {
                 this.isLoaded = false;
+                let that = this;
                 this.$nextTick(() => {
-                    this.isLoaded = true;
+                    that.isLoaded = true;
                 });
             } catch (e) {
                 console.error(e);
@@ -182,8 +183,9 @@ export default {
                 this.user = null;
                 this.isLoaded = false;
                 this.user = new ViewUser().copy(body);
+                let that = this;
                 this.$nextTick(() => {
-                    this.isLoaded = true;
+                    that.isLoaded = true;
                 });
                 // this.isUserExisted = true;
             } catch (error){

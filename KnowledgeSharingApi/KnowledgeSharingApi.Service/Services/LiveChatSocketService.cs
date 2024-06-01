@@ -1,8 +1,13 @@
 ﻿using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
+using KnowledgeSharingApi.Domains.Models.ApiRequestModels.ConversationModels;
+using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities;
+using KnowledgeSharingApi.Domains.Models.Entities.Tables;
+using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
+using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -19,85 +24,81 @@ namespace KnowledgeSharingApi.Services.Services
     public class LiveChatSocketService(
         ILiveChatSocketSessionManager liveChatSocketSessionManager,
         IResourceFactory resourceFactory,
+        IConversationService conversationService,
+        IConversationRepository conversationRepository,
+        IMessageRepository messageRepository,
         IEncrypt Encrypt
         ) : SocketService(liveChatSocketSessionManager, resourceFactory, Encrypt), ILiveChatSocketService
     {
-        //    protected override Task HandleMessage(KSSocket socket, string message)
-        //    {
-        //        // Step 1. Tạo Message ứng với message
-        //        try
-        //        {
-        //            SendMessageSocketModel? messageFromClient = JsonConvert.DeserializeObject<SendMessageSocketModel>(message)
-        //                ?? throw new JsonReaderException();
-
-        //            // Tạo message
-        //            Message messageToDatabase = new()
-        //            {
-        //                UserConversationId = messageFromClient.UserConversationId,
-        //                Content = messageFromClient.Content,
-        //                Time = DateTime.UtcNow,
-        //                CreatedTime = DateTime.UtcNow,
-        //                CreatedBy = socket.Username,
-        //                IsEdited = false,
-        //                ReplyId = messageFromClient.ReplyId
-        //            };
-
-
-        //            // Lấy ra Conversation
-
-
-        //            // Lấy ra người dùng thứ kia và gửi message tới họ
-
-        //            messageFromClient.UserConversationId;
-
-        //            // Step 2. Lưu message vào database
-
-        //            // Step 3. Gửi lại thông báo tới user
-        //        }
-        //        catch (JsonReaderException ex)
-        //        {
-        //            // Xử lý khi có lỗi xảy ra trong quá trình phân tích JSON
-        //            Console.WriteLine("Error parsing JSON: " + ex.Message);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            // Xử lý các ngoại lệ khác nếu có
-        //            Console.WriteLine("An error occurred: " + ex.Message);
-        //        }
-
-
-
-        //        // Step 4. Thành công
-        //        return Task.CompletedTask;
-        //    }
-        //}
+        protected readonly IConversationService ConversationService = conversationService;
+        protected readonly IConversationRepository ConversationRepository = conversationRepository;
+        protected readonly IMessageRepository MessageRepository = messageRepository;
 
         protected override async Task HandleMessage(KSSocket socket, string message)
         {
-            // Send Broadcast
-            string data = (string) JsonConvert.DeserializeObject(message)!;
-            await SendBroadcast(JsonConvert.SerializeObject($"{socket.Username}: {data}"));
+            // Step 1. Tạo Message ứng với message
+            try
+            {
+                SendMessageSocketModel? messageFromClient = JsonConvert.DeserializeObject<SendMessageSocketModel>(message)
+                    ?? throw new JsonReaderException();
+
+                // Thu insert:
+                (bool isSuccess, ViewMessage? sended, List<string> usernames) res = 
+                    await ConversationService.SendMessageBySocket(socket.UserId, messageFromClient);
+                if (!res.isSuccess) return;
+
+                string messageToSend = JsonConvert.SerializeObject(res.sended);
+
+                // Step 3. Gửi lại thông báo tới user
+                await Task.WhenAll(res.usernames.Select(usn => Send(messageToSend, usn)));
+            }
+            catch (JsonReaderException ex)
+            {
+                // Xử lý khi có lỗi xảy ra trong quá trình phân tích JSON
+                Console.WriteLine("Error parsing JSON: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý các ngoại lệ khác nếu có
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+
+
+
+            // Step 4. Thành công
         }
 
-        public override async Task<ServiceResult> ConnectSocket(HttpContext HttpContext, string? token)
-        {
-            // Chấp nhận kết nối
-            if (HttpContext.WebSockets.IsWebSocketRequest)
-            {
-                WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                KSSocket socket = new(Guid.NewGuid().ToString(), webSocket);
-                socketManager.AddSocket(socket);
+        //protected override async Task HandleMessage(KSSocket socket, string message)
+        //{
+        //     Send Broadcast
+        //    string data = (string) JsonConvert.DeserializeObject(message)!;
+        //    await SendBroadcast(JsonConvert.SerializeObject($"{socket.Username}: {data}"));
+        //}
 
-                // Bắt đầu vòng lặp để lắng nghe tin nhắn từ client
-                await ReceiveMessages(socket);
+        //public override async Task<ServiceResult> ConnectSocket(HttpContext HttpContext, string? token)
+        //{
+        //    // check token
+        //    if (string.IsNullOrEmpty(token)) return ServiceResult.BadRequest("Token is Empty");
+        //    JwtTokenDto? jwtToken = Encrypt.JwtDecrypt(token, isValidateLifeTime: true);
+        //    if (jwtToken == null) return ServiceResult.BadRequest("Token is invalid or expired");
 
-                return ServiceResult.Success(responseResource.Success());
-            }
-            else
-            {
-                //HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-                return ServiceResult.BadRequest(responseResource.Failure());
-            }
-        }
+        //    // Chấp nhận kết nối
+        //    if (HttpContext.WebSockets.IsWebSocketRequest)
+        //    {
+        //        WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+        //        KSSocket socket = new(jwtToken.Username, jwtToken.UserId, webSocket);
+        //        socketManager.AddSocket(socket);
+
+        //        // Bắt đầu vòng lặp để lắng nghe tin nhắn từ client
+        //        await ReceiveMessages(socket);
+
+        //        return ServiceResult.Success(responseResource.Success());
+        //    }
+        //    else
+        //    {
+        //        //HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+        //        return ServiceResult.BadRequest(responseResource.Failure());
+        //    }
+        //}
     }
 }

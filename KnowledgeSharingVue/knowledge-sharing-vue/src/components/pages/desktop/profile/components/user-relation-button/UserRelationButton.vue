@@ -86,8 +86,9 @@ export default {
             try {
                 this.isLoaded = false;
                 this.refreshRelation();
+                let that = this;
                 this.$nextTick(() => {
-                    this.isLoaded = true;
+                    that.isLoaded = true;
                 });
             } catch (e) {
                 console.error(e);

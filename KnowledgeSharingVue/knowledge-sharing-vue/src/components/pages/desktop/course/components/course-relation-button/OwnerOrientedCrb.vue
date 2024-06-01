@@ -58,8 +58,9 @@ export default {
         async forceRender(){
             try {
                 this.isShow = false;
+                let that = this;
                 this.$nextTick(() => {
-                    this.isShow = true;
+                    that.isShow = true;
                 });
             } catch (e){
                 console.error(e);

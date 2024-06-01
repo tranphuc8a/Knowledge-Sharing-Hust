@@ -1,5 +1,5 @@
 
-import ViewMessage from './view-message-model';
+import ViewMessage from "../views/view-message";
 
 class ResponseMessageModel extends ViewMessage {
     constructor() {
@@ -9,6 +9,14 @@ class ResponseMessageModel extends ViewMessage {
 
     init() {
         return new ResponseMessageModel();
+    }
+
+    copy(entity){
+        super.copy(entity);
+        if (this.ReplyMessage != null) {
+            this.ReplyMessage = new ResponseMessageModel().copy(this.ReplyMessage);
+        }
+        return this;
     }
 }
 

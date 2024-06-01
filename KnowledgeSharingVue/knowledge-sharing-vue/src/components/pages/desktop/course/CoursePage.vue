@@ -150,9 +150,10 @@ export default {
 
         async forceRender(){
             try {
+                let that = this;
                 this.isLoaded = false;
                 this.$nextTick(() => {
-                    this.isLoaded = true;
+                    that.isLoaded = true;
                 });
             } catch (e) {
                 console.error(e);
@@ -184,8 +185,9 @@ export default {
                 this.course = null;
                 this.isLoaded = false;
                 this.user = new ResponseCourseModel().copy(body);
+                let that = this;
                 this.$nextTick(() => {
-                    this.isLoaded = true;
+                    that.isLoaded = true;
                 });
                 // this.isCourseExisted = true;
             } catch (error){
