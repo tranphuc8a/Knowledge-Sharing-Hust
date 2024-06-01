@@ -19,7 +19,7 @@
 
 .d-home {
     background-color: var(--primary-color-50);
-    overflow: auto;
+    /* overflow: auto; */
     min-height: 100vh;
 }
 

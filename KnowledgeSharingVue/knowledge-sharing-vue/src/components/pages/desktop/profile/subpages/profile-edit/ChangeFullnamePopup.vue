@@ -127,6 +127,7 @@ export default {
     justify-content: flex-start;
     align-items: center;
     max-width: 750px;
+    min-width: 400px;
     width: 100%;
     height: fit-content;
     gap: 16px;
@@ -145,6 +146,7 @@ export default {
 .p-cnpc-textfield-frame {
     width: 50%;
     max-width: 750px;
+    min-width: 250px;
 }
 
 

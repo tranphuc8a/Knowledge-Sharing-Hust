@@ -189,6 +189,7 @@ export default {
     align-items: center;
     width: 100%;
     height: 100%;
+    min-width: 450px;
     gap: 16px;
 }
 
