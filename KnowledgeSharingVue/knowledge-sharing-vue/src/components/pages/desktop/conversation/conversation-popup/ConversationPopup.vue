@@ -304,6 +304,13 @@ export default {
     overflow: hidden;
 }
 
+@media screen and (max-width: 768px) {
+    .p-conversation-popup-frame {
+        left: 16px;
+        right: 16px;
+    }
+}
+
 .p-conversation-popup-hide-frame {
     height: fit-content;
     background-color: var(--primary-color-200);
