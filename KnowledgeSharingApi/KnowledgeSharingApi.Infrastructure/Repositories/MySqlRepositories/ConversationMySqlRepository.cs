@@ -22,7 +22,6 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         {
             return await DbContext.ViewUserConversations
                 .Where(participant => participant.ConversationId == conversationId)
-                .OrderBy(participant => participant.Time)
                 .ToListAsync();
         }
 
@@ -38,6 +37,16 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                     DbContext.ViewMessages
                     .Where(message => message.ConversationId == conversationId && message.Time >= userConversation.LastDeleteTime)
                     .OrderByDescending(message => message.Time),
+                    pagination
+                ).ToListAsync();
+        }
+
+        public virtual async Task<List<ViewMessage>> GetMessages(Guid conversationId, DateTime lastDeleteTime, PaginationDto pagination)
+        {
+            return await ApplyPagination(
+                    DbContext.ViewMessages
+                    .Where(message => message.ConversationId == conversationId && message.CreatedTime >= lastDeleteTime)
+                    .OrderByDescending(message => message.CreatedTime),
                     pagination
                 ).ToListAsync();
         }

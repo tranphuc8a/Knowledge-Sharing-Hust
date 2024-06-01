@@ -12,6 +12,8 @@ namespace KnowledgeSharingApi.Services.Interfaces
     {
         Task<ServiceResult> ConnectSocket(HttpContext httpContext, string? token);
 
+        Task<ServiceResult> ConnectSocket(HttpContext httpContent);
+
         Task<bool> CloseSocket(KSSocket socket);
 
         Task<bool> CloseSocket(string username);

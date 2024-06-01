@@ -145,6 +145,30 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
 
+        public virtual async Task<ServiceResult> ConnectSocket(HttpContext HttpContext)
+        {
+            // Chấp nhận kết nối
+            if (HttpContext.WebSockets.IsWebSocketRequest)
+            {
+                WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                Guid newId = Guid.NewGuid();
+                KSSocket socket = new(newId.ToString(), newId, webSocket);
+                socketManager.AddSocket(socket);
+
+                // Bắt đầu vòng lặp để lắng nghe tin nhắn từ client
+                await ReceiveMessages(socket);
+
+                return ServiceResult.Success(responseResource.Success(), string.Empty, newId);
+                //await WaitForCloseSession(webSocket);
+            }
+            else
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+                return ServiceResult.BadRequest(responseResource.Failure());
+            }
+        }
+
+
         protected virtual JwtTokenDto? VerifyToken(string? token)
         {
             try
@@ -193,5 +217,6 @@ namespace KnowledgeSharingApi.Services.Services
         #endregion
 
         protected abstract Task HandleMessage(KSSocket socket, string message);
+
     }
 }

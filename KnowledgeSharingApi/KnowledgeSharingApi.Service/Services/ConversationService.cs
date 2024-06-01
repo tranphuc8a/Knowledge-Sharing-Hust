@@ -48,15 +48,15 @@ namespace KnowledgeSharingApi.Services.Services
         /// <returns></returns>
         /// Created: PhucTV (20/3/24)
         /// Modified: None
-        protected virtual async Task<ResponseConversationModel> GetConversationDetail(Guid myUid, Guid conversationId)
+        protected virtual async Task<ResponseConversationModel> GetConversationDetail(Guid myUid, Conversation conversation)
         {
             // Lấy về cuộc hội thoại
-            Conversation conv = await ConversationRepository.Get(conversationId)
-                ?? throw new ValidatorException(ResponseResource.NotFound(ConversationResource));
+            //Conversation conv = await ConversationRepository.Get(conversationId)
+            //    ?? throw new ValidatorException(ResponseResource.NotFound(ConversationResource));
 
             // Lấy về danh sách participant
             List<ResponseParticipantModel> listParticipants =
-                (await ConversationRepository.GetParticipants(conversationId))
+                (await ConversationRepository.GetParticipants(conversation.ConversationId))
                 .Select(participant => (new ResponseParticipantModel().Copy(participant) as ResponseParticipantModel)!)
                 .ToList();
 
@@ -74,7 +74,7 @@ namespace KnowledgeSharingApi.Services.Services
 
 
             ResponseConversationModel model = new();
-            model.Copy(conv);
+            model.Copy(conversation);
             model.Participants = listParticipants;
             model.Messages = [];
 
@@ -138,7 +138,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.Success(),
                 string.Empty,
-                await GetConversationDetail(user_1, conversation.ConversationId)
+                await GetConversationDetail(user_1, conversation)
             );
         }
 
@@ -154,13 +154,13 @@ namespace KnowledgeSharingApi.Services.Services
             // Kiểm tra conversation phải tồn tại
             Conversation conversation = await CheckExistedConversation(conversationId);
 
+            // Lấy về thông tin chi tiết conservation
+            ResponseConversationModel model = await GetConversationDetail(myUId, conversation);
+
             // Kiểm tra conversation phải chứa myUid
-            List<ViewUserConversation> participants = await ConversationRepository.GetParticipants(conversationId);
-            if (!participants.Any(participant => participant.UserId == myUId))
+            if (!model.Participants.Any(participant => participant.UserId == myUId))
                 return ServiceResult.Forbidden("Bạn chưa tham gia cuộc hội thoại này");
 
-            // Lấy về thông tin chi tiết conservation
-            ResponseConversationModel model = await GetConversationDetail(myUId, conversationId);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetSuccess(ConversationResource), string.Empty, model);
@@ -192,7 +192,7 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> GetConversationWith(Guid myUid, Guid uid)
         {
             //ViewUser user_1 = await CheckExistedUser(myUid);
-            _ = await CheckExistedUser(uid);
+            //_ = await CheckExistedUser(uid);
 
             Conversation? conversation = await ConversationRepository.GetConversationWithUser(myUid, uid);
             if (conversation == null)
@@ -201,7 +201,7 @@ namespace KnowledgeSharingApi.Services.Services
             return ServiceResult.Success(
                 ResponseResource.GetSuccess(ConversationResource),
                 string.Empty,
-                await GetConversationDetail(myUid, conversation.ConversationId)
+                await GetConversationDetail(myUid, conversation)
             );
         }
 
@@ -219,7 +219,7 @@ namespace KnowledgeSharingApi.Services.Services
                 return ServiceResult.Success(
                     ResponseResource.InsertSuccess(ConversationResource),
                     string.Empty,
-                    await GetConversationDetail(myUid, conversation.ConversationId)
+                    await GetConversationDetail(myUid, conversation)
                 );
             }
 
@@ -327,7 +327,7 @@ namespace KnowledgeSharingApi.Services.Services
         public async virtual Task<ServiceResult> GetMessages(Guid myUid, Guid conversationId, PaginationDto pagination)
         {
             //ViewUser user = await CheckExistedUser(myUid);
-            Conversation conv = await CheckExistedConversation(conversationId);
+            //Conversation conv = await CheckExistedConversation(conversationId);
 
             // Kiểm tra đúng quyền
             ViewUserConversation userConversation = await ConversationRepository.GetParticipant(myUid, conversationId)
@@ -335,7 +335,7 @@ namespace KnowledgeSharingApi.Services.Services
 
             // Lấy về danh sách tin nhắn
             List<ResponseMessageModel> messages =
-                (await ConversationRepository.GetMessages(myUid, conversationId, pagination))
+                (await ConversationRepository.GetMessages(conversationId, lastDelete: userConversation.LastDeleteTime, pagination))
                 .Select(message => (new ResponseMessageModel().Copy(message) as ResponseMessageModel)!)
                 .ToList();
 
@@ -469,10 +469,11 @@ namespace KnowledgeSharingApi.Services.Services
         {
             try
             {
-                ViewUser profile = await CheckExistedUser(myUId);
+                //ViewUser profile = await CheckExistedUser(myUId);
                 // Check Conversation phù hợp
-                _ = await CheckExistedConversation(model.ConversationId);
+                //_ = await CheckExistedConversation(model.ConversationId);
                 // Check participant
+
                 List<ViewUserConversation> participants = await ConversationRepository.GetParticipants(model.ConversationId);
                 ViewUserConversation? participant = participants.Where(p => p.UserId == myUId).FirstOrDefault();
                 if (participant == null) return (false, null, []);
@@ -485,7 +486,7 @@ namespace KnowledgeSharingApi.Services.Services
                     Content = model.Content!,
                     Time = DateTime.UtcNow,
                     CreatedTime = DateTime.UtcNow,
-                    CreatedBy = profile.FullName,
+                    CreatedBy = participant.FullName,
                     IsEdited = false,
                     ReplyId = null
                 };
@@ -495,7 +496,6 @@ namespace KnowledgeSharingApi.Services.Services
                 ViewMessage res = new();
                 res.Copy(msg);
                 res.Copy(participant);
-                res.Copy(profile);
 
                 return (true, res, participants.Select(p => p.Username).ToList());
             }

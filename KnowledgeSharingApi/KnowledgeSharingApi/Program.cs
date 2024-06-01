@@ -129,6 +129,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<INotificationSocketSessionManager, NotificationSocketSessionManager>();
 builder.Services.AddSingleton<ILiveChatSocketSessionManager, LiveChatSocketSessionManager>();
 builder.Services.AddSingleton<INewMessageNotificationSocketSessionManager, NewMessageNotificationSocketSessionManager>();
+builder.Services.AddSingleton<IBroadcastSocketSesstionManager, BroadcastSocketSessionManager>();
 builder.Services.AddSingleton<IGoogleOAuth2, GoogleOAuth2>();
 builder.Services.AddSingleton<IMarkdownConverter, MarkdownConverter>();
 
@@ -192,6 +193,7 @@ builder.Services.AddScoped<ICourseLessonService, CourseLessonService>();
 builder.Services.AddScoped<IOAuth2Service, OAuth2Service>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddSingleton<ICalculateKnowledgeSearchScore, CalculateKnowledgeSearchScore>();
+builder.Services.AddScoped<IBroadcastSocket, BroadcastSocket>();
 
 
 
