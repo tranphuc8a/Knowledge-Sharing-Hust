@@ -118,8 +118,8 @@ namespace KnowledgeSharingApi.Services.Services
         public virtual async Task<ServiceResult> ConnectSocket(HttpContext HttpContext, string? token)
         {
             // Check token lấy username
-            string? username = VerifyToken(token);
-            if (username == null)
+            JwtTokenDto? tokenDto = VerifyToken(token);
+            if (tokenDto == null)
             {
                 return ServiceResult.BadRequest(responseResource.InvalidToken());
             }
@@ -128,7 +128,7 @@ namespace KnowledgeSharingApi.Services.Services
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 WebSocket webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                KSSocket socket = new(username, webSocket);
+                KSSocket socket = new(tokenDto.Username, tokenDto.UserId, webSocket);
                 socketManager.AddSocket(socket);
 
                 // Bắt đầu vòng lặp để lắng nghe tin nhắn từ client
@@ -145,16 +145,16 @@ namespace KnowledgeSharingApi.Services.Services
         }
 
 
-        protected virtual string? VerifyToken(string? token)
+        protected virtual JwtTokenDto? VerifyToken(string? token)
         {
             try
             {
                 if (token == null) return null;
 
-                ClaimsPrincipal? claimsPrincipal = Encrypt.JwtDecryptToClaimsPrincipal(token, isValidateLifeTime: true);
-                if (claimsPrincipal == null) return null;
+                JwtTokenDto? tokenDto = Encrypt.JwtDecrypt(token, isValidateLifeTime: true);
+                if (token == null) return null;
 
-                return claimsPrincipal.Identity?.Name;
+                return tokenDto;
             }
             catch (Exception)
             {

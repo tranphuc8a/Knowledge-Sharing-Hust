@@ -1,7 +1,7 @@
 // Framework: .NET Core
 // Technology stack: C#
 
-import Message from './message';
+import Message from "../entities/message";
 
 class ViewMessage extends Message {
     constructor() {

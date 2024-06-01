@@ -58,9 +58,26 @@ class Validator {
     **/
     static isEmpty(val){
         try {
-            if (val === null || val === undefined || val === ""){
+            if (val === null || val === undefined || (typeof val === "string" && val === "")){
                 return true;
             } 
+            return false;
+        } catch (error){
+            console.error(error);
+        }
+    }
+
+    /**
+    * Kiểm tra xem một giá trị có là rỗng hay không 
+    * @param {*} value - giá trị cần kiểm tra
+    * @Author TVPhuc (02/12/23)
+    * @Edit 
+    **/
+    static isEmptyOrSpace(val){
+        try {
+            if (val === null || val === undefined || (typeof val === "string" && val === "")){
+                return true;
+            }
             return false;
         } catch (error){
             console.error(error);

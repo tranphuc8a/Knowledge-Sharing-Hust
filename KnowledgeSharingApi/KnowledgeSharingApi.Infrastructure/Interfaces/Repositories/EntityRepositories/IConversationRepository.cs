@@ -40,7 +40,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// <returns></returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<Conversation> CreateConversation(Profile user1, Profile user2);
+        Task<Conversation?> CreateConversation(Guid user1, Guid user2);
 
 
         /// <summary>

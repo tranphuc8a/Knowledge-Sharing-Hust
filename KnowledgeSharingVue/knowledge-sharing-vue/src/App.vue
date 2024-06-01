@@ -11,6 +11,7 @@
     <PopupManager ref="popupManager"/>
     <ToastManager ref="toastManager"/>
     <LoadingPanel ref="loadingPanel"/>
+    <ConversationPopup ref="conversationPopup"/>
     
 </template>
 
@@ -21,6 +22,7 @@ import ToastManager from '@/components/base/toast/MToastManager.vue';
 import { language } from '@/js/resources/language';
 import resolveAxiosResponse from '@/js/services/resolve-axios-response';
 import CurrentUser from './js/models/entities/current-user';
+import ConversationPopup from './components/pages/desktop/conversation/conversation-popup/ConversationPopup.vue';
 // import Common from './js/utils/common';
 
 export default {
@@ -31,7 +33,8 @@ export default {
         }
     },
     components: {
-        PopupManager, ToastManager, LoadingPanel
+        PopupManager, ToastManager, LoadingPanel,
+        ConversationPopup
     },
     mounted(){
         this.toastManager = this.$refs.toastManager;
@@ -58,6 +61,9 @@ export default {
         },
         getLoadingPanel(){
             return this.$refs.loadingPanel;
+        },
+        getConversationPopup(){
+            return this.$refs.conversationPopup;
         },
         /**
          * Hàm thực hiện thay đổi ngôn ngữ cho các component nhận inject language của trang này
@@ -113,6 +119,7 @@ export default {
             getToastManager: this.getToastManager,
             getPopupManager: this.getPopupManager,
             getLoadingPanel: this.getLoadingPanel,
+            getConversationPopup: this.getConversationPopup,
             getCurrentUser: this.getCurrentUser,
             getLanguage: () => this.globalData.lang,
             changeLanguage: this.changeLanguage

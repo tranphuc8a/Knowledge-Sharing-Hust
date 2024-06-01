@@ -7,6 +7,7 @@ class ResponseParticipantModel extends Entity{
         this.UserConversationId = null;
         this.UserId = null;
         this.ConversationId = null;
+        this.Username = null;
         this.FullName = null;
         this.Avatar = null;
         this.Cover = null;

@@ -144,11 +144,16 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             ];
         }
 
-        public async Task<Conversation> CreateConversation(Profile user1, Profile user2)
+        public async Task<Conversation?> CreateConversation(Guid uid1, Guid uid2)
         {
             await using var transaction = await DbContext.BeginTransaction();
             try
             {
+                List<Profile> profiles = await DbContext.Profiles
+                    .Where(p => p.UserId == uid1 || p.UserId == uid2).ToListAsync();
+                Profile user1 = profiles.Where(p => p.UserId == uid1).First() ?? throw new Exception();
+                Profile user2 = profiles.Where(p => p.UserId == uid2).First() ?? throw new Exception();
+
                 var conversation = CreateConversationEntity(user1, user2);
                 DbContext.Conversations.Add(conversation);
 
@@ -163,7 +168,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
             catch (Exception)
             {
                 await transaction.RollbackAsync();
-                throw;
+                return null;
             }
         }
     }
