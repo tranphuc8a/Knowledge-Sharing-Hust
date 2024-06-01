@@ -304,11 +304,12 @@ export default {
     overflow: hidden;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 600px) {
     .p-conversation-popup-frame {
         left: 16px;
         right: 16px;
         width: calc(100vw - 32px);
+        height: calc(100vh - 32px);
     }
 }
 
