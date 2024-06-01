@@ -308,6 +308,7 @@ export default {
     .p-conversation-popup-frame {
         left: 16px;
         right: 16px;
+        width: calc(100vw - 32px);
     }
 }
 
