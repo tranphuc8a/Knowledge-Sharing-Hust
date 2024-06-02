@@ -101,6 +101,7 @@ export default {
     justify-content: flex-end;
     align-items: stretch;
     gap: 8px;
+    text-align: left;
 }
 
 .p-conversation-message-other {
