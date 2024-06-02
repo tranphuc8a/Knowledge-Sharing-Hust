@@ -114,7 +114,7 @@ export default {
                 if (this.isWorking || this.isOutOfMessage) return;
                 let scrollContainer = this.$refs['scroll-container'];
                 if (scrollContainer == null) return;
-                let scrollTop = scrollContainer.scrollTop;
+                let scrollTop = -scrollContainer.scrollTop;
                 let scrollHeight = scrollContainer.scrollHeight;
                 let clientHeight = scrollContainer.clientHeight;
                 let leftHeight = scrollHeight - (scrollTop + clientHeight);

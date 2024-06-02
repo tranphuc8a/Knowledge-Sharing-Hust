@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using System;
@@ -19,6 +20,15 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
         /// Created: PhucTV (20/3/24)
         /// Modified: None
         Task<List<ViewUserConversation>> GetParticipants(Guid conversationId);
+
+        /// <summary>
+        /// Lấy về chi tiet mot conversation
+        /// </summary>
+        /// <param name="conversationId"> id của cuộc hội thoại muốn lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        Task<ResponseConversationModel?> GetDetailsConversation(Guid conversationId);
 
 
         /// <summary>
