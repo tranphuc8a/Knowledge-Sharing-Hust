@@ -328,7 +328,7 @@ class StringAlgorithm{
         
         const sentenceLength = words.length;
 
-        for (let startIndex = 0; i < sentenceLength; i++) {
+        for (let startIndex = 0; startIndex < sentenceLength; startIndex++) {
             let maxLength = sentenceLength - startIndex;
             for (let l = 1; l <= maxLength; l++) {
                 const gram = words.slice(startIndex, startIndex + l).join(' ');
