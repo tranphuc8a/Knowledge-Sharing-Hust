@@ -219,7 +219,8 @@ class StringAlgorithm{
 
             // calculate n-gram of each text in listText
             for (let text of listText){
-                let mapGramOfStringB = this.getMapGramCharacter(Unicode.unicodeToAscii(text).toLowerCase());
+                // let mapGramOfStringB = this.getMapGramCharacter(Unicode.unicodeToAscii(text).toLowerCase());
+                let mapGramOfStringB = this.getMapGramCharacterPattern(Unicode.unicodeToAscii(text).toLowerCase(), mapGramOfStringA);
                 let score = 0;
                 for (let gram in mapGramOfStringA) {
                     if (mapGramOfStringB[gram] !== undefined) {
@@ -259,6 +260,33 @@ class StringAlgorithm{
         return mapGram;
     }
 
+    static getMapGramCharacterPattern(text, patternMapGram){
+        if (Validator.isEmpty(text)) return {};
+        let mapGram = {};
+        let words = text.split(" ").filter(word => word.length > 0);
+        
+        for (let word of words) {
+            let wordLength = word.length;
+            for (let startIndex = 0; startIndex < wordLength; startIndex++) {
+                let maxLength = wordLength - startIndex;
+                for (let l = 1; l <= maxLength; l++) {
+                    let gram = word.substring(startIndex, startIndex + l);
+                    if (gram.trim() === '') continue;
+                    if (patternMapGram[gram] === undefined || patternMapGram[gram] === 0 || patternMapGram[gram] === null) {
+                        break;
+                    }
+                    if (mapGram[gram] === undefined) {
+                        mapGram[gram] = 1;
+                    }
+                    else {
+                        mapGram[gram]++;
+                    }
+                }
+            }
+        }
+        return mapGram;
+    }
+
     static getMapGramWord(text) {
         if (!text || text.trim() === '') {
             return {};
@@ -282,6 +310,36 @@ class StringAlgorithm{
             }
         }
         
+        return mapGram;
+    }
+
+    static getMapGramWordPattern(text, patternMapGram) {
+        if (!text || text.trim() === '') {
+            return {};
+        }
+        
+        const mapGram = {};
+        const words = text.split(/\s+/).filter(word => word !== '');
+        
+        const maxWords = 100; // only focus first 100 words of text
+        if (words.length > maxWords) {
+            words.splice(maxWords);
+        }
+        
+        const sentenceLength = words.length;
+
+        for (let startIndex = 0; i < sentenceLength; i++) {
+            let maxLength = sentenceLength - startIndex;
+            for (let l = 1; l <= maxLength; l++) {
+                const gram = words.slice(startIndex, startIndex + l).join(' ');
+                if (!gram.trim()) continue;
+                if (patternMapGram[gram] === undefined || patternMapGram[gram] === 0 || patternMapGram[gram] === null) {
+                    break;
+                }
+                mapGram[gram] = (mapGram[gram] || 0) + 1;
+            }
+        }
+
         return mapGram;
     }
     
@@ -324,7 +382,8 @@ class StringAlgorithm{
             const mapGramOfStringA = this.getMapGramWord(Unicode.unicodeToAscii(search).toLowerCase());
         
             for (const text of listText) {
-                const mapGramOfStringB = this.getMapGramWord(Unicode.unicodeToAscii(text).toLowerCase());
+                // const mapGramOfStringB = this.getMapGramWord(Unicode.unicodeToAscii(text).toLowerCase());
+                const mapGramOfStringB = this.getMapGramWordPattern(Unicode.unicodeToAscii(text).toLowerCase(), mapGramOfStringA);
                 let score = 0;
                 for (const [gram, countInA] of Object.entries(mapGramOfStringA)) {
                     if (mapGramOfStringB[gram]) {
