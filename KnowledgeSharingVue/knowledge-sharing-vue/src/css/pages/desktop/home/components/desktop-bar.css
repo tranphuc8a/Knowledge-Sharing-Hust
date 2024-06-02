@@ -13,11 +13,11 @@
 
     /* of scrollbar */
     padding-right: 8px;
-
+    /* overflow: auto; */
     background-color: white;
     box-shadow: 0 0 10px rgba(var(--primary-color-rgb), 0.56);
 
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;

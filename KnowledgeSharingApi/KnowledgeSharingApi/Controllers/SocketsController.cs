@@ -10,12 +10,27 @@ namespace KnowledgeSharingApi.Controllers
     public class SocketsController(
         ILiveChatSocketService liveChatSocketService,
         INotificationSocketService notificationSocketService,
-        INewMessageNotificationSocketService newMessageNotificationSocketService
+        INewMessageNotificationSocketService newMessageNotificationSocketService,
+        IBroadcastSocket broadcastSocket
         ) : BaseController
     {
         protected readonly ILiveChatSocketService liveChatSocketService = liveChatSocketService;
         protected readonly INotificationSocketService notificationSocketService = notificationSocketService;
         protected readonly INewMessageNotificationSocketService newMessageNotificationSocketService = newMessageNotificationSocketService;
+        protected readonly IBroadcastSocket BroadcastSocket = broadcastSocket;
+
+        /// <summary>
+        /// Xử lý yêu cầu kết nối tới socket broadcast
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (13/3/24)
+        /// Modified: None
+        [HttpGet("public-broadcast")]
+        public virtual async Task<IActionResult> ConnectToBroadcastChatSocket()
+        {
+            ServiceResult res = await BroadcastSocket.ConnectSocket(HttpContext);
+            return StatusCode(res);
+        }
 
         /// <summary>
         /// Xử lý yêu cầu kết nối tới socket live chat

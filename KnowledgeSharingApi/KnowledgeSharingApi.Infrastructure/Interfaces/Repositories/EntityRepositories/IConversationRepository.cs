@@ -56,6 +56,18 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepo
 
 
         /// <summary>
+        /// Lấy về danh sách tin nhắn của một cuộc hội thoại
+        /// </summary> 
+        /// <param name="conversationId"> id của cuộc hội thoại muốn lấy </param>
+        /// <param name="lastDelete"> Thoi gian cuoi xoa </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/3/24)
+        /// Modified: None
+        Task<List<ViewMessage>> GetMessages(Guid conversationId, DateTime lastDelete, PaginationDto pagination);
+
+
+        /// <summary>
         /// Lấy về danh sách cuộc trò chuyện của userId
         /// </summary>
         /// <param name="userId"> id của user cần lấy </param>
