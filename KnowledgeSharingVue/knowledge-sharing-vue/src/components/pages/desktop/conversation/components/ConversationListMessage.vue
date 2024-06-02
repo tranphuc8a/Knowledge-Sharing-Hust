@@ -193,6 +193,7 @@ export default {
     width: 100%;
     overflow-y: scroll;
     padding: 8px;
+    gap: 8px;
 }
 
 .p-plm-scrollable > :first-child {
