@@ -24,6 +24,7 @@
 import MImageInput from './../../inputs/MImageInput.vue';
 import Common from '@/js/utils/common';
 import appConfig from '@/app-config';
+import { MyRandom } from '@/js/utils/myrandom';
 
 export default {
     name: 'UploadImageContent',
@@ -38,17 +39,27 @@ export default {
                 width: '300px', 
                 height: '300px',
             },
-            siteKey: appConfig.getCaptchaSiteKey()
+            siteKey: appConfig.getCaptchaSiteKey(),
+            captchaId: MyRandom.generateUUID()
         }
     },
     async mounted(){
-        Common.loadRecaptchaScript();
+        let that = this;
+        this.$nextTick(() => {
+            Common.loadRecaptchaScript();
+            that.recaptchaWidgetId = grecaptcha.render(that.$refs.grecaptcha, {
+                'sitekey' : that.siteKey,
+                'callback' : function(response) {
+                    console.log(response);
+                }
+            });
+        });
     },
     methods: {
         async getSelectedImage(){
             try {
                 let image = await this.$refs.imageInput.getValue();
-                let captcha = grecaptcha.getResponse(this.$refs.grecaptcha);
+                let captcha = grecaptcha.getResponse(this.recaptchaWidgetId);
                 return { image, captcha };
             } catch (error) {
                 console.error(error);
