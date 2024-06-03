@@ -12,7 +12,7 @@
             />
         </div>
         <div class="p-uic-captcha">
-            <div class="g-recaptcha" :data-sitekey="siteKey"></div>
+            <div class="g-recaptcha" :data-sitekey="siteKey" ref="grecaptcha"></div>
         </div>
     </div>
 </template>
@@ -48,7 +48,7 @@ export default {
         async getSelectedImage(){
             try {
                 let image = await this.$refs.imageInput.getValue();
-                let captcha = grecaptcha.getResponse();
+                let captcha = grecaptcha.getResponse(this.$refs.grecaptcha);
                 return { image, captcha };
             } catch (error) {
                 console.error(error);
