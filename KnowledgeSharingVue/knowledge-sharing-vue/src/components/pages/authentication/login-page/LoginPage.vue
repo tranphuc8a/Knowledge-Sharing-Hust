@@ -66,7 +66,7 @@ import MButton from '@/components/base/buttons/MButton.vue';
 import { UsernameValidator, PasswordValidator, Validator, NotEmptyValidator } from '@/js/utils/validator';
 import { Request, PostRequest, GetRequest } from '@/js/services/request';
 import statusCodeEnum from '@/js/resources/status-code-enum';
-import appConfig from '@/app-config';
+// import appConfig from '@/app-config';
 import { useRouter } from 'vue-router';
 
 export default {
@@ -349,7 +349,7 @@ export default {
                 let redirectTo = localStorage.getItem("redirect-to");
                 localStorage.setItem("redirect-to", "");
                 if (Validator.isEmpty(redirectTo)){
-                    redirectTo = appConfig.getHomePageUrl();
+                    redirectTo = "/";
                 }
                 // window.location.href = redirectTo;
                 this.router.push(redirectTo);
