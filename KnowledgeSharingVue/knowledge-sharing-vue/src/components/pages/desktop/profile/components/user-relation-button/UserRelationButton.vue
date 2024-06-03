@@ -105,13 +105,18 @@ export default {
                     return;
                 }
                 if (isCallApi || (this.user != null && this.userRelation == null)){
-                    if (this.getUser() == null) return;
-                    let res = await new GetRequest('UserRelations/relation-status/' + this.getUser().UserId)
+                    if (this.user.UserId == this.currentUser.UserId){
+                        this.userRelation = this.userRelationType.IsMySelf;
+                        this.user.UserRelationType = this.userRelationType.IsMySelf;
+                        return;
+                    }
+                    let res = await new GetRequest('UserRelations/relation-status/' + this.user.UserId)
                         .execute();
                     let body = await Request.tryGetBody(res);
                     this.userCard = new ResponseUserCardModel().copy(body);
                     this.userRelation = this.userCard.UserRelationType;
                     this.getUser().UserRelationId = this.userCard.UserRelationId;
+                    this.getUser().UserRelationType = this.userCard.UserRelationType;
                 }
             } catch (e) {
                 console.error(e);
@@ -136,7 +141,8 @@ export default {
         }
     },
     inject:{
-        getUser: {}
+        getUser: {},
+        getCurrentUser: {},
     }
 }
 

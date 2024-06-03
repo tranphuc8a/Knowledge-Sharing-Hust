@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Domains.Models.Dtos;
+﻿using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
@@ -83,11 +84,8 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
         {
             List<ViewUserConversation> participants = await GetParticipants(conversationId);
             DateTime minLastDelete = participants.Select(participant => participant.LastDeleteTime).Min();
-            List<Message> expired_messages =
-                DbContext.Messages
-                .Where(message => message.Time <= minLastDelete)
-                .ToList();
 
+            IQueryable<Message> expired_messages = DbContext.Messages.Where(message => message.Time <= minLastDelete);
             DbContext.Messages.RemoveRange(expired_messages);
 
             await DbContext.SaveChangesAsync();
@@ -119,6 +117,7 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 CreatedBy = user1.FullName
             };
         }
+
         /// <summary>
         /// Tạo mới một 2 participants của một conversation
         /// </summary>
@@ -179,6 +178,32 @@ namespace KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories
                 await transaction.RollbackAsync();
                 return null;
             }
+        }
+
+        public async Task<ResponseConversationModel?> GetDetailsConversation(Guid conversationId)
+        {
+            var query =
+                from conversation in DbContext.Conversations
+                join participant in DbContext.ViewUserConversations
+                    on conversation.ConversationId equals participant.ConversationId
+                group participant by conversation into g
+                select new {
+                    Conversation = g.Key,
+                    Participants = g.ToList()
+                };
+            var tempConversation = await query.FirstOrDefaultAsync();
+
+            if (tempConversation == null) return null;
+            ResponseConversationModel res = new();
+            res.Copy(tempConversation.Conversation);
+            res.Participants = tempConversation.Participants.Select(p =>
+            {
+                var temp = new ResponseParticipantModel();
+                temp.Copy(p);
+                return temp;
+            }).ToList();
+
+            return res;
         }
     }
 }

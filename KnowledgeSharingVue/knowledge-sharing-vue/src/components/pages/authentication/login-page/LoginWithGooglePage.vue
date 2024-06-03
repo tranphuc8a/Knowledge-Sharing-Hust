@@ -32,7 +32,7 @@
 <script>
 import BaseAuthenticationPage from '@/components/pages/authentication/base-page/BaseAuthenticationPage.vue';
 import { Request, PostRequest, GetRequest } from '@/js/services/request';
-import appConfig from '@/app-config';
+// import appConfig from '@/app-config';
 import statusCodeEnum from '@/js/resources/status-code-enum';
 import { Validator } from '@/js/utils/validator';
 import { useRoute, useRouter } from 'vue-router';
@@ -159,7 +159,7 @@ export default {
                 let redirectTo = localStorage.getItem("redirect-to");
                 localStorage.setItem("redirect-to", "");
                 if (Validator.isEmpty(redirectTo)){
-                    redirectTo = appConfig.getHomePageUrl();
+                    redirectTo = "/";
                 }
                 // window.location.href = redirectTo;
                 this.router.push('/');

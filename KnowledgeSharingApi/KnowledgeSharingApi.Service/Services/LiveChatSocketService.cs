@@ -24,13 +24,13 @@ namespace KnowledgeSharingApi.Services.Services
     public class LiveChatSocketService(
         ILiveChatSocketSessionManager liveChatSocketSessionManager,
         IResourceFactory resourceFactory,
-        IConversationService conversationService,
+        //IConversationService conversationService,
         IConversationRepository conversationRepository,
         IMessageRepository messageRepository,
         IEncrypt Encrypt
         ) : SocketService(liveChatSocketSessionManager, resourceFactory, Encrypt), ILiveChatSocketService
     {
-        protected readonly IConversationService ConversationService = conversationService;
+        //protected readonly IConversationService ConversationService = conversationService;
         protected readonly IConversationRepository ConversationRepository = conversationRepository;
         protected readonly IMessageRepository MessageRepository = messageRepository;
 
@@ -42,15 +42,31 @@ namespace KnowledgeSharingApi.Services.Services
                 SendMessageSocketModel? messageFromClient = JsonConvert.DeserializeObject<SendMessageSocketModel>(message)
                     ?? throw new JsonReaderException();
 
-                // Thu insert:
-                (bool isSuccess, ViewMessage? sended, List<string> usernames) res = 
-                    await ConversationService.SendMessageBySocket(socket.UserId, messageFromClient);
-                if (!res.isSuccess) return;
+                List<ViewUserConversation> participants = await ConversationRepository.GetParticipants(messageFromClient.ConversationId);
+                ViewUserConversation? participant = participants.Where(p => p.UserId == socket.UserId).FirstOrDefault();
+                if (participant == null) return;
 
-                string messageToSend = JsonConvert.SerializeObject(res.sended);
+                // Thêm message
+                Message msg = new()
+                {
+                    MessageId = Guid.NewGuid(),
+                    UserConversationId = participant.UserConversationId,
+                    Content = messageFromClient.Content,
+                    Time = DateTime.UtcNow,
+                    CreatedTime = DateTime.UtcNow,
+                    CreatedBy = participant.FullName,
+                    IsEdited = false,
+                    ReplyId = null
+                };
 
-                // Step 3. Gửi lại thông báo tới user
-                await Task.WhenAll(res.usernames.Select(usn => Send(messageToSend, usn)));
+                ViewMessage res = new();
+                res.Copy(msg);
+                res.Copy(participant);
+
+                string messageToSend = JsonConvert.SerializeObject(res);
+                await Task.WhenAll(participants.Select(p => Send(messageToSend, p.Username)));
+
+                await MessageRepository.Insert(msg.MessageId, msg);
             }
             catch (JsonReaderException ex)
             {

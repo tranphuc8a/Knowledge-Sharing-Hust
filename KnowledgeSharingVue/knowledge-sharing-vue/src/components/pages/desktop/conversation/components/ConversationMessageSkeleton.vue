@@ -5,51 +5,52 @@
 
         <div class="p-conversation-message-other">
             <div class="p-cmo-left">
-                <div style="width: 30px; height: 30px; border-radius: 100%;">
+                <div style="width: 30px; height: 30px; border-radius: 100%;" class="skeleton">
                 </div>
             </div>
             <div class="p-cmo-right">
-                <div class="p-cmo-content-frame"
-                    style="height: 30px; width: 170px;"
+                <div class="p-cmo-content-frame skeleton"
+                    style="height: 30px; width: 170px; padding: 0px"
                 ></div>
             </div>
         </div>
-
+    
         <div class="p-conversation-message-other">
             <div class="p-cmo-left">
-                <div style="width: 30px; height: 30px; border-radius: 100%;">
+                <div style="width: 30px; height: 30px; border-radius: 100%;" class="skeleton">
                 </div>
             </div>
             <div class="p-cmo-right">
-                <div class="p-cmo-content-frame"
-                    style="height: 30px; width: 75px;"
+                <div class="p-cmo-content-frame skeleton"
+                    style="height: 30px; width: 75px; padding: 0px"
                 ></div>
             </div>
         </div>
-
+    
         <div class="p-conversation-message-me">
-            <div class="p-cmm-left skeleton">
-                <div class="p-cmm-content-frame"
-                    style="height: 30px; width: 120px;"
+            <div class="p-cmm-left">
+                <div class="p-cmm-content-frame skeleton"
+                    style="height: 30px; width: 160px; padding: 0px"
                 ></div>
             </div>
             <div class="p-cmm-right">
-                <div style="width: 30px; height: 30px; border-radius: 100%;">
+                <div style="width: 30px; height: 30px; border-radius: 100%; " class="skeleton">
                 </div>
             </div>
         </div>
-
+    
         <div class="p-conversation-message-other">
             <div class="p-cmo-left">
-                <div style="width: 30px; height: 30px; border-radius: 100%;">
+                <div style="width: 30px; height: 30px; border-radius: 100%;" class="skeleton">
                 </div>
             </div>
             <div class="p-cmo-right">
-                <div class="p-cmo-content-frame"
-                    style="height: 30px; width: 150px;"
+                <div class="p-cmo-content-frame skeleton"
+                    style="height: 30px; width: 150px; padding: 0px"
                 ></div>
             </div>
         </div>
+        
     </div>
 </template>
 
@@ -70,6 +71,7 @@ export default {
     height: fit-content;
     display: flex;
     flex-direction: column;
+    gap: 8px;
 }
 
 .p-conversation-message-me {
@@ -92,6 +94,8 @@ export default {
     width: 0;
     flex-grow: 1;
     max-width: 70%;
+    display: flex;
+    flex-flow: row-reverse nowrap;
 }
 
 .p-cmm-right {
