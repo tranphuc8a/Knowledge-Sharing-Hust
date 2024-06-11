@@ -7,7 +7,7 @@ using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
+using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIteractionRepositories;
 
 namespace KnowledgeSharingApi.Services.Services
 {

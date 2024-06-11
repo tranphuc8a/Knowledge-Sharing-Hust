@@ -7,7 +7,7 @@ using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Caches;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Captcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIteractionRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System;

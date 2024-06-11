@@ -14,17 +14,15 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
 using KnowledgeSharingApi.Infrastructures.Interfaces.GoogleRecaptcha;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Markdown;
 using KnowledgeSharingApi.Infrastructures.Interfaces.OAuth2;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Repositories.Interfaces;
+using KnowledgeSharingApi.Repositories.Interfaces.DecorationRepositories;
+using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Request;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
 using KnowledgeSharingApi.Infrastructures.Interfaces.UnitOfWorks;
 using KnowledgeSharingApi.Infrastructures.Interfaces.WebSockets;
 using KnowledgeSharingApi.Infrastructures.Markdown;
 using KnowledgeSharingApi.Infrastructures.OAuth2;
-using KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositories;
-using KnowledgeSharingApi.Infrastructures.Repositories.MySqlRepositories;
 using KnowledgeSharingApi.Infrastructures.Request;
 using KnowledgeSharingApi.Infrastructures.Storages;
 using KnowledgeSharingApi.Infrastructures.UnitOfWorks;
@@ -37,6 +35,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.KnowledgeRepositories;
+using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIteractionRepositories;
+using KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlUserIteractionRepositories;
+using KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlKnowledgeRepositories;
+using KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories;
+using KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories;
+using KnowledgeSharingApi.Repositories.Interfaces.Repositories;
 
 
 

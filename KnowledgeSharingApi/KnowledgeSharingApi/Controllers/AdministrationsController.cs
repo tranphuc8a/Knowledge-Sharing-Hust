@@ -1,4 +1,5 @@
-﻿using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories;
+﻿using KnowledgeSharingApi.Repositories.Interfaces;
+using KnowledgeSharingApi.Repositories.Interfaces.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

@@ -10,10 +10,9 @@ using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Domains.Resources.Vietnamese;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.DecorationRepositories;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Repositories.EntityRepositories;
+using KnowledgeSharingApi.Repositories.Interfaces.DecorationRepositories;
+using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
-using KnowledgeSharingApi.Infrastructures.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -23,6 +22,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using ZstdSharp.Unsafe;
+using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIteractionRepositories;
 
 namespace KnowledgeSharingApi.Services.Services
 {

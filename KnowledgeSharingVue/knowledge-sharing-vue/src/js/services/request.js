@@ -247,6 +247,10 @@ class Request {
             } else {
                 throw error1;
             }
+        } finally {
+            if (Request.isCheckedLogedIn === false){
+                this.checkLogedIn();
+            }
         }
     }
 
@@ -269,11 +273,14 @@ class Request {
         } catch (error){
             console.error(error);
             return false;
+        } finally {
+            Request.isCheckedLogedIn = true;
         }
     }
 
 
     static isTokenRefresh       = true;
+    static isCheckedLogedIn     = false;
     static tryGetBody           = resolveAxiosResponse.tryGetBody.bind(resolveAxiosResponse);
     static tryGetStatusCode     = resolveAxiosResponse.tryGetStatusCode.bind(resolveAxiosResponse);
     static tryGetUserMessage    = resolveAxiosResponse.tryGetUserMessage.bind(resolveAxiosResponse);

@@ -97,6 +97,9 @@ export default {
                     .setBody(image)
                     .execute();
                 this.getToastManager().success('Cập nhật ảnh bìa thành công');
+                let currentUser = await CurrentUser.getInstance();
+                currentUser.Cover = image;
+                await CurrentUser.setInstance(currentUser);
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);

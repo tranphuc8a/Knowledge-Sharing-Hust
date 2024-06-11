@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\KnowledgeSharingApi.Domain\KnowledgeSharingApi.Domains.csproj" />
     <ProjectReference Include="..\KnowledgeSharingApi.Infrastructure\KnowledgeSharingApi.Infrastructures.csproj" />
+    <ProjectReference Include="..\KnowledgeSharingApi.Repositories\KnowledgeSharingApi.Repositories.csproj" />
   </ItemGroup>
 
 </Project>
