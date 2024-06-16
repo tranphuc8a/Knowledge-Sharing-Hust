@@ -2,7 +2,7 @@
 
 import UserConversation from '../entities/user-conversation';
 
-class ViewUserConversation extends UserConversation {
+class ViewUserProfileConversation extends UserConversation {
     constructor() {
         super();
         this.Username = null;
@@ -12,8 +12,8 @@ class ViewUserConversation extends UserConversation {
     }
 
     init() {
-        return new ViewUserConversation();
+        return new ViewUserProfileConversation();
     }
 }
 
-export default ViewUserConversation;
+export default ViewUserProfileConversation;

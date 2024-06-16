@@ -1,0 +1,3 @@
+User-agent: *
+Allow: *
+Sitemap: https://knowledge-sharing-delta.vercel.app/sitemap.xml

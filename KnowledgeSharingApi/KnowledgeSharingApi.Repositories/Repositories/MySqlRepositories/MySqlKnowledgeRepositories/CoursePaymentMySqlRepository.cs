@@ -52,7 +52,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
         /// <returns></returns>
         /// Created: PhucTV (31/3/24)
         /// Modified: None
-        protected virtual CourseRegister CreateCourseRegister(ViewUser user, ViewCourse course)
+        protected virtual CourseRegister CreateCourseRegister(ViewUserProfile user, ViewCourse course)
         {
             return new CourseRegister()
             {
@@ -74,7 +74,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
         /// <returns></returns>
         /// Created: PhucTV (31/3/24)
         /// Modified: None
-        protected virtual CoursePayment CreateCoursePayment(ViewUser user, ViewCourse course)
+        protected virtual CoursePayment CreateCoursePayment(ViewUserProfile user, ViewCourse course)
         {
             return new CoursePayment()
             {
@@ -91,7 +91,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
 
         public async Task<int> UserPayCourse(Guid userId, Guid courseId)
         {
-            ViewUser? user = await DbContext.ViewUsers.FindAsync(userId);
+            ViewUserProfile? user = await DbContext.ViewUserProfiles.FindAsync(userId);
             ViewCourse? course = await DbContext.ViewCourses.FindAsync(courseId);
             if (user == null || course == null) return 0;
 

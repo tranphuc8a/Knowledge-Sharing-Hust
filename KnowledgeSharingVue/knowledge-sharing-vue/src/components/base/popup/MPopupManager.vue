@@ -162,6 +162,10 @@ export default {
 
         async requiredLogin(){
             try {
+                let msg = "Bạn cần đăng nhập để thực hiện chức năng này!";
+                if (this.listPopup.some(p => p.content == msg)){
+                    return;
+                }
                 let that = this;
                 let currentPath = this.router.currentRoute.path;
                 if (currentPath != null){
@@ -170,8 +174,7 @@ export default {
                 // let homepage = appConfig.getHomePageUrl();
                 // homepage = Common.removeTrailingSlash(homepage);
                 let router = this.router;
-                this.inform("Bạn cần đăng nhập để thực hiện chức năng này!",
-                    async function(){
+                this.inform(msg, async function(){
                         that.listPopup = [];
                         // window.location.href = homepage + "/login";
                         router.push("/login");

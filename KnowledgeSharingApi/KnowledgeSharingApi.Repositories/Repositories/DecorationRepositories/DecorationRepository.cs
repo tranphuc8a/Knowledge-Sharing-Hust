@@ -396,13 +396,13 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
         protected virtual async Task<Dictionary<Guid, ResponseUserCardModel?>> GetMapUserCard(Guid? myUid, List<Guid> userIds)
         {
             Dictionary<Guid, ResponseUserCardModel?> mapUsers = [];
-            Dictionary<Guid, ViewUser?> listUsers = await UserRepository
+            Dictionary<Guid, ViewUserProfile?> listUsers = await UserRepository
                     .GetDetail([.. userIds]);
             mapUsers = listUsers.ToDictionary(
                 item => item.Key,
                 item =>
                 {
-                    ViewUser? user = item.Value;
+                    ViewUserProfile? user = item.Value;
                     if (user == null) return null;
                     ResponseUserCardModel resUser = new();
                     if (user != null) resUser.Copy(user);
@@ -422,7 +422,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
 
             if (isDecorateUser)
             {
-                // Get Dictionary <userid, ViewUser -> ResponseUserCardModel>
+                // Get Dictionary <userid, ViewUserProfile -> ResponseUserCardModel>
                 mapUserPromise = GetMapUserCard(myUid, listStars.Select(st => st.UserId).ToList());
             }
             mapUsers = await mapUserPromise;

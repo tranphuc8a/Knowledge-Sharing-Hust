@@ -130,6 +130,7 @@ export default {
 .p-list-members__item_container{
     width: 34px;
     height: 34px;
+    max-width: 34px;
     border-radius: 100%;
     background-color: white;
     position: relative;

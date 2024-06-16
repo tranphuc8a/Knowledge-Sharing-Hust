@@ -9,7 +9,8 @@
             <template #tooltipMask>
                 <div class="p-tooltip-username" @:click="resolveClickUsername"
                     :style="style">
-                    {{ user?.FullName ?? "User"}}
+                    <EllipsisText :text="user?.FullName ?? 'User'" :max-line="2" />
+                    <!-- {{ user?.FullName ?? "User"}} -->
                 </div>
             </template>
     
@@ -24,6 +25,7 @@
 <script>
 import TooltipUserV2 from './TooltipUserV2.vue';
 import TooltipFrame from '../tooltip/TooltipFrame.vue';
+import EllipsisText from '../text/EllipsisText.vue';
 import { useRouter } from 'vue-router';
 import { Validator } from '@/js/utils/validator';
 
@@ -36,7 +38,8 @@ export default {
         }
     },
     components: {
-        TooltipUserV2, TooltipFrame
+        TooltipUserV2, TooltipFrame,
+        EllipsisText
     },
     methods: {
         /**

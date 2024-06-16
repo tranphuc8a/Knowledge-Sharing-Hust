@@ -42,6 +42,14 @@ using KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlKnowl
 using KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories;
 using KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories;
 using KnowledgeSharingApi.Repositories.Interfaces.Repositories;
+using KnowledgeSharingApi.Services.Interfaces.Authentications;
+using KnowledgeSharingApi.Services.Interfaces.Sockets;
+using KnowledgeSharingApi.Services.Interfaces.Knowledges;
+using KnowledgeSharingApi.Services.Interfaces.UserIteractions;
+using KnowledgeSharingApi.Services.Services.Authentications;
+using KnowledgeSharingApi.Services.Services.Sockets;
+using KnowledgeSharingApi.Services.Services.Knowledges;
+using KnowledgeSharingApi.Services.Services.UserIterations;
 
 
 
@@ -197,7 +205,7 @@ builder.Services.AddScoped<ICoursePaymentService, CoursePaymentService>();
 builder.Services.AddScoped<ICourseLessonService, CourseLessonService>();
 builder.Services.AddScoped<IOAuth2Service, OAuth2Service>();
 builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddSingleton<ICalculateKnowledgeSearchScore, CalculateKnowledgeSearchScore>();
+builder.Services.AddSingleton<ISearchService, SearchService>();
 builder.Services.AddScoped<IBroadcastSocket, BroadcastSocket>();
 
 

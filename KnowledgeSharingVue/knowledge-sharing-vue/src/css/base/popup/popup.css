@@ -60,7 +60,7 @@
     flex-flow: row nowrap;
     justify-content: flex-start;
     align-items: flex-start;
-    text-align: left;
+    text-align: justify;
 }
 
 .p-popup-header{

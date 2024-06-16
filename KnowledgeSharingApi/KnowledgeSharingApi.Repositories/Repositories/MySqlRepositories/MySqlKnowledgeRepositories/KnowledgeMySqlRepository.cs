@@ -166,16 +166,16 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
                 .ToListAsync();
         }
 
-        public virtual async Task<PaginationResponseModel<ViewUser>> GetListUserMaredKnowledge(Guid knowledgeId, PaginationDto pagination)
+        public virtual async Task<PaginationResponseModel<ViewUserProfile>> GetListUserMaredKnowledge(Guid knowledgeId, PaginationDto pagination)
         {
             var listUserIds = await DbContext.Marks.Where(mark => mark.KnowledgeId == knowledgeId)
                 .Select(mark => mark.UserId).Distinct().ToListAsync();
             int total = listUserIds.Count;
-            IQueryable<ViewUser> listUser = ApplyPagination(
-                DbContext.ViewUsers
+            IQueryable<ViewUserProfile> listUser = ApplyPagination(
+                DbContext.ViewUserProfiles
                 .Where(user => listUserIds.Contains(user.UserId)),
                 pagination);
-            return new PaginationResponseModel<ViewUser>
+            return new PaginationResponseModel<ViewUserProfile>
             {
                 Total = total,
                 Limit = pagination.Limit,

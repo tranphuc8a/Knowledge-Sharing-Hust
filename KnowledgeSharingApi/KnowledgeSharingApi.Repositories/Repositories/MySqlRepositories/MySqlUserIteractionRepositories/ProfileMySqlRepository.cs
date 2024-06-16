@@ -18,37 +18,37 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
     public class ProfileMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Profile>(dbContext), IProfileRepository
     {
-        public virtual Task<ViewUser?> GetByEmail(string email)
+        public virtual Task<ViewUserProfile?> GetByEmail(string email)
         {
-            IQueryable<ViewUser> result =
-                from profile in DbContext.ViewUsers
+            IQueryable<ViewUserProfile> result =
+                from profile in DbContext.ViewUserProfiles
                 where profile.Email == email
                 select profile;
             return result.FirstOrDefaultAsync();
         }
 
-        public virtual Task<ViewUser?> GetByUserId(Guid userId)
+        public virtual Task<ViewUserProfile?> GetByUserId(Guid userId)
         {
-            IQueryable<ViewUser> query =
-                from profile in DbContext.ViewUsers
+            IQueryable<ViewUserProfile> query =
+                from profile in DbContext.ViewUserProfiles
                 where profile.UserId == userId
                 select profile;
             return query.FirstOrDefaultAsync();
         }
 
-        public virtual Task<ViewUser?> GetByUsername(string username)
+        public virtual Task<ViewUserProfile?> GetByUsername(string username)
         {
-            IQueryable<ViewUser> result =
-                from profile in DbContext.ViewUsers
+            IQueryable<ViewUserProfile> result =
+                from profile in DbContext.ViewUserProfiles
                 where profile.Username == username
                 select profile;
             return result.FirstOrDefaultAsync();
         }
 
-        public Task<ViewUser?> GetByUsernameOrUserId(string unOruid)
+        public Task<ViewUserProfile?> GetByUsernameOrUserId(string unOruid)
         {
-            IQueryable<ViewUser> result =
-                from profile in DbContext.ViewUsers
+            IQueryable<ViewUserProfile> result =
+                from profile in DbContext.ViewUserProfiles
                 where profile.Username == unOruid || profile.UserId.ToString() == unOruid
                 select profile;
             return result.FirstOrDefaultAsync();

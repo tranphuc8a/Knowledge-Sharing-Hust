@@ -1,16 +1,12 @@
-﻿using KnowledgeSharingApi.Domains.Models.Dtos;
-using KnowledgeSharingApi.Domains.Models.Entities;
+﻿using BCrypt.Net;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Infrastructures.Encrypts
 {
@@ -139,10 +135,13 @@ namespace KnowledgeSharingApi.Infrastructures.Encrypts
                 return null;
 
             return principal;
-        } 
+        }
         #endregion
 
-        public virtual string Sha256HashPassword(string username, string password)
+
+        #region Password Encrypyt
+
+        protected virtual string SHA256HashPassword(string username, string password)
         {
             string combineUser = $"{username} - {password} - {_passwordHashSecretKey}";
 
@@ -157,5 +156,37 @@ namespace KnowledgeSharingApi.Infrastructures.Encrypts
 
             return builder.ToString();
         }
+        protected virtual bool SHA256VerfifyPassword(string username, string password, string hashPassword)
+        {
+            return SHA256HashPassword(username, password) == hashPassword;
+        }
+
+        protected virtual string BCryptHashPassword(string username, string password)
+        {
+            string combineUser = $"{username}-{password}-{_passwordHashSecretKey}";
+            string salt = BCrypt.Net.BCrypt.GenerateSalt();
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(combineUser, salt);
+
+            return hashedPassword;
+        }
+
+        protected virtual bool BcryptVerifyPassword(string username, string password, string hashedPassword)
+        {
+            string combineUser = $"{username}-{password}-{_passwordHashSecretKey}";
+            return BCrypt.Net.BCrypt.Verify(combineUser, hashedPassword);
+        }
+
+
+        public virtual string HashPassword(string username, string password)
+        {
+            return BCryptHashPassword(username, password);
+        }
+
+        public virtual bool VerifyPassword(string username, string password, string hashPassword)
+        {
+            return BcryptVerifyPassword(username, password, hashPassword);
+        }
+
+        #endregion
     }
 }

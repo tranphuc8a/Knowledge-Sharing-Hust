@@ -42,7 +42,7 @@ import ProfileEditInformationContent from './ProfileEditInformationContent.vue';
 import ProfileEditContactContent from './ProfileEditContactContent.vue';
 import ProfileEditCareerContent from './ProfileEditCareerContent.vue';
 import CurrentUser from '@/js/models/entities/current-user';
-import ViewUser from '@/js/models/views/view-user';
+import ViewUserProfile from '@/js/models/views/view-user';
 import Profile from '@/js/models/entities/profile';
 import { PatchRequest, Request } from '@/js/services/request';
 
@@ -93,7 +93,7 @@ export default {
         async refresh(){
             try {
                 this.tabIndex = this.tabEnum.General;
-                this.user = new ViewUser().copy(await CurrentUser.getInstance());
+                this.user = new ViewUserProfile().copy(await CurrentUser.getInstance());
                 await this.setInputValue();
             } catch (error){
                 console.error(error);
@@ -127,7 +127,7 @@ export default {
                     .execute();
 
                 // success: update profile for current user
-                let newUser = new ViewUser().copy(currentUser).copy(profile);
+                let newUser = new ViewUserProfile().copy(currentUser).copy(profile);
                 await CurrentUser.setInstance(newUser);
 
                 // update profile for input:

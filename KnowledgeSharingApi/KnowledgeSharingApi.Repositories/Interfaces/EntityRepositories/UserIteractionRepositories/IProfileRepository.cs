@@ -16,48 +16,48 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIte
         /// Lấy về profile theo userId
         /// </summary>
         /// <param name="userId"> userId cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (16/3/24)
         /// Modified: None
-        Task<ViewUser?> GetByUserId(Guid userId);
+        Task<ViewUserProfile?> GetByUserId(Guid userId);
 
         /// <summary>
         /// Lấy về profile theo username
         /// </summary>
         /// <param name="username"> userId cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (16/3/24)
         /// Modified: None
-        Task<ViewUser?> GetByUsername(string username);
+        Task<ViewUserProfile?> GetByUsername(string username);
 
         /// <summary>
         /// Lấy về profile theo userId
         /// </summary>
         /// <param name="unOruid"> userId cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (16/3/24)
         /// Modified: None
-        Task<ViewUser?> GetByUsernameOrUserId(string unOruid);
+        Task<ViewUserProfile?> GetByUsernameOrUserId(string unOruid);
 
         /// <summary>
         /// Lấy về profile theo email
         /// </summary>
         /// <param name="email"> userId cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (16/3/24)
         /// Modified: None
-        Task<ViewUser?> GetByEmail(string email);
+        Task<ViewUserProfile?> GetByEmail(string email);
 
         ///// <summary>
-        ///// Tìm kiếm danh sách ViewUser theo search Key
+        ///// Tìm kiếm danh sách ViewUserProfile theo search Key
         ///// </summary>
         ///// <param name="uid"> id của n </param>
         ///// <param name="searchKey"></param>
         ///// <param name="limit"></param>
         ///// <param name="offset"></param>
-        ///// <returns> ViewUser </returns>
+        ///// <returns> ViewUserProfile </returns>
         ///// Created: PhucTV (16/3/24)
         ///// Modified: None
-        //Task<PaginationResponseModel<ViewUser>> Search(string uid, string searchKey, int? limit, int? offset);
+        //Task<PaginationResponseModel<ViewUserProfile>> Search(string uid, string searchKey, int? limit, int? offset);
     }
 }

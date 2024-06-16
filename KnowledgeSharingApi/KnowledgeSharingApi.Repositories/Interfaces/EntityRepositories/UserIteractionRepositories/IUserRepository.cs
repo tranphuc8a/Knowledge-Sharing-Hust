@@ -36,65 +36,65 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIte
         /// <summary>
         /// Lấy về danh sách chi tiết usser
         /// </summary>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<List<ViewUser>> GetDetail();
+        Task<List<ViewUserProfile>> GetDetail();
 
         /// <summary>
         /// Lấy về danh sách chi tiết user có phân trang
         /// </summary>
         /// <param name="pagination"> Thuoc tinh phan trang </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<List<ViewUser>> GetDetail(PaginationDto pagination);
+        Task<List<ViewUserProfile>> GetDetail(PaginationDto pagination);
 
         /// <summary>
         /// Lấy về danh sách chi tiết user theo danh sách id
         /// </summary>
         /// <param name="userIds"> danh sách id user cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (27/3/24)
         /// Modified: None
-        Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds);
+        Task<Dictionary<Guid, ViewUserProfile?>> GetDetail(Guid[] userIds);
 
         /// <summary>
         /// Lấy về chi tiết user
         /// </summary>
         /// <param name="userId"> userId của user cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<ViewUser?> GetDetail(Guid userId);
+        Task<ViewUserProfile?> GetDetail(Guid userId);
 
         /// <summary>
         /// Lấy về chi tiết user bằng email
         /// </summary>
         /// <param name="email"> email của user cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<ViewUser?> GetDetailByEmail(string email);
+        Task<ViewUserProfile?> GetDetailByEmail(string email);
 
 
         /// <summary>
         /// Lấy về chi tiết user bằng username
         /// </summary>
         /// <param name="username"> username của user cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<ViewUser?> GetDetailByUsername(string username);
+        Task<ViewUserProfile?> GetDetailByUsername(string username);
 
         /// <summary>
         /// Lấy về chi tiết user bằng username hoặc userId
         /// </summary>
         /// <param name="unOruid"> unOruid của user cần lấy </param>
-        /// <returns> ViewUser </returns>
+        /// <returns> ViewUserProfile </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        Task<ViewUser?> GetDetailByUsernameOrUserId(string unOruid);
+        Task<ViewUserProfile?> GetDetailByUsernameOrUserId(string unOruid);
 
         /// <summary>
         /// Kiểm tra xem mật khẩu đúng hay sai
@@ -105,6 +105,17 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIte
         /// Created: PhucTV (12/3/24)
         /// Modified: None
         Task<bool> CheckPassword(string username, string password);
+
+        /// <summary>
+        /// Kiểm tra xem mật khẩu đúng hay sai
+        /// </summary>
+        /// <param name="username"> username cần kiểm tra </param>
+        /// <param name="password"> mật khẩu cần kiểm tra </param>
+        /// <param name="hashPassword"> mật khẩu da bi bam </param>
+        /// <returns> true - đúng, false - sai </returns>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        Task<bool> CheckPassword(string username, string password, string hashPassword);
 
         /// <summary>
         /// Cập nhật mật khẩu cho user
@@ -125,7 +136,7 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIte
         /// <returns> Trả về view user tương ứng </returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage);
+        Task<ViewUserProfile> CheckExistedUser(Guid userId, string errorMessage);
 
         /// <summary>
         /// Dang ky moi mot user

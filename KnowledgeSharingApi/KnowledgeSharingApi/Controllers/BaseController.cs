@@ -6,7 +6,7 @@ using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
 using KnowledgeSharingApi.Repositories.Interfaces;
 using KnowledgeSharingApi.Services.Filters;
-using KnowledgeSharingApi.Services.Interfaces;
+using KnowledgeSharingApi.Services.Interfaces.Authentications;
 using KnowledgeSharingApi.Services.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.CodeDom;

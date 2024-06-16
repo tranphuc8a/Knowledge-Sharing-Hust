@@ -10,7 +10,7 @@
             </div>
             <div class="p-feedcard-lestion__abstract" v-show="question?.Abstract != null">
                 <!-- <textarea type="text" v-model="content"/> -->
-                <LatexMarkdownRender :markdown-content="question?.Abstract" />
+                <LightLatexMarkdownRender :markdown-content="question?.Abstract" />
             </div>
             <div class="p-feedcard-lestion__categories" v-show="compiledCategories?.length > 0">
                 <CategoriesList :categories="compiledCategories" />
@@ -33,7 +33,7 @@
 
 <script>
 import PostCardCommentList from '../comment/PostCardCommentList.vue';
-import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
+import LightLatexMarkdownRender from '@/components/base/markdown/LightLatexMarkdownRender.vue';
 import PostCardToolBar from './PostCardToolBar.vue';
 import PostCardThumbnail from './PostCardThumbnail.vue';
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
@@ -64,7 +64,7 @@ export default {
         this.compiledCategories = this.getCategories();
     },
     components: {
-        LatexMarkdownRender, PostCardCommentList,
+        LightLatexMarkdownRender, PostCardCommentList,
         PostCardThumbnail, PostCardToolBar,
         FeedCardFrame, PostCardHeader, CategoriesList
     },

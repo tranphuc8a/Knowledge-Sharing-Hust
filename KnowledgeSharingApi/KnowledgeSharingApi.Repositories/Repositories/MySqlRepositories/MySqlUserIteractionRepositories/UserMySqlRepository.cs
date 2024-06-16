@@ -30,13 +30,17 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             User? user = await GetByUsername(username);
             if (user == null) return false;
 
-            string hashPassword = encrypt.Sha256HashPassword(username, password);
-            return hashPassword == user.HashPassword;
+            return encrypt.VerifyPassword(username, password, user.HashPassword);
+        }
+
+        public virtual async Task<bool> CheckPassword(string username, string password, string hashPassword)
+        {
+            return encrypt.VerifyPassword(username, password, hashPassword);
         }
 
         public virtual async Task<int> UpdatePassword(string username, string newPassword)
         {
-            string hashPassword = encrypt.Sha256HashPassword(username, newPassword);
+            string hashPassword = encrypt.HashPassword(username, newPassword);
             DateTime currentTime = DateTime.UtcNow;
             string modifiedBy = username;
             string sqlCommand = "update User set HashPassword = @hashPassword, ModifiedTime = @currentTime, ModifiedBy = @modifiedBy " +
@@ -45,43 +49,43 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             return res;
         }
 
-        public virtual async Task<List<ViewUser>> GetDetail()
+        public virtual async Task<List<ViewUserProfile>> GetDetail()
         {
-            return await DbContext.ViewUsers.ToListAsync();
+            return await DbContext.ViewUserProfiles.ToListAsync();
         }
 
-        public virtual async Task<List<ViewUser>> GetDetail(PaginationDto pagination)
+        public virtual async Task<List<ViewUserProfile>> GetDetail(PaginationDto pagination)
         {
-            return await ApplyPagination(DbContext.ViewUsers, pagination).ToListAsync();
+            return await ApplyPagination(DbContext.ViewUserProfiles, pagination).ToListAsync();
         }
 
-        public virtual Task<ViewUser?> GetDetail(Guid userId)
+        public virtual Task<ViewUserProfile?> GetDetail(Guid userId)
         {
-            var query = from user in DbContext.ViewUsers
+            var query = from user in DbContext.ViewUserProfiles
                         where user.UserId == userId
                         select user;
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public virtual Task<ViewUser?> GetDetailByEmail(string email)
+        public virtual Task<ViewUserProfile?> GetDetailByEmail(string email)
         {
-            var query = from viewUser in DbContext.ViewUsers
+            var query = from viewUser in DbContext.ViewUserProfiles
                         where viewUser.Email == email
                         select viewUser;
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public virtual Task<ViewUser?> GetDetailByUsername(string username)
+        public virtual Task<ViewUserProfile?> GetDetailByUsername(string username)
         {
-            var query = from user in DbContext.ViewUsers
+            var query = from user in DbContext.ViewUserProfiles
                         where user.Username == username
                         select user;
             return Task.FromResult(query.FirstOrDefault());
         }
 
-        public virtual Task<ViewUser?> GetDetailByUsernameOrUserId(string unOruid)
+        public virtual Task<ViewUserProfile?> GetDetailByUsernameOrUserId(string unOruid)
         {
-            var query = from user in DbContext.ViewUsers
+            var query = from user in DbContext.ViewUserProfiles
                         where user.Username == unOruid || user.UserId.ToString() == unOruid
                         select user;
             return Task.FromResult(query.FirstOrDefault());
@@ -125,17 +129,17 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             return res;
         }
 
-        public virtual async Task<ViewUser> CheckExistedUser(Guid userId, string errorMessage)
+        public virtual async Task<ViewUserProfile> CheckExistedUser(Guid userId, string errorMessage)
         {
-            return (ViewUser)((await DbContext.ViewUsers.Where(user => user.UserId == userId).FirstOrDefaultAsync())?.Clone()
+            return (ViewUserProfile)((await DbContext.ViewUserProfiles.Where(user => user.UserId == userId).FirstOrDefaultAsync())?.Clone()
                 ?? throw new NotExistedEntityException(errorMessage));
         }
 
-        public virtual async Task<Dictionary<Guid, ViewUser?>> GetDetail(Guid[] userIds)
+        public virtual async Task<Dictionary<Guid, ViewUserProfile?>> GetDetail(Guid[] userIds)
         {
-            Dictionary<Guid, ViewUser?> res = userIds.Distinct().ToDictionary(id => id, id => (ViewUser?)null);
+            Dictionary<Guid, ViewUserProfile?> res = userIds.Distinct().ToDictionary(id => id, id => (ViewUserProfile?)null);
 
-            List<ViewUser> users = await DbContext.ViewUsers
+            List<ViewUserProfile> users = await DbContext.ViewUserProfiles
                 .Where(user => userIds.Contains(user.UserId))
                 .ToListAsync();
 
@@ -151,7 +155,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             var transaction = await DbContext.BeginTransaction();
             try
             {
-                user.HashPassword = encrypt.Sha256HashPassword(user.Username, password);
+                user.HashPassword = encrypt.HashPassword(user.Username, password);
                 user.Role = UserRoles.User;
                 user.UserId = userId;
 

@@ -264,7 +264,13 @@ class Request {
      */
     async checkLogedIn(){
         try {
-            let response = await new GetRequest('Users/me').execute();
+            let getRequest = new GetRequest('Users/me');
+            if (getRequest.token == null || getRequest.token == undefined ||
+                getRequest.refreshToken == null || getRequest.refreshToken == undefined
+            ){ 
+                return false;
+            }
+            let response = await getRequest.execute();
             let body = this.tryGetBody(response);
             let user = new CurrentUser();
             user.copy(body);

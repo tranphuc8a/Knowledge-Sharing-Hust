@@ -53,7 +53,7 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.Knowled
         /// <returns></returns>
         /// Created: PhucTV (23/3/24)
         /// Modified: None
-        Task<PaginationResponseModel<ViewUser>> GetListUserMaredKnowledge(Guid knowledgeId, PaginationDto pagination);
+        Task<PaginationResponseModel<ViewUserProfile>> GetListUserMaredKnowledge(Guid knowledgeId, PaginationDto pagination);
 
         /// <summary>
         /// Lấy về phiên mark của user và knowledgeId nếu tồn tại

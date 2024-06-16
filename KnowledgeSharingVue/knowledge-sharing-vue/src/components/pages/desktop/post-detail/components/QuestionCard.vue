@@ -10,7 +10,7 @@
             </div>
             <div class="p-feedcard-lestion__abstract" v-show="question?.Abstract != null">
                 <!-- <textarea type="text" v-model="content"/> -->
-                <LatexMarkdownRender :markdown-content="question?.Abstract" />
+                <LightLatexMarkdownRender :markdown-content="question?.Abstract" />
             </div>
             <div class="p-feedcard-lestion__categories" v-show="compiledCategories?.length > 0">
                 <CategoriesList :categories="compiledCategories" />
@@ -21,7 +21,7 @@
                 <div></div>
             </div>
             <div class="p-feedcard-lestion__content" v-if="question?.Content != null">
-                <LatexMarkdownRender :markdown-content="question?.Content" />
+                <LightLatexMarkdownRender :markdown-content="question?.Content" />
             </div>
             <div class="p-feedcard-lestion__thumbnail">
                 <PostCardThumbnail />
@@ -41,7 +41,7 @@
 
 <script>
 import PostCardCommentList from '../../home/components/feed-subpage/comment/PostCardCommentList.vue';
-import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
+import LightLatexMarkdownRender from '@/components/base/markdown/LightLatexMarkdownRender.vue';
 import PostCardToolBar from '../../home/components/feed-subpage/postcard/PostCardToolBar.vue';
 import PostCardThumbnail from '../../home/components/feed-subpage/postcard/PostCardThumbnail.vue';
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
@@ -72,7 +72,7 @@ export default {
         this.compiledCategories = this.getCategories();
     },
     components: {
-        LatexMarkdownRender, PostCardCommentList,
+        LightLatexMarkdownRender, PostCardCommentList,
         PostCardThumbnail, PostCardToolBar,
         FeedCardFrame, PostCardHeader, CategoriesList
     },

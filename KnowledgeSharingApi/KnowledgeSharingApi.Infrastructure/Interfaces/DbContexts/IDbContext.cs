@@ -92,6 +92,7 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts
         DbSet<User> Users {get; set;}
         DbSet<Session> Sessions {get; set;}
         DbSet<Profile> Profiles {get; set;}
+        DbSet<ViewUserProfile> ViewUserProfiles { get; set;}
         DbSet<ViewUser> ViewUsers { get; set;}
         DbSet<Notification> Notifications {get; set;}
 

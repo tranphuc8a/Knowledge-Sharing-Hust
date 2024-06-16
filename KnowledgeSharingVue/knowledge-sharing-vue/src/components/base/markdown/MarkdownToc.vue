@@ -10,6 +10,9 @@
                     <a :href="'#' + entry.id" class="p-a" :title="entry.title">{{ entry.title }}</a>
                     <div v-for="child in entry.children ?? []" :key="child.id" class="p-item p-item-level-2">
                         <a :href="'#' + child.id" class="p-a" :title="child.title">{{ child.title }}</a>
+                        <div v-for="subchild in child.children ?? []" :key="subchild.id" class="p-item p-item-level-3">
+                            <a :href="'#' + subchild.id" class="p-a" :title="subchild.title">{{ subchild.title }}</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -24,6 +27,7 @@
 <script>
 
 import Common from '@/js/utils/common';
+import TocCreator from '@/js/utils/toc-creator';
 
 export default {
     name: "MarkdownToc",
@@ -45,7 +49,8 @@ export default {
         async updateTocTree(){
             this.mdContent = Common.unescapeSpecialCharacters(this.markdownContent);
             this.mdContent = Common.normalizeMarkdownText(this.mdContent);
-            this.tocTree = this.createTOCTree(this.mdContent);
+            // this.tocTree = this.createTOCTree(this.mdContent);
+            this.tocTree = TocCreator.createTocFromMarkdownRenderByHtmlSyntax(this.mdContent);
             // console.log(this.tocTree);
         },
 
@@ -117,7 +122,6 @@ export default {
     align-items: flex-start;
     text-decoration: none;
     color: var(--primary-color);
-    font-family: 'ks-font-semibold';
     width: 100%;
 }
 
@@ -134,11 +138,17 @@ export default {
 }
 
 .p-item-level-1{
-    font-size: 15px;
+    font-size: 16px;
+    font-family: 'ks-font-semibold';
 }
 .p-item-level-2{
     font-size: 14px;
     padding-left: 18px;
+}
+.p-item-level-3{
+    font-size: 13px;
+    padding-left: 24px;
+    font-family: 'ks-font-regular';
 }
 
 .p-item{
@@ -176,7 +186,6 @@ export default {
 
 .not-toc{
     font-size: 16px;
-    font-family: 'ks-font-semibold';
     color: var(--primary-color);
 }
 

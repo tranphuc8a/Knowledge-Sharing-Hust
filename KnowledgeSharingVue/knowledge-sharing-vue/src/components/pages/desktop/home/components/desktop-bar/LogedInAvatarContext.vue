@@ -197,6 +197,8 @@ export default {
 }
 
 .p-lac-user .router-link{
+    width: 0;
+    flex-grow: 1;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
@@ -204,6 +206,12 @@ export default {
     gap: 8px;
 }
 
+.p-lac-user .router-link > :last-child{
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 
 .p-lac-menu{
     display: flex;

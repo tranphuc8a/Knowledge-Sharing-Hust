@@ -2,7 +2,7 @@
 
 import Profile from "../entities/profile";
 
-class ViewUser extends Profile {
+class ViewUserProfile extends Profile {
     constructor() {
         super();
         this.Email = null;
@@ -19,9 +19,9 @@ class ViewUser extends Profile {
     }
 
     init() {
-        return new ViewUser();
+        return new ViewUserProfile();
     }
 }
 
-export default ViewUser;
+export default ViewUserProfile;
 
