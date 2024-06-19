@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -80,6 +81,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             return await DbContext.SaveChangesAsync();
         }
 
+        #region Get ViewQuestion
         public virtual async Task<List<ViewQuestion>> GetByUserId(Guid userId)
         {
             List<ViewQuestion> posts = await
@@ -173,14 +175,14 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             var posts = await ApplyPagination(
                     DbContext.ViewQuestions
                     .Where(post =>
-                           // myUid có thể truy cập post:
+                            // myUid có thể truy cập post:
                             // post là bài thảo luận của chính mình
                             post.UserId == userId ||
                             // hoặc post là bài thảo luận public
                             post.Privacy == EPrivacy.Public ||
                             // hoặc post là câu hỏi trong khóa học mà myUid có tham gia
                             post.CourseId != null && registeredCourseIds.Contains(post.CourseId.Value)
-                        
+
                     )
                     .OrderByDescending(post => post.CreatedTime),
                     pagination)
@@ -285,16 +287,238 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
 
             // Thực thi truy vấn và trả về kết quả
             return await query.ToListAsync();
+        } 
+
+        public virtual async Task<List<ViewQuestion>> GetPublicPosts()
+        {
+            return await DbContext.ViewQuestions.Where(q => q.Privacy == EPrivacy.Public).ToListAsync();
         }
+        #endregion
 
         protected override DbSet<Question> GetDbSet()
         {
             return DbContext.Questions;
         }
 
-        public virtual async Task<List<ViewQuestion>> GetPublicPosts()
+
+        #region Get T
+        public virtual async Task<List<T>> GetByUserId<T>(Guid userId, Expression<Func<ViewQuestion, T>> projector)
         {
-            return await DbContext.ViewQuestions.Where(q => q.Privacy == EPrivacy.Public).ToListAsync();
+            List<T> posts = await
+                DbContext.ViewQuestions
+                .Where(post => post.UserId == userId)
+                .OrderByDescending(post => post.CreatedTime)
+                .Select(projector)
+                .ToListAsync();
+            return posts;
         }
+
+
+        public virtual async Task<List<T>> GetByUserId<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            List<T> posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post => post.UserId == userId)
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+            return posts;
+        }
+
+        public virtual async Task<List<T>> GetPublicPosts<T>(PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            List<T> posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post => post.Privacy == EPrivacy.Public)
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+            return posts;
+        }
+
+        public virtual async Task<List<T>> GetPublicPostsByUserId<T>(Guid userId, Expression<Func<ViewQuestion, T>> projector)
+        {
+            List<T> posts = await
+                DbContext.ViewQuestions
+                .Where(post => post.Privacy == EPrivacy.Public && post.UserId == userId)
+                .OrderByDescending(post => post.CreatedTime)
+                .Select(projector)
+                .ToListAsync();
+            return posts;
+        }
+
+        public virtual async Task<List<T>> GetPublicPostsByUserId<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            List<T> posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post => post.Privacy == EPrivacy.Public && post.UserId == userId)
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+            return posts;
+        }
+
+        public virtual async Task<List<T>> GetQuestionInCourse<T>(Guid courseid, Expression<Func<ViewQuestion, T>> projector)
+        {
+            List<T> posts = await
+                DbContext.ViewQuestions
+                .Where(post => post.CourseId != null && post.CourseId == courseid)
+                .OrderByDescending(post => post.CreatedTime)
+                .Select(projector)
+                .ToListAsync();
+            return posts;
+        }
+
+
+        public virtual async Task<T?> GetQuestionDetail<T>(Guid questionId, Expression<Func<ViewQuestion, T>> projector)
+        {
+            return await DbContext.ViewQuestions
+                .Where(ques => ques.UserItemId == questionId)
+                .Select(projector)
+                .FirstOrDefaultAsync();
+        }
+
+        public virtual async Task<List<T>> GetViewPost<T>(PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            return await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .OrderByDescending(question => question.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetViewPost<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            // Lấy danh sách CourseId mà User đã đăng ký
+            var registeredCourseIds = DbContext.CourseRegisters
+                .Where(c => c.UserId == userId)
+                .Select(c => c.CourseId)
+                .Distinct()
+                .ToList(); // Dùng ToList để tải kết quả về và tránh query lại nhiều lần
+
+            var posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post =>
+                            // myUid có thể truy cập post:
+                            // post là bài thảo luận của chính mình
+                            post.UserId == userId ||
+                            // hoặc post là bài thảo luận public
+                            post.Privacy == EPrivacy.Public ||
+                            // hoặc post là câu hỏi trong khóa học mà myUid có tham gia
+                            post.CourseId != null && registeredCourseIds.Contains(post.CourseId.Value)
+
+                    )
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+
+            return posts;
+        }
+
+        public virtual async Task<List<T>> GetPublicPostsOfCategory<T>(string catName, PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            var knowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(k => k.CategoryName == catName)
+                .Select(k => k.KnowledgeId)
+                .Distinct();
+            var posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post => post.Privacy == EPrivacy.Public) // công khai
+                    .Where(post => knowledgesId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+            return posts;
+        }
+
+        public virtual async Task<List<T>> GetPostsOfCategory<T>(string catName, PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            var knowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(k => k.CategoryName == catName)
+                .Select(k => k.KnowledgeId)
+                .Distinct();
+
+            var posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post => knowledgesId.Contains(post.UserItemId)) // Lọc post dựa vào danh sách ID đã lấy
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+
+            return posts;
+        }
+
+        public virtual async Task<List<T>> GetPostsOfCategory<T>(Guid myUId, string catName, PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            // Danh sach cac knowledge co cateName
+            var knowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(k => k.CategoryName == catName)
+                .Select(k => k.KnowledgeId)
+                .Distinct();
+
+            // Lấy danh sách CourseId mà User đã đăng ký
+            var registeredCourseIds = DbContext.CourseRegisters
+                .Where(c => c.UserId == myUId)
+                .Select(c => c.CourseId)
+                .Distinct()
+                .ToList(); // Dùng ToList để tải kết quả về và tránh query lại nhiều lần
+
+            var posts = await ApplyPagination(
+                    DbContext.ViewQuestions
+                    .Where(post => knowledgesId.Contains(post.UserItemId) &&
+                        (   // myUid có thể truy cập post:
+                            // post là bài thảo luận của chính mình
+                            post.UserId == myUId ||
+                            // hoặc post là bài thảo luận public
+                            post.Privacy == EPrivacy.Public ||
+                            // hoặc post là câu hỏi trong khóa học mà myUid có tham gia
+                            post.CourseId != null && registeredCourseIds.Contains(post.CourseId.Value)
+                        )
+                    )
+                    .OrderByDescending(post => post.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+
+            return posts;
+        }
+
+        public virtual async Task<List<T>> GetMarkedPosts<T>(Guid userId, Expression<Func<ViewQuestion, T>> projector)
+        {
+            var query =
+                from post in DbContext.ViewQuestions
+                join mark in DbContext.Marks
+                    on post.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId
+                orderby mark.CreatedTime descending
+                select post;
+
+            var projected = query.Select(projector);
+            // Thực thi truy vấn và trả về kết quả
+            return await projected.ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetMarkedPosts<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewQuestion, T>> projector)
+        {
+            var query =
+                from post in DbContext.ViewQuestions
+                join mark in DbContext.Marks
+                    on post.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId
+                orderby mark.CreatedTime descending
+                select post;
+
+            // Apply Pagination
+            var projected = ApplyPagination(query, pagination).Select(projector);
+
+            // Thực thi truy vấn và trả về kết quả
+            return await projected.ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetPublicPosts<T>(Expression<Func<ViewQuestion, T>> projector)
+        {
+            return await DbContext.ViewQuestions.Where(q => q.Privacy == EPrivacy.Public).Select(projector).ToListAsync();
+        }
+
+        #endregion
     }
 }

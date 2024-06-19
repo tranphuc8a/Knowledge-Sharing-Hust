@@ -38,7 +38,7 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.Knowled
         /// <returns> Danh sách cate </returns>
         /// Created: PhucTV (25/3/24)
         /// Modified: None
-        Task<List<Category>> GetByKnowledgeId(Guid knowledgeId);
+        Task<List<string>> GetByKnowledgeId(Guid knowledgeId);
 
         /// <summary>
         /// Lấy về danh sách categories của một danh sách knowledge
@@ -47,7 +47,7 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.Knowled
         /// <returns> Danh sách cate </returns>
         /// Created: PhucTV (4/5/24)
         /// Modified: None
-        Task<Dictionary<Guid, List<Category>?>> GetByKnowledgeId(List<Guid> knowledgeIds);
+        Task<Dictionary<Guid, List<string>>> GetByKnowledgeId(List<Guid> knowledgeIds);
 
         /// <summary>
         /// Cập nhật danh sách category của một knowledge

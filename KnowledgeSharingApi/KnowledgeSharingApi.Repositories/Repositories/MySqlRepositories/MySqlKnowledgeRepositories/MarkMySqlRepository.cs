@@ -18,14 +18,13 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
         {
             Dictionary<Guid, bool> result = knowledgeId.Distinct().ToDictionary(id => id, id => false);
 
-            List<Mark> listMarks = await DbContext.Marks
+            List<Guid> listMarkedKnowledgeIds = await DbContext.Marks
                 .Where(mark => mark.UserId == userId && knowledgeId.Contains(mark.KnowledgeId))
+                .Select(mark => mark.KnowledgeId)
                 .ToListAsync();
 
-            foreach (Mark mark in listMarks)
-            {
-                result[mark.KnowledgeId] = true;
-            }
+            foreach (Guid id in listMarkedKnowledgeIds)
+                result[id] = true;
 
             return result;
         }

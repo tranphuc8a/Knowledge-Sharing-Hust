@@ -41,7 +41,7 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.DecorationRepositories
         /// <returns></returns>
         /// Created: PhucTV (3/5/24)
         /// Modified: None
-        Task<List<IResponseCourseModel>> DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses);
+        Task<List<IResponseCourseModel>> DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses, bool isDecorateCourseRoleType = true);
 
         /// <summary>
         /// Bổ sung thêm thông tin cho ResponseCourseLessonModel từ CourseLesson

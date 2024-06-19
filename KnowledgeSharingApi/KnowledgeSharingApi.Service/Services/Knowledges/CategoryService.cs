@@ -143,7 +143,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             // Không nhất thiết, trường hợp knowledge không tồn tại, trả về rỗng
 
             // Get 
-            List<Category> res = await CategoryRepository.GetByKnowledgeId(knowledgeId);
+            List<string> res = await CategoryRepository.GetByKnowledgeId(knowledgeId);
 
             // Trả về thành công
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(CategoryResource), string.Empty, res);

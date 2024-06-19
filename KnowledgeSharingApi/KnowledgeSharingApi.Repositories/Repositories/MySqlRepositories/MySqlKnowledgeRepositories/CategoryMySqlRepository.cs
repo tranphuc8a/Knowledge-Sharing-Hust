@@ -19,7 +19,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
     public class CategoryMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<Category>(dbContext), ICategoryRepository
     {
-        public async Task<List<Category>> GetByKnowledgeId(Guid knowledgeId)
+        public async Task<List<string>> GetByKnowledgeId(Guid knowledgeId)
         {
             var cateIds = DbContext.KnowledgeCategories
                 .Where(item => item.KnowledgeId == knowledgeId)
@@ -28,30 +28,24 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             return await DbContext.Categories
                 .Where(cate => cateIds.Contains(cate.CategoryId))
                 .OrderByDescending(cate => cate.CreatedTime)
+                .Select(c => c.CategoryName)
                 .ToListAsync();
         }
 
-        public async Task<Dictionary<Guid, List<Category>?>> GetByKnowledgeId(List<Guid> knowledgeIds)
+        public async Task<Dictionary<Guid, List<string>>> GetByKnowledgeId(List<Guid> knowledgeIds)
         {
-            Dictionary<Guid, List<ViewKnowledgeCategory>> categories = await DbContext.ViewKnowledgeCategories
+            Dictionary<Guid, List<string>> categories = await DbContext.ViewKnowledgeCategories
                 .Where(knowCate => knowledgeIds.Contains(knowCate.KnowledgeId))
                 .GroupBy(knowCate => knowCate.KnowledgeId)
-                .ToDictionaryAsync(group => group.Key, group => group.ToList());
+                .ToDictionaryAsync(group => group.Key, group => group.Select(item => item.CategoryName).ToList());
 
             return knowledgeIds.Distinct().ToDictionary(
                 id => id,
                 id =>
                 {
-                    if (categories.TryGetValue(id, out List<ViewKnowledgeCategory>? value))
-                    {
-                        return value.Select(viewCate =>
-                        {
-                            Category cat = new();
-                            cat.Copy(viewCate);
-                            return cat;
-                        }).ToList();
-                    }
-                    return null;
+                    if (categories.TryGetValue(id, out List<string>? value))
+                        return value ?? [];
+                    return [];
                 }
             );
         }

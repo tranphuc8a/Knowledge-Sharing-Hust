@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
         IUserRepository userRepository,
         IResourceFactory resourceFactory,
         IQuestionService questionService,
-        ISearchService calculateKnowledgeSearchScore,
+        ICalculateSearchScoreService calculateKnowledgeSearchScore,
         IDecorationRepository decorationRepository,
         IKnowledgeRepository knowledgeRepository,
         ILessonService lessonService
@@ -39,7 +39,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
         protected readonly IQuestionService QuestionService = questionService;
         protected readonly ILessonService LessonService = lessonService;
         protected readonly IKnowledgeRepository KnowledgeRepository = knowledgeRepository;
-        protected readonly ISearchService CalculateKnowledgeSearchScore = calculateKnowledgeSearchScore;
+        protected readonly ICalculateSearchScoreService CalculateKnowledgeSearchScore = calculateKnowledgeSearchScore;
 
         protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
         protected readonly IEntityResource EntityResource = resourceFactory.GetEntityResource();
@@ -281,9 +281,9 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             List<ViewPost> listPost = await PostRepository.GetPublicPosts();
 
             // calculate score
-            List<(Guid, string, string, string, string?)> listShortPost = listPost
-                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+            List<(Guid, string, string, string?, int?, int?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Abstract, p.SumStar, p.TotalStar)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeScore(search, listShortPost);
 
             // order by score
             listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
@@ -313,9 +313,9 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             List<ViewPost> listPost = await PostRepository.GetByUserId(myUid);
 
             // calculate score
-            List<(Guid, string, string, string, string?)> listShortPost = listPost
-                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+            List<(Guid, string, string, string?, int?, int?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Abstract, p.SumStar, p.TotalStar)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeScore(search, listShortPost);
 
             // order by score
             listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
@@ -345,9 +345,9 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             List<ViewPost> listPost = await PostRepository.GetPublicPostsByUserId(userId);
 
             // calculate score
-            List<(Guid, string, string, string, string?)> listShortPost = listPost
-                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+            List<(Guid, string, string, string?, int?, int?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Abstract, p.SumStar, p.TotalStar)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeScore(search, listShortPost);
 
             // order by score
             listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];
@@ -377,9 +377,9 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             List<ViewPost> listPost = await PostRepository.GetByUserId(userId);
 
             // calculate score
-            List<(Guid, string, string, string, string?)> listShortPost = listPost
-                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Content, p.Abstract)).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+            List<(Guid, string, string, string?, int?, int?)> listShortPost = listPost
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Abstract, p.SumStar, p.TotalStar)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeScore(search, listShortPost);
 
             // order by score
             listPost = [.. listPost.OrderByDescending(p => scored[p.UserItemId])];

@@ -12,7 +12,7 @@ class ResponseUserCardModel extends Entity {
         this.Cover = null;
         this.FullName = null;
         this.Role = null;
-        this.Bio = null;
+        // this.Bio = null;
         this.UserRelationType = null;
         this.UserRelationId = null;
         this.CourseRoleType = null;

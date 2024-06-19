@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,7 +36,8 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
 
         public virtual async Task<bool> CheckPassword(string username, string password, string hashPassword)
         {
-            return encrypt.VerifyPassword(username, password, hashPassword);
+            bool isPasswordMatch = encrypt.VerifyPassword(username, password, hashPassword);
+            return await Task.FromResult(isPasswordMatch);
         }
 
         public virtual async Task<int> UpdatePassword(string username, string newPassword)
@@ -49,6 +51,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             return res;
         }
 
+        #region Getter
         public virtual async Task<List<ViewUserProfile>> GetDetail()
         {
             return await DbContext.ViewUserProfiles.ToListAsync();
@@ -89,6 +92,74 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
                         where user.Username == unOruid || user.UserId.ToString() == unOruid
                         select user;
             return Task.FromResult(query.FirstOrDefault());
+        }
+
+        public virtual async Task<Dictionary<Guid, ViewUserProfile?>> GetDetail(Guid[] userIds)
+        {
+            Dictionary<Guid, ViewUserProfile?> res = userIds.Distinct().ToDictionary(id => id, id => (ViewUserProfile?)null);
+
+            List<ViewUserProfile> users = await DbContext.ViewUserProfiles
+                .Where(user => userIds.Contains(user.UserId))
+                .ToListAsync();
+
+            foreach (var item in users)
+            {
+                res[item.UserId] = item;
+            }
+            return res;
+        }
+
+        public virtual async Task<List<T>> GetDetail<T>(Expression<Func<ViewUserProfile, T>> projector)
+        {
+            return await DbContext.ViewUserProfiles.Select(projector).ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetDetail<T>(PaginationDto pagination, Expression<Func<ViewUserProfile, T>> projector)
+        {
+            return await ApplyPagination(DbContext.ViewUserProfiles.Select(projector), pagination).ToListAsync();
+        }
+
+        public virtual Task<T?> GetDetail<T>(Guid userId, Expression<Func<ViewUserProfile, T>> projector)
+        {
+            var query = DbContext.ViewUserProfiles.Where(u => u.UserId == userId).Select(projector);
+            return Task.FromResult(query.FirstOrDefault());
+        }
+
+        public virtual Task<T?> GetDetailByEmail<T>(string email, Expression<Func<ViewUserProfile, T>> projector)
+        {
+            var query = DbContext.ViewUserProfiles.Where(u => u.Email == email).Select(projector);
+            return Task.FromResult(query.FirstOrDefault());
+        }
+
+        public virtual Task<T?> GetDetailByUsername<T>(string username, Expression<Func<ViewUserProfile, T>> projector)
+        {
+            var query = DbContext.ViewUserProfiles.Where(u => u.Username == username).Select(projector);
+            return Task.FromResult(query.FirstOrDefault());
+        }
+
+        public virtual Task<T?> GetDetailByUsernameOrUserId<T>(string unOruid, Expression<Func<ViewUserProfile, T>> projector)
+        {
+            var query = DbContext.ViewUserProfiles.Where(user => user.Username == unOruid || user.UserId.ToString() == unOruid)
+                        .Select(projector);
+            return Task.FromResult(query.FirstOrDefault());
+        }
+
+        public virtual async Task<Dictionary<Guid, T?>> GetDetail<T>(Guid[] userIds, Expression<Func<ViewUserProfile, T>> projector)
+        {
+            Dictionary<Guid, T?> res = userIds.Distinct().ToDictionary(id => id, id => default(T));
+
+            Dictionary<Guid, T> users = await DbContext.ViewUserProfiles
+                .Where(user => userIds.Contains(user.UserId))
+                .ToDictionaryAsync(
+                    item => item.UserId,
+                    projector.Compile()
+                );
+
+            foreach (var item in users)
+            {
+                res[item.Key] = item.Value;
+            }
+            return res;
         }
 
         public virtual Task<User?> GetByEmail(string email)
@@ -134,21 +205,8 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             return (ViewUserProfile)((await DbContext.ViewUserProfiles.Where(user => user.UserId == userId).FirstOrDefaultAsync())?.Clone()
                 ?? throw new NotExistedEntityException(errorMessage));
         }
-
-        public virtual async Task<Dictionary<Guid, ViewUserProfile?>> GetDetail(Guid[] userIds)
-        {
-            Dictionary<Guid, ViewUserProfile?> res = userIds.Distinct().ToDictionary(id => id, id => (ViewUserProfile?)null);
-
-            List<ViewUserProfile> users = await DbContext.ViewUserProfiles
-                .Where(user => userIds.Contains(user.UserId))
-                .ToListAsync();
-
-            foreach (var item in users)
-            {
-                res[item.UserId] = item;
-            }
-            return res;
-        }
+        
+        #endregion
 
         public virtual async Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName, string? avatar = null)
         {

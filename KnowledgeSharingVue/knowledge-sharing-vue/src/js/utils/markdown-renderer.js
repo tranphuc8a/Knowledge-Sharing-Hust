@@ -21,7 +21,9 @@ import anchor from 'markdown-it-anchor';
 import { Validator } from "@/js/utils/validator";
 
 
-import mis from 'markdown-it-sanitizer'
+// import mis from 'markdown-it-sanitizer'
+
+import sanitizeHtml from "sanitize-html";
 
 class MarkdownRenderer{
     static _instance = null;
@@ -50,17 +52,21 @@ class MarkdownRenderer{
         //     // }
         // };
         this.misOptions = {
-            allowTags: [
+            allowedTags: [
                 'a', 'abbr', 'b', 'blockquote', 'br', 'code', 'del', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'hr', 'i', 'img', 'kbd', 'li', 'ol', 'p', 'pre', 's', 'sup', 'sub', 'strong', 'table', 'tbody',
-                'td', 'th', 'thead', 'tr', 'ul', 'div'
+                'td', 'th', 'thead', 'tr', 'ul', 'div', 'span'
             ],
-            allowAttributes: {
-                '*': ['class', 'id', 'style'],
+            allowedAttributes: {
+                '*': ['class', 'id', 'style', 'align'],
                 'a': ['href', 'title', 'target'],
                 'img': ['src', 'alt', 'title', 'width', 'height'],
-                'div': ['class', 'id', 'style']
-            }
+                'div': ['class', 'id', 'style', 'align'],
+                'span': ['class', 'id', 'style', 'align'],
+                'p': ['class', 'id', 'style', 'align'],
+            },
+            removeUnbalanced: false,
+            removeUnknown: false
         };
         this.mdOptions = {
             youtube: { width: 640, height: 390 },
@@ -79,7 +85,7 @@ class MarkdownRenderer{
                 // linkify: true,
             }
         )
-        .use(mis, this.misOptions)
+        // .use(mis, this.misOptions)
         .use(anchor, this.anchorOptions)
         // .use(TOC, this.tocOptions)
         .use(ml)
@@ -104,6 +110,7 @@ class MarkdownRenderer{
             }
             let temp = Common.unescapeSpecialCharacters(content);
             let renderedContent = this.mdRenderer.render(temp) ?? "";
+            renderedContent = sanitizeHtml(renderedContent, this.misOptions);
             // console.log(renderedContent);
             return renderedContent;
         } catch (error) {

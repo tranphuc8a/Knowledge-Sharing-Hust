@@ -30,7 +30,7 @@ namespace KnowledgeSharingApi.Controllers.Knowledges
         /// Created: PhucTV (3/4/24)
         /// Modified: None
         [HttpGet("{courseId}")]
-        [CustomAuthorization("Roles: Admin, User")]
+        [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetListCourseParticipants(Guid courseId, int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));

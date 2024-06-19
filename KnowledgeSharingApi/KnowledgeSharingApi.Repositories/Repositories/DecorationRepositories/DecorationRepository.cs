@@ -29,6 +29,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
         ICourseRelationRepository courseRelationRepository,
         IUserRelationRepository userRelationRepository,
         IUserItemRepository userItemRepository,
+        ICourseRepository courseRepository,
         IUserRepository userRepository,
         IDbContext dbContext
         ) : BaseMySqlUserItemRepository<UserItem>(dbContext), IDecorationRepository
@@ -41,6 +42,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
         protected readonly IPostRepository PostRepository = postRepository;
         protected readonly IUserItemRepository UserItemRepository = userItemRepository;
         protected readonly ICourseRelationRepository CourseRelationRepository = courseRelationRepository;
+        protected readonly ICourseRepository CourseRepository = courseRepository;
         protected readonly IUserRepository UserRepository = userRepository;
         protected readonly IUserRelationRepository UserRelationRepository = userRelationRepository;
         protected readonly int NumberOfTopComments = 20;
@@ -57,10 +59,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
             {
                 // calculate myStar from myUid to all lessons
                 myStars = await StarRepository.CalculateUserStars(myUid.Value, uiid);
-            }
-
-            if (myStars != null)
-            {
+            
                 foreach (IResponseUserItemModel useritem in userItems)
                 {
                     if (myStars.TryGetValue(useritem.UserItemId, out int? value))
@@ -74,57 +73,74 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
         }
 
         protected virtual async Task<List<IResponseKnowledgeModel>> DecorateResponseKnowledgeModel
-            (Guid? myUid, List<IResponseKnowledgeModel> knowledges)
+            (Guid? myUid, List<IResponseKnowledgeModel> knowledges, bool isDecorateCategory = true)
         {
             await DecorateResponseUserItemModel(myUid, knowledges.OfType<IResponseUserItemModel>().ToList());
 
             // Attributes: categories, ismark
             List<Guid> knowledgeIds = knowledges.Select(lesson => lesson.UserItemId).ToList();
 
-            Dictionary<Guid, bool>? isMarks = null;
-            Task<Dictionary<Guid, bool>>? promise2 = null;
+            // is Mark
             if (myUid != null)
             {
-                // is Mark
-                promise2 = MarkRepository.GetUserMarkListKnowledge(myUid.Value, knowledgeIds);
-            }
-            if (promise2 != null) isMarks = await promise2;
-            // Number comments & Top comments
-            // Dictionary<Guid, PaginationResponseModel<ViewComment>?> topComments =
-            //    await CommentRepository.GetListCommentsOfKnowledge(knowledgeIds, NumberOfTopComments);
+                Dictionary<Guid, bool> isMarks = await MarkRepository.GetUserMarkListKnowledge(myUid.Value, knowledgeIds);
+                foreach (IResponseKnowledgeModel knowledge in knowledges)
+                {
+                    if (isMarks.TryGetValue(knowledge.UserItemId, out bool value2))
+                    {
+                        knowledge.IsMarked = value2;
+                    };
+                }
+            }            
 
             // List Categories
-            Dictionary<Guid, List<Category>?> lsCategories =
-                (await CategoryRepository.GetByKnowledgeId(knowledgeIds)).ToDictionary(
-                    it => it.Key,
-                    it => it.Value?.ToList()
-                );
-
-            foreach (IResponseKnowledgeModel knowledge in knowledges)
+            if (isDecorateCategory)
             {
-                // Number comments & Top comments & List categories
-                // await DecorateResponseKnowledgeModel(myUid, knowledge);
-                //knowledge.NumberComments = topComments[knowledge.UserItemId]?.Total ?? 0;
-                //knowledge.TopComments = topComments[knowledge.UserItemId] != null ?
-                //    topComments[knowledge.UserItemId]!.Results.Select(viewComment =>
-                //    {
-                //        ResponseCommentModel resComment = new();
-                //        resComment.Copy(viewComment);
-                //        return resComment;
-                //    }).ToList() : [];
-                if (lsCategories.TryGetValue(knowledge.UserItemId, out List<Category>? value))
+                Dictionary<Guid, List<string>> lsCategories = await CategoryRepository.GetByKnowledgeId(knowledgeIds);
+                foreach (IResponseKnowledgeModel knowledge in knowledges)
                 {
-                    knowledge.Categories = value ?? [];
+                    if (lsCategories.TryGetValue(knowledge.UserItemId, out List<string>? value))
+                    {
+                        knowledge.Categories = value ?? [];
+                    }
                 }
-                if (isMarks != null && isMarks.TryGetValue(knowledge.UserItemId, out bool value2))
-                {
-                    knowledge.IsMarked = value2;
-                };
             }
 
             return knowledges;
         }
 
+        public virtual async Task<List<IResponsePostModel>> DecorateResponsePostModel(Guid? myUid, List<ViewPost> posts)
+        {
+            List<Guid> postIds = posts.Select(p => p.UserItemId).ToList();
+            //Dictionary<Guid, IResponseUserItemModel?> postDict = await PostRepository.GetExactlyResponseUserItemModel(postIds);
+
+            List<IResponsePostModel> res = posts.Select<ViewPost, IResponsePostModel>(p =>
+            {
+                if (p.PostType == EPostType.Lesson)
+                {
+                    return (ResponseLessonModel)new ResponseLessonModel().Copy(p);
+                }
+                return (ResponseQuestionModel)new ResponseQuestionModel().Copy(p);
+            }).ToList();
+            //foreach (IResponsePostModel item in res)
+            //{
+            //    if (postDict.TryGetValue(item.UserItemId, out IResponseUserItemModel? value) && value != null)
+            //    {
+            //        if (item is ResponseLessonModel resLes)
+            //        {
+            //            resLes.Copy(value);
+            //        }
+            //        else if (item is ResponseQuestionModel resQues)
+            //        {
+            //            resQues.Copy(value);
+            //        }
+            //    }
+            //}
+
+            await DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
+            return res;
+        }
+        
         protected override DbSet<UserItem> GetDbSet()
         {
             return DbContext.UserItems;
@@ -162,40 +178,37 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
         public virtual async Task<List<ResponseCourseLessonModel>> DecorateResponseCourseLessonModel(Guid? myUid, List<CourseLesson> participants, bool isDecorateLesson = false, bool isDecorateCourse = false)
         {
             // Atrributes: Course, Lesson
-            Dictionary<Guid, IResponseCourseModel?> mapCourse = [];
-            Dictionary<Guid, IResponseLessonModel?> mapLesson = [];
-            Task<Dictionary<Guid, IResponseCourseModel?>> mapCoursePromise = Task.FromResult(mapCourse);
-            Task<Dictionary<Guid, IResponseLessonModel?>> mapLessonPromise = Task.FromResult(mapLesson);
+            List<ResponseCourseLessonModel> res = participants.Select(part =>
+            {
+                ResponseCourseLessonModel item = (ResponseCourseLessonModel)new ResponseCourseLessonModel().Copy(part);
+                return item;
+            }).ToList();
 
             if (isDecorateCourse)
             { // Get list course
                 List<Guid> listCourseIds = participants.Select(p => p.CourseId).Distinct().ToList();
-                mapCoursePromise = GetMapCourse(myUid, listCourseIds);
+                Dictionary<Guid, IResponseCourseModel?> mapCourse = await GetMapCourse(myUid, listCourseIds);
+                foreach (var item in res){
+                    if (mapCourse.TryGetValue(item.CourseId, out IResponseCourseModel? value1))
+                    {
+                        item.Course = value1;
+                    }
+                }
             }
-            mapCourse = await mapCoursePromise;
+
             if (isDecorateLesson)
             { // get list lesson
                 List<Guid> listLessonIds = participants.Select(p => p.LessonId).Distinct().ToList();
-                mapLessonPromise = GetMapLesson(myUid, listLessonIds);
+                Dictionary<Guid, IResponseLessonModel?> mapLesson = await GetMapLesson(myUid, listLessonIds);
+                foreach (var item in res)
+                {
+                    if (mapLesson.TryGetValue(item.LessonId, out IResponseLessonModel? value2))
+                    {
+                        item.Lesson = value2;
+                    }
+                }
             }
-            mapLesson = await mapLessonPromise;
-            //await Task.WhenAll([mapCoursePromise, mapLessonPromise]);
-            //mapCourse = mapCoursePromise.Result;
-            //mapLesson = mapLessonPromise.Result;
-
-            List<ResponseCourseLessonModel> res = participants.Select(part =>
-            {
-                ResponseCourseLessonModel item = (ResponseCourseLessonModel)new ResponseCourseLessonModel().Copy(part);
-                if (mapCourse.TryGetValue(item.CourseId, out IResponseCourseModel? value1))
-                {
-                    item.Course = value1;
-                }
-                if (mapLesson.TryGetValue(item.LessonId, out IResponseLessonModel? value2))
-                {
-                    item.Lesson = value2;
-                }
-                return item;
-            }).ToList();
+            
             return res;
         }
 
@@ -205,7 +218,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
             {
                 ResponseLessonModel les = new();
                 les.Copy(lesson);
-                return (IResponseLessonModel)les;
+                return (IResponseLessonModel) les;
             }).ToList();
             await DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
             return res;
@@ -223,7 +236,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
             return res;
         }
 
-        public virtual async Task<List<IResponseCourseModel>> DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses)
+        public virtual async Task<List<IResponseCourseModel>> DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses, bool isDecorateCourseRoleType = true)
         {
             List<ResponseCourseModel> res = courses.Select(course =>
             {
@@ -234,7 +247,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
             await DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
 
             // Decorate CourseRoleType
-            if (myUid != null)
+            if (myUid != null && isDecorateCourseRoleType)
             {
                 Dictionary<Guid, CourseRoleTypeDto> mapCourseRoleType = await CourseRelationRepository
                     .GetCourseRoleType(myUid.Value, courses.Select(c => c.UserItemId).ToList());
@@ -330,23 +343,37 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
                 {
                     userIds = relations.Select(r => r.SenderId).ToList();
                 }
-                dictUser = await GetMapUserCard(myUid, userIds);
+                dictUser = await GetMapUserCard(null, userIds);
             }
             if (isDecorateCourse)
             {
                 List<Guid> courseIds = relations.Select(r => r.CourseId).ToList();
-                Dictionary<Guid, IResponseCourseModel?> dictViewCourse = await GetMapCourse(myUid, courseIds);
+                Dictionary<Guid, ResponseCourseCardModel?> dictViewCourse = (await CourseRepository
+                    .GetViewCourse([.. courseIds], viewCourse => new ResponseCourseCardModel()
+                    {
+                        UserItemId = viewCourse.UserItemId,
+                        Title = viewCourse.Title,
+                        Abstract = viewCourse.Abstract,
+                        Thumbnail = viewCourse.Thumbnail,
+                        Privacy = viewCourse.Privacy,
+                        Fee = viewCourse.Fee,
+                        IsFree = viewCourse.IsFree,
+                        UserId = viewCourse.UserId,
+                        Username = viewCourse.Username,
+                        FullName = viewCourse.FullName,
+                        Avatar = viewCourse.Avatar,
+                    }))
+                    .Where(item => item != null).ToList()
+                    .ToDictionary(
+                        item => item!.UserItemId,
+                        item => item
+                    );
                 dictCourse = courseIds.Distinct().ToDictionary(
                     id => id,
                     id =>
                     {
-                        if (dictViewCourse.TryGetValue(id, out IResponseCourseModel? course))
-                        {
-                            if (course == null) return null;
-                            ResponseCourseCardModel resCourseCard = new();
-                            resCourseCard.Copy(course);
-                            return resCourseCard;
-                        }
+                        if (dictViewCourse.TryGetValue(id, out ResponseCourseCardModel? course))
+                            return course;
                         return null;
                     }
                 );
@@ -395,20 +422,18 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
 
         protected virtual async Task<Dictionary<Guid, ResponseUserCardModel?>> GetMapUserCard(Guid? myUid, List<Guid> userIds)
         {
-            Dictionary<Guid, ResponseUserCardModel?> mapUsers = [];
-            Dictionary<Guid, ViewUserProfile?> listUsers = await UserRepository
-                    .GetDetail([.. userIds]);
-            mapUsers = listUsers.ToDictionary(
-                item => item.Key,
-                item =>
-                {
-                    ViewUserProfile? user = item.Value;
-                    if (user == null) return null;
-                    ResponseUserCardModel resUser = new();
-                    if (user != null) resUser.Copy(user);
-                    return resUser;
-                }
-            );
+            Dictionary<Guid, ResponseUserCardModel?> mapUsers = await UserRepository
+                .GetDetail<ResponseUserCardModel?>([.. userIds], model => new ResponseUserCardModel() {
+                    UserId = model.UserId,
+                    Username = model.Username,
+                    FullName = model.FullName,
+                    Avatar = model.Avatar,
+                    Cover = model.Cover,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    Role = model.Role,
+                    CreatedTime = model.CreatedTime
+                });
             await DecorateResponseUserCardModel(myUid, mapUsers
                 .Where(item => item.Value != null).Select(item => item.Value!).ToList());
             return mapUsers;
@@ -456,42 +481,6 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
             return res;
         }
 
-        public virtual async Task<List<IResponsePostModel>> DecorateResponsePostModel(Guid? myUid, List<ViewPost> posts)
-        {
-            List<Guid> postIds = posts.Select(p => p.UserItemId).ToList();
-            var postDictPromise = PostRepository.GetExactlyResponseUserItemModel(postIds);
-            Dictionary<Guid, IResponseUserItemModel?> postDict = await postDictPromise;
-
-            List<IResponsePostModel> res = posts.Select<ViewPost, IResponsePostModel>(p =>
-            {
-                if (p.PostType == EPostType.Lesson)
-                {
-                    return (ResponseLessonModel)new ResponseLessonModel().Copy(p);
-                }
-                return (ResponseQuestionModel)new ResponseQuestionModel().Copy(p);
-            }).ToList();
-
-            //await Task.WhenAll([postDictPromise, decoratePromise]);
-            //Dictionary<Guid, IResponseUserItemModel?> postDict = postDictPromise.Result;
-            foreach (IResponsePostModel item in res)
-            {
-                if (postDict.TryGetValue(item.UserItemId, out IResponseUserItemModel? value) && value != null)
-                {
-                    if (item is ResponseLessonModel resLes)
-                    {
-                        resLes.Copy(value);
-                    }
-                    else if (item is ResponseQuestionModel resQues)
-                    {
-                        resQues.Copy(value);
-                    }
-                }
-            }
-
-            var decoratePromise = DecorateResponseKnowledgeModel(myUid, res.OfType<IResponseKnowledgeModel>().ToList());
-            await decoratePromise;
-            return res;
-        }
 
     }
 }

@@ -29,6 +29,7 @@ namespace KnowledgeSharingApi.Controllers.Knowledges
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         [HttpGet("anonymous")]
+        [AllowAnonymous]
         public async Task<IActionResult> AnonymousGetListPosts(int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
@@ -47,6 +48,7 @@ namespace KnowledgeSharingApi.Controllers.Knowledges
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Users/anonymous/posts/{userId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> AnonymousGetListUserPosts(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));
@@ -158,7 +160,7 @@ namespace KnowledgeSharingApi.Controllers.Knowledges
         /// Created: PhucTV (23/3/24)
         /// Modified: None
         [HttpGet("/api/v1/Users/posts/{userId}")]
-        [CustomAuthorization(Roles: "Adminm, User")]
+        [CustomAuthorization(Roles: "Admin, User")]
         public async Task<IActionResult> UserGetPost(Guid userId, int? limit, int? offset, string? order, string? filter)
         {
             PaginationDto pagination = new(limit, offset, ParseOrder(order), ParseFilter(filter));

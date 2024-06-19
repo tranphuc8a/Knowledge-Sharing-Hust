@@ -34,6 +34,11 @@ namespace KnowledgeSharingApi.Repositories.Repositories.DecorationRepositories
             throw new NotImplementedException();
         }
 
+        public Task<List<IResponseCourseModel>> DecorateResponseCourseModel(Guid? myUid, List<ViewCourse> courses, bool isDecorateCourseRoleType = true)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<ResponseCourseRegisterModel>> DecorateResponseCourseRegisterModel(Guid? myUid, List<ViewCourseRegister> registers)
         {
             throw new NotImplementedException();

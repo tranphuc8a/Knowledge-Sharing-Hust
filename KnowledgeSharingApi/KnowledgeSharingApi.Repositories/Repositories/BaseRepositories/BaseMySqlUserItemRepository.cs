@@ -1,20 +1,10 @@
-﻿using Dapper;
-using KnowledgeSharingApi.Domains.Enums;
-using KnowledgeSharingApi.Domains.Exceptions;
-using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
+﻿using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces.ApiResponseModelInterfaces;
 using KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiResponseModels;
-using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using KnowledgeSharingApi.Repositories.Interfaces.Repositories;
 using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
@@ -188,73 +178,46 @@ namespace KnowledgeSharingApi.Repositories.Repositories.BaseRepositories
 
         public virtual async Task<IResponseUserItemModel?> GetExactlyResponseUserItemModel(Guid userItemId)
         {
-            UserItem? res = await DbContext.UserItems.FindAsync(userItemId);
-            if (res == null) return null;
+            // Not:
+            Guid? id = await DbContext.UserItems.Where(it => it.UserItemId == userItemId).Select(u => u.UserItemId).FirstOrDefaultAsync();
+            if (id == null) return null;
 
             // Comments
-            if (res.UserItemType == EUserItemType.Comment)
-            {
-                ViewComment? comment = await DbContext.ViewComments
-                    .Where(com => com.UserItemId == userItemId).FirstOrDefaultAsync();
-                return comment != null ? (ResponseCommentModel)new ResponseCommentModel().Copy(comment) : null;
-            }
+            ViewComment? comment = await DbContext.ViewComments.FindAsync(userItemId);
+            if (comment != null)
+                return (ResponseCommentModel)new ResponseCommentModel().Copy(comment);
 
-            // Knowledges:
-            Knowledge? knowledge = await DbContext.Knowledges.FindAsync(userItemId);
-            if (knowledge == null) return null;
+            // Course
+            ViewCourse? course = await DbContext.ViewCourses.FindAsync(userItemId);
+            if (course != null)
+                return (ResponseCourseModel)new ResponseCourseModel().Copy(course);
 
-            // Member
-            if (knowledge.KnowledgeType == EKnowledgeType.Course)
-            {
-                ViewCourse? course = await DbContext.ViewCourses
-                    .Where(c => c.UserItemId == userItemId).FirstOrDefaultAsync();
-                return course != null ? (ResponseCourseModel)new ResponseCourseModel().Copy(course) : null;
-            }
+            // Question:
+            ViewQuestion? question = await DbContext.ViewQuestions.FindAsync(userItemId);
+            if (question != null)
+                return (ResponseQuestionModel)new ResponseQuestionModel().Copy(question);
 
-            // Post
-            Post? p = await DbContext.Posts.FindAsync(userItemId);
-            if (p == null) return null;
-
-            if (p.PostType == EPostType.Question)
-            {
-                // Question:
-                ViewQuestion? question = await DbContext.ViewQuestions.FindAsync(userItemId);
-                return question != null ? (ResponseQuestionModel)new ResponseQuestionModel().Copy(question) : null;
-            }
             // Leson: 
             ViewLesson? lesson = await DbContext.ViewLessons.FindAsync(userItemId);
-            return lesson != null ? (ResponseLessonModel)new ResponseLessonModel().Copy(lesson) : null;
+            if (lesson != null)
+                return (ResponseLessonModel)new ResponseLessonModel().Copy(lesson);
+            
+            return null;
         }
 
-        public virtual async Task<Dictionary<Guid, IResponseUserItemModel?>> GetExactlyResponseUserItemModel(List<Guid> userIds)
+        public virtual async Task<Dictionary<Guid, IResponseUserItemModel?>> GetExactlyResponseUserItemModel(List<Guid> userItemId)
         {
-            Dictionary<Guid, IResponseUserItemModel?> res = userIds
+            Dictionary<Guid, IResponseUserItemModel?> res = userItemId
                 .Distinct().ToDictionary(id => id, id => (IResponseUserItemModel?)null);
 
             // Get List commentIds, courseIds, lessonIds and questionsIds:
-            var userItems = await DbContext.UserItems.Where(uit => userIds.Contains(uit.UserItemId)).ToListAsync();
-            var knowledgeIds = userItems
-                .Where(uit => uit.UserItemType == EUserItemType.Knowledge)
-                .Select(uit => uit.UserItemId).ToList();
-            var commentIds = userItems.Select(u => u.UserItemId).Except(knowledgeIds).ToList();
-
-            var courseIds = await DbContext.Knowledges
-                .Where(kn => kn.KnowledgeType == EKnowledgeType.Course && knowledgeIds.Contains(kn.UserItemId))
-                .Select(kn => kn.UserItemId)
-                .ToListAsync();
-
-            var postIds = knowledgeIds.Except(courseIds).ToList();
-
-            var lessonIds = await DbContext.Posts
-                .Where(p => p.PostType == EPostType.Lesson && postIds.Contains(p.UserItemId))
-                .Select(p => p.UserItemId)
-                .ToListAsync();
-
-            var questionIds = postIds.Except(lessonIds).ToList();
-
-            var vComments = await DbContext.ViewComments.Where(com => commentIds.Contains(com.UserItemId)).ToListAsync();
-            var vCourses = await DbContext.ViewCourses.Where(course => courseIds.Contains(course.UserItemId)).ToListAsync();
-            var vLessons = await DbContext.ViewLessons.Where(lesson => lessonIds.Contains(lesson.UserItemId)).ToListAsync();
+            userItemId = await DbContext.UserItems.Where(it => userItemId.Contains(it.UserItemId)).Select(u => u.UserItemId).ToListAsync();
+            var vComments = await DbContext.ViewComments.Where(com => userItemId.Contains(com.UserItemId)).ToListAsync();
+            var knowledgeIds = userItemId.Except(vComments.Select(c => c.UserItemId));
+            var vCourses = await DbContext.ViewCourses.Where(course => knowledgeIds.Contains(course.UserItemId)).ToListAsync();
+            var postIds = knowledgeIds.Except(vCourses.Select(c => c.UserItemId));
+            var vLessons = await DbContext.ViewLessons.Where(lesson => postIds.Contains(lesson.UserItemId)).ToListAsync();
+            var questionIds = postIds.Except(vLessons.Select(l => l.UserItemId));
             var vQuestions = await DbContext.ViewQuestions.Where(question => questionIds.Contains(question.UserItemId)).ToListAsync();
 
             // Return result:
@@ -281,40 +244,52 @@ namespace KnowledgeSharingApi.Repositories.Repositories.BaseRepositories
             return res;
         }
 
-        public virtual async Task<IUserItemView?> GetExactlyUserItem(Guid userItemId)
+        public virtual async Task<IViewUserItem?> GetExactlyUserItem(Guid userItemId)
         {
-            UserItem? res = await DbContext.UserItems.FindAsync(userItemId);
-            if (res == null) return null;
+            // Not:
+            Guid? id = await DbContext.UserItems.Where(it => it.UserItemId == userItemId).Select(u => u.UserItemId).FirstOrDefaultAsync();
+            if (id == null) return null;
 
             // Comments
-            if (res.UserItemType == EUserItemType.Comment)
-            {
-                return await DbContext.ViewComments
-                    .Where(com => com.UserItemId == userItemId).FirstOrDefaultAsync();
-            }
+            ViewComment? comment = await DbContext.ViewComments.FindAsync(userItemId);
+            if (comment != null) return comment;
 
-            // Knowledges:
-            Knowledge? knowledge = await DbContext.Knowledges.FindAsync(userItemId);
-            if (knowledge == null) return null;
+            // Course
+            ViewCourse? course = await DbContext.ViewCourses.FindAsync(userItemId);
+            if (course != null) return course;
 
-            // Member
-            if (knowledge.KnowledgeType == EKnowledgeType.Course)
-            {
-                return await DbContext.ViewCourses
-                    .Where(c => c.UserItemId == userItemId).FirstOrDefaultAsync();
-            }
+            // Question:
+            ViewQuestion? question = await DbContext.ViewQuestions.FindAsync(userItemId);
+            if (question != null) return question;
 
-            // Post
-            Post? p = await DbContext.Posts.FindAsync(userItemId);
-            if (p == null) return null;
-
-            if (p.PostType == EPostType.Question)
-            {
-                // Question:
-                return await DbContext.ViewQuestions.FindAsync(userItemId);
-            }
             // Leson: 
-            return await DbContext.ViewLessons.FindAsync(userItemId);
+            ViewLesson? lesson = await DbContext.ViewLessons.FindAsync(userItemId);
+            if (lesson != null) return lesson;
+
+            return null;
+        }
+
+        public virtual async Task<Dictionary<Guid, IViewUserItem?>> GetExactlyUserItem(List<Guid> userItemId)
+        {
+            Dictionary<Guid, IViewUserItem?> res = userItemId
+                .Distinct().ToDictionary(id => id, id => (IViewUserItem?)null);
+
+            // Get List commentIds, courseIds, lessonIds and questionsIds:
+            userItemId = await DbContext.UserItems.Where(it => userItemId.Contains(it.UserItemId)).Select(u => u.UserItemId).ToListAsync();
+            var vComments = await DbContext.ViewComments.Where(com => userItemId.Contains(com.UserItemId)).ToListAsync();
+            var knowledgeIds = userItemId.Except(vComments.Select(c => c.UserItemId));
+            var vCourses = await DbContext.ViewCourses.Where(course => knowledgeIds.Contains(course.UserItemId)).ToListAsync();
+            var postIds = knowledgeIds.Except(vCourses.Select(c => c.UserItemId));
+            var vLessons = await DbContext.ViewLessons.Where(lesson => postIds.Contains(lesson.UserItemId)).ToListAsync();
+            var questionIds = postIds.Except(vLessons.Select(l => l.UserItemId));
+            var vQuestions = await DbContext.ViewQuestions.Where(question => questionIds.Contains(question.UserItemId)).ToListAsync();
+
+            // Return result:
+            foreach (ViewComment vCom in vComments) res[vCom.UserItemId] = vCom;
+            foreach (ViewCourse vCourse in vCourses) res[vCourse.UserItemId] = vCourse;
+            foreach (ViewLesson vLes in vLessons) res[vLes.UserItemId] = vLes;
+            foreach (ViewQuestion vQues in vQuestions) res[vQues.UserItemId] = vQues;
+            return res;
         }
 
         #endregion

@@ -89,8 +89,7 @@ export default {
         getCategories() {
             if (this.course?.Categories != null
                 && this.course.Categories.length > 0){
-                return this.course.Categories
-                    .map(cate => cate.CategoryName);
+                return this.course.Categories;
             }
             return this.defaultCategoriesList;
         },

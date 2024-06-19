@@ -8,11 +8,8 @@ using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.KnowledgeRepositories;
 using KnowledgeSharingApi.Repositories.Repositories.BaseRepositories;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
+
 
 namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlKnowledgeRepositories
 {
@@ -260,5 +257,195 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             return DbContext.Lessons;
         }
 
+        #region Get T
+
+        public virtual async Task<List<T>> GetByUserId<T>(Guid userId, Expression<Func<ViewLesson, T>> projector)
+        {
+            return await DbContext.ViewLessons
+                .Where(les => les.UserId == userId)
+                .OrderByDescending(les => les.CreatedTime)
+                .Select(projector)
+                .ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetByUserId<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les => les.UserId == userId)
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetMarkedPosts<T>(Guid userId, Expression<Func<ViewLesson, T>> projector)
+        {
+            IQueryable<ViewLesson> query =
+                from lesson in DbContext.ViewLessons
+                join mark in DbContext.Marks
+                    on lesson.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId
+                orderby mark.CreatedTime descending
+                select lesson;
+            return await query.Select(projector).ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetMarkedPosts<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            IQueryable<ViewLesson> query =
+                from lesson in DbContext.ViewLessons
+                join mark in DbContext.Marks
+                    on lesson.UserItemId equals mark.KnowledgeId
+                where mark.UserId == userId
+                orderby mark.CreatedTime descending
+                select lesson;
+            IQueryable<T> projectedQuery = ApplyPagination(query, pagination).Select(projector);
+            return await projectedQuery.ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetPostsOfCategory<T>(string catName, PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            IQueryable<Guid> listKnowledgeId = DbContext.ViewKnowledgeCategories
+                .Where(cat => cat.CategoryName == catName).Select(cat => cat.KnowledgeId);
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les => listKnowledgeId.Contains(les.UserItemId))
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).Select(projector).ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetPostsOfCategory<T>(Guid myUId, string catName, PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            // Lấy danh sách id các khóa học mà myUid đang học
+            IQueryable<Guid> listCoursesId = DbContext.CourseRegisters
+                .Where(cr => cr.UserId == myUId).Select(cr => cr.CourseId).Distinct();
+
+            // Lấy danh sách id của các bài học trong các khóa học này
+            IQueryable<Guid> listViewableLessonsId = DbContext.CourseLessons
+                .Where(cl => listCoursesId.Contains(cl.CourseId))
+                .Select(cl => cl.LessonId).Distinct();
+
+            // Lấy danh sách id của các knowledge có catName
+            IQueryable<Guid> listKnowledgesId = DbContext.ViewKnowledgeCategories
+                .Where(kc => kc.CategoryName == catName)
+                .Select(kc => kc.KnowledgeId).Distinct();
+
+            // Lấy danh sách các Lesson thỏa mãn:
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les => listKnowledgesId.Contains(les.UserItemId) && (
+                        // myUId phải Xem được:
+                        // Là chủ
+                        les.UserId == myUId ||
+                        // public
+                        les.Privacy == EPrivacy.Public ||
+                        // Trong các khóa học đã đăng ký
+                        listViewableLessonsId.Contains(les.UserItemId)
+                    ))
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).Select(projector).ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetPublicPosts<T>(Expression<Func<ViewLesson, T>> projector)
+        {
+            return await DbContext.ViewLessons.Where(vl => vl.Privacy == EPrivacy.Public)
+                .Select(projector).ToListAsync();
+        }
+
+        public async Task<List<T>> GetPublicPosts<T>(PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            return await ApplyPagination(
+                    DbContext.ViewLessons.Where(les => les.Privacy == EPrivacy.Public)
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).Select(projector).ToListAsync();
+        }
+
+        public async Task<List<T>> GetPublicPostsByUserId<T>(Guid userId, Expression<Func<ViewLesson, T>> projector)
+        {
+            return await DbContext.ViewLessons.Where(les => les.UserId == userId && les.Privacy == EPrivacy.Public)
+                .OrderByDescending(les => les.CreatedTime)
+                .Select(projector).ToListAsync();
+        }
+
+        public async Task<List<T>> GetPublicPostsByUserId<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            return await ApplyPagination(
+                DbContext.ViewLessons.Where(les => les.UserId == userId && les.Privacy == EPrivacy.Public)
+                .OrderByDescending(les => les.CreatedTime), pagination)
+                .Select(projector).ToListAsync();
+        }
+
+        public async Task<List<T>> GetPublicPostsOfCategory<T>(string catName, PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            IQueryable<Guid> listKnIds = DbContext.ViewKnowledgeCategories
+                .Where(ct => ct.CategoryName == catName)
+                .Select(ct => ct.KnowledgeCategoryId);
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les => listKnIds.Contains(les.UserItemId) && les.Privacy == EPrivacy.Public)
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).Select(projector).ToListAsync();
+        }
+
+        public async Task<PaginationResponseModel<T>> GetLessonsInCourse<T>
+            (Guid courseid, PaginationDto pagination, Expression<Func<ViewLesson, T>> projector) where T:class
+        {
+            List<Guid> listIds = await DbContext.CourseLessons
+                .Where(cl => cl.CourseId == courseid)
+                .Select(cl => cl.LessonId).Distinct()
+                .ToListAsync();
+            int total = listIds.Count;
+
+            IQueryable<T> listlessons = ApplyPagination(
+                DbContext.ViewLessons
+                .Where(les => listIds.Contains(les.UserItemId)),
+                pagination
+            ).Select(projector);
+
+            return new PaginationResponseModel<T>(total, pagination.Limit, pagination.Offset, await listlessons.ToListAsync());
+        }
+
+        public async Task<List<T>> GetViewPost<T>(PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .OrderByDescending(l => l.CreatedTime),
+                    pagination).Select(projector)
+                .ToListAsync();
+        }
+
+        public async Task<List<T>> GetViewPost<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewLesson, T>> projector)
+        {
+            // Lấy danh sách id các khóa học mà myUid đang học
+            IQueryable<Guid> listCoursesId = DbContext.CourseRegisters
+                .Where(cr => cr.UserId == userId).Select(cr => cr.CourseId).Distinct();
+
+            // Lấy danh sách id của các bài học trong các khóa học này
+            IQueryable<Guid> listViewableLessonsId = DbContext.CourseLessons
+                .Where(cl => listCoursesId.Contains(cl.CourseId))
+                .Select(cl => cl.LessonId).Distinct();
+
+            // Lấy danh sách các Lesson thỏa mãn:
+            return await ApplyPagination(
+                    DbContext.ViewLessons
+                    .Where(les =>
+                            // userId phải Xem được:
+                            // Là chủ
+                            les.UserId == userId ||
+                            // public
+                            les.Privacy == EPrivacy.Public ||
+                            // Trong các khóa học đã đăng ký
+                            listViewableLessonsId.Contains(les.UserItemId)
+                    )
+                    .OrderByDescending(les => les.CreatedTime),
+                    pagination
+                ).Select(projector).ToListAsync();
+        }
+
+        #endregion
     }
 }

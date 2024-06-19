@@ -11,18 +11,10 @@ using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Domains.Resources.Vietnamese;
 using KnowledgeSharingApi.Repositories.Interfaces.DecorationRepositories;
-using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Storages;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using ZstdSharp.Unsafe;
 using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIteractionRepositories;
 using KnowledgeSharingApi.Services.Interfaces.UserIteractions;
+using KnowledgeSharingApi.Services.Interfaces;
 
 namespace KnowledgeSharingApi.Services.Services.UserIterations
 {
@@ -33,11 +25,13 @@ namespace KnowledgeSharingApi.Services.Services.UserIterations
         IDecorationRepository decorationRepository,
         IImageRepository imageRepository,
         IStorage storage,
+        ICalculateSearchScoreService calculateSearchScoreService,
         IUserRelationRepository userRelationRepository
         ) : IUserService
     {
         #region Attributes
         protected readonly IUserRepository UserRepository = userRepository;
+        protected readonly ICalculateSearchScoreService CalculateSearchScoreService = calculateSearchScoreService;
         protected readonly IProfileRepository ProfileRepository = profileRepository;
         protected readonly IResourceFactory ResourceFactory = resourceFactory;
         protected readonly IResponseResource ResponseResource = resourceFactory.GetResponseResource();
@@ -311,21 +305,23 @@ namespace KnowledgeSharingApi.Services.Services.UserIterations
 
         public virtual async Task<ServiceResult> SearchUser(Guid? myuid, string searchKey, PaginationDto pagination)
         {
-            // Format search key
-            searchKey = Unicode.RemoveVietnameseTone(searchKey).ToLower();
-
             // Lấy về toàn bộ user và Thực hiện truy vấn
-            List<ViewUserProfile> lsUser = await UserRepository.GetDetail();
-            List<ViewUserProfile> filteredUser;
+            List<(Guid UserId, string FullName, string Username, string Email, string? PhoneNumber, string Role, string? Avatar, string? Cover)> lsUser = 
+                (await UserRepository.GetDetail(user => 
+                    new { user.UserId, user.FullName, user.Username, user.Email, user.PhoneNumber, user.Role, user.Avatar, user.Cover }))
+                .Select(item => (item.UserId, item.FullName, item.Username, item.Email, item.PhoneNumber, item.Role, item.Avatar, item.Cover))
+                .ToList();
+            List<(Guid UserId, string FullName, string Username, string Email, string? PhoneNumber, string Role, string? Avatar, string? Cover) > filteredUser;
 
             // Loc khong chan, khong bi banned...
             if (myuid != null)
             {
-                List<ViewUserRelation> myBlockee = await UserRelationRepository.GetByUserIdAndType(myuid.Value, isActive: false, EUserRelationType.Block);
-                List<ViewUserRelation> myBlocker = await UserRelationRepository.GetByUserIdAndType(myuid.Value, isActive: true, EUserRelationType.Block);
-                List<Guid> myBlockeeId = myBlockee.Select(mb => mb.SenderId).ToList();
-                List<Guid> myBlockerId = myBlocker.Select(mb => mb.ReceiverId).ToList();
-                List<Guid> exceptId = myBlockeeId.Union(myBlockerId).Distinct().ToList();
+                List<ViewUserRelation> myBlocks = await UserRelationRepository.GetBlocksByUserId(myuid.Value);
+                List<Guid> myBlocksId = myBlocks.Select(mb =>
+                {
+                    return mb.SenderId == myuid ? mb.ReceiverId : mb.SenderId;
+                }).ToList();
+                List<Guid> exceptId = myBlocksId.Distinct().ToList();
                 filteredUser = lsUser
                     .Where(lsUser => lsUser.Role != UserRoles.Banned && !exceptId.Contains(lsUser.UserId))
                     .ToList();
@@ -335,27 +331,10 @@ namespace KnowledgeSharingApi.Services.Services.UserIterations
                 filteredUser = lsUser;
             }
             filteredUser = filteredUser.GroupBy(f => f.UserId).Select(g => g.First()).ToList();
-
-            // Tinh toan similiarity Score
-            List<string> listFullname = filteredUser.Select(fu => fu.FullName).ToList();
-            List<string> listUsername = filteredUser.Select(fu => fu.Username).ToList();
-            List<string> listEmail = filteredUser.Select(fu => fu.Email).ToList();
-            List<string> listPhone = filteredUser.Select(fu => fu.PhoneNumber ?? "").ToList();
-
-            Dictionary<string, double> scoreFullName = Algorithm.SimilarityList(searchKey, listFullname);
-            Dictionary<string, double> scoreUsername = Algorithm.SimilarityList(searchKey, listUsername);
-            Dictionary<string, double> scoreEmail = Algorithm.SimilarityList(searchKey, listEmail);
-            Dictionary<string, double> scorePhone = Algorithm.SimilarityList(searchKey, listPhone);
-
-            double fullnameWeight = 0.4, usernameWeight = 0.3, emailWeight = 0.2, phoneWeight = 0.1;
-
-            Dictionary<Guid, double> scored = filteredUser.ToDictionary(
-                u => u.UserId,
-                u => fullnameWeight * scoreFullName[u.FullName] +
-                        usernameWeight * scoreUsername[u.Username] +
-                        emailWeight * scoreEmail[u.Email] +
-                        phoneWeight * scorePhone[u.PhoneNumber ?? ""]
-            );
+            Dictionary<Guid, double> scored = CalculateSearchScoreService.CalculateUserScore(
+                searchKey,
+                filteredUser.Select(item => (item.UserId, item.FullName, item.Username, item.Email, item.PhoneNumber, (int?) null, (int?) null))
+                .ToList());
 
             // Sap xep theo scored:
             filteredUser = [.. filteredUser.OrderByDescending(u => scored[u.UserId])];
@@ -369,8 +348,17 @@ namespace KnowledgeSharingApi.Services.Services.UserIterations
             List<ResponseUserCardModel> res = await DecorationRepository.DecorateResponseUserCardModel(myuid,
                 filteredUser.Select(u =>
                 {
-                    ResponseUserCardModel rUCM = new();
-                    rUCM.Copy(u);
+                    ResponseUserCardModel rUCM = new()
+                    {
+                        UserId = u.UserId,
+                        FullName = u.FullName,
+                        Username = u.Username,
+                        Email = u.Email,
+                        PhoneNumber = u.PhoneNumber,
+                        Role = u.Role,
+                        Avatar = u.Avatar,
+                        Cover = u.Cover
+                    };
                     return rUCM;
                 }).ToList());
 

@@ -5,6 +5,7 @@ using KnowledgeSharingApi.Repositories.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -208,5 +209,148 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.Knowled
         #endregion
 
 
+        #region Get T
+
+
+        /// <summary>
+        /// Lấy về ViewCourse theo id
+        /// </summary>
+        /// <param name="courseId"> id của course cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<T?> GetViewCourse<T>(Guid courseId, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách ViewCourse theo danh sách id
+        /// </summary>
+        /// <param name="courseIds"> danh sách id của các khóa học cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T?>> GetViewCourse<T>(Guid[] courseIds, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course
+        /// </summary>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetViewCourse<T>(PaginationDto pagination, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetViewCourse<T>(Guid myUid, PaginationDto pagination, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course công khai
+        /// Lay toan bo khong phan trang
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetPublicViewCourse<T>(Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course công khai
+        /// </summary>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetPublicViewCourse<T>(PaginationDto pagination, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course công khai của một user
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetPublicViewCourseOfUser<T>(Guid userId, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một user (cho admin)
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetViewCourseOfUser<T>(Guid userId, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một user cho một user khác
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetViewCourseOfUser<T>(Guid myUid, Guid userId, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một catefories
+        /// </summary>
+        /// <param name="catName"> tên category muốn lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetViewCourseOfCategory<T>(string catName, PaginationDto pagination, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course public của một catefories
+        /// </summary>
+        /// <param name="catName"> tên category muốn lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetPublicViewCourseOfCategory<T>(string catName, PaginationDto pagination, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một catefories theo user
+        /// </summary>
+        /// <param name="myUid"> id của user muốn lấy </param>
+        /// <param name="catName"> tên category muốn lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetViewCourseOfCategory<T>(Guid myUid, string catName, PaginationDto pagination, Expression<Func<ViewCourse, T>> projector);
+
+        /// <summary>
+        /// Lấy về Danh sách view course của một user đã mark
+        /// </summary>
+        /// <param name="userId"> id của user cần lấy </param>
+        /// <param name="limit"> Số lượng </param>
+        /// <param name="offset"> Độ lệch </param>
+        /// <returns></returns>
+        /// Created: PhucTV (30/03/24)
+        /// Modified: None
+        Task<List<T>> GetMarkedCoursesOfUser<T>(Guid userId, PaginationDto pagination, Expression<Func<ViewCourse, T>> projector);
+
+
+        #endregion
+
+        /// <summary>
+        /// Lay ve quan he cua user voi mot danh sach khoa hoc
+        /// </summary>
+        /// <param name="userId"> id cua user thuc hien </param>
+        /// <param name="courseIds"> Danh sach course id </param>
+        /// <returns></returns>
+        /// Created: PhucTV (13/5/24)
+        /// Modified: None
+        Task<Dictionary<Guid, CourseRoleTypeDto>> GetCourseRoleType(Guid userId, List<Guid> courseIds);
     }
 }

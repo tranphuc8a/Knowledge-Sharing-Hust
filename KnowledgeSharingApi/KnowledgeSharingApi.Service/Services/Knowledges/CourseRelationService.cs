@@ -27,7 +27,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
 
         protected readonly IUserRepository UserRepository;
         protected readonly IDecorationRepository DecorationRepository;
-        protected readonly ISearchService CalculateKnowledgeSearchScore;
+        protected readonly ICalculateSearchScoreService CalculateKnowledgeSearchScore;
         protected readonly ICourseRepository CourseRepository;
         protected readonly ICourseRelationRepository CourseRelationRepository;
         protected readonly ICoursePaymentRepository CoursePaymentRepository;
@@ -44,7 +44,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             IResourceFactory resourceFactory,
             IUserRepository userRepository,
             ICourseRelationRepository courseRelationRepository,
-            ISearchService calculateKnowledgeSearchScore,
+            ICalculateSearchScoreService calculateKnowledgeSearchScore,
             ICoursePaymentRepository coursePaymentRepository,
             ICourseRegisterRepository courseRegisterRepository,
             IDecorationRepository decorationRepository,
@@ -228,7 +228,17 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             }
 
             // Get lisst register
-            List<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId);
+            List<ViewCourseRegister> registers = await CourseRegisterRepository.GetCourseRegisters(courseId, it => new ViewCourseRegister
+            {
+                CreatedTime = it.CreatedTime,
+                CourseRegisterId = it.CourseRegisterId,
+                UserId = it.UserId,
+                CourseId = it.CourseId,
+                FullName = it.FullName,
+                Username = it.Username,
+                Avatar = it.Avatar,
+                Cover = it.Cover,
+            });
 
             // Pagination
             int total = registers.Count;
@@ -657,7 +667,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
                 .Select(group => group.First())
                 .ToList();
 
-            // Calculate score --> search by user: FullName.6, Username.4
+            // CalculateKnowledgeScore score --> search by user: FullName.6, Username.4
             search = search.ToLower();
             double fullnameWeight = 0.6, usernameWeight = 0.4;
             Dictionary<string, double> fullnameScore = Algorithm.SimilarityList(search, registers.Select(r => r.FullName).ToList());
@@ -772,14 +782,14 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
                 .DecorateResponseCourseRelationModel(myUid, lisRelations, ECourseRelationType.Invite, isDecorateCourse: true, isDecorateUser: false);
 
             // calculate score --> search by course (title .4, owner fullname .3, content .2, abstract .1)
-            List<(Guid, string, string, string, string?)> shortKnowledge = models.Select(
+            List<(Guid, string, string, string?)> shortKnowledge = models.Select(
                     model => (model.CourseRelationId,
                             model.Course?.Title ?? string.Empty,
                             model.Course?.FullName ?? string.Empty,
-                            model.Course?.Introduction ?? string.Empty,
-                            model.Course?.Abstract)
+                            model.Course?.Abstract
+                            ) 
                 ).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, shortKnowledge);
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeSimiliarityScore(search, shortKnowledge);
 
             // order and apply pagination
             models = [.. models.OrderByDescending(m => scored[m.CourseRelationId])];
@@ -804,14 +814,13 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
                 .DecorateResponseCourseRelationModel(myUid, lisRelations, ECourseRelationType.Request, isDecorateCourse: true, isDecorateUser: false);
 
             // calculate score --> search by course
-            List<(Guid, string, string, string, string?)> shortKnowledge = models.Select(
+            List<(Guid, string, string, string?)> shortKnowledge = models.Select(
                     model => (model.CourseRelationId,
                             model.Course?.Title ?? string.Empty,
                             model.Course?.FullName ?? string.Empty,
-                            model.Course?.Introduction ?? string.Empty,
                             model.Course?.Abstract)
                 ).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, shortKnowledge);
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeSimiliarityScore(search, shortKnowledge);
 
             models = [.. models.OrderByDescending(m => scored[m.CourseRelationId])];
             if (page.Filters != null)

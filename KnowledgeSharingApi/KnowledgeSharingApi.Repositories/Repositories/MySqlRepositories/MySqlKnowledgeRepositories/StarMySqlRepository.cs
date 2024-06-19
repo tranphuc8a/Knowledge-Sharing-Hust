@@ -59,8 +59,9 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
 
         public async Task<Dictionary<Guid, int?>> CalculateUserStars(Guid userId, List<Guid> userItemsId)
         {
-            List<Star> userstars = await DbContext.Stars
+            var userstars = await DbContext.Stars
                 .Where(star => star.UserId == userId && userItemsId.Contains(star.UserItemId))
+                .Select(it => new { it.UserItemId, it.Stars})
                 .ToListAsync();
 
             // Chuyển đổi danh sách trung bình thành từ điển, với giá trị mặc định là null cho mọi giá trị.

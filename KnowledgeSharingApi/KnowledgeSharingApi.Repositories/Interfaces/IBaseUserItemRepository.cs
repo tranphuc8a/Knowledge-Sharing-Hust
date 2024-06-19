@@ -19,7 +19,8 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.Repositories
         /// <returns></returns>
         /// Created: PhucTV (28/3/24)
         /// Modified: None
-        Task<IUserItemView?> GetExactlyUserItem(Guid userItemId);
+        Task<IViewUserItem?> GetExactlyUserItem(Guid userItemId);
+        Task<Dictionary<Guid, IViewUserItem?>> GetExactlyUserItem(List<Guid> userItemId);
         Task<IResponseUserItemModel?> GetExactlyResponseUserItemModel(Guid userItemId);
         Task<Dictionary<Guid, IResponseUserItemModel?>> GetExactlyResponseUserItemModel(List<Guid> userIds);
 

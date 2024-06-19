@@ -187,7 +187,7 @@ export default {
                 this.$nextTick(() => {
                     that.isLoaded = true;
                 });
-                // this.isUserExisted = true;
+                this.isUserExisted = true;
             } catch (error){
                 try {
                     Request.resolveAxiosError(error);

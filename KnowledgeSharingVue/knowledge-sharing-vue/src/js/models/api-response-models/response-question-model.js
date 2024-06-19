@@ -3,7 +3,6 @@
 
 import ViewQuestion from '../views/view-question';
 import ResponseCommentModel from './response-comment-model';
-import Category from '../entities/category';
 
 class ResponseQuestionModel extends ViewQuestion {
     constructor() {
@@ -30,13 +29,6 @@ class ResponseQuestionModel extends ViewQuestion {
                 let comm = new ResponseCommentModel();
                 comm.copy(com);
                 return comm;
-            });
-        }
-        if (this.Categories?.length > 0){
-            this.Categories = this.Categories.map(function(cat){
-                let cate = new Category();
-                cate.copy(cat);
-                return cate;
             });
         }
         return this;

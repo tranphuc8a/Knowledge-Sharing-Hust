@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,6 +26,21 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             return await DbContext.ViewCourseRegisters
                 .Where(cr => cr.CourseId == courseId)
                 .OrderByDescending(cr => cr.CreatedTime)
+                .ToListAsync();
+        }
+
+        public async Task<T?> GetCourseRegister<T>(Guid registerId, Expression<Func<ViewCourseRegister, T>> projector)
+        {
+            return await DbContext.ViewCourseRegisters
+                .Where(it => it.CourseRegisterId == registerId).Select(projector).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<T>> GetCourseRegisters<T>(Guid courseId, Expression<Func<ViewCourseRegister, T>> projector)
+        {
+            return await DbContext.ViewCourseRegisters
+                .Where(cr => cr.CourseId == courseId)
+                .OrderByDescending(cr => cr.CreatedTime)
+                .Select(projector)
                 .ToListAsync();
         }
     }

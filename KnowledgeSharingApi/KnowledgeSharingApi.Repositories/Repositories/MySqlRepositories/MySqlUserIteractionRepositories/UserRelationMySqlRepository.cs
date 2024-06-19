@@ -58,8 +58,8 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             List<UserRelation> listBlock = await DbContext.UserRelations
                 .Where(relation =>
                     relation.UserRelationType == EUserRelationType.Block
-                    && (relation.SenderId == user1Id || relation.ReceiverId == user2Id)
-                    && (relation.SenderId == user2Id || relation.ReceiverId == user1Id)
+                    && ((relation.SenderId == user1Id && relation.ReceiverId == user2Id)
+                    || (relation.SenderId == user2Id && relation.ReceiverId == user1Id))
                 ).ToListAsync();
             return listBlock.Count != 0;
         }
@@ -99,8 +99,15 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             return await query.ToListAsync();
         }
 
+        public virtual async Task<List<ViewUserRelation>> GetBlocksByUserId(Guid userId)
+        {
+            return await DbContext.ViewUserRelations.Where(ur => ur.UserRelationType == EUserRelationType.Block
+                            && (ur.SenderId == userId || ur.ReceiverId == userId)).ToListAsync();
+        }
 
-        protected virtual UserRelationTypeDto GetUserRelationType(Guid myUid, Guid userId, List<ViewUserRelation> userRelations)
+
+        protected virtual UserRelationTypeDto GetUserRelationType(Guid myUid, Guid userId, 
+            List<(Guid UserRelationId, EUserRelationType UserRelationType, Guid SenderId, Guid ReceiverId)> userRelations)
         {
             UserRelationTypeDto res = new()
             {
@@ -116,10 +123,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             if (userRelations.Count == 0) return res;
 
             // Check block:
-            ViewUserRelation? block = userRelations
+            var block = userRelations
                 .Where(relation => relation.UserRelationType == EUserRelationType.Block)
                 .FirstOrDefault();
-            if (block != null)
+            if (block != default)
             {
                 res.UserRelationType = block.SenderId == myUid ? EUserRelationType.Blocker : EUserRelationType.Blockee;
                 res.UserRelationId = block.UserRelationId;
@@ -127,10 +134,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             }
 
             // Check friend:
-            ViewUserRelation? friend = userRelations
+            var friend = userRelations
                 .Where(relation => relation.UserRelationType == EUserRelationType.Friend)
                 .FirstOrDefault();
-            if (friend != null)
+            if (friend != default)
             {
                 res.UserRelationType = EUserRelationType.Friend;
                 res.UserRelationId = friend.UserRelationId;
@@ -138,10 +145,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             }
 
             // Check request:
-            ViewUserRelation? request = userRelations
+            var request = userRelations
                 .Where(relation => relation.UserRelationType == EUserRelationType.FriendRequest)
                 .FirstOrDefault();
-            if (request != null)
+            if (request != default)
             {
                 res.UserRelationType = request.SenderId == myUid ? EUserRelationType.Requester : EUserRelationType.Requestee;
                 res.UserRelationId = request.UserRelationId;
@@ -149,10 +156,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             }
 
             // Check follower:
-            ViewUserRelation? follower = userRelations
+            var follower = userRelations
                 .Where(rel => rel.SenderId == myUid && rel.UserRelationType == EUserRelationType.Follow)
                 .FirstOrDefault();
-            if (follower != null)
+            if (follower != default)
             {
                 res.UserRelationType = EUserRelationType.Follower;
                 res.UserRelationId = follower.UserRelationId;
@@ -160,10 +167,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             }
 
             // Check followee:
-            ViewUserRelation? followee = userRelations
+            var followee = userRelations
                 .Where(rel => rel.ReceiverId == myUid && rel.UserRelationType == EUserRelationType.Follow)
                 .FirstOrDefault();
-            if (followee != null)
+            if (followee != default)
             {
                 res.UserRelationType = EUserRelationType.Followee;
                 res.UserRelationId = followee.UserRelationId;
@@ -176,22 +183,37 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
 
         public virtual async Task<EUserRelationType> GetUserRelationType(Guid user1, Guid user2)
         {
-            List<ViewUserRelation> userRelations = await
+            List<(Guid Id, EUserRelationType type, Guid send, Guid receive)> userRelations = (await
                 DbContext.ViewUserRelations
-                .Where(relation => 
+                .Where(relation =>
                     relation.SenderId == user1 && relation.ReceiverId == user2
-                 || 
+                 ||
                     relation.SenderId == user2 && relation.ReceiverId == user1
-                ).ToListAsync();
+                ).Select(item => new
+                {
+                    item.UserRelationId,
+                    item.UserRelationType,
+                    item.SenderId,
+                    item.ReceiverId
+                }).ToListAsync())
+                .Select(item => (item.UserRelationId, item.UserRelationType, item.SenderId, item.ReceiverId))
+                .ToList();
 
             return GetUserRelationType(user1, user2, userRelations).UserRelationType!.Value;
         }
 
         public virtual async Task<Dictionary<Guid, EUserRelationType>> GetUserRelationType(Guid user1, List<Guid> users2)
         {
-            List<ViewUserRelation> userRelations = await DbContext.ViewUserRelations
+            var userRelations = await DbContext.ViewUserRelations
                 .Where(relation => relation.SenderId == user1 && users2.Contains(relation.ReceiverId) ||
                                    relation.ReceiverId == user1 && users2.Contains(relation.SenderId))
+                .Select(item => new
+                {
+                    item.UserRelationId,
+                    item.UserRelationType,
+                    item.SenderId,
+                    item.ReceiverId
+                })
                 .ToListAsync();
 
             // Khởi tạo kết quả mặc định là NotInRelation
@@ -200,8 +222,9 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             // Xác định loại quan hệ cho từng cặp người dùng
             foreach (Guid otherUser in users2)
             {
-                List<ViewUserRelation> relations = userRelations
+                var relations = userRelations
                     .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser)
+                    .Select(rel => (rel.UserRelationId, rel.UserRelationType, rel.SenderId, rel.ReceiverId))
                     .ToList();
                 EUserRelationType relationType = GetUserRelationType(user1, otherUser, relations).UserRelationType!.Value;
                 results[otherUser] = relationType;
@@ -212,9 +235,16 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
 
         public virtual async Task<Dictionary<Guid, UserRelationTypeDto>> GetDetailUserRelationType(Guid user1, List<Guid> users2)
         {
-            List<ViewUserRelation> userRelations = await DbContext.ViewUserRelations
+            var userRelations = await DbContext.ViewUserRelations
                 .Where(relation => relation.SenderId == user1 && users2.Contains(relation.ReceiverId) ||
-                                   relation.ReceiverId == user1 && users2.Contains(relation.SenderId))
+                                   relation.ReceiverId == user1 && users2.Contains(relation.SenderId)).
+                Select(item => new
+                {
+                    item.UserRelationId,
+                    item.UserRelationType,
+                    item.SenderId,
+                    item.ReceiverId
+                })
                 .ToListAsync();
 
             // Khởi tạo kết quả mặc định là NotInRelation
@@ -227,8 +257,9 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             // Xác định loại quan hệ cho từng cặp người dùng
             foreach (Guid otherUser in users2)
             {
-                List<ViewUserRelation> relations = userRelations
+                var relations = userRelations
                     .Where(rel => rel.SenderId == otherUser || rel.ReceiverId == otherUser)
+                    .Select(rel => (rel.UserRelationId, rel.UserRelationType, rel.SenderId, rel.ReceiverId))
                     .ToList();
                 UserRelationTypeDto relationType = GetUserRelationType(user1, otherUser, relations);
                 results[otherUser] = relationType;

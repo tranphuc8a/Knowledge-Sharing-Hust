@@ -62,6 +62,15 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIte
         Task<List<ViewUserRelation>> GetFriendsByUserId(Guid userId);
 
         /// <summary>
+        /// Lấy về danh sách blocker and blockee
+        /// </summary>
+        /// <param name="userId"> Id của user cần lấy </param>
+        /// <returns></returns>
+        /// Created: PhucTV (20/5/24)
+        /// Modified: None
+        Task<List<ViewUserRelation>> GetBlocksByUserId(Guid userId);
+
+        /// <summary>
         /// Lấy về danh sách quan hệ theo UserId và loại quan hệ
         /// </summary>
         /// <param name="userId"> Id của user cần lấy </param>

@@ -243,6 +243,18 @@ export default {
                     } else {
                         this.listOptions.push(this.actions.LockComment);
                     }
+                    // Admin & User:
+                    if (this.currentUser.UserId == this.getPost()?.UserId){
+                        // Owner
+                        this.listOptions.push(this.actions.Edit);
+                        if (this.getPost().PostType == myEnum.EPostType.Question){
+                            if (this.getPost().IsAcepted){
+                                this.listOptions.push(this.actions.Uncomplete);
+                            } else {
+                                this.listOptions.push(this.actions.Complete);
+                            }
+                        }
+                    }
                 } else if (this.currentUser.Role == myEnum.EUserRole.Banned){
                     // Banned
                     this.listOptions = [

@@ -29,7 +29,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
         protected readonly ICourseRepository CourseRepository;
         protected readonly IStarRepository StarRepository;
         protected readonly IUserRepository UserRepository;
-        protected readonly ISearchService CalculateKnowledgeSearchScore;
+        protected readonly ICalculateSearchScoreService CalculateKnowledgeSearchScore;
         protected readonly IKnowledgeRepository KnowledgeRepository;
         protected readonly IDecorationRepository DecorationRepository;
         protected readonly ICategoryRepository CategoryRepository;
@@ -48,7 +48,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             ICourseRepository courseRepository,
             IResourceFactory resourceFactory,
             IStarRepository starRepository,
-            ISearchService calculateKnowledgeSearchScore,
+            ICalculateSearchScoreService calculateKnowledgeSearchScore,
             IUserRepository userRepository,
             IKnowledgeRepository knowledgeRepository,
             IDecorationRepository decorationRepository,
@@ -399,15 +399,17 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
         {
             // Kiểm tra course tồn tại
             ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
-            if (course.UserId == myUid) return await UserGetMyCourseDetail(myUid, courseId);
+            //if (course.UserId == myUid) return await UserGetMyCourseDetail(myUid, courseId);
 
             // Kiểm tra accessible
-            bool isAccessible = await KnowledgeRepository.CheckCourseAccessible(myUid, courseId);
-            if (!isAccessible)
+            CourseRoleTypeDto courseRoleTypeDto = (await CourseRepository.GetCourseRoleType(myUid, [courseId]))[courseId];
+            if (courseRoleTypeDto.CourseRoleType == ECourseRoleType.NotAccessible)
                 return ServiceResult.Forbidden("Bạn không có quyền truy cập khóa học này");
 
             // decorate và trả về thành công
-            IResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(myUid, [course])).First();
+            IResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(myUid, [course], isDecorateCourseRoleType: false)).First();
+            res.CourseRoleType = courseRoleTypeDto.CourseRoleType;
+            res.CourseRelationId = courseRoleTypeDto.CourseRelationId;
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
         }
 
@@ -457,6 +459,8 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
 
             // decorate
             IResponseCourseModel res = (await DecorationRepository.DecorateResponseCourseModel(myUid, [course])).First();
+            res.CourseRoleType = ECourseRoleType.Owner;
+            res.CourseRelationId = res.UserItemId;
 
             // return Success
             return ServiceResult.Success(ResponseResource.GetSuccess(CourseResource), string.Empty, res);
@@ -472,7 +476,12 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             lsCourses = CourseRepository.ApplyPagination(lsCourses, pagination);
 
             // decorate
-            List<IResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses);
+            List<IResponseCourseModel> lsRes = await DecorationRepository.DecorateResponseCourseModel(myUid, lsCourses, isDecorateCourseRoleType: false);
+            lsRes.ForEach(course =>
+            {
+                course.CourseRoleType = ECourseRoleType.Owner;
+                course.CourseRelationId = course.UserItemId;
+            });
             PaginationResponseModel<IResponseCourseModel> res =
                 new(total, pagination.Limit, pagination.Offset, lsRes);
 
@@ -532,9 +541,9 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             List<ViewCourse> listCourse = await CourseRepository.GetPublicViewCourse();
 
             // calculate score
-            List<(Guid, string, string, string, string?)> listShortPost = listCourse
-                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Introduction, p.Abstract)).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+            List<(Guid, string, string, string?, int?, int?)> listShortPost = listCourse
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Abstract, p.SumStar, p.TotalStar)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeScore(search, listShortPost);
 
             // order by score
             listCourse = [.. listCourse.OrderByDescending(p => scored[p.UserItemId])];
@@ -564,9 +573,9 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             List<ViewCourse> listCourse = await CourseRepository.GetViewCourseOfUser(myUid);
 
             // calculate score
-            List<(Guid, string, string, string, string?)> listShortPost = listCourse
-                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Introduction, p.Abstract)).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+            List<(Guid, string, string, string?, int?, int?)> listShortPost = listCourse
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Abstract, p.SumStar, p.TotalStar)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeScore(search, listShortPost);
 
             // order by score
             listCourse = [.. listCourse.OrderByDescending(p => scored[p.UserItemId])];
@@ -596,9 +605,9 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             List<ViewCourse> listCourse = await CourseRepository.GetPublicViewCourseOfUser(userId);
 
             // calculate score
-            List<(Guid, string, string, string, string?)> listShortPost = listCourse
-                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Introduction, p.Abstract)).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+            List<(Guid, string, string, string?, int?, int?)> listShortPost = listCourse
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Abstract, p.SumStar, p.TotalStar)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeScore(search, listShortPost);
 
             // order by score
             listCourse = [.. listCourse.OrderByDescending(p => scored[p.UserItemId])];
@@ -628,9 +637,9 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             List<ViewCourse> listCourse = await CourseRepository.GetViewCourseOfUser(userId);
 
             // calculate score
-            List<(Guid, string, string, string, string?)> listShortPost = listCourse
-                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Introduction, p.Abstract)).ToList();
-            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.Calculate(search, listShortPost);
+            List<(Guid, string, string, string?, int?, int?)> listShortPost = listCourse
+                .Select(p => (p.UserItemId, p.Title, p.FullName, p.Abstract, p.SumStar, p.TotalStar)).ToList();
+            Dictionary<Guid, double> scored = CalculateKnowledgeSearchScore.CalculateKnowledgeScore(search, listShortPost);
 
             // order by score
             listCourse = [.. listCourse.OrderByDescending(p => scored[p.UserItemId])];

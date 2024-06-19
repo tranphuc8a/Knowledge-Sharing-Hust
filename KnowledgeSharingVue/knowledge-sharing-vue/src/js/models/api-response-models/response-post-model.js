@@ -28,13 +28,6 @@ class ResponsePostModel extends ViewPost {
                 return comm;
             });
         }
-        if (this.Categories?.length > 0){
-            this.Categories = this.Categories.map(function(cat){
-                let cate = new Category();
-                cate.copy(cat);
-                return cate;
-            });
-        }
         return this;
     }
 }

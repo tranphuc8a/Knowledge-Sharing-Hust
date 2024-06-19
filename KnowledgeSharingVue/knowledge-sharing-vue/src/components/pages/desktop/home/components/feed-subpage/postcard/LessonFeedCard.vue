@@ -21,7 +21,7 @@
             <div class="p-feedcard-lestion__toolbar">
                 <PostCardToolBar />
             </div>
-            <div class="p-feedcard-lestion__devide">
+            <div class="p-feedcard-lestion__devide" v-if="isShowComment">
                 <div></div>
             </div>
             <div class="p-feedcard-lestion__comments" v-if="isShowComment">
@@ -56,7 +56,7 @@ export default {
             content: '',
             lesson: this.post,
             compiledCategories: [],
-            isShowComment: true,
+            isShowComment: this.isViewComment,
         }
 
     },
@@ -101,11 +101,18 @@ export default {
         post(newValue) {
             this.lesson = newValue;
             this.compiledCategories = this.getCategories();
+        },
+        isViewComment(newValue) {
+            this.isShowComment = newValue;
         }
     },
     props: {
         post: {
             required: true
+        },
+        isViewComment: {
+            type: Boolean,
+            default: true
         }
     }
 }

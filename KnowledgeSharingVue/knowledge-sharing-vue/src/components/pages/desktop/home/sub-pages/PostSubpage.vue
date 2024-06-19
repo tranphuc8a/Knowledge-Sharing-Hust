@@ -27,7 +27,7 @@
         <component v-for="item in listPosts" 
             :key="item?.UserItemId"
             :is="getComponent(item)"
-            v-bind="{post: item}">
+            v-bind="{post: item, isViewComment: isViewComment}">
             Hello
         </component>
 
@@ -95,11 +95,14 @@ export default {
         // prop xac dinh context cua postsubpage hien tai (null, user, course)
         owner: {
             default: null,
-        }
+        },
         // isShowAddPost: {
         //     type: Boolean,
         //     default: true,
-        // }
+        // },
+        isViewComment: {
+            default: true,
+        }
     },
     data(){
         return {

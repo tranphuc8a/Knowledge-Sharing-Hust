@@ -156,6 +156,7 @@ export default {
                 }
 
             } catch (e){
+                this.isOutOfPost = true;
                 Request.resolveAxiosError(e);
             } finally {
                 this.isLoadingMore = false;

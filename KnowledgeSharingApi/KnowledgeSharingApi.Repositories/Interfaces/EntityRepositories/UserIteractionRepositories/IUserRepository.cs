@@ -7,6 +7,7 @@ using KnowledgeSharingApi.Repositories.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -95,6 +96,69 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIte
         /// Created: PhucTV (12/3/24)
         /// Modified: None
         Task<ViewUserProfile?> GetDetailByUsernameOrUserId(string unOruid);
+
+        /// <summary>
+        /// Lấy về danh sách chi tiết usser
+        /// </summary>
+        /// <returns> T </returns>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        Task<List<T>> GetDetail<T>(Expression<Func<ViewUserProfile, T>> projector);
+
+        /// <summary>
+        /// Lấy về danh sách chi tiết user có phân trang
+        /// </summary>
+        /// <param name="pagination"> Thuoc tinh phan trang </param>
+        /// <returns> T </returns>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        Task<List<T>> GetDetail<T>(PaginationDto pagination, Expression<Func<ViewUserProfile, T>> projector);
+
+        /// <summary>
+        /// Lấy về danh sách chi tiết user theo danh sách id
+        /// </summary>
+        /// <param name="userIds"> danh sách id user cần lấy </param>
+        /// <returns> T </returns>
+        /// Created: PhucTV (27/3/24)
+        /// Modified: None
+        Task<Dictionary<Guid, T?>> GetDetail<T>(Guid[] userIds, Expression<Func<ViewUserProfile, T>> projector);
+
+        /// <summary>
+        /// Lấy về chi tiết user
+        /// </summary>
+        /// <param name="userId"> userId của user cần lấy </param>
+        /// <returns> T </returns>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        Task<T?> GetDetail<T>(Guid userId, Expression<Func<ViewUserProfile, T>> projector);
+
+        /// <summary>
+        /// Lấy về chi tiết user bằng email
+        /// </summary>
+        /// <param name="email"> email của user cần lấy </param>
+        /// <returns> T </returns>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        Task<T?> GetDetailByEmail<T>(string email, Expression<Func<ViewUserProfile, T>> projector);
+
+
+        /// <summary>
+        /// Lấy về chi tiết user bằng username
+        /// </summary>
+        /// <param name="username"> username của user cần lấy </param>
+        /// <returns> T </returns>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        Task<T?> GetDetailByUsername<T>(string username, Expression<Func<ViewUserProfile, T>> projector);
+
+        /// <summary>
+        /// Lấy về chi tiết user bằng username hoặc userId
+        /// </summary>
+        /// <param name="unOruid"> unOruid của user cần lấy </param>
+        /// <returns> T </returns>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        Task<T?> GetDetailByUsernameOrUserId<T>(string unOruid, Expression<Func<ViewUserProfile, T>> projector);
 
         /// <summary>
         /// Kiểm tra xem mật khẩu đúng hay sai

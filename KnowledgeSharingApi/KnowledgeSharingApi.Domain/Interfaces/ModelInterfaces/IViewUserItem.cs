@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Interfaces.ModelInterfaces
 {
-    public interface IUserItemView
+    public interface IViewUserItem
     {
     }
 }

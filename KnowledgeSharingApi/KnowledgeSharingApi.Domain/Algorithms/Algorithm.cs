@@ -229,6 +229,36 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             return mapGram;
         }
 
+        private static Dictionary<string, int> GetMapGramCharacterPattern(string text, Dictionary<string, int> patternMapGram)
+        {
+            if (string.IsNullOrEmpty(text)) return [];
+
+            var mapGram = new Dictionary<string, int>();
+            var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var word in words)
+            {
+                var wordLength = word.Length;
+                for (var startIndex = 0; startIndex < wordLength; startIndex++)
+                {
+                    var maxLength = wordLength - startIndex;
+                    for (var l = 1; l <= maxLength; l++)
+                    {
+                        var gram = word.Substring(startIndex, l);
+                        if (string.IsNullOrWhiteSpace(gram))
+                            continue;
+                        if (!patternMapGram.TryGetValue(gram, out var value) || value == 0)
+                            break;
+                        if (!mapGram.TryGetValue(gram, out int value2))
+                            mapGram[gram] = 1;
+                        else
+                            mapGram[gram] = ++value2;
+                    }
+                }
+            }
+            return mapGram;
+        }
+
         private static Dictionary<string, int> GetMapGramWord(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return [];
@@ -259,6 +289,40 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                 }
             }
 
+            return mapGram;
+        }
+
+        private static Dictionary<string, int> GetMapGramWordPattern(string text, Dictionary<string, int> patternMapGram)
+        {
+            if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text)) return [];
+
+            var mapGram = new Dictionary<string, int>();
+            var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+            const int maxWords = 100; // only focus first 100 words of text
+            if (words.Length > maxWords)
+            {
+                Array.Resize(ref words, maxWords);
+            }
+
+            var sentenceLength = words.Length;
+
+            for (var startIndex = 0; startIndex < sentenceLength; startIndex++)
+            {
+                var maxLength = sentenceLength - startIndex;
+                for (var l = 1; l <= maxLength; l++)
+                {
+                    var gram = string.Join(" ", words, startIndex, l);
+                    if (string.IsNullOrWhiteSpace(gram))
+                        continue;
+                    if (!patternMapGram.TryGetValue(gram, out var value) || value == 0)
+                        break;
+                    if (!mapGram.TryGetValue(gram, out int value2))
+                        mapGram[gram] = 1;
+                    else
+                        mapGram[gram] = ++value;
+                }
+            }
             return mapGram;
         }
 
@@ -319,7 +383,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                 // calculate n-gram of each text in listText
                 foreach (var text in listText)
                 {
-                    Dictionary<string, int> mapGramOfStringB = GetMapGramCharacter(Unicode.RemoveVietnameseTone(text).ToLower());
+                    Dictionary<string, int> mapGramOfStringB = GetMapGramCharacterPattern(Unicode.RemoveVietnameseTone(text).ToLower(), mapGramOfStringA);
                     double score = 0;
                     foreach (var gram in mapGramOfStringA)
                     {
@@ -400,7 +464,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                 // calculate n-gram of each text in listText
                 foreach (var text in listText)
                 {
-                    Dictionary<string, int> mapGramOfStringB = GetMapGramWord(Unicode.RemoveVietnameseTone(text).ToLower());
+                    Dictionary<string, int> mapGramOfStringB = GetMapGramWordPattern(Unicode.RemoveVietnameseTone(text).ToLower(), mapGramOfStringA);
                     double score = 0;
                     foreach (var gram in mapGramOfStringA)
                     {
@@ -409,7 +473,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                             int countInA = gram.Value;
                             int countInB = value;
                             int gramLength = gram.Key.Length;
-                            double addScore = countInA * countInB * gramLength * gramLength / 1e2;
+                            double addScore = countInA * countInB * gramLength * gramLength / 2e2;
                             score += addScore;
                         }
                     }

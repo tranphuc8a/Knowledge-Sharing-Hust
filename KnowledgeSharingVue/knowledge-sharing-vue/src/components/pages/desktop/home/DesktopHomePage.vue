@@ -58,7 +58,8 @@ export default {
     },
     methods: {
         registerScrollHandler(handler){
-            this.handler.push(handler);
+            // this.handler.push(handler);
+            this.handler = [handler];
         },
         async resolveOnScroll(){
             try {
@@ -100,6 +101,11 @@ export default {
         return {
             registerScrollHandler: this.registerScrollHandler
         }
+    },
+    watch: {
+        // '$route.fullPath'() {
+        //     this.handler = [];
+        // }
     },
     inject: {
         getLanguage: {},

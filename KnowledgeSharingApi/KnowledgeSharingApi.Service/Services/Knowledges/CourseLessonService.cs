@@ -293,10 +293,10 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
         public async Task<ServiceResult> UserGetListCourseParticipants(Guid myUid, Guid courseId, PaginationDto pagination)
         {
             // Kiem tra khoa hoc ton tai
-            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
+            //Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
 
             // Kiem tra role == member hoặc owner
-            ECourseRoleType role = await CourseRelationRepository.GetRole(myUid, course.UserItemId);
+            ECourseRoleType role = await CourseRelationRepository.GetRole(myUid, courseId);
             if (role != ECourseRoleType.Owner && role != ECourseRoleType.Member)
                 return ServiceResult.Forbidden("Bạn không phải là thành viên của khóa học này");
 
@@ -309,7 +309,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
 
             // Decorate
             List<ResponseCourseLessonModel> listResponse = await
-                DecorationRepository.DecorateResponseCourseLessonModel(myUid, listLesson, isDecorateLesson: true);
+                DecorationRepository.DecorateResponseCourseLessonModel(myUid, listLesson, isDecorateLesson: true, isDecorateCourse: false);
             PaginationResponseModel<ResponseCourseLessonModel> res = new(total, pagination.Limit, pagination.Offset, listResponse);
 
             // Tra ve thanh cong
