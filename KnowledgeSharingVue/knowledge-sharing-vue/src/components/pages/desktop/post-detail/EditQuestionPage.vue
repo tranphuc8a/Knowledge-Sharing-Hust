@@ -264,7 +264,7 @@ export default {
                         this.inputs.title.setValue(question.Title);
                         this.inputs.abstract.setValue(question.Abstract);
                         this.inputs.thumbnail.setValue(question.Thumbnail);
-                        this.inputs.category.setValue(question.Categories.map(cat => cat.CategoryName));
+                        this.inputs.category.setValue(question.Categories);
                         this.inputs.content.setValue(question.Content);
                     }
                 }

@@ -12,6 +12,8 @@ namespace KnowledgeSharingApi.Domains.Algorithms
     {
         //private static readonly string[] separator = [" ", ",", ".", ";", "!", ":", "?"];
         private static char[] separator = [' ', '\t', '\n', '\r', ',', '.', ';', '!', '?'];
+        private const int MAX_WORD_LENGTH = 20;
+        private const int MAX_SENTENCE_LENGTH = 100;
 
         public static bool IsPermutation<T>(List<T> A, List<T> B)
         {
@@ -200,13 +202,12 @@ namespace KnowledgeSharingApi.Domains.Algorithms
 
             var mapGram = new Dictionary<string, int>();
             var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
-            int maxLengthSentences = 200;
-            if (words.Count > 200) words = words[..maxLengthSentences];
+            if (words.Count > MAX_SENTENCE_LENGTH) words = words[..MAX_SENTENCE_LENGTH];
 
             foreach (var word in words)
             {
-                // If word is longer than 100 characters, trim it
-                var processedWord = word.Length > 100 ? word[..100] : word;
+                // If word is longer than MAX_WORD_LENGTH characters, trim it
+                var processedWord = word.Length > MAX_WORD_LENGTH ? word[..MAX_WORD_LENGTH] : word;
 
                 int wordLength = processedWord.Length;
                 for (int l = 1; l <= wordLength; l++)
@@ -266,9 +267,8 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             var mapGram = new Dictionary<string, int>();
             List<string> words = [.. text.Split(separator, StringSplitOptions.RemoveEmptyEntries)];
 
-            int maxWords = 100; // only focus first 100 words of text
-            if (words.Count > maxWords)
-                words = words.Take(maxWords).ToList();
+            if (words.Count > MAX_SENTENCE_LENGTH)
+                words = words.Take(MAX_SENTENCE_LENGTH).ToList();
 
             int sentenceLength = words.Count;
 
@@ -298,12 +298,6 @@ namespace KnowledgeSharingApi.Domains.Algorithms
 
             var mapGram = new Dictionary<string, int>();
             var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-
-            const int maxWords = 100; // only focus first 100 words of text
-            if (words.Length > maxWords)
-            {
-                Array.Resize(ref words, maxWords);
-            }
 
             var sentenceLength = words.Length;
 
