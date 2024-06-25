@@ -180,7 +180,12 @@ namespace KnowledgeSharingApi.Services.Services.Authentications
             if (user == null) return loginFailed;
 
             // Step 3. Cập nhật lần cuối đăng nhập
-            CheckLoginAttackCacheDto checkLogin = CacheGet(user.Username)!;
+            CheckLoginAttackCacheDto? checkLogin = CacheGet(user.Username);
+            checkLogin ??= new CheckLoginAttackCacheDto()
+                {
+                    Username = user.Username,
+                    NumberFailedAttempt = 100,
+                };
             checkLogin.LastAccessTime = DateTime.UtcNow;
             CacheSet(checkLogin);
 
