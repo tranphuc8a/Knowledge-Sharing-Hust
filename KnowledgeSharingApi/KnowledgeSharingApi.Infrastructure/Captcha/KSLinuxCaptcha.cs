@@ -1,6 +1,6 @@
 ﻿using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
-using SixLabors.Fonts;
 using SkiaSharp;
+
 
 namespace KnowledgeSharingApi.Infrastructures.Captcha
 {
