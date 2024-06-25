@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 
 # Create a non-root user
-RUN addgroup --system app && adduser --system --ingroup app app
+# RUN addgroup --system app && adduser --system --ingroup app app
 
 # Switch to non-root user
 USER app
