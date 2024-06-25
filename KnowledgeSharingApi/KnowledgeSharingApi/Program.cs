@@ -134,7 +134,7 @@ builder.Services.AddSingleton<ICache, MemoryCache>();
 builder.Services.AddSingleton<IEmail, Email>();
 builder.Services.AddSingleton<IStorage, FirebaseStorage>();
 builder.Services.AddSingleton<IEncrypt, KSEncrypt>();
-builder.Services.AddSingleton<ICaptcha, KSCaptcha>();
+builder.Services.AddSingleton<ICaptcha, KSLinuxCaptcha>();
 builder.Services.AddSingleton<IGoogleRecaptchaApi, GoogleRecaptchaApi>();
 builder.Services.AddScoped<IDbContext, MySqlDbContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

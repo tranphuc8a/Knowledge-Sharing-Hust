@@ -1,27 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts;
-using KnowledgeSharingApi.Infrastructures.Interfaces.Captcha;
 
 namespace KnowledgeSharingApi.Infrastructures.Captcha
 {
 #pragma warning disable CA1416 // Validate platform compatibility
-    public class KSCaptcha(IEncrypt jwtService) : ICaptcha, IDisposable
+    public class KSWindowCaptcha(IEncrypt jwtService) : KSBaseCaptcha(jwtService)
     {
         private const int Width = 170;
         private const int Height = 50;
-        readonly IEncrypt JwtService = jwtService;
-        readonly Random random = new(DateTime.UtcNow.Second);
-        readonly string CAPTCHA_KEY = "Captcha";
-        readonly string EXPIRED_KEY = "Expired";
-
 
         // For Drawing
         readonly Font[] fonts = [
@@ -34,33 +22,7 @@ namespace KnowledgeSharingApi.Infrastructures.Captcha
         readonly List<Brush> brushes = [Brushes.Gray, Brushes.Red, Brushes.Orange, Brushes.Yellow, Brushes.Green, Brushes.Blue, Brushes.Violet];
         readonly StringFormat stringFormat = new() { LineAlignment = StringAlignment.Center };
 
-        public virtual string? DecodeCaptcha(string token)
-        {
-            // Step 1. Decode token
-            List<Claim>? listClaims = JwtService.JwtDecryptToListClaims(token, false)?.ToList();
-            if (listClaims == null) return null;
-
-            // Step 2. Lấy ra trường EXPIRED
-            Claim? expired = listClaims.FirstOrDefault(claim => claim.Type == EXPIRED_KEY);
-            if (expired == null) return null;
-
-            // Step 3. Kiểm tra chưa hết hạn
-            bool isDateTime = DateTime.TryParse(expired.Value, out DateTime dateTime);
-            if (isDateTime)
-            {
-                if (dateTime < DateTime.UtcNow) return null;
-
-                // Step 4. Lấy ra trường CAPTCHA
-                Claim? captcha = listClaims.FirstOrDefault(claim => claim.Type == CAPTCHA_KEY);
-                if (captcha == null) return null;
-
-                // Trả về giá trị của trường
-                return captcha.Value;
-            }
-            return null;
-        }
-
-        public void Dispose()
+        public override void Dispose()
         {
             // Cleanup Fonts (they are disposable)
             foreach (Font font in fonts)
@@ -69,17 +31,7 @@ namespace KnowledgeSharingApi.Infrastructures.Captcha
             }
         }
 
-        public virtual string? EncodeCaptcha(string captcha, int expiredInMinutes = 1)
-        {
-            List<Claim> claims = [
-                new Claim(CAPTCHA_KEY, captcha),
-                new Claim(EXPIRED_KEY, DateTime.UtcNow.AddMinutes(expiredInMinutes).ToString())
-            ];
-            return JwtService.JwtEncrypt(claims);
-        }
-
-
-        public virtual byte[] GenerateBase64ImageCaptcha(string captcha)
+        public override byte[] GenerateBase64ImageCaptcha(string captcha)
         {
             byte[]? byteArray = null;
 
@@ -113,21 +65,6 @@ namespace KnowledgeSharingApi.Infrastructures.Captcha
             }
 
             return byteArray;
-        }
-
-
-
-        public virtual string GenerateRandomCaptcha(int length = 6)
-        {
-            string numbers = "0123456789";
-            char[] chars = new char[length];
-
-            for (int i = 0; i < length; i++)
-            {
-                chars[i] = numbers[random.Next(numbers.Length)];
-            }
-
-            return new string(chars);
         }
     }
 #pragma warning restore CA1416 // Validate platform compatibility

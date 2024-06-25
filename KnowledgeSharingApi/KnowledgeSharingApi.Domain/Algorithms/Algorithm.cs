@@ -1,30 +1,21 @@
 ﻿using KnowledgeSharingApi.Domains.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-
 namespace KnowledgeSharingApi.Domains.Algorithms
 {
     public static class Algorithm
     {
         //private static readonly string[] separator = [" ", ",", ".", ";", "!", ":", "?"];
-        private static char[] separator = [' ', '\t', '\n', '\r', ',', '.', ';', '!', '?'];
+        private static readonly char[] separator = [' ', '\t', '\n', '\r', ',', '.', ';', '!', '?'];
         private const int MAX_WORD_LENGTH = 20;
         private const int MAX_SENTENCE_LENGTH = 100;
 
-        public static bool IsPermutation<T>(List<T> A, List<T> B)
+        public static bool IsPermutation<T>(List<T> A, List<T> B) where T : notnull
         {
             // Kiểm tra xem hai List có cùng độ dài không
             if (A.Count != B.Count)
                 return false;
 
             // Tạo một Dictionary để đếm số lần xuất hiện của từng phần tử trong List B
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             Dictionary<T, int> count = [];
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             foreach (var item in B)
             {
                 if (count.TryGetValue(item, out int value))
@@ -311,7 +302,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                         continue;
                     if (!patternMapGram.TryGetValue(gram, out var value) || value == 0)
                         break;
-                    if (!mapGram.TryGetValue(gram, out int value2))
+                    if (!mapGram.TryGetValue(gram, out _))
                         mapGram[gram] = 1;
                     else
                         mapGram[gram] = ++value;
