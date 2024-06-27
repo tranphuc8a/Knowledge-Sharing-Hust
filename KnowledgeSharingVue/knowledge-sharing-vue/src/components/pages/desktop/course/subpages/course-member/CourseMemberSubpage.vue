@@ -216,6 +216,7 @@ export default {
                     .setParams({ offset, limit, search: text })
                     .execute();
                 let body = await Request.tryGetBody(res);
+                if (body.Total != null) this.numberMember = Common.formatNumber(Number(body.Total));
                 if (body.Results != null) body = body.Results;
 
                 // get list of members

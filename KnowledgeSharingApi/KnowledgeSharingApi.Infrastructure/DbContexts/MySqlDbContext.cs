@@ -106,5 +106,6 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<ViewCoursePayment> ViewCoursePayments { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<ViewUser> ViewUsers { get; set; }
+        public DbSet<ViewCourseTotalRelation> ViewCourseTotalRelations { get; set; }
     }
 }

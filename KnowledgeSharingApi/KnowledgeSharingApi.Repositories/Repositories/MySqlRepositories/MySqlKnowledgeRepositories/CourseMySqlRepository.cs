@@ -146,21 +146,21 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
 
         public virtual async Task<List<ViewCourse>> GetViewCourse(Guid myUid, PaginationDto pagination)
         {
-            IQueryable<Guid> listRegisteredCourseIds = DbContext.ViewCourseRegisters
-                .Where(cr => cr.UserId == myUid)
-                .Select(cr => cr.CourseId);
-            // Lấy danh sách course mà myUid được invite vào
-            IQueryable<Guid> listInvitedCourseIds = DbContext.CourseRelations
-                .Where(invite => invite.ReceiverId == myUid && invite.CourseRelationType == ECourseRelationType.Invite)
-                .Select(invite => invite.CourseId);
+            //IQueryable<Guid> listRegisteredCourseIds = DbContext.ViewCourseRegisters
+            //    .Where(cr => cr.UserId == myUid)
+            //    .Select(cr => cr.CourseId);
+            //// Lấy danh sách course mà myUid được invite vào
+            //IQueryable<Guid> listInvitedCourseIds = DbContext.CourseRelations
+            //    .Where(invite => invite.ReceiverId == myUid && invite.CourseRelationType == ECourseRelationType.Invite)
+            //    .Select(invite => invite.CourseId);
 
             return await ApplyPagination(
                 DbContext.ViewCourses
                 .Where(vc => 
                     vc.Privacy == EPrivacy.Public ||
-                    vc.UserId == myUid ||
-                    listRegisteredCourseIds.Contains(vc.UserItemId) ||
-                    listInvitedCourseIds.Contains(vc.UserItemId)
+                    vc.UserId == myUid
+                    //listRegisteredCourseIds.Contains(vc.UserItemId) ||
+                    //listInvitedCourseIds.Contains(vc.UserItemId)
                 )
                 .OrderByDescending(c => c.CreatedTime),
                 pagination)

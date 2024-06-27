@@ -42,7 +42,7 @@ import DesktopHomeFrame from '../home/DesktopHomeFrame.vue';
 import ProfilePanel from './components/profile-panel/ProfilePanel.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { GetRequest, Request } from '@/js/services/request';
-import ViewUserProfile from '@/js/models/views/view-user';
+import ViewUserProfile from '@/js/models/views/view-user-profile';
 import { Validator } from '@/js/utils/validator';
 import Debounce from '@/js/utils/debounce';
 

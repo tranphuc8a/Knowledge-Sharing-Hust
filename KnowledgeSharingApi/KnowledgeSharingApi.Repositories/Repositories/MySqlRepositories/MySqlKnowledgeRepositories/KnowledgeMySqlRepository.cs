@@ -145,20 +145,19 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
 
         public virtual async Task<PaginationResponseModel<ViewComment>> GetListComments(Guid knowledgeId, PaginationDto pagination)
         {
-            List<ViewComment> listComment = await
+            IQueryable<ViewComment> listComment =
                 DbContext.ViewComments
                 .Where(comment => comment.KnowledgeId == knowledgeId &&
                     // comment là comment bậc 1 (không phải comment reply)
                     comment.ReplyId == null
                 )
-                .OrderByDescending(comment => comment.CreatedTime)
-                .ToListAsync();
+                .OrderByDescending(comment => comment.CreatedTime);
             PaginationResponseModel<ViewComment> res = new()
             {
-                Total = listComment.Count,
+                Total = listComment.Count(),
                 Limit = pagination.Limit,
                 Offset = pagination.Offset,
-                Results = ApplyPagination(listComment, pagination)
+                Results = await ApplyPagination(listComment, pagination).ToListAsync()
             };
             return res;
         }
@@ -171,7 +170,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
                 .ToListAsync();
         }
 
-        public virtual async Task<PaginationResponseModel<ViewUserProfile>> GetListUserMaredKnowledge(Guid knowledgeId, PaginationDto pagination)
+        public virtual async Task<PaginationResponseModel<ViewUserProfile>> GetListUserMarkedKnowledge(Guid knowledgeId, PaginationDto pagination)
         {
             var listUserIds = await DbContext.Marks.Where(mark => mark.KnowledgeId == knowledgeId)
                 .Select(mark => mark.UserId).Distinct().ToListAsync();

@@ -116,7 +116,8 @@ export default {
 <style scoped>
 
 .p-lesson-tooltip{
-    min-width: 350px;
+    min-width: 250px;
+    max-width: 450px;
     width: 100%;
     cursor: pointer;
     font-size: initial;

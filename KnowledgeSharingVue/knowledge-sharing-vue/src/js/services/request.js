@@ -263,7 +263,9 @@ class Request {
      * @Modified None
      */
     async checkLogedIn(){
+        if (Request.isCheckingLogedIn) return;
         try {
+            Request.isCheckingLogedIn = true;
             let getRequest = new GetRequest('Users/me');
             if (getRequest.token == null || getRequest.token == undefined ||
                 getRequest.refreshToken == null || getRequest.refreshToken == undefined
@@ -281,12 +283,14 @@ class Request {
             return false;
         } finally {
             Request.isCheckedLogedIn = true;
+            Request.isCheckingLogedIn = false;
         }
     }
 
 
     static isTokenRefresh       = true;
     static isCheckedLogedIn     = false;
+    static isCheckingLogedIn    = false;
     static tryGetBody           = resolveAxiosResponse.tryGetBody.bind(resolveAxiosResponse);
     static tryGetStatusCode     = resolveAxiosResponse.tryGetStatusCode.bind(resolveAxiosResponse);
     static tryGetUserMessage    = resolveAxiosResponse.tryGetUserMessage.bind(resolveAxiosResponse);

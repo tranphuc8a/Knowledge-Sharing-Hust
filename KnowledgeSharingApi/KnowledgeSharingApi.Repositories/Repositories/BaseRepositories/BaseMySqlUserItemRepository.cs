@@ -41,14 +41,14 @@ namespace KnowledgeSharingApi.Repositories.Repositories.BaseRepositories
 
         public override async Task<PaginationResponseModel<T>> Get(PaginationDto pagination)
         {
-            List<T> list = await GetDbSet().OrderByDescending(item => item.CreatedTime).ToListAsync();
-            int total = list.Count;
+            var list = GetDbSet().OrderByDescending(item => item.CreatedTime);
+            int total = list.Count();
             PaginationResponseModel<T> res = new()
             {
                 Total = total,
                 Limit = pagination.Limit,
                 Offset = pagination.Offset,
-                Results = ApplyPagination(list, pagination)
+                Results = await ApplyPagination(list, pagination).ToListAsync()
             };
             return res;
         }

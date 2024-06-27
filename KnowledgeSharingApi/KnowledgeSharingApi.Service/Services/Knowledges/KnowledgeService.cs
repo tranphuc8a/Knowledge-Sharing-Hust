@@ -76,7 +76,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             // Lấy về danh sách những người đã mark knowledge (có tính người đã bị banned không?)
             // Tạm thời lấy toàn bộ những người đã mark, kể cả banned
             PaginationResponseModel<ViewUserProfile> listUsers =
-                await KnowledgeRepository.GetListUserMaredKnowledge(knowledgeId, pagination);
+                await KnowledgeRepository.GetListUserMarkedKnowledge(knowledgeId, pagination);
 
             // Phân trang và trang trí cho từng ViewUserProfile -> ResponseUserCardModel
             PaginationResponseModel<ResponseUserCardModel> res = new()

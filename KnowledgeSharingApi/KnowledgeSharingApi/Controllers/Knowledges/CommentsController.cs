@@ -119,7 +119,7 @@ namespace KnowledgeSharingApi.Controllers.Knowledges
         /// <returns></returns>
         /// Created: PhucTV (26/3/24)
         /// Modified: None
-        [HttpGet("admin/block/{knowledgeId}")]
+        [HttpPost("admin/block/{knowledgeId}")]
         [CustomAuthorization(Roles: "Admin")]
         public async Task<IActionResult> AdminBlockComment(Guid knowledgeId)
         {
@@ -134,7 +134,7 @@ namespace KnowledgeSharingApi.Controllers.Knowledges
         /// <returns></returns>
         /// Created: PhucTV (26/3/24)
         /// Modified: None
-        [HttpGet("admin/unblock/{knowledgeId}")]
+        [HttpPost("admin/unblock/{knowledgeId}")]
         [CustomAuthorization(Roles: "Admin")]
         public async Task<IActionResult> AdminUnBlockComment(Guid knowledgeId)
         {

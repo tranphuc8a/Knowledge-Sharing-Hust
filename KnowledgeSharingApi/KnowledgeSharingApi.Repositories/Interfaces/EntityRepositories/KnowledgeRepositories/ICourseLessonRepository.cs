@@ -65,6 +65,16 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.Knowled
         /// Modified: None
         Task<List<CourseLesson>> GetCourseParticipant(Guid courseId);
 
+        /// <summary>
+        /// Lay ve toan bo bai giang trong mot khoa hoc cu the
+        /// </summary>
+        /// <param name="courseId"> id cua khoa hoc muon lay</param>
+        /// <param name="pagination"> phan trang </param>
+        /// <returns></returns>
+        /// Created: PhucTV (3/4/24)
+        /// Modified: None
+        Task<List<CourseLesson>> GetCourseParticipant(Guid courseId, PaginationDto pagination);
+
         #endregion
 
         #region Update

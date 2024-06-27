@@ -1,6 +1,6 @@
 
 import { Validator } from "@/js/utils/validator";
-import ViewUserProfile from "../views/view-user";
+import ViewUserProfile from "../views/view-user-profile";
 class CurrentUser extends ViewUserProfile {
     static _instance = null;
 

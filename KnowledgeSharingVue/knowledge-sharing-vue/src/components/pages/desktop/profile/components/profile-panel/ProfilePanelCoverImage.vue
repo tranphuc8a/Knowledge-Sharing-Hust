@@ -21,7 +21,7 @@
                 fa="camera" family="fas" :iconStyle="iconStyle"
             />
         </div>
-        <PreviewImage :src="coverImage" ref="preview" />
+        <PreviewImage :src="coverImage" ref="preview" v-if="coverImage != null" />
     </div>
     <!-- <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitCoverImage" :isShow="false"/> -->
 

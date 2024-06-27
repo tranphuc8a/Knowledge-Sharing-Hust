@@ -70,62 +70,55 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
 
         public virtual async Task<PaginationResponseModel<ViewComment>> GetCommentsOfUserInKnowledge(Guid userId, Guid knowledgeId, PaginationDto pagination)
         {
-            List<ViewComment> comments = await DbContext.ViewComments
-                .Where(com => com.UserId == userId && com.KnowledgeId == knowledgeId)
-                .ToListAsync();
-            int total = comments.Count;
+            IQueryable<ViewComment> comments = DbContext.ViewComments
+                .Where(com => com.UserId == userId && com.KnowledgeId == knowledgeId);
+            int total = comments.Count();
             return new PaginationResponseModel<ViewComment>()
             {
                 Total = total,
                 Limit = pagination.Limit,
                 Offset = pagination.Offset,
-                Results = ApplyPagination(comments, pagination)
+                Results = await ApplyPagination(comments, pagination).ToListAsync()
             };
         }
 
         public virtual async Task<PaginationResponseModel<ViewComment>> GetListCommentsOfKnowledge(Guid knowledgeId, PaginationDto pagination)
         {
-            List<ViewComment> listComments = await DbContext.ViewComments
+            IQueryable<ViewComment> listComments = DbContext.ViewComments
                 .Where(comment => comment.KnowledgeId == knowledgeId)
-                .OrderBy(comment => comment.CreatedBy)
-                .ToListAsync();
-            int total = listComments.Count;
-            return new PaginationResponseModel<ViewComment>(total, pagination.Limit, pagination.Offset, ApplyPagination(listComments, pagination));
+                .OrderBy(comment => comment.CreatedBy);
+            int total = listComments.Count();
+            return new PaginationResponseModel<ViewComment>(total, pagination.Limit, pagination.Offset, 
+                await ApplyPagination(listComments, pagination).ToListAsync());
         }
 
         public virtual async Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetListCommentsOfKnowledge(List<Guid> knowledgeIds, PaginationDto pagination)
         {
-            var comments = await DbContext.ViewComments
-                .Where(comment => knowledgeIds.Any(id => id == comment.KnowledgeId) && comment.ReplyId == null)
-                .OrderBy(comment => comment.CreatedBy)
-                .ToListAsync();
+            var comments = DbContext.ViewComments
+                .Where(comment => knowledgeIds.Any(id => id == comment.KnowledgeId) && comment.ReplyId == null);
 
-            var groupedComments = comments
+            var groupedComments = await comments
                 .GroupBy(comment => comment.KnowledgeId)
-                .ToDictionary(group => group.Key, group => group.ToList());
-
-            var mapping = groupedComments.ToDictionary(
-                kvp => kvp.Key,
-                kvp => new PaginationResponseModel<ViewComment>(
-                    kvp.Value.Count,
-                    pagination.Limit,
-                    pagination.Offset,
-                    ApplyPagination(kvp.Value, pagination)
-                )
-            );
+                .ToDictionaryAsync(group => group.Key, group => new
+                {
+                    total = group.Count(),
+                    list = ApplyPagination(group.AsQueryable(), pagination).ToList()
+                });
 
             var result = knowledgeIds.Distinct().ToDictionary(
                 id => id,
                 id =>
                 {
-                    if (mapping.TryGetValue(id, out PaginationResponseModel<ViewComment>? value))
+                    if (groupedComments.TryGetValue(id, out var value))
                     {
-                        return value;
+                        return new PaginationResponseModel<ViewComment>(
+                            value.total,
+                            pagination.Limit,
+                            pagination.Offset,
+                            value.list
+                        );
                     }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
                 }
             );
 
@@ -152,52 +145,46 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
 
         public virtual async Task<PaginationResponseModel<ViewComment>> GetRepliesOfComment(Guid commentId, PaginationDto pagination)
         {
-            List<ViewComment> comments = await DbContext.ViewComments
-                .Where(com => com.ReplyId == commentId)
-                .ToListAsync();
-            int total = comments.Count;
+            IQueryable<ViewComment> comments = DbContext.ViewComments
+                .Where(com => com.ReplyId == commentId);
+            int total = comments.Count();
             return new PaginationResponseModel<ViewComment>()
             {
                 Total = total,
                 Limit = pagination.Limit,
                 Offset = pagination.Offset,
-                Results = ApplyPagination(comments, pagination)
+                Results = await ApplyPagination(comments, pagination).ToListAsync()
             };
         }
 
         public virtual async Task<Dictionary<Guid, PaginationResponseModel<ViewComment>?>> GetRepliesOfComment(List<Guid> commentIds, PaginationDto pagination)
         {
-            var comments = await DbContext.ViewComments
-                .Where(comment => comment.ReplyId != null && commentIds.Any(id => id == comment.ReplyId))
-                .OrderBy(comment => comment.CreatedBy)
-                .ToListAsync();
+            var comments = DbContext.ViewComments
+                .Where(comment => comment.ReplyId != null && commentIds.Any(id => id == comment.ReplyId));
 
-            var groupedComments = comments
+            var groupedComments = await comments
                 .GroupBy(comment => comment.ReplyId!.Value)
-                .ToDictionary(group => group.Key, group => group.ToList());
-
-            var mapping = groupedComments.ToDictionary(
-                kvp => kvp.Key,
-                kvp => new PaginationResponseModel<ViewComment>(
-                    kvp.Value.Count,
-                    pagination.Limit,
-                    pagination.Offset,
-                    ApplyPagination(kvp.Value, pagination)
-                )
-            );
+                .ToDictionaryAsync(group => group.Key, group => new
+                {
+                    total = group.Count(),
+                    list = ApplyPagination(group.AsQueryable(), pagination).ToList()
+                });
 
             var result = commentIds.Distinct().ToDictionary(
                 id => id,
                 id =>
                 {
-                    if (mapping.TryGetValue(id, out PaginationResponseModel<ViewComment>? value))
+                    if (groupedComments.TryGetValue(id, out var value))
                     {
-                        return value;
+                        return new PaginationResponseModel<ViewComment>()
+                        {
+                            Total = value.total,
+                            Offset = pagination.Offset,
+                            Limit = pagination.Limit,
+                            Results = value.list
+                        };
                     }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
                 }
             );
 

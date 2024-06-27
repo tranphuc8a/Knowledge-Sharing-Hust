@@ -434,17 +434,17 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
         public virtual async Task<ServiceResult> UserGetMyMarkedPosts(Guid myUid, PaginationDto pagination)
         {
             // GEt list về
-            List<ViewLesson> listLessons = await LessonRepository.GetMarkedPosts(myUid);
+            List<ViewLesson> listLessons = await LessonRepository.GetMarkedPosts(myUid, pagination);
 
             // Pagination
-            int total = listLessons.Count;
-            listLessons = LessonRepository.ApplyPagination(listLessons, pagination);
+            //int total = listLessons;
+            //listLessons = LessonRepository.ApplyPagination(listLessons, pagination);
 
             // DecorateResponseLessonModel 
             List<IResponseLessonModel> listResLesson = await DecorationRepository.DecorateResponseLessonModel(myUid, listLessons);
 
             // Trả về thành công
-            PaginationResponseModel<IResponseLessonModel> res = new(total, pagination.Limit, pagination.Offset, listResLesson);
+            PaginationResponseModel<IResponseLessonModel> res = new(null, pagination.Limit, pagination.Offset, listResLesson);
             return ServiceResult.Success(ResponseResource.GetMultiSuccess(), string.Empty, res);
         }
 

@@ -262,4 +262,19 @@ namespace KnowledgeSharingApi.Domains.Enums
         // Chủ nhân của khóa học
         Owner = 3
     }
+
+    /// <summary>
+    /// Thứ tự của phần tử người dùng
+    /// </summary>
+    public enum EUserItemOrder
+    {
+        // Mới nhất
+        Newest = 0,
+
+        // Cũ nhất
+        Oldest = 1,
+
+        // Đánh giá tốt nhất
+        Best = 2,
+    }
 }

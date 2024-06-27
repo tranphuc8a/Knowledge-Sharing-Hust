@@ -42,7 +42,7 @@ import ProfileEditInformationContent from './ProfileEditInformationContent.vue';
 import ProfileEditContactContent from './ProfileEditContactContent.vue';
 import ProfileEditCareerContent from './ProfileEditCareerContent.vue';
 import CurrentUser from '@/js/models/entities/current-user';
-import ViewUserProfile from '@/js/models/views/view-user';
+import ViewUserProfile from '@/js/models/views/view-user-profile';
 import Profile from '@/js/models/entities/profile';
 import { PatchRequest, Request } from '@/js/services/request';
 

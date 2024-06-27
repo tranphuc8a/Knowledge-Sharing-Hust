@@ -69,6 +69,7 @@ import CurrentUser from '@/js/models/entities/current-user';
 import Avatar from '@/components/base/avatar/Avatar.vue';
 import Common from '@/js/utils/common';
 import { PostRequest, Request } from '@/js/services/request';
+import { myEnum } from '@/js/resources/enum';
 
 export default {
     name: 'LogedInAvatarContext',
@@ -115,6 +116,17 @@ export default {
                     }
                 });
             }
+            if (await this.checkAdmin()) {
+                that.menuItems.push({
+                    fa: 'user-shield',
+                    family: 'fas',
+                    label: 'Quản trị hệ thống',
+                    key: 7,
+                    onclick: () => {
+                        that.$router.push('/administrator');
+                    }
+                });
+            }
         },
 
         async createElement(){
@@ -151,6 +163,18 @@ export default {
                 location.reload();
             } catch (e){
                 await Request.resolveAxiosError(e);
+            }
+        },
+
+
+        async checkAdmin(){
+            try {
+                let currentUser = await CurrentUser.getInstance();
+                if (currentUser?.Role == null) return false;
+                return currentUser.Role == myEnum.EUserRole.Admin;
+            } catch (e){
+                console.error(e);
+                return false;
             }
         }
         

@@ -1,6 +1,7 @@
 ﻿using KnowledgeSharingApi.Domains.Algorithms;
 using KnowledgeSharingApi.Domains.Exceptions;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.CourseLessonModels;
+using KnowledgeSharingApi.Domains.Models.Dtos;
 using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.KnowledgeRepositories;
@@ -177,6 +178,14 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             return await DbContext.CourseLessons
                 .Where(cl => cl.CourseId == courseId)
                 .OrderBy(cl => cl.Offset)
+                .ToListAsync();
+        }
+
+        public async Task<List<CourseLesson>> GetCourseParticipant(Guid courseId, PaginationDto pagination)
+        {
+            return await ApplyPagination(DbContext.CourseLessons
+                .Where(cl => cl.CourseId == courseId)
+                .OrderBy(cl => cl.Offset), pagination)
                 .ToListAsync();
         }
 

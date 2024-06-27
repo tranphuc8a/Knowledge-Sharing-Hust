@@ -209,6 +209,16 @@ export default {
                 console.error(e);
             }
         },
+        async gotoAdministrator(){
+            try {
+                let postId = this.getPost()?.UserItemId;
+                if (postId == null) return;
+                let url = '/administrator/post?filter=' + postId;
+                this.router.push(url);
+            } catch (e){
+                console.error(e);
+            }
+        },
 
         async updateOptions(){
             try {
@@ -224,37 +234,6 @@ export default {
                         this.actions.History,
                         this.actions.CopyUserItemId,
                     ];
-                } else if (this.currentUser.Role == myEnum.EUserRole.Admin){
-                    // Admin
-                    this.listOptions = [
-                        this.actions.Delete,
-                        this.actions.Comment,
-                        this.actions.Report,
-                        this.actions.History,
-                        this.actions.CopyUserItemId,
-                    ];
-                    if (this.getPost().IsMarked){
-                        this.listOptions.push(this.actions.Unmark);
-                    } else {
-                        this.listOptions.push(this.actions.Mark);
-                    }
-                    if (this.getPost()?.IsBlockComment){
-                        this.listOptions.push(this.actions.UnlockComment);
-                    } else {
-                        this.listOptions.push(this.actions.LockComment);
-                    }
-                    // Admin & User:
-                    if (this.currentUser.UserId == this.getPost()?.UserId){
-                        // Owner
-                        this.listOptions.push(this.actions.Edit);
-                        if (this.getPost().PostType == myEnum.EPostType.Question){
-                            if (this.getPost().IsAcepted){
-                                this.listOptions.push(this.actions.Uncomplete);
-                            } else {
-                                this.listOptions.push(this.actions.Complete);
-                            }
-                        }
-                    }
                 } else if (this.currentUser.Role == myEnum.EUserRole.Banned){
                     // Banned
                     this.listOptions = [
@@ -323,6 +302,10 @@ export default {
                         }
                     }
                 }
+
+                if (this.currentUser?.Role == myEnum.EUserRole.Admin){
+                    this.listOptions.push(this.actions.GotoAdministrator);
+                }
             }
             catch (error){
                 console.error(error);
@@ -360,6 +343,7 @@ export default {
                 UnlockComment: 11,
                 CopyUserItemId: 12,
                 GotoCourse: 13,
+                GotoAdministrator: 14,
             },
             listOptions: [],
             options: {
@@ -442,6 +426,12 @@ export default {
                     label: 'Đi đến khóa học',
                     fa: 'forward',
                     onClick: this.resolveGotoCourse,
+                },
+                [14]: {
+                    id: 14,
+                    label: 'Quản trị viên',
+                    fa: 'user-shield',
+                    onClick: this.gotoAdministrator,
                 },
             }
         }

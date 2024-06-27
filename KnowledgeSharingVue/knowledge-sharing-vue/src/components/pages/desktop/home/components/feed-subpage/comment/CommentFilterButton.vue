@@ -36,7 +36,7 @@ export default{
     },
     data(){
         return {
-            selected: 0,
+            selected: this.value,
             iconStyle: {
                 fontSize: '18px',
                 color: 'var(--primary-color)'
@@ -69,6 +69,18 @@ export default{
         onChange: {
             type: Function,
             default: async () => {}
+        },
+        value: {
+            type: Number,
+            default: myEnum.commentFilterType.Best
+        }
+    },
+    watch: {
+        value: {
+            handler: function(newValue){
+                this.selected = newValue;
+            },
+            immediate: true
         }
     },
     methods: {

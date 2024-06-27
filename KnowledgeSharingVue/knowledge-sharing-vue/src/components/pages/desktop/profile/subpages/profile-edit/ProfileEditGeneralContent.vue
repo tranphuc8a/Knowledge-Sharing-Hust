@@ -59,7 +59,7 @@
                                 :onclick="resolveOnChangeCover"
                             />
                         </div>
-                        <PreviewImage :src="coverImageUrl" ref="cover"/>
+                        <PreviewImage :src="coverImageUrl" ref="cover" v-if="coverImageUrl != null"/>
                     </div>
                 </div>
             </div>

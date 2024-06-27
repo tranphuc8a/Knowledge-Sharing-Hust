@@ -1,7 +1,7 @@
 <template>
     <div class="p-postcard-comment-list" v-if="isLoaded && !isBlockComment">
-        <div class="p-pcl-filter-button" v-show="false">
-            <CommentFilterButton :on-change="resolveOnchangeFilter" />
+        <div class="p-pcl-filter-button" v-show="true">
+            <CommentFilterButton :on-change="resolveOnchangeFilter" :value="orderValue" />
         </div>
         <div class="p-pcl-comment-list" v-show="listComments?.length > 0">
             <PostCardComment 
@@ -26,6 +26,11 @@
     <div class="p-postcard-comment-list" v-if="isLoaded && isBlockComment">
         <div class="p-pcl-empty-comment">
             Bài viết đã bị khóa bình luận
+        </div>
+    </div>
+    <div class="p-postcard-comment-list" v-if="!isLoaded">
+        <div class="p-pcl-loading-comment">
+            <MSpinner />
         </div>
     </div>
 </template>
@@ -53,6 +58,9 @@ export default {
             isOutOfComments: false,
             pageSize: 10,
             currentUser: null,
+            defaultOrder: '',
+            order: '',
+            orderValue: myEnum.commentFilterType.Best
         }
     },
     components: {
@@ -96,19 +104,9 @@ export default {
 
         async resolveOnchangeFilter(commentFilterType){
             try {
-                switch (commentFilterType) {
-                    case myEnum.commentFilterType.Best: 
-
-                        break;
-                    case myEnum.commentFilterType.Recent: 
-
-                        break;
-                    case myEnum.commentFilterType.All: 
-
-                        break;
-                    default:
-                        break;
-                }
+                this.order = commentFilterType;
+                this.orderValue = commentFilterType;
+                this.getTopComments();
             } catch (e) {
                 console.error(e);
             }
@@ -117,20 +115,36 @@ export default {
 
         async getTopComments(){
             try {
+                this.isLoaded = false;
                 let url = null;
                 let postId = this.getPost()?.UserItemId;
                 if (postId == null){
                     return;
                 }
-                if (this.currentUser == null){
-                    url = 'Comments/anonymous/' + postId;
+                let orderString = "";
+                if (this.order == myEnum.commentFilterType.Best){
+                    // api for best comments
+                    if (this.currentUser == null){
+                        url = 'Comments/anonymous/' + postId;
+                    } else {
+                        url = 'Comments/' + postId;
+                    }
+                    orderString = 'TotalStar:desc,AverageStar:desc,TotalComment:desc';
                 } else {
-                    url = 'Comments/' + postId;
+                    // default api for top comments
+                    if (this.currentUser == null){
+                        url = 'Comments/anonymous/' + postId;
+                    } else {
+                        url = 'Comments/' + postId;
+                    }
+                    orderString = '';
                 }
+
                 let res = await new GetRequest(url)
                     .setParams({
                         limit: this.pageSize,
-                        offset: 0
+                        offset: 0,
+                        order: orderString
                     }).execute();
                 let body = await Request.tryGetBody(res);
                 let readComments = body?.Results ?? [];
@@ -145,11 +159,7 @@ export default {
             } catch (e) {
                 console.error(e);
             } finally {
-                // let that = this;
-                // this.isLoaded = false;
-                // this.$nextTick(() => {
-                //     that.isLoaded = true;
-                // });
+                this.isLoaded = true;
             }
         },
 
@@ -162,15 +172,30 @@ export default {
                 if (postId == null){
                     return;
                 }
-                if (this.currentUser == null){
-                    url = 'Comments/anonymous/' + postId;
+                let orderString = "";
+                if (this.order == myEnum.commentFilterType.Best){
+                    // api for best comments
+                    if (this.currentUser == null){
+                        url = 'Comments/anonymous/' + postId;
+                    } else {
+                        url = 'Comments/' + postId;
+                    }
+                    orderString = 'TotalStar:desc,AverageStar:desc,TotalComment:desc';
                 } else {
-                    url = 'Comments/' + postId;
+                    // default api for top comments
+                    if (this.currentUser == null){
+                        url = 'Comments/anonymous/' + postId;
+                    } else {
+                        url = 'Comments/' + postId;
+                    }
+                    orderString = '';
                 }
+                
                 let res = await new GetRequest(url)
                     .setParams({
                         limit: this.pageSize,
-                        offset: numComs
+                        offset: numComs,
+                        order: orderString
                     }).execute();
                 let body = await Request.tryGetBody(res);
                 let readComments = body?.Results ?? [];
@@ -248,6 +273,12 @@ export default {
     padding: 12px 0px 18px 0px;
     color: var(--grey-color);
     font-family: 'ks-font-regular';
+}
+
+.p-pcl-loading-comment{
+    width: 100%;
+    text-align: center;
+    padding: 12px 0px 18px 0px;
 }
 
 .p-pcl-comment-load-more{

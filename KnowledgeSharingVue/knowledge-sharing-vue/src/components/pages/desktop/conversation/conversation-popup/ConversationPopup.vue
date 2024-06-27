@@ -67,7 +67,7 @@
                 </div>
 
                 <!-- popup-body -->
-                <div class="p-cp-body">
+                <div class="p-cp-body" v-if="isShowListMessage">
                     <!-- List messages -->
                     <ConversationListMessage  ref="list-message" />
                 </div>

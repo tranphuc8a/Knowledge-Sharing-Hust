@@ -26,7 +26,7 @@
                 :iconStyle="iconStyle"
             />
         </div>
-        <PreviewImage :src="imageSrc" ref="preview"/>
+        <PreviewImage :src="imageSrc" ref="preview" v-if="imageSrc != null"/>
         <div>
             <!-- <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitAvatar" :isShow="false"/> -->
         </div>

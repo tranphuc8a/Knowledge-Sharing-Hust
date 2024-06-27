@@ -21,7 +21,7 @@
                 fa="camera" family="fas" :iconStyle="iconStyle"
             />
         </div>
-        <PreviewImage :src="thumbnail" ref="preview" />
+        <PreviewImage :src="thumbnail" ref="preview" v-if="thumbnail != null"/>
     </div>
 </template>
 
