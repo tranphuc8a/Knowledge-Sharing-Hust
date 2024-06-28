@@ -150,6 +150,19 @@ export default {
             } finally {
                 this.isWorking = false;
             }
+        },
+
+        async resolveOnDeletedUser(userId){
+            try {
+                let index = this.listUser.findIndex(function(user){
+                    return user.UserId == userId;
+                });
+                if (index >= 0){
+                    this.listUser.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     watch: {
@@ -167,7 +180,9 @@ export default {
         registerScrollHandler: {},
     },
     provide(){
-        return {}
+        return {
+            onUserDeleted: this.resolveOnDeletedUser
+        }
     }
 }
 

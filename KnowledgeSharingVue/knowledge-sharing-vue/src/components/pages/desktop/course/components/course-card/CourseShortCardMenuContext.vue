@@ -94,14 +94,16 @@ export default {
                 this.isWorking = true;
                 let courseId = this.getCourse()?.UserItemId;
                 if (courseId == null) return;
-                let url = 'Course/' + courseId;
+                let url = 'Courses/' + courseId;
                 await new DeleteRequest(url).execute();
                 
                 // delete success:
                 this.getToastManager().success(`Xóa khóa học thành công!`);
 
                 // push sang location hop ly hon
-                window.location.reload();
+                if (this.onCourseDeleted){
+                    this.onCourseDeleted(courseId);
+                }
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -362,6 +364,7 @@ export default {
         getCourse: {},
         getPopupManager: {},
         getToastManager: {},
+        onCourseDeleted: { default: null, }
     }
 }
 

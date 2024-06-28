@@ -86,7 +86,9 @@ export default {
                 this.getToastManager().success(`Đã xóa bài giảng khỏi khóa học!`);
 
                 // push sang location hop ly hon
-                window.location.reload();
+                if (this.onCourseLessonDeleted){
+                    this.onCourseLessonDeleted(participantId);
+                }
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -281,6 +283,7 @@ export default {
         getCourse: { default: () => null },
         getPopupManager: {},
         getToastManager: {},
+        onCourseLessonDeleted: { default: null },
     }
 }
 

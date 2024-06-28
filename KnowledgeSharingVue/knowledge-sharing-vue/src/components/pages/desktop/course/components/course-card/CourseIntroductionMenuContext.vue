@@ -94,7 +94,7 @@ export default {
                 this.isWorking = true;
                 let courseId = this.getCourse()?.UserItemId;
                 if (courseId == null) return;
-                let url = 'Course/' + courseId;
+                let url = 'Courses/' + courseId;
                 await new DeleteRequest(url).execute();
                 
                 // delete success:

@@ -117,7 +117,7 @@ export default {
 
 .p-lesson-tooltip{
     min-width: 250px;
-    max-width: 450px;
+    max-width: 300px;
     width: 100%;
     cursor: pointer;
     font-size: initial;

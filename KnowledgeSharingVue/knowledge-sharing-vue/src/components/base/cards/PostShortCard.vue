@@ -126,7 +126,7 @@ export default {
             let isLesson = this.dPost.PostType == myEnum.EPostType.Lesson;
             let postLink = isLesson ? `/lesson/${this.dPost.UserItemId}` : `/question/${this.dPost.UserItemId}`;
             this.postDetailLink = this.detailLink ?? postLink;
-            await this.updateThumbnail();
+            this.updateThumbnail();
             this.postOwner = this.dPost?.getUser();
             this.isLoaded = true;
         },

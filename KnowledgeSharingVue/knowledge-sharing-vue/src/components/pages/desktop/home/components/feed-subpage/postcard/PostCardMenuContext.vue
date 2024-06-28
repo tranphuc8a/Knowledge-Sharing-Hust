@@ -86,7 +86,9 @@ export default {
                 this.getToastManager().success(`Xóa ${this.postResource} thành công!`);
 
                 // push sang location hop ly hon
-                window.location.reload();
+                if (this.onPostDeleted){
+                    this.onPostDeleted(this.getPost()?.UserItemId);
+                }
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -444,6 +446,7 @@ export default {
         getCourse: { default: () => null },
         getPopupManager: {},
         getToastManager: {},
+        onPostDeleted: {default: null},
     }
 }
 

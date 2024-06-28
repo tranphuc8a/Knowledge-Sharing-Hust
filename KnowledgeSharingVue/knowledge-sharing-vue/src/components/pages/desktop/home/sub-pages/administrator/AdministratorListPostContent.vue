@@ -153,6 +153,17 @@ export default {
             } finally {
                 this.isWorking = false;
             }
+        },
+
+        async resolveOnDeletedPost(postId){
+            try {
+                let index = this.listPost.findIndex(post => post.UserItemId == postId);
+                if (index >= 0){
+                    this.listPost.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     watch: {
@@ -170,7 +181,9 @@ export default {
         registerScrollHandler: {},
     },
     provide(){
-        return {}
+        return {
+            onPostDeleted: this.resolveOnDeletedPost,
+        }
     }
 }
 

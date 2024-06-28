@@ -49,6 +49,7 @@ import Popup from './MPopup.vue';
 // import appConfig from '@/app-config';
 // import Common from '@/js/utils/common';
 import { useRouter } from 'vue-router';
+import CurrentUser from '@/js/models/entities/current-user';
 
 export default {
     data(){
@@ -162,6 +163,7 @@ export default {
 
         async requiredLogin(){
             try {
+                await CurrentUser.deleteInstance();
                 let msg = "Bạn cần đăng nhập để thực hiện chức năng này!";
                 if (this.listPopup.some(p => p.content == msg)){
                     return;

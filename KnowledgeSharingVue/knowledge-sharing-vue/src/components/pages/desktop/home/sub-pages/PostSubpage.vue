@@ -203,6 +203,19 @@ export default {
             } catch (e){
                 console.error(e);
             }
+        },
+
+        async resolveDeletePost(postId){
+            try {
+                let index = this.listPosts.findIndex(function(post){
+                    return post.UserItemId == postId;
+                });
+                if (index >= 0){
+                    this.listPosts.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     inject: {
@@ -211,6 +224,11 @@ export default {
     watch: {
         getPost(){
             this.refresh();
+        }
+    },
+    provide(){
+        return {
+            onPostDeleted: this.resolveDeletePost
         }
     }
 }

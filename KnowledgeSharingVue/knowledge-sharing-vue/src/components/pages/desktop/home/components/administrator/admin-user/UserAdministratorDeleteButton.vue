@@ -50,8 +50,8 @@ export default {
                 await new DeleteRequest("Users/admin/delete-user/" + userId).execute();
                 // success:
                 this.getToastManager().success("Xóa người dùng thành công");
-                if (this.onDeletedUser != null){
-                    this.onDeletedUser(userId);
+                if (this.onUserDeleted != null){
+                    this.onUserDeleted(userId);
                 }
             } catch (e){
                 Request.resolveAxiosError(e);
@@ -62,7 +62,7 @@ export default {
         getUser: {},
         getToastManager: {},
         getPopupManager: {},
-        onDeletedUser: { default: null },
+        onUserDeleted: { default: null },
     },
     provide(){
         return {}

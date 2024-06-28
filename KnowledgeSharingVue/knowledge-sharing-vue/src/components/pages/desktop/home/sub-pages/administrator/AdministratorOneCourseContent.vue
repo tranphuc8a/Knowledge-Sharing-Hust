@@ -91,6 +91,9 @@ export default {
             }
         },
 
+        resolveDeletedCourse(){
+            this.createdPage();
+        }
     },
     watch: {
         '$route.query.filter': {
@@ -106,7 +109,9 @@ export default {
         getCurrentUser: {},
     },
     provide(){
-        return {}
+        return {
+            onCourseDeleted: this.resolveDeletedCourse,
+        }
     }
 }
 

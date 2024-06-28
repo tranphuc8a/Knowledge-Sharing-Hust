@@ -86,6 +86,9 @@ export default {
             }
         },
 
+        async resolveOnDeletedUser(){
+            this.createdPage();
+        }
     },
     watch: {
         '$route.query.filter': {
@@ -101,7 +104,9 @@ export default {
         getCurrentUser: {},
     },
     provide(){
-        return {}
+        return {
+            onUserDeleted: this.resolveOnDeletedUser,
+        }
     }
 }
 

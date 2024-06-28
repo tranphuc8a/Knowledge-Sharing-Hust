@@ -147,6 +147,19 @@ export default {
             } finally {
                 this.isWorking = false;
             }
+        },
+
+        async resolveOnDeletedLesson(lessonId){
+            try {
+                let index = this.listPost.findIndex(function(post){
+                    return post.UserItemId == lessonId;
+                });
+                if (index >= 0){
+                    this.listPost.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     watch: {
@@ -164,7 +177,9 @@ export default {
         registerScrollHandler: {},
     },
     provide(){
-        return {}
+        return {
+            onPostDeleted: this.resolveOnDeletedLesson
+        }
     }
 }
 

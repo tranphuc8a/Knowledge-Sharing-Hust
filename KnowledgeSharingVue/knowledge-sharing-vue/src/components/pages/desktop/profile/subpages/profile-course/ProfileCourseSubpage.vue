@@ -159,10 +159,28 @@ export default {
                 console.error(error);
             }
         },
+
+        async resolveDeletedCourse(courseId){
+            try {
+                let index = this.listCourse.findIndex(function(vCourse){
+                    return vCourse.UserItemId === courseId;
+                });
+                if (index === -1) return;
+                this.listCourse.splice(index, 1);
+                this.listFilteredCourse = this.listCourse;
+            } catch (error){
+                console.error(error);
+            }
+        }
     },
     inject: {
         getIsMySelf: {},
         getUser: {},
+    },
+    provide(){
+        return {
+            onCourseDeleted: this.resolveDeletedCourse,
+        }
     }
 }
 

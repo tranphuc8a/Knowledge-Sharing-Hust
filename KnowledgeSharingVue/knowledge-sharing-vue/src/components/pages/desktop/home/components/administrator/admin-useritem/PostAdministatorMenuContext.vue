@@ -65,9 +65,9 @@ export default {
         },
         async submitDelete(){
             try {
-                let url = 'Lessons/admin';
+                let url = 'Lessons/admin/';
                 if (this.getPost()?.PostType == myEnum.EPostType.Question){
-                    url = 'Questions/admin';
+                    url = 'Questions/admin/';
                 }
                 await new DeleteRequest(url + this.getPost()?.UserItemId)
                     .execute();

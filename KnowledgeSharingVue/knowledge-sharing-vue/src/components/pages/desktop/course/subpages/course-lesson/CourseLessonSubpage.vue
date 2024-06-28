@@ -170,6 +170,19 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+        },
+
+        async resolveCourseLessonDeleted(courseLessonId){
+            try {
+                let index = this.listCourseLesson.findIndex(function(item){
+                    return item.CourseLessonId == courseLessonId;
+                });
+                if (index >= 0){
+                    this.listCourseLesson.splice(index, 1);
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
     },
     inject: {
@@ -178,7 +191,9 @@ export default {
         registerScrollHandler: {}
     },
     provide(){
-        return{}
+        return{
+            onCourseLessonDeleted: this.resolveCourseLessonDeleted,
+        }
     }
 }
 

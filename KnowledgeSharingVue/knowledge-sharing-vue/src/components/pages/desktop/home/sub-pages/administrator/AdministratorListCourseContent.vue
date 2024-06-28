@@ -146,6 +146,19 @@ export default {
             } finally {
                 this.isWorking = false;
             }
+        },
+
+        async resolveOnDeletedCourse(courseId){
+            try {
+                let index = this.listCourse.findIndex(function(tCourse){
+                    return tCourse.UserItemId == courseId;
+                });
+                if (index >= 0){
+                    this.listCourse.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     watch: {
@@ -163,7 +176,9 @@ export default {
         registerScrollHandler: {},
     },
     provide(){
-        return {}
+        return {
+            onCourseDeleted: this.resolveOnDeletedCourse,
+        }
     }
 }
 

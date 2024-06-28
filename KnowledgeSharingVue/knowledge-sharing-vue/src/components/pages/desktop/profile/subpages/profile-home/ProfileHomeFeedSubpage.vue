@@ -175,12 +175,30 @@ export default {
             } catch (e){
                 console.error(e);
             }
+        },
+
+        async resolveDeletedPost(postId){
+            try {
+                let index = this.listPosts.findIndex(function(post){
+                    return post.UserItemId == postId;
+                });
+                if (index >= 0){
+                    this.listPosts.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     inject: {
         getUser: {},
         getIsMySelf: {},
         registerScrollHandler: {},
+    },
+    provide(){
+        return {
+            onPostDeleted: this.resolveDeletedPost,
+        }
     }
 }
 
