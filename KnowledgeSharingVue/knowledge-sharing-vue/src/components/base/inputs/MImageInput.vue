@@ -136,7 +136,8 @@ label{
     height: fit-content;
 }
 
-.p-image-input{
+.p-input .p-image-input{
+    margin-top: 16px;
     width: 100px;
     height: 100px;
     display: flex;

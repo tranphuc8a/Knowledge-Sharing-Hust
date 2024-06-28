@@ -39,9 +39,10 @@
 
                 <div class="p-row">
                     <div class="p-input-category">
-                        <CategoryInput :label="'Nhập category'" 
+                        <CategoryInput :label="'Chọn danh mục'" 
                             ref="category"
                             :validator="validators.category"
+                            :is-show-title="true" :is-show-error="true" :is-obligate="false"
                         />
                     </div>
 
