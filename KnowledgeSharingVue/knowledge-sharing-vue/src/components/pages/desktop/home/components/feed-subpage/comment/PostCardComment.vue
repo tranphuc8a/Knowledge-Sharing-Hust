@@ -55,15 +55,15 @@
             </div>
         </div>
 
-        <div class="p-comment-line" v-show="listReplies.length > 0">
+        <div class="p-comment-line" v-show="listCombinedReplies.length > 0">
             <div class="p-comment-left"></div>
             <div class="p-comment-right">
                 <div class="p-comment-replies">
                     <PostCardComment 
-                        v-for="(cmt, index) in listReplies" 
-                        :key="cmt?.UserItemId" 
+                        v-for="(cmt, index) in listCombinedReplies" 
+                        :key="cmt?.UserItemId ?? index" 
                         :comment="cmt"
-                        :on-deleted-comment="resolveDeletedReply(index)"
+                        :on-deleted-comment="resolveDeletedReply(cmt?.UserItemId)"
                     />
                 </div>
             </div>
@@ -72,12 +72,12 @@
         <div class="p-comment-line" v-show="!isOutOfReplies">
             <div class="p-comment-left"></div>
             <div class="p-comment-right">
-                <MLinkButton v-show="listReplies?.length <= 0" 
+                <MLinkButton v-show="listCombinedReplies?.length <= 0" 
                     :onclick="getMoreReplies" 
                     :label="`Có ${dComment?.TotalComment ?? 0} phản hồi`" :href="null"
                     :buttonStyle="buttonStyle"
                 />
-                <MLinkButton v-show="listReplies?.length > 0" :onclick="getMoreReplies" 
+                <MLinkButton v-show="listCombinedReplies?.length > 0" :onclick="getMoreReplies" 
                     label="Tải thêm phản hồi" :href="null"
                     :buttonStyle="buttonStyle"
                 />
@@ -132,6 +132,8 @@ export default {
                 replyEnter: null
             },
             listReplies: [],
+            listPostedReplies: [],
+            listCombinedReplies: [],
             isLoadingMoreReplies: false,
         }
     },
@@ -253,7 +255,7 @@ export default {
                         await new DeleteRequest('Comments/' + that.dComment.UserItemId)
                             .execute();
                         that.getToastManager()?.success('Xóa bình luận thành công');
-                        that.onDeletedComment?.();
+                        that.onDeletedComment?.(that.dComment);
                     } catch (error) {
                         Request.resolveAxiosError(error);
                     }
@@ -264,11 +266,17 @@ export default {
             }
         },
 
-        resolveDeletedReply(index){
+        resolveDeletedReply(cmtId){
             let that = this;
             return async function(){    
                 try {
-                    that.listReplies.splice(index, 1);
+                    that.listReplies = that.listReplies.filter(function(cmt){
+                        return cmt.UserItemId !== cmtId;
+                    });
+                    that.listPostedReplies = that.listPostedReplies.filter(function(cmt){
+                        return cmt.UserItemId !== cmtId;
+                    });
+                    that.updateListCombinedReplies();
                 } catch (error){
                     console.error(error);
                 }
@@ -289,11 +297,12 @@ export default {
             try {
                 this.isLoadingMoreReplies = true;
                 let offset = this.listReplies.length;
-                let limit = 10;
+                let limit = 6;
                 let res = await new GetRequest('Comments/replies/' + this.comment.UserItemId)
                     .setParams({
                         offset: offset,
-                        limit: limit
+                        limit: limit,
+                        order: 'CreatedTime:asc'
                     })
                     .execute();
                 let body = await Request.tryGetBody(res);
@@ -306,7 +315,14 @@ export default {
                     comm.copy(com);
                     return comm;
                 });
+                let listReplyIds = this.listReplies.map(function(cmt){
+                    return cmt.UserItemId;
+                });
+                tempComment = tempComment.filter(function(cmt){
+                    return listReplyIds.indexOf(cmt.UserItemId) < 0;
+                });
                 this.listReplies = this.listReplies.concat(tempComment);
+                this.updateListCombinedReplies();
             } catch (error){
                 Request.resolveAxiosError(error);
             } finally {
@@ -317,11 +333,26 @@ export default {
         async resolveSubmittedReplies(comment){
             try {
                 if (comment == null) return;
-                this.listReplies.push(comment);
+                this.listPostedReplies.push(comment);
+                this.updateListCombinedReplies();
             } catch (error){
                 console.error(error);
             }
         },
+
+        async updateListCombinedReplies(){
+            try {
+                let listReplyIds = this.listReplies.map(function(cmt){
+                    return cmt.UserItemId;
+                });
+                this.listPostedReplies = this.listPostedReplies.filter(function(cmt){
+                    return listReplyIds.indexOf(cmt.UserItemId) < 0;
+                });
+                this.listCombinedReplies = this.listReplies.concat(this.listPostedReplies);
+            } catch (error){
+                console.error(error);
+            }
+        }
     },
     props: {
         comment: {

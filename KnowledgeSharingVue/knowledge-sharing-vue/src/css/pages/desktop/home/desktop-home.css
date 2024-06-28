@@ -17,6 +17,14 @@
     --course-page-max-width: 1186px;
 }
 
+* {
+    max-width: 100%;
+}
+
+span {
+    max-width: fit-content;
+}
+
 .d-home {
     background-color: var(--primary-color-50);
     /* overflow: auto; */

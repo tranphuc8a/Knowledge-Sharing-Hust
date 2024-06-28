@@ -83,13 +83,13 @@ export default {
         onCancel: {
             type: Function,
             default: async function() {
-                console.log("Click cancel dialog");
+                // console.log("Click cancel dialog");
             }
         },
         onOkay: {
             type: Function,
             default: async function() {
-                console.log("Click okay dialog");
+                // console.log("Click okay dialog");
             }
         }
     }

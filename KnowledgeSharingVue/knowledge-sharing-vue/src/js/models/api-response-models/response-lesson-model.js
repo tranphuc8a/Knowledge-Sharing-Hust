@@ -2,7 +2,6 @@
 
 import ViewLesson from "../views/view-lesson";
 import ResponseCommentModel from "./response-comment-model";
-import Category from "../entities/category";
 
 class ResponseLessonModel extends ViewLesson {
     constructor() {
@@ -27,13 +26,6 @@ class ResponseLessonModel extends ViewLesson {
                 let comm = new ResponseCommentModel();
                 comm.copy(com);
                 return comm;
-            });
-        }
-        if (this.Categories?.length > 0){
-            this.Categories = this.Categories.map(function(cat){
-                let cate = new Category();
-                cate.copy(cat);
-                return cate;
             });
         }
         return this;

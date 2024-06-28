@@ -21,7 +21,7 @@
                 fa="camera" family="fas" :iconStyle="iconStyle"
             />
         </div>
-        <PreviewImage :src="thumbnail" ref="preview" />
+        <PreviewImage :src="thumbnail" ref="preview" v-if="thumbnail != null"/>
     </div>
 </template>
 
@@ -71,11 +71,6 @@ export default {
     },
     methods: {
         async resolveClickButton(){
-            try {
-                console.log("click edit course thumbnail button");
-            } catch (e) {
-                console.error(e);
-            }
         },
 
         async resolveClickThumbnail(){

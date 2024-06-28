@@ -9,7 +9,7 @@
                 {{course?.Title ?? "Title of course"}}
             </div>
             <div class="p-feedcard-lestion__abstract" v-show="course?.Abstract != null">
-                <LatexMarkdownRender :markdown-content="course?.Abstract" />
+                <LightLatexMarkdownRender :markdown-content="course?.Abstract" />
             </div>
             <div class="p-feedcard-lestion__categories" v-show="compiledCategories?.length > 0">
                 <CategoriesList :categories="compiledCategories" />
@@ -20,7 +20,7 @@
                 <div></div>
             </div>
             <div class="p-feedcard-lestion__content" v-if="course?.Introduction != null">
-                <LatexMarkdownRender :markdown-content="course?.Introduction" />
+                <LightLatexMarkdownRender :markdown-content="course?.Introduction" />
             </div>
             <div class="p-feedcard-lestion__thumbnail">
                 <PostCardThumbnail />
@@ -44,7 +44,7 @@ import PostCardHeader from '../../../home/components/feed-subpage/postcard/PostC
 import CategoriesList from '@/components/base/category/CategoriesList.vue';
 import PostCardThumbnail from '../../../home/components/feed-subpage/postcard/PostCardThumbnail.vue';
 import PostCardToolBar from '../../../home/components/feed-subpage/postcard/PostCardToolBar.vue';
-import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
+import LightLatexMarkdownRender from '@/components/base/markdown/LightLatexMarkdownRender.vue';
 import PostCardCommentList from '../../../home/components/feed-subpage/comment/PostCardCommentList.vue';
 
 export default {
@@ -67,7 +67,7 @@ export default {
         this.compiledCategories = this.getCategories();
     },
     components: {
-        LatexMarkdownRender, PostCardCommentList,
+        LightLatexMarkdownRender, PostCardCommentList,
         PostCardThumbnail, PostCardToolBar,
         FeedCardFrame, PostCardHeader, CategoriesList
     },
@@ -89,8 +89,7 @@ export default {
         getCategories() {
             if (this.course?.Categories != null
                 && this.course.Categories.length > 0){
-                return this.course.Categories
-                    .map(cate => cate.CategoryName);
+                return this.course.Categories;
             }
             return this.defaultCategoriesList;
         },

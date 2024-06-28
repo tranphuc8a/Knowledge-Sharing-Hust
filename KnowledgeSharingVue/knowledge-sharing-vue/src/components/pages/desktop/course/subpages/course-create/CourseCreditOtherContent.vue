@@ -27,7 +27,7 @@
                         Hãy tưởng tượng như bạn đang chọn topping cho chiếc pizza của mình vậy! Đừng chọn hết trừ khi bạn muốn pizza của mình thành... đống lộn xộn!"
                     </div>
                     <div class="p-ccg-input-content">
-                        <CategoryInput :label="'Nhập category'" 
+                        <CategoryInput :label="'Chọn danh mục'" 
                             ref="Categories" 
                             :validator="validators.Categories"
                             :is-show-title="false" :is-show-error="true" :is-obligate="false"

@@ -94,14 +94,16 @@ export default {
                 this.isWorking = true;
                 let courseId = this.getCourse()?.UserItemId;
                 if (courseId == null) return;
-                let url = 'Course/' + courseId;
+                let url = 'Courses/' + courseId;
                 await new DeleteRequest(url).execute();
                 
                 // delete success:
                 this.getToastManager().success(`Xóa khóa học thành công!`);
 
                 // push sang location hop ly hon
-                window.location.reload();
+                if (this.onCourseDeleted){
+                    this.onCourseDeleted(courseId);
+                }
             } catch (error) {
                 console.error(error);
                 Request.resolveAxiosError(error);
@@ -183,6 +185,17 @@ export default {
             }
         },
 
+        async gotoAdminstrator(){
+            try {
+                let courseId = this.getCourse()?.UserItemId;
+                if (courseId == null) return;
+                let url = '/administrator/course?filter=' + courseId;
+                this.router.push(url);
+            } catch (error){
+                console.error(error);
+            }
+        },
+
         async updateOptions(){
             try {
                 // role of user for a course:
@@ -195,24 +208,6 @@ export default {
                         this.actions.CopyUserItemId,
                         this.actions.GotoCourse
                     ];
-                } else if (this.currentUser.Role == myEnum.EUserRole.Admin){
-                    // Admin
-                    this.listOptions = [
-                        this.actions.Delete,
-                        this.actions.Report,
-                        this.actions.CopyUserItemId,
-                        this.actions.GotoCourse
-                    ];
-                    if (this.getCourse().IsMarked){
-                        this.listOptions.push(this.actions.Unmark);
-                    } else {
-                        this.listOptions.push(this.actions.Mark);
-                    }
-                    if (this.getCourse()?.IsBlockComment){
-                        this.listOptions.push(this.actions.UnlockComment);
-                    } else {
-                        this.listOptions.push(this.actions.LockComment);
-                    }
                 } else if (this.currentUser.Role == myEnum.EUserRole.Banned){
                     // Banned
                     this.listOptions = [
@@ -256,6 +251,10 @@ export default {
                         }
                     }
                 }
+
+                if (this.currentUser?.Role == myEnum.EUserRole.Admin){
+                    this.listOptions.push(this.actions.GotoAdminstrator);
+                }
             }
             catch (error){
                 console.error(error);
@@ -286,6 +285,7 @@ export default {
                 UnlockComment: 11,
                 CopyUserItemId: 12,
                 GotoCourse: 13,
+                GotoAdminstrator: 14,
             },
             listOptions: [],
             options: {
@@ -350,6 +350,12 @@ export default {
                     fa: 'forward',
                     onClick: this.resolveGotoCourse,
                 },
+                [14]: {
+                    id: 14,
+                    label: 'Quản trị viên',
+                    fa: 'user-shield',
+                    onClick: this.gotoAdminstrator,
+                },
             }
         }
     },
@@ -358,6 +364,7 @@ export default {
         getCourse: {},
         getPopupManager: {},
         getToastManager: {},
+        onCourseDeleted: { default: null, }
     }
 }
 

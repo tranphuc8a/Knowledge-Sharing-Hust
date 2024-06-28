@@ -7,10 +7,10 @@
             <span v-show="isCollapsed">{{ collapsedText }} </span> -->
 
             <span v-show="!isCollapsed"> 
-                <LatexMarkdownRender :markdownContent="dText" />
+                <LightLatexMarkdownRender :markdownContent="dText" />
             </span> 
             <span v-show="isCollapsed">
-                <LatexMarkdownRender :markdownContent="collapsedText" />    
+                <LightLatexMarkdownRender :markdownContent="collapsedText" />    
             </span>
         </span>
 
@@ -26,7 +26,7 @@
 
 <script>
 import { Validator } from '@/js/utils/validator';
-import LatexMarkdownRender from '../markdown/LatexMarkdownRender.vue';
+import LightLatexMarkdownRender from '../markdown/LightLatexMarkdownRender.vue';
 
 export default {
     name: "LimitLengthText",
@@ -40,7 +40,7 @@ export default {
         }
     },
     components: {
-        LatexMarkdownRender
+        LightLatexMarkdownRender
     },
     mounted() {
         this.updateText();

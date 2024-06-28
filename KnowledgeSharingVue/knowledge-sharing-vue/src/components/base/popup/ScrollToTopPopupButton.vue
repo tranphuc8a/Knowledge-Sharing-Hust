@@ -71,6 +71,7 @@ export default {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    box-shadow: 0px 0px 5px 0px #000000;
 }
 
 .p-sttb-frame:hover{

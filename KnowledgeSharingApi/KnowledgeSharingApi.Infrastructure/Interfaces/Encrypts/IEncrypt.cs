@@ -66,7 +66,19 @@ namespace KnowledgeSharingApi.Infrastructures.Interfaces.Encrypts
         /// <returns> hashpassword sau khi băm </returns>
         /// Created: PhucTV (12/3/24)
         /// Modified: None
-        string Sha256HashPassword(string username, string password);
+        string HashPassword(string username, string password);
+
+
+        /// <summary>
+        /// Kiem tra password hop le
+        /// </summary>
+        /// <param name="username"> tên tài khoản </param>
+        /// <param name="password"> mật khẩu </param>
+        /// <param name="hashedPassword"> Ma bam mat khau </param>
+        /// <returns> true - hop le, false - khong hop le </returns>
+        /// Created: PhucTV (12/3/24)
+        /// Modified: None
+        bool VerifyPassword(string username, string password, string hashedPassword);
 
     }
 }

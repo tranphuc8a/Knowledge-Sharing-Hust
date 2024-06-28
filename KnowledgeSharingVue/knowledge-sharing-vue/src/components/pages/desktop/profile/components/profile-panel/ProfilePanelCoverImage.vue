@@ -21,9 +21,9 @@
                 fa="camera" family="fas" :iconStyle="iconStyle"
             />
         </div>
-        <PreviewImage :src="coverImage" ref="preview" />
+        <PreviewImage :src="coverImage" ref="preview" v-if="coverImage != null" />
     </div>
-    <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitCoverImage" :isShow="false"/>
+    <!-- <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitCoverImage" :isShow="false"/> -->
 
 </template>
 
@@ -34,7 +34,7 @@ import CurrentUser from '@/js/models/entities/current-user';
 import MCancelButton from '@/components/base/buttons/MCancelButton';
 import Common from '@/js/utils/common';
 import PreviewImage from '@/components/base/image/PreviewImage.vue';
-import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
+// import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
 import { PatchRequest, Request } from '@/js/services/request';
 import { Validator } from '@/js/utils/validator';
 
@@ -42,7 +42,7 @@ export default {
     name: 'ProfilePanelCoverImage',
     components: {
         MCancelButton, PreviewImage,
-        SelectImagePopup
+        // SelectImagePopup
     },
     props: {
     },
@@ -81,7 +81,8 @@ export default {
     methods: {
         async resolveClickChangeCoverImage(){
             try {
-                this.$refs['select-image-popup'].show();
+                // this.$refs['select-image-popup'].show();
+                this.getSelectImagePopup().show(this.resolveSubmitCoverImage.bind(this));
             } catch (e) {
                 console.error(e);
             }
@@ -89,7 +90,6 @@ export default {
 
         async resolveSubmitCoverImage(image){
             try {
-                this.$refs['select-image-popup'].hide();
                 if (Validator.isEmpty(image)){
                     return;
                 }
@@ -97,11 +97,16 @@ export default {
                     .setBody(image)
                     .execute();
                 this.getToastManager().success('Cập nhật ảnh bìa thành công');
+                let currentUser = await CurrentUser.getInstance();
+                currentUser.Cover = image;
+                await CurrentUser.setInstance(currentUser);
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
             } catch (e) {
                 Request.resolveAxiosError(e);
+            } finally {
+                this.getSelectImagePopup()?.hide?.();
             }
         },
 
@@ -117,6 +122,7 @@ export default {
         getUser: {},
         forceUpdateProfilePanel: {},
         getToastManager: {},
+        getSelectImagePopup: {}
     }
 }
 

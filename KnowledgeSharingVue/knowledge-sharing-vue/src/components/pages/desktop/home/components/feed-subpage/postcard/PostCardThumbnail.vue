@@ -11,7 +11,7 @@
     >
         <!-- <img :src="imgSrc" class="p-postcard-thumbnail__img" 
             @:click="resolveClickThumbnail"/> -->
-        <PreviewImage :src="imgSrc" ref="preview" />
+        <PreviewImage :src="imgSrc" ref="preview" v-if="imgSrc != null"/>
     </div>
 </template>
 

@@ -3,10 +3,9 @@
 export default{
     methods: {
         getCategories() {
-            if (this.lesson?.Categories != null
-                && this.lesson.Categories.length > 0){
-                return this.lesson.Categories
-                    .map(cate => cate.CategoryName);
+            if (this.post?.Categories != null
+                && this.post.Categories.length > 0){
+                return this.post.Categories;
             }
             return this.defaultCategoriesList;
         },

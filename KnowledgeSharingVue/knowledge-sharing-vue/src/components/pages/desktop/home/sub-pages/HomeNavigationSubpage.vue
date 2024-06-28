@@ -21,6 +21,7 @@
 import CurrentUser from '@/js/models/entities/current-user';
 import HomeNavigationItem from '../components/home-navigation/HomeNavigationItem.vue';
 import HomeNavigationUser from '../components/home-navigation/HomeNavigationUser.vue';
+import { myEnum } from '@/js/resources/enum';
 
 export default {
     name: 'HomeNavigationSubpage',
@@ -51,6 +52,24 @@ export default {
                     label: label[i],
                     destination: destination[i]
                 });
+            }
+            if (await this.checkAdmin()){
+                this.items.push({
+                    fa: 'user-shield',
+                    label: 'Quản trị viên',
+                    destination: '/administrator'
+                });
+            }
+        },
+
+        async checkAdmin(){
+            try {
+                let currentUser = await CurrentUser.getInstance();
+                if (currentUser?.Role == null) return false;
+                return currentUser.Role == myEnum.EUserRole.Admin;
+            } catch (e){
+                console.error(e);
+                return false;
             }
         }
     },

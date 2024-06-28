@@ -3,7 +3,7 @@
 
 import UserRelation from '../entities/user-relation';
 
-class ViewUserRelation extends UserRelation {
+class ViewUserProfileRelation extends UserRelation {
     constructor() {
         super();
 
@@ -23,8 +23,8 @@ class ViewUserRelation extends UserRelation {
     }
 
     init() {
-        return new ViewUserRelation();
+        return new ViewUserProfileRelation();
     }
 }
 
-export default ViewUserRelation;
+export default ViewUserProfileRelation;

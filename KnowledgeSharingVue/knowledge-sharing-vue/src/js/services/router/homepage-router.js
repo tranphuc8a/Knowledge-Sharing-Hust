@@ -6,6 +6,7 @@ import HomeLessonSubpage from '@/components/pages/desktop/home/sub-pages/HomeLes
 import HomeQuestionSubpage from '@/components/pages/desktop/home/sub-pages/HomeQuestionSubpage.vue';
 import HomeCourseSubpage from '@/components/pages/desktop/home/sub-pages/HomeCourseSubpage.vue';
 import searchRouter from './search-router';
+import administratorRouter from './administrator-router';
 
 const homepageRouter = [
     {
@@ -42,6 +43,7 @@ const homepageRouter = [
                 component: HomeQuestionSubpage
             }, 
             ...searchRouter,
+            ...administratorRouter
         ]
     },
 ];

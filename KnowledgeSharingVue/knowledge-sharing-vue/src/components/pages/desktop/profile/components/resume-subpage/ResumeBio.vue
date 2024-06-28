@@ -4,7 +4,7 @@
     <div class="prb-resume-bio" >
 
         <div class="prb-bio-viewer" v-show="isShowBio && isEditing === false">
-            <LatexMarkdownRender :markdown-content="dBio" />
+            <LightLatexMarkdownRender :markdown-content="dBio" />
             <MSecondaryButton 
                 label="Chỉnh sửa tiểu sử"
                 :onclick="resolveEditBio"
@@ -70,7 +70,7 @@
 
 <script>
 import { Validator } from '@/js/utils/validator';
-import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
+import LightLatexMarkdownRender from '@/components/base/markdown/LightLatexMarkdownRender.vue';
 import MSecondaryButton from '@/components/base/buttons/MSecondaryButton';
 import MButton from '@/components/base/buttons/MButton';
 import MTextArea from '@/components/base/inputs/MTextArea';
@@ -81,7 +81,7 @@ import CurrentUser from '@/js/models/entities/current-user';
 export default {
     name: 'ResumeBio',
     components: {
-        LatexMarkdownRender,
+        LightLatexMarkdownRender,
         MSecondaryButton, MButton, MDeleteButton,
         MTextArea
     },

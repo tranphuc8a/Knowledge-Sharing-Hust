@@ -217,6 +217,13 @@
     };
 </script>
 
+<style>
+
+.p-popup-context-content *{
+    max-width: initial;
+}
+
+</style>
 
 <style scoped>
 .p-popup-context-container {
@@ -236,6 +243,7 @@
 }
 
 .p-popup-context-content {
+    max-width: max-content;
     box-sizing: border-box;
     position: absolute;
     overflow: hidden;

@@ -121,7 +121,7 @@ export default {
                     parsedParams[parts[0]] = parts[1];
                 });
                 this.params = parsedParams;
-                console.log(this.params);
+                // console.log(this.params);
 
                 let url = 'https://www.googleapis.com/oauth2/v2/userinfo';
                 let res = await new GetRequest(url)

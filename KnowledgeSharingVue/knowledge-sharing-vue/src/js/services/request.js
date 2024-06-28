@@ -247,6 +247,10 @@ class Request {
             } else {
                 throw error1;
             }
+        } finally {
+            if (Request.isCheckedLogedIn === false){
+                this.checkLogedIn();
+            }
         }
     }
 
@@ -259,8 +263,16 @@ class Request {
      * @Modified None
      */
     async checkLogedIn(){
+        if (Request.isCheckingLogedIn) return;
         try {
-            let response = await new GetRequest('Users/me').execute();
+            Request.isCheckingLogedIn = true;
+            let getRequest = new GetRequest('Users/me');
+            if (getRequest.token == null || getRequest.token == undefined ||
+                getRequest.refreshToken == null || getRequest.refreshToken == undefined
+            ){ 
+                return false;
+            }
+            let response = await getRequest.execute();
             let body = this.tryGetBody(response);
             let user = new CurrentUser();
             user.copy(body);
@@ -269,11 +281,16 @@ class Request {
         } catch (error){
             console.error(error);
             return false;
+        } finally {
+            Request.isCheckedLogedIn = true;
+            Request.isCheckingLogedIn = false;
         }
     }
 
 
     static isTokenRefresh       = true;
+    static isCheckedLogedIn     = false;
+    static isCheckingLogedIn    = false;
     static tryGetBody           = resolveAxiosResponse.tryGetBody.bind(resolveAxiosResponse);
     static tryGetStatusCode     = resolveAxiosResponse.tryGetStatusCode.bind(resolveAxiosResponse);
     static tryGetUserMessage    = resolveAxiosResponse.tryGetUserMessage.bind(resolveAxiosResponse);

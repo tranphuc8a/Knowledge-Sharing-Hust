@@ -109,9 +109,6 @@ export default {
         extractTableOfContents() {
             return this.toc?.innerHTML || "";
         },
-
-        
-
     }
 };
 </script>

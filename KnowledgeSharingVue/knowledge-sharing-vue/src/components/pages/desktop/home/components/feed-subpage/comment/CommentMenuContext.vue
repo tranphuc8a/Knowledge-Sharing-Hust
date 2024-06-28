@@ -1,7 +1,7 @@
 
 
 <template>
-    <m-context-popup :delay-hiding="0">
+    <m-context-popup :delay-hiding="200">
         <template #popupContextMask>
             <MActionIcon fa="ellipsis-h" :onclick="null"
                 :iconStyle="iconStyle" :containerStyle="containerStyle" />

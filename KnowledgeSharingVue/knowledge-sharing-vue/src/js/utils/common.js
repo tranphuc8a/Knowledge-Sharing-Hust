@@ -12,11 +12,15 @@ class Common {
      * @example Common.loadRecaptchaScript();
      */
     static loadRecaptchaScript() {
-        let script = document.createElement('script');
-        script.src = 'https://www.google.com/recaptcha/api.js';
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
+        try {
+            let script = document.createElement('script');
+            script.src = 'https://www.google.com/recaptcha/api.js';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     /**

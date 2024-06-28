@@ -1,4 +1,6 @@
-﻿using KnowledgeSharingApi.Domains.Annotations.Validators;
+﻿using KnowledgeSharingApi.Domains.Annotations.Converters;
+using KnowledgeSharingApi.Domains.Annotations.Validators;
+using KnowledgeSharingApi.Domains.Enums;
 using KnowledgeSharingApi.Domains.Resources.Vietnamese;
 using System;
 using System.Collections.Generic;
@@ -11,5 +13,8 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.UpdateUserItemMode
     public class UpdateLessonModel : UpdatePostModel
     {
         public int? EstimateTimeInMinutes { get; set; }
+
+        [PrivacyConverter]
+        public EPrivacy? Privacy { get; set; }
     }
 }

@@ -93,7 +93,7 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<UserItem> UserItems { get; set; }
         public DbSet<UserRelation> UserRelations { get; set; }
         public DbSet<ViewUserRelation> ViewUserRelations { get; set; }
-        public DbSet<ViewUser> ViewUsers { get; set; }
+        public DbSet<ViewUserProfile> ViewUserProfiles { get; set; }
         public DbSet<ViewMessage> ViewMessages { get; set; }
         public DbSet<ViewUserConversation> ViewUserConversations { get; set; }
         public DbSet<ViewComment> ViewComments { get; set; }
@@ -105,5 +105,7 @@ namespace KnowledgeSharingApi.Infrastructures.DbContexts
         public DbSet<ViewKnowledgeCategory> ViewKnowledgeCategories { get; set; }
         public DbSet<ViewCoursePayment> ViewCoursePayments { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<ViewUser> ViewUsers { get; set; }
+        public DbSet<ViewCourseTotalRelation> ViewCourseTotalRelations { get; set; }
     }
 }

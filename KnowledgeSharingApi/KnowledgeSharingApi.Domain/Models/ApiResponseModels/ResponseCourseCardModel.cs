@@ -14,17 +14,17 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
 
         public string Title { get; set; } = string.Empty;
 
-        public string Abstract { get; set; } = string.Empty;
+        public string? Abstract { get; set; } = string.Empty;
 
         public string? Thumbnail { get; set; }
 
         public EPrivacy Privacy { get; set; }
 
-        public string Introduction { get; set; } = string.Empty;
+        //public string Introduction { get; set; } = string.Empty;
 
         public decimal Fee { get; set; }
 
-        public int EstimateTimeInMinutes { get; set; }
+        //public int EstimateTimeInMinutes { get; set; }
 
         public bool IsFree { get; set; }
 

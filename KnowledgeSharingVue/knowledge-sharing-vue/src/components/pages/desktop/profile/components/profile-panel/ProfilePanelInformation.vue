@@ -103,7 +103,8 @@ export default {
 }
 
 .p-user-information__left{
-    width: fit-content;
+    width: 0;
+    flex-grow: 1;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
@@ -113,6 +114,8 @@ export default {
 }
 
 .p-user-infor{
+    width: 0;
+    flex-grow: 1;
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;

@@ -26,9 +26,9 @@
                 :iconStyle="iconStyle"
             />
         </div>
-        <PreviewImage :src="imageSrc" ref="preview"/>
+        <PreviewImage :src="imageSrc" ref="preview" v-if="imageSrc != null"/>
         <div>
-            <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitAvatar" :isShow="false"/>
+            <!-- <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitAvatar" :isShow="false"/> -->
         </div>
     </div>
 </template>
@@ -39,7 +39,7 @@
 import Common from '@/js/utils/common';
 import CurrentUser from '@/js/models/entities/current-user';
 import PreviewImage from '@/components/base/image/PreviewImage.vue';
-import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
+// import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
 import { Validator } from '@/js/utils/validator';
 import { PatchRequest, Request } from '@/js/services/request';
 
@@ -47,7 +47,7 @@ export default {
     name: 'ProfilePanelUserAvatar',
     components: {
         PreviewImage,
-        SelectImagePopup
+        // SelectImagePopup
     },
     props: {
     },
@@ -64,7 +64,7 @@ export default {
     },
     async mounted(){
         try {
-            this.$refs['select-image-popup'].hide();
+            // this.$refs['select-image-popup'].hide();
             this.imageSrc = this.defaultImageSrc;
             let avatar = this.getUser()?.Avatar;
             if (await Common.isValidImage(avatar)){
@@ -81,7 +81,8 @@ export default {
     methods: {
         async resolveClickEditAvatar(){
             try {
-                this.$refs['select-image-popup'].show();
+                // this.$refs['select-image-popup'].show();
+                this.getSelectImagePopup().show(this.resolveSubmitAvatar.bind(this));
             } catch (e) {
                 console.error(e);
             }
@@ -97,7 +98,7 @@ export default {
 
         async resolveSubmitAvatar(image){
             try {
-                this.$refs['select-image-popup'].hide();
+                // this.$refs['select-image-popup'].hide();
                 if (Validator.isEmpty(image)){
                     return;
                 }
@@ -106,17 +107,24 @@ export default {
                     .setBody(image).execute();
                 // success:
                 this.getToastManager().success('Cập nhật ảnh đại diện thành công');
+                let currentUser = await CurrentUser.getInstance();
+                currentUser.Avatar = image;
+                await CurrentUser.setInstance(currentUser);
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
             } catch (e) {
                 Request.resolveAxiosError(e);
+            } finally {
+                // this.$refs['select-image-popup'].hide();
+                this.getSelectImagePopup()?.hide?.();
             }
         }
     },
     inject: {
         getUser: {},
         getToastManager: {},
+        getSelectImagePopup: {}
     }
 }
 

@@ -70,8 +70,8 @@ export default {
         this.button = this.$refs.button;
         this.email = this.route.query.email;
         this.accessCode = this.route.query.accessCode;
-        console.log(this.email);
-        console.log(this.accessCode);
+        // console.log(this.email);
+        // console.log(this.accessCode);
     },
     components: {
         BaseAuthenticationPage, MSlotedTextfield, MButton

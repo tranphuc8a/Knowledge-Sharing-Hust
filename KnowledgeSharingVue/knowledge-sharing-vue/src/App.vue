@@ -12,6 +12,7 @@
     <ToastManager ref="toastManager"/>
     <LoadingPanel ref="loadingPanel"/>
     <ConversationPopup ref="conversationPopup"/>
+    <SelectImagePopup ref="selectImagePopup"/>
     
 </template>
 
@@ -23,6 +24,7 @@ import { language } from '@/js/resources/language';
 import resolveAxiosResponse from '@/js/services/resolve-axios-response';
 import CurrentUser from './js/models/entities/current-user';
 import ConversationPopup from './components/pages/desktop/conversation/conversation-popup/ConversationPopup.vue';
+import SelectImagePopup from './components/base/popup/select-image-popup/SelectImagePopup.vue';
 // import Common from './js/utils/common';
 
 export default {
@@ -34,7 +36,7 @@ export default {
     },
     components: {
         PopupManager, ToastManager, LoadingPanel,
-        ConversationPopup
+        ConversationPopup, SelectImagePopup
     },
     mounted(){
         this.toastManager = this.$refs.toastManager;
@@ -65,6 +67,10 @@ export default {
         getConversationPopup(){
             return this.$refs.conversationPopup;
         },
+        getSelectImagePopup(){
+            return this.$refs.selectImagePopup;
+        },
+
         /**
          * Hàm thực hiện thay đổi ngôn ngữ cho các component nhận inject language của trang này
          * @param {*} lang - ngôn ngữ cần thay đổi (theo enum language)
@@ -76,10 +82,10 @@ export default {
             try {
                 if (lang === this.languageEnum.VIETNAMESE){
                     this.globalData.lang = language['vi'];
-                    console.log("Change language to " + 'vi');
+                    // console.log("Change language to " + 'vi');
                 } else if (lang === this.languageEnum.ENGLISH){
                     this.globalData.lang = language['en'];
-                    console.log("Change language to " + 'en');
+                    // console.log("Change language to " + 'en');
                 }
             } catch (error){
                 console.error(error);
@@ -120,6 +126,7 @@ export default {
             getPopupManager: this.getPopupManager,
             getLoadingPanel: this.getLoadingPanel,
             getConversationPopup: this.getConversationPopup,
+            getSelectImagePopup: this.getSelectImagePopup,
             getCurrentUser: this.getCurrentUser,
             getLanguage: () => this.globalData.lang,
             changeLanguage: this.changeLanguage

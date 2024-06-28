@@ -106,6 +106,7 @@
 
 .p-csc-course-owner{
     width: 100%;
+    max-width: 100%;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
@@ -115,9 +116,10 @@
 
 .p-csc-course-owner__username{
     display: block;
-    /* overflow: hidden; */
+    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    /* max-width: 100%; */
 }
 
 .p-csc-bottom-relation{

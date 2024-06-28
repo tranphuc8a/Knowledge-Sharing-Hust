@@ -1,11 +1,11 @@
 <template>
     <div class="p-postcard-comment-list" v-if="isLoaded && !isBlockComment">
-        <div class="p-pcl-filter-button" v-show="false">
-            <CommentFilterButton :on-change="resolveOnchangeFilter" />
+        <div class="p-pcl-filter-button" v-show="true">
+            <CommentFilterButton :on-change="resolveOnchangeFilter" :value="orderValue" />
         </div>
-        <div class="p-pcl-comment-list" v-show="listComments?.length > 0">
+        <div class="p-pcl-comment-list" v-show="listCombinedComment?.length > 0">
             <PostCardComment 
-                v-for="comment in listComments" 
+                v-for="comment in listCombinedComment" 
                 :key="comment?.UserItemId" 
                 :comment="comment"
                 :on-deleted-comment="resolveDeletedComment(comment)"
@@ -16,7 +16,7 @@
             />
 
         </div>
-        <div class="p-pcl-empty-comment" v-show="listComments?.length <= 0">
+        <div class="p-pcl-empty-comment" v-show="listCombinedComment?.length <= 0">
             Hiện không có bình luận nào
         </div>
         <div class="p-pcl-enter-comment">
@@ -26,6 +26,11 @@
     <div class="p-postcard-comment-list" v-if="isLoaded && isBlockComment">
         <div class="p-pcl-empty-comment">
             Bài viết đã bị khóa bình luận
+        </div>
+    </div>
+    <div class="p-postcard-comment-list" v-if="!isLoaded">
+        <div class="p-pcl-loading-comment">
+            <MSpinner />
         </div>
     </div>
 </template>
@@ -50,9 +55,14 @@ export default {
             buttonStyle: { padding: '0px', fontSize: '13px', height: '24px' },
             label: null,
             listComments: [],
+            listPostedComment: [],
+            listCombinedComment: [],
             isOutOfComments: false,
-            pageSize: 10,
+            pageSize: 6,
             currentUser: null,
+            defaultOrder: '',
+            order: '',
+            orderValue: myEnum.commentFilterType.Best
         }
     },
     components: {
@@ -66,6 +76,8 @@ export default {
                 com.copy(comment);
                 return com;
             });
+            this.listPostedComment = [];
+            await this.updateListCombinedComments();
         }
         this.isBlockComment = this.getPost()?.IsBlockComment ?? false;
         // console.log(this.listComments);
@@ -96,19 +108,13 @@ export default {
 
         async resolveOnchangeFilter(commentFilterType){
             try {
-                switch (commentFilterType) {
-                    case myEnum.commentFilterType.Best: 
-
-                        break;
-                    case myEnum.commentFilterType.Recent: 
-
-                        break;
-                    case myEnum.commentFilterType.All: 
-
-                        break;
-                    default:
-                        break;
-                }
+                this.order = commentFilterType;
+                this.orderValue = commentFilterType;
+                this.listComments = [];
+                this.listPostedComment = [];
+                this.listCombinedComment = [];
+                this.isOutOfComments = false;
+                this.getTopComments();
             } catch (e) {
                 console.error(e);
             }
@@ -117,24 +123,47 @@ export default {
 
         async getTopComments(){
             try {
-                let url = null;
+                this.listComments = [];
+                this.listPostedComment = [];
+
+                this.isLoaded = false;
                 let postId = this.getPost()?.UserItemId;
                 if (postId == null){
                     return;
                 }
+                let url = 'Comments/anonymous/' + postId;
+                let orderString = "";
+
+                if (this.order == myEnum.commentFilterType.Best){
+                    // api for best comments
+                    orderString = 'TotalStar:desc,AverageStar:desc,TotalComment:desc';
+                } else if (this.order == myEnum.commentFilterType.Newest){
+                    // default api for top comments
+                    orderString = 'CreatedTime:desc';
+                } else if (this.order == myEnum.commentFilterType.Oldest){
+                    // default api for top comments
+                    orderString = 'CreatedTime:asc';
+                } else {
+                    // default api for top comments
+                    orderString = '';
+                }
+
                 if (this.currentUser == null){
                     url = 'Comments/anonymous/' + postId;
                 } else {
                     url = 'Comments/' + postId;
                 }
+
+                let pageSize = 3;
                 let res = await new GetRequest(url)
                     .setParams({
-                        limit: this.pageSize,
-                        offset: 0
+                        limit: pageSize,
+                        offset: 0,
+                        order: orderString
                     }).execute();
                 let body = await Request.tryGetBody(res);
                 let readComments = body?.Results ?? [];
-                if (readComments < this.pageSize)
+                if (readComments < pageSize)
                     this.isOutOfComments = true;
                 let mappedComments = readComments.map(function(comment){
                     let com = new ResponseCommentModel();
@@ -142,14 +171,11 @@ export default {
                     return com;
                 });
                 this.listComments = mappedComments;
+                await this.updateListCombinedComments();
             } catch (e) {
                 console.error(e);
             } finally {
-                // let that = this;
-                // this.isLoaded = false;
-                // this.$nextTick(() => {
-                //     that.isLoaded = true;
-                // });
+                this.isLoaded = true;
             }
         },
 
@@ -157,33 +183,55 @@ export default {
         async getMoreComments(){
             try {
                 let numComs = this.listComments.length;
-                let url = null;
                 let postId = this.getPost()?.UserItemId;
                 if (postId == null){
                     return;
                 }
+                let url = 'Comments/anonymous/' + postId;
+                let orderString = "";
+                if (this.order == myEnum.commentFilterType.Best){
+                    // api for best comments
+                    orderString = 'TotalStar:desc,AverageStar:desc,TotalComment:desc';
+                } else if (this.order == myEnum.commentFilterType.Newest){
+                    // default api for top comments
+                    orderString = 'CreatedTime:desc';
+                } else if (this.order == myEnum.commentFilterType.Oldest){
+                    // default api for top comments
+                    orderString = 'CreatedTime:asc';
+                } else {
+                    // default api for top comments
+                    orderString = '';
+                }
+
                 if (this.currentUser == null){
                     url = 'Comments/anonymous/' + postId;
                 } else {
                     url = 'Comments/' + postId;
                 }
+                
                 let res = await new GetRequest(url)
                     .setParams({
                         limit: this.pageSize,
-                        offset: numComs
+                        offset: numComs,
+                        order: orderString
                     }).execute();
                 let body = await Request.tryGetBody(res);
                 let readComments = body?.Results ?? [];
-                if (readComments < this.pageSize)
+                if (readComments.length < this.pageSize)
                     this.isOutOfComments = true;
                 let mappedComments = readComments.map(function(comment){
                     let com = new ResponseCommentModel();
                     com.copy(comment);
                     return com;
                 });
-                this.listComments = this.listComments.concat(mappedComments);
-                // this.listComments = this.listComments.concat(mappedComments);
-                // this.$forceUpdate();
+                let listCommentIds = this.listComments.map(function(comment){
+                    return comment.UserItemId;
+                });
+                let newComments = mappedComments.filter(function(comment){
+                    return listCommentIds.indexOf(comment.UserItemId) < 0;
+                });
+                this.listComments = this.listComments.concat(newComments);
+                await this.updateListCombinedComments();
             } catch (e) {
                 console.error(e);
                 Request.resolveAxiosError(e);
@@ -193,7 +241,11 @@ export default {
 
         async resolvePostedComment(comment){
             try {
-                this.listComments.push(comment);
+                if (comment == null){
+                    return;
+                }
+                this.listPostedComment.push(comment);
+                await this.updateListCombinedComments();
             } catch (e) {
                 console.error(e);
             }
@@ -203,10 +255,13 @@ export default {
             let that = this;
             return async function(){
                 try {
-                    let index = that.listComments.indexOf(comment);
-                    if (index >= 0){
-                        that.listComments.splice(index, 1);
-                    }
+                    that.listComments = that.listComments.filter(function(com){
+                        return com.UserItemId != comment.UserItemId;
+                    });
+                    that.listPostedComment = that.listPostedComment.filter(function(com){
+                        return com.UserItemId != comment.UserItemId;
+                    });
+                    await that.updateListCombinedComments();
                 } catch (e) {
                     console.error(e);
                 }
@@ -216,6 +271,21 @@ export default {
         async focus(){
             try {
                 await this.$refs['enter-comment']?.focus?.();
+            } catch (e) {
+                console.error(e);
+            }
+        },
+
+
+        async updateListCombinedComments(){
+            try {
+                let listCommendIds = this.listComments.map(function(comment){
+                    return comment.UserItemId;
+                });
+                this.listPostedComment = this.listPostedComment.filter(function(comment){
+                    return listCommendIds.indexOf(comment.UserItemId) < 0;
+                });
+                this.listCombinedComment = this.listComments.concat(this.listPostedComment);
             } catch (e) {
                 console.error(e);
             }
@@ -248,6 +318,12 @@ export default {
     padding: 12px 0px 18px 0px;
     color: var(--grey-color);
     font-family: 'ks-font-regular';
+}
+
+.p-pcl-loading-comment{
+    width: 100%;
+    text-align: center;
+    padding: 12px 0px 18px 0px;
 }
 
 .p-pcl-comment-load-more{

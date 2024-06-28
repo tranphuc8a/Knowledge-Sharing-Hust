@@ -27,7 +27,7 @@
         <component v-for="item in listPosts" 
             :key="item?.UserItemId"
             :is="getComponent(item)"
-            v-bind="{post: item}">
+            v-bind="{post: item, isViewComment: isViewComment}">
             Hello
         </component>
 
@@ -95,11 +95,14 @@ export default {
         // prop xac dinh context cua postsubpage hien tai (null, user, course)
         owner: {
             default: null,
-        }
+        },
         // isShowAddPost: {
         //     type: Boolean,
         //     default: true,
-        // }
+        // },
+        isViewComment: {
+            default: true,
+        }
     },
     data(){
         return {
@@ -173,7 +176,7 @@ export default {
                 });
                 if (tempListPosts.length < limit){
                     this.isOutOfPost = true;
-                    console.log("Out of posts");
+                    // console.log("Out of posts");
                 } 
                 
                 if (tempListPosts.length > 0){
@@ -200,6 +203,19 @@ export default {
             } catch (e){
                 console.error(e);
             }
+        },
+
+        async resolveDeletePost(postId){
+            try {
+                let index = this.listPosts.findIndex(function(post){
+                    return post.UserItemId == postId;
+                });
+                if (index >= 0){
+                    this.listPosts.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     inject: {
@@ -208,6 +224,11 @@ export default {
     watch: {
         getPost(){
             this.refresh();
+        }
+    },
+    provide(){
+        return {
+            onPostDeleted: this.resolveDeletePost
         }
     }
 }

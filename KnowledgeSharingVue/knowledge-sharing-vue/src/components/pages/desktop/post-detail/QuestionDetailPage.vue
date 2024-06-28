@@ -85,7 +85,9 @@ export default {
 
     },
     methods: {
-
+        async resolveDeletedQuestion(){
+            location.reload();
+        }
     },
     props: {
 
@@ -95,6 +97,11 @@ export default {
         getToastManager: {},
         getPopupManager: {},
         getLoadingPanel: {}
+    },
+    provide(){
+        return {
+            onPostDeleted: this.resolveDeletedQuestion,
+        }
     }
 }
 </script>

@@ -29,13 +29,6 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Views
 
         public int? TotalComment { get; set; }
 
-
-        public int? TotalLesson { get; set; }
-        public int? TotalQuestion { get; set; }
-        public int? TotalRegister { get; set; }
-        public int? TotalInvite { get; set; }
-        public int? TotalRequest { get; set; }
-
         protected override ViewCourse Init()
         {
             return new ViewCourse();

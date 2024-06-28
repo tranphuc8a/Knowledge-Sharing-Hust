@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
 {
-    public class UserItem : Entity, IUserItemView
+    public class UserItem : Entity, IViewUserItem
     {
         [Key]
         public Guid UserItemId { get; set; }

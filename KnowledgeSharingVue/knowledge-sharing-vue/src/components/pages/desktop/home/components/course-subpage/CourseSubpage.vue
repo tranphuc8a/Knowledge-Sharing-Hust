@@ -195,6 +195,19 @@ export default {
             } catch (e){
                 console.error(e);
             }
+        },
+
+        async resolveDeletedCourse(courseId){
+            try {
+                let index = this.listCourses.findIndex(function(course){
+                    return course?.UserItemId == courseId;
+                });
+                if (index >= 0){
+                    this.listCourses.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     inject: {
@@ -203,6 +216,11 @@ export default {
     watch: {
         getCourse(){
             this.refresh();
+        },
+    },
+    provide(){
+        return {
+            onCourseDeleted: this.resolveDeletedCourse,
         }
     }
 }

@@ -63,16 +63,16 @@ export default {
     },
     methods: {
         async resolveChangeFormOne(){
-            try {
-                let atextfield = this.$refs['a-textfield'];
-                let btextfield = this.$refs['b-textfield'];
-                let atext = await atextfield.getValue();
-                let btext = await btextfield.getValue();
-                console.log(atext + "  " + btext);
+            // try {
+            //     let atextfield = this.$refs['a-textfield'];
+            //     let btextfield = this.$refs['b-textfield'];
+            //     let atext = await atextfield.getValue();
+            //     let btext = await btextfield.getValue();
+            //     console.log(atext + "  " + btext);
                 
-            } catch (e){
-                console.error(e);
-            }
+            // } catch (e){
+            //     console.error(e);
+            // }
         }
     }
 }

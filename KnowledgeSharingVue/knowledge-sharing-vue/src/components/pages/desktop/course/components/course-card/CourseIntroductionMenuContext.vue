@@ -94,7 +94,7 @@ export default {
                 this.isWorking = true;
                 let courseId = this.getCourse()?.UserItemId;
                 if (courseId == null) return;
-                let url = 'Course/' + courseId;
+                let url = 'Courses/' + courseId;
                 await new DeleteRequest(url).execute();
                 
                 // delete success:
@@ -189,6 +189,17 @@ export default {
                 console.error(error);
             }
         },
+
+        async gotoAdminstrator(){
+            try {
+                let courseId = this.getCourse()?.UserItemId;
+                if (courseId == null) return;
+                let url = '/administrator/course?filter=' + courseId;
+                this.router.push(url);
+            } catch (error){
+                console.error(error);
+            }
+        },
         
         async updateOptions(){
             try {
@@ -204,22 +215,6 @@ export default {
                 if (this.currentUser == null){ 
                     // Anonymous
                     this.listOptions = [ ...anonymousRoles ];
-                } else if (this.currentUser.Role == myEnum.EUserRole.Admin){
-                    // Admin
-                    this.listOptions = [
-                        this.actions.Delete,
-                        ...anonymousRoles
-                    ];
-                    if (this.getCourse().IsMarked){
-                        this.listOptions.push(this.actions.Unmark);
-                    } else {
-                        this.listOptions.push(this.actions.Mark);
-                    }
-                    if (this.getCourse()?.IsBlockComment){
-                        this.listOptions.push(this.actions.UnlockComment);
-                    } else {
-                        this.listOptions.push(this.actions.LockComment);
-                    }
                 } else if (this.currentUser.Role == myEnum.EUserRole.Banned){
                     // Banned
                     this.listOptions = [
@@ -256,6 +251,11 @@ export default {
                         }
                     }
                 }
+
+                // Admin
+                if (this.currentUser?.Role == myEnum.EUserRole.Admin){
+                    this.listOptions.push(this.actions.GotoAdminstrator);
+                }
             }
             catch (error){
                 console.error(error);
@@ -287,6 +287,7 @@ export default {
                 LockComment: 10,
                 UnlockComment: 11,
                 CopyUserItemId: 12,
+                GotoAdminstrator: 13,
             },
             listOptions: [],
             options: {
@@ -356,7 +357,13 @@ export default {
                     label: 'Sao chép id phần tử',
                     fa: 'copy',
                     onClick: this.resolveCopyUserItemId,
-                }
+                },
+                [13]: {
+                    id: 13,
+                    label: 'Quản trị viên',
+                    fa: 'user-shield',
+                    onClick: this.gotoAdminstrator,
+                },
             }
         }
     },

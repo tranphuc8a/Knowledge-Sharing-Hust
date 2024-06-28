@@ -203,12 +203,18 @@ export default {
 }
 
 .p-tui-fullname {
+    max-width: 100%;
     font-size: 1.2rem;
     font-weight: bold;
     color: #333;
 }
 
+.p-tui-fullname > a {
+    max-width: 100%;
+}
+
 .p-tui-username {
+    max-width: 100%;
     font-size: 0.9rem;
     color: #666;
 }

@@ -6,7 +6,8 @@
             <UserAvatar :user="user" :size="32" />
         </div>
         <div class="d-item-label">
-            {{ user?.FullName ?? "Người dùng hệ thống" }}
+            <!-- {{ user?.FullName ?? "Người dùng hệ thống" }} -->
+            <EllipsisText :text="user?.FullName ?? 'Người dùng'" :max-line="2" />
         </div>
     </div>
 </template>
@@ -15,6 +16,7 @@
 
 <script>
 
+import EllipsisText from '@/components/base/text/EllipsisText.vue';
 import { useRouter } from 'vue-router';
 import UserAvatar from '@/components/base/avatar/UserAvatar.vue';
 import CurrentUser from '@/js/models/entities/current-user';
@@ -24,7 +26,8 @@ export default {
     props: {
     },
     components: {
-        UserAvatar
+        UserAvatar,
+        EllipsisText
     },
     data(){
         return {

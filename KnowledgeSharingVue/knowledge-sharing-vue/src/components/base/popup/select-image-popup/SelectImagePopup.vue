@@ -90,15 +90,17 @@ export default {
             },
             tabIndex: 0,
             isListImageCreated: false,
-            dIsShow: this.isShow
+            dIsShow: this.isShow,
+            onOkayParams: null,
         }
     },
     async mounted(){
     },
     methods: {
-        async show(){
+        async show(onOkay){
             this.dIsShow = true;
-            this.isListImageCreated = true
+            this.isListImageCreated = true;
+            this.onOkayParams = onOkay;
         },
         async hide(){
             this.dIsShow = false;
@@ -120,14 +122,16 @@ export default {
                     await this.resolveImageInvalid();
                     return;
                 }
-                await this.onOkay(imageUrl);
+                await this.onOkay?.(imageUrl);
+                await this.onOkayParams?.(imageUrl);
             } else if (this.tabIndex === this.tabEnum.EnterUrl){
                 result = await this.$refs.enterImageUrlContent.getSelectedImage();
                 if (result == null){
                     await this.resolveImageInvalid();
                     return;
                 }
-                await this.onOkay(result);
+                await this.onOkay?.(result);
+                await this.onOkayParams?.(result);
             } else if (this.tabIndex === this.tabEnum.Upload){
                 let { image, captcha } = await this.$refs.uploadImageContent.getSelectedImage();
                 if (image == null){
@@ -136,10 +140,10 @@ export default {
                 }
                 let imageUrl = await this.resolveUploadImage(image, captcha);
                 if (imageUrl == null){
-                    await this.resolveImageInvalid();
                     return;
                 }
-                await this.onOkay(imageUrl);
+                await this.onOkay?.(imageUrl);
+                await this.onOkayParams?.(imageUrl);
             }
         },
 

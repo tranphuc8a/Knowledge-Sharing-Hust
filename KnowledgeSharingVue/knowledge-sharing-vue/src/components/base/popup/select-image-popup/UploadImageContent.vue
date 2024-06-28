@@ -12,7 +12,13 @@
             />
         </div>
         <div class="p-uic-captcha">
-            <div class="g-recaptcha" :data-sitekey="siteKey" ref="grecaptcha"></div>
+            <!-- <div class="g-recaptcha" :data-sitekey="siteKey" ref="grecaptcha" :id="captchaId"></div> -->
+            <VueRecaptcha
+                :sitekey="siteKey"
+                :load-recaptcha-script="true"
+                @verify="handleSuccess"
+                @error="handleError"
+            ></VueRecaptcha>
         </div>
     </div>
 </template>
@@ -20,16 +26,18 @@
 
 
 <script>
-/* global grecaptcha */
+// /* global grecaptcha */
+import { VueRecaptcha } from 'vue-recaptcha';
 import MImageInput from './../../inputs/MImageInput.vue';
-import Common from '@/js/utils/common';
+// import Common from '@/js/utils/common';
 import appConfig from '@/app-config';
 import { MyRandom } from '@/js/utils/myrandom';
 
 export default {
     name: 'UploadImageContent',
     components: {
-        MImageInput
+        MImageInput,
+        VueRecaptcha,
     },
     props: {
     },
@@ -40,26 +48,32 @@ export default {
                 height: '300px',
             },
             siteKey: appConfig.getCaptchaSiteKey(),
-            captchaId: MyRandom.generateUUID()
+            captchaId: MyRandom.generateUUID(),
+            response: null,
         }
     },
-    async mounted(){
-        let that = this;
-        this.$nextTick(() => {
-            Common.loadRecaptchaScript();
-            that.recaptchaWidgetId = grecaptcha.render(that.$refs.grecaptcha, {
-                'sitekey' : that.siteKey,
-                'callback' : function(response) {
-                    console.log(response);
-                }
-            });
-        });
+    mounted(){
+        // Common.loadRecaptchaScript();
     },
     methods: {
+        resolveResponse(response){
+            // console.log(response);
+            this.response = response;
+        },
+
+        handleSuccess(response){
+            this.resolveResponse(response);
+        },
+
+        handleError(error){
+            console.error(error);
+        },
+
         async getSelectedImage(){
             try {
                 let image = await this.$refs.imageInput.getValue();
-                let captcha = grecaptcha.getResponse(this.recaptchaWidgetId);
+                // let captcha = grecaptcha.getResponse(this.recaptchaWidgetId);
+                let captcha = this.response;
                 return { image, captcha };
             } catch (error) {
                 console.error(error);

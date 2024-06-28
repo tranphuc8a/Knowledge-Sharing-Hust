@@ -122,7 +122,7 @@ export default {
             }
             let lessonLink = `/lesson/${this.dLesson.UserItemId}`;
             this.lessonDetailLink = this.detailLink ?? lessonLink;
-            await this.updateThumbnail();
+            this.updateThumbnail();
             this.lessonOwner = this.dLesson?.getUser();
             this.isLoaded = true;
         },

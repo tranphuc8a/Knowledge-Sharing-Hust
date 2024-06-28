@@ -59,7 +59,7 @@
                                 :onclick="resolveOnChangeCover"
                             />
                         </div>
-                        <PreviewImage :src="coverImageUrl" ref="cover"/>
+                        <PreviewImage :src="coverImageUrl" ref="cover" v-if="coverImageUrl != null"/>
                     </div>
                 </div>
             </div>
@@ -83,7 +83,7 @@
                 </div>
             </div>
         </div>
-        <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitImage" :isShow="false"/>
+        <!-- <SelectImagePopup ref="select-image-popup" :on-okay="resolveSubmitImage" :isShow="false"/> -->
         <ChangeFullnamePopup ref="change-fullname-popup" :isShow="false"/>
     </div>
 </template>
@@ -97,7 +97,7 @@ import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue
 import MEmbeddedButton from './../../../../../base/buttons/MEmbeddedButton.vue'
 import Common from '@/js/utils/common';
 import CurrentUser from '@/js/models/entities/current-user';
-import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
+// import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
 import { Validator } from '@/js/utils/validator';
 import { PatchRequest } from '@/js/services/request';
 import ChangeFullnamePopup from './ChangeFullnamePopup.vue';
@@ -106,7 +106,7 @@ export default {
     name: 'ProfileEditGeneralContent',
     components: {
         ProfilePanelUserAvatar, PreviewImage,
-        SelectImagePopup,
+        // SelectImagePopup,
         MEmbeddedButton, MSecondaryButton,
         ChangeFullnamePopup
     },
@@ -171,7 +171,8 @@ export default {
         async resolveOnChangeAvatar(){
             try {
                 this.focusImage = this.imageEnum.AVATAR;
-                this.$refs['select-image-popup'].show();
+                // this.$refs['select-image-popup'].show();
+                this.getSelectImagePopup()?.show?.(this.resolveSubmitImage.bind(this));
             } catch (e){
                 console.error(e);
             }
@@ -180,7 +181,8 @@ export default {
         async resolveOnChangeCover(){
             try {
                 this.focusImage = this.imageEnum.COVER;
-                this.$refs['select-image-popup'].show();
+                // this.$refs['select-image-popup'].show();
+                this.getSelectImagePopup()?.show?.(this.resolveSubmitImage.bind(this));
             } catch (e){
                 console.error(e);
             }
@@ -188,7 +190,7 @@ export default {
 
         async resolveSubmitImage(image){
             try {
-                this.$refs['select-image-popup'].hide();
+                // this.$refs['select-image-popup'].hide();
                 if (Validator.isEmpty(image)){
                     return;
                 }
@@ -212,6 +214,8 @@ export default {
                 }, 1000);
             } catch (e){
                 Request.resolveAxiosError(e);
+            } finally {
+                this.getSelectImagePopup()?.hide?.();
             }
         },
 
@@ -232,6 +236,7 @@ export default {
     },
     inject: {
         getToastManager: {},
+        getSelectImagePopup: {}
     },
     provide(){
         return{}

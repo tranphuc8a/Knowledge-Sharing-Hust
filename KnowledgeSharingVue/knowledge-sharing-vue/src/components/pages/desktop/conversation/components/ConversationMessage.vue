@@ -5,7 +5,7 @@
         <div class="p-conversation-message-me" v-if="isMyMessage">
             <div class="p-cmm-left">
                 <div class="p-cmm-content-frame">
-                    <LatexMarkdownRender
+                    <LightLatexMarkdownRender
                         :markdown-content="viewMessage?.Content ?? ''"
                     />
                 </div>
@@ -32,7 +32,7 @@
             </div>
             <div class="p-cmo-right">
                 <div class="p-cmo-content-frame">
-                    <LatexMarkdownRender
+                    <LightLatexMarkdownRender
                         :markdown-content="viewMessage?.Content ?? ''"
                     />
                 </div>
@@ -46,13 +46,13 @@
 <script>
 import TooltipUserAvatar from '@/components/base/avatar/TooltipUserAvatar.vue';
 import CurrentUser from '@/js/models/entities/current-user';
-import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
+import LightLatexMarkdownRender from '@/components/base/markdown/LightLatexMarkdownRender.vue';
 
 export default {
     name: 'ConversationMessage',
     components: {
         TooltipUserAvatar,
-        LatexMarkdownRender,
+        LightLatexMarkdownRender,
     },
     props: {
         viewMessage: {

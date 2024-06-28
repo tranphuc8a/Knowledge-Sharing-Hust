@@ -198,7 +198,7 @@ export default {
                     fa: 'trash-can',
                     style: { color: 'var(--red-color)'},
                     label: 'Xóa',
-                    onclick: async function(){ console.log("xóa"); }
+                    onclick: async function(){ }
                 }]
             }
         }

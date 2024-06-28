@@ -150,12 +150,13 @@ export default {
                 });
                 if (tempListPosts.length <= 0){
                     this.isOutOfPost = true;
-                    console.log("Out of posts");
+                    // console.log("Out of posts");
                 } else {
                     this.listPosts = this.listPosts.concat(tempListPosts);
                 }
 
             } catch (e){
+                this.isOutOfPost = true;
                 Request.resolveAxiosError(e);
             } finally {
                 this.isLoadingMore = false;
@@ -164,7 +165,7 @@ export default {
 
         async refresh(){
             try {
-                console.log("Refresh");
+                // console.log("Refresh");
                 this.isLoaded = false;
                 this.isMySelf = await this.getIsMySelf();
                 this.currentUser = await CurrentUser.getInstance();
@@ -174,12 +175,30 @@ export default {
             } catch (e){
                 console.error(e);
             }
+        },
+
+        async resolveDeletedPost(postId){
+            try {
+                let index = this.listPosts.findIndex(function(post){
+                    return post.UserItemId == postId;
+                });
+                if (index >= 0){
+                    this.listPosts.splice(index, 1);
+                }
+            } catch (e){
+                console.error(e);
+            }
         }
     },
     inject: {
         getUser: {},
         getIsMySelf: {},
         registerScrollHandler: {},
+    },
+    provide(){
+        return {
+            onPostDeleted: this.resolveDeletedPost,
+        }
     }
 }
 

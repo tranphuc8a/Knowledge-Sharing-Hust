@@ -17,6 +17,6 @@ namespace KnowledgeSharingApi.Domains.Models.ApiResponseModels
         public double? AverageStars { get; set; }
         public double? MyStars { get; set; }
         public int TotalStars { get; set; }
-        public List<Category> Categories { get; set; } = [];
+        public List<string> Categories { get; set; } = [];
     }
 }

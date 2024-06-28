@@ -19,14 +19,14 @@
                         ></textarea>
                 </div>
                 <div class="p-preview-frame" v-show="editorViewMode != editorViewModeEnums.Normal">
-                    <LatexMarkdownRender :markdownContent="dText" />
+                    <LightLatexMarkdownRender :markdownContent="dText" />
                 </div>
             </div>
         </div>
-        <SelectImagePopup  
+        <!-- <SelectImagePopup  
             ref="selectImagePopup"
             :on-okay="insertImage"
-        />
+        /> -->
     </div>
 
 </template>
@@ -36,11 +36,11 @@
 
 import MarkdownEditorToolbar from './MarkdownEditorToolbar.vue';
 import { myEnum } from '@/js/resources/enum';
-import LatexMarkdownRender from '@/components/base/markdown/LatexMarkdownRender.vue';
+import LightLatexMarkdownRender from '@/components/base/markdown/LightLatexMarkdownRender.vue';
 import markdownSyntax from '@/js/resources/markdown/markdown-syntax';
 import { Validator } from '@/js/utils/validator';
 import Debounce from '@/js/utils/debounce';
-import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
+// import SelectImagePopup from '@/components/base/popup/select-image-popup/SelectImagePopup.vue';
 
 class EditorState{
     constructor(content, cursorPointer){
@@ -92,7 +92,8 @@ class EditorHistory{
 export default {
     name: 'MarkdownEditor',
     components: {
-        MarkdownEditorToolbar, LatexMarkdownRender, SelectImagePopup
+        MarkdownEditorToolbar, LightLatexMarkdownRender, 
+        // SelectImagePopup
     },
     data() {
         return {
@@ -232,7 +233,8 @@ export default {
 
         async resolveSelectImage(){
             try {
-                this.$refs['selectImagePopup'].show();
+                // this.$refs['selectImagePopup'].show();
+                this.getSelectImagePopup().show(this.insertImage.bind(this));
             } catch (e) {
                 console.error(e);
             }
@@ -256,7 +258,8 @@ export default {
             } catch (e) {
                 console.error(e);
             } finally {
-                this.$refs['selectImagePopup']?.hide?.();
+                // this.$refs['selectImagePopup']?.hide?.();
+                this.getSelectImagePopup()?.hide?.();
             }
         },
 
@@ -345,6 +348,9 @@ export default {
             getEditorViewMode: () => this.editorViewMode,
             changeEditorViewMode: this.changeEditorViewMode,
         }
+    },
+    inject: {
+        getSelectImagePopup: {}
     }
 }
 

@@ -4,6 +4,7 @@
     <div class="p-search-post-by-category-content">
         <PostSubpage
             :getPost="getPostCallback"
+            :isViewComment="false"
         />
     </div>
 </template>

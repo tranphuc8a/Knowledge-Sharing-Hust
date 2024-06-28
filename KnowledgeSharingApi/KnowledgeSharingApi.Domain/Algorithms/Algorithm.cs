@@ -1,28 +1,21 @@
 ﻿using KnowledgeSharingApi.Domains.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-
 namespace KnowledgeSharingApi.Domains.Algorithms
 {
     public static class Algorithm
     {
         //private static readonly string[] separator = [" ", ",", ".", ";", "!", ":", "?"];
-        private static char[] separator = [' ', '\t', '\n', '\r', ',', '.', ';', '!', '?'];
+        private static readonly char[] separator = [' ', '\t', '\n', '\r', ',', '.', ';', '!', '?'];
+        private const int MAX_WORD_LENGTH = 20;
+        private const int MAX_SENTENCE_LENGTH = 100;
 
-        public static bool IsPermutation<T>(List<T> A, List<T> B)
+        public static bool IsPermutation<T>(List<T> A, List<T> B) where T : notnull
         {
             // Kiểm tra xem hai List có cùng độ dài không
             if (A.Count != B.Count)
                 return false;
 
             // Tạo một Dictionary để đếm số lần xuất hiện của từng phần tử trong List B
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             Dictionary<T, int> count = [];
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             foreach (var item in B)
             {
                 if (count.TryGetValue(item, out int value))
@@ -200,13 +193,12 @@ namespace KnowledgeSharingApi.Domains.Algorithms
 
             var mapGram = new Dictionary<string, int>();
             var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries).ToList();
-            int maxLengthSentences = 200;
-            if (words.Count > 200) words = words[..maxLengthSentences];
+            if (words.Count > MAX_SENTENCE_LENGTH) words = words[..MAX_SENTENCE_LENGTH];
 
             foreach (var word in words)
             {
-                // If word is longer than 100 characters, trim it
-                var processedWord = word.Length > 100 ? word[..100] : word;
+                // If word is longer than MAX_WORD_LENGTH characters, trim it
+                var processedWord = word.Length > MAX_WORD_LENGTH ? word[..MAX_WORD_LENGTH] : word;
 
                 int wordLength = processedWord.Length;
                 for (int l = 1; l <= wordLength; l++)
@@ -229,6 +221,36 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             return mapGram;
         }
 
+        private static Dictionary<string, int> GetMapGramCharacterPattern(string text, Dictionary<string, int> patternMapGram)
+        {
+            if (string.IsNullOrEmpty(text)) return [];
+
+            var mapGram = new Dictionary<string, int>();
+            var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var word in words)
+            {
+                var wordLength = word.Length;
+                for (var startIndex = 0; startIndex < wordLength; startIndex++)
+                {
+                    var maxLength = wordLength - startIndex;
+                    for (var l = 1; l <= maxLength; l++)
+                    {
+                        var gram = word.Substring(startIndex, l);
+                        if (string.IsNullOrWhiteSpace(gram))
+                            continue;
+                        if (!patternMapGram.TryGetValue(gram, out var value) || value == 0)
+                            break;
+                        if (!mapGram.TryGetValue(gram, out int value2))
+                            mapGram[gram] = 1;
+                        else
+                            mapGram[gram] = ++value2;
+                    }
+                }
+            }
+            return mapGram;
+        }
+
         private static Dictionary<string, int> GetMapGramWord(string text)
         {
             if (string.IsNullOrWhiteSpace(text)) return [];
@@ -236,9 +258,8 @@ namespace KnowledgeSharingApi.Domains.Algorithms
             var mapGram = new Dictionary<string, int>();
             List<string> words = [.. text.Split(separator, StringSplitOptions.RemoveEmptyEntries)];
 
-            int maxWords = 100; // only focus first 100 words of text
-            if (words.Count > maxWords)
-                words = words.Take(maxWords).ToList();
+            if (words.Count > MAX_SENTENCE_LENGTH)
+                words = words.Take(MAX_SENTENCE_LENGTH).ToList();
 
             int sentenceLength = words.Count;
 
@@ -259,6 +280,34 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                 }
             }
 
+            return mapGram;
+        }
+
+        private static Dictionary<string, int> GetMapGramWordPattern(string text, Dictionary<string, int> patternMapGram)
+        {
+            if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text)) return [];
+
+            var mapGram = new Dictionary<string, int>();
+            var words = text.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+            var sentenceLength = words.Length;
+
+            for (var startIndex = 0; startIndex < sentenceLength; startIndex++)
+            {
+                var maxLength = sentenceLength - startIndex;
+                for (var l = 1; l <= maxLength; l++)
+                {
+                    var gram = string.Join(" ", words, startIndex, l);
+                    if (string.IsNullOrWhiteSpace(gram))
+                        continue;
+                    if (!patternMapGram.TryGetValue(gram, out var value) || value == 0)
+                        break;
+                    if (!mapGram.TryGetValue(gram, out _))
+                        mapGram[gram] = 1;
+                    else
+                        mapGram[gram] = ++value;
+                }
+            }
             return mapGram;
         }
 
@@ -319,7 +368,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                 // calculate n-gram of each text in listText
                 foreach (var text in listText)
                 {
-                    Dictionary<string, int> mapGramOfStringB = GetMapGramCharacter(Unicode.RemoveVietnameseTone(text).ToLower());
+                    Dictionary<string, int> mapGramOfStringB = GetMapGramCharacterPattern(Unicode.RemoveVietnameseTone(text).ToLower(), mapGramOfStringA);
                     double score = 0;
                     foreach (var gram in mapGramOfStringA)
                     {
@@ -400,7 +449,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                 // calculate n-gram of each text in listText
                 foreach (var text in listText)
                 {
-                    Dictionary<string, int> mapGramOfStringB = GetMapGramWord(Unicode.RemoveVietnameseTone(text).ToLower());
+                    Dictionary<string, int> mapGramOfStringB = GetMapGramWordPattern(Unicode.RemoveVietnameseTone(text).ToLower(), mapGramOfStringA);
                     double score = 0;
                     foreach (var gram in mapGramOfStringA)
                     {
@@ -409,7 +458,7 @@ namespace KnowledgeSharingApi.Domains.Algorithms
                             int countInA = gram.Value;
                             int countInB = value;
                             int gramLength = gram.Key.Length;
-                            double addScore = countInA * countInB * gramLength * gramLength / 1e2;
+                            double addScore = countInA * countInB * gramLength * gramLength / 2e2;
                             score += addScore;
                         }
                     }

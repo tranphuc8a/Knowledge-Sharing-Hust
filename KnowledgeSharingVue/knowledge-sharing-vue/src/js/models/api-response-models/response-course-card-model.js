@@ -11,8 +11,8 @@ class ResponseCourseCardModel extends Entity{
         this.Fee = null;
         this.IsFree = null;
         this.Privacy = null;
-        this.Introduction = null;
-        this.EstimateTimeInMinutes = null;
+        // this.Introduction = null;
+        // this.EstimateTimeInMinutes = null;
 
         this.CourseRoleType = null;
         this.CourseRelationId = null;

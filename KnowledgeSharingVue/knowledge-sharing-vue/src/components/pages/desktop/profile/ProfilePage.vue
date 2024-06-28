@@ -42,7 +42,7 @@ import DesktopHomeFrame from '../home/DesktopHomeFrame.vue';
 import ProfilePanel from './components/profile-panel/ProfilePanel.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { GetRequest, Request } from '@/js/services/request';
-import ViewUser from '@/js/models/views/view-user';
+import ViewUserProfile from '@/js/models/views/view-user-profile';
 import { Validator } from '@/js/utils/validator';
 import Debounce from '@/js/utils/debounce';
 
@@ -131,7 +131,7 @@ export default {
                     .execute();
                 let body = await Request.tryGetBody(res);
 
-                this.user = new ViewUser().copy(body);
+                this.user = new ViewUserProfile().copy(body);
                 this.isUserExisted = true;
                 this.forceRender();
             } catch (error) {
@@ -182,12 +182,12 @@ export default {
                 let body = await Request.tryGetBody(res);
                 this.user = null;
                 this.isLoaded = false;
-                this.user = new ViewUser().copy(body);
+                this.user = new ViewUserProfile().copy(body);
                 let that = this;
                 this.$nextTick(() => {
                     that.isLoaded = true;
                 });
-                // this.isUserExisted = true;
+                this.isUserExisted = true;
             } catch (error){
                 try {
                     Request.resolveAxiosError(error);

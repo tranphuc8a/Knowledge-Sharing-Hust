@@ -51,12 +51,6 @@ export default {
                             value = Number(value);
                         }
                     }
-                    if (key == "Categories"){
-                        let categories = value?.map(function(item){
-                            return item.CategoryName;
-                        }) ?? [];
-                        value = categories;
-                    }
                     await this.components[key].setValue?.(value);
                 }
             } catch (error){

@@ -55,7 +55,8 @@ export default {
                 Notification: 12,
                 Block: 13,
                 Invitation: 14,
-                Account: 15
+                Account: 15,
+                Administrator: 16,
             },
             mainItems: [],
             moreItems: [],
@@ -80,27 +81,30 @@ export default {
                 // let index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
                 let name = ["Feed", "Learn", "Lesson", "Question", "Course", "Save", 
                             "Star", "Friend", "Comment", "Payment", "Image", "Message", 
-                            "Notification", "Block", "Invitation", "Account"];
+                            "Notification", "Block", "Invitation", "Account", "Administrator"];
                 
                 let key = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
                             'star', 'friend', 'comment', 'payment', 'image', 'message', 
-                            'notification', 'block', 'invitation', 'account'];
+                            'notification', 'block', 'invitation', 'account', 'administrator'];
                 
                 let label = ['Bài viết', 'Học tập', 'Bài học', 'Thảo luận', 'Khóa học', 'Lưu', 
                             'Đánh giá', 'Bạn bè', 'Bình luận', 'Thanh toán', 'Hình ảnh', 'Tin nhắn', 
-                            'Thông báo', 'Chặn', 'Lời mời', 'Tài khoản'];
+                            'Thông báo', 'Chặn', 'Lời mời', 'Tài khoản', 'Quản trị viên'];
                 
                 let link = ['feed', 'learn', 'lesson', 'question', 'course', 'save', 
                             'star', 'friend', 'comment', 'payment', 'image', 'message', 
-                            'notification', 'friend/blocker', 'invitation', 'account'];
+                            'notification', 'friend/blocker', 'invitation', 'account', '/administrator/user?filter='];
                 
-                let totalItems = 16;
+                let totalItems = name.length;
                 for (let i = 0; i < totalItems; i++){
                     this.itemEnum[name[i]] = name[i];
                     this.items[name[i]] = {
                         key: key[i],
                         label: label[i],
                         link: `/profile/${username}/${link[i]}`
+                    }
+                    if (name[i] == "Administrator"){
+                        this.items[name[i]].link = link[i] + username;
                     }
                 }
             } catch (e) {
@@ -133,7 +137,8 @@ export default {
                         this.items.Message,
                         this.items.Notification,
                         this.items.Block,
-                        this.items.Account
+                        this.items.Account,
+                        this.items.Administrator
                     ];
                 } else {
                     this.mainItems = [
@@ -148,7 +153,8 @@ export default {
                         this.items.Lesson,
                         this.items.Question,
                         this.items.Course,
-                        this.items.Friend
+                        this.items.Friend,
+                        this.items.Administrator,
                     ];
                 }
             } catch (e) {

@@ -185,7 +185,7 @@ export default {
                 if (this.isOutOfLesson || this.isLoadingMore || !(this.dIsShow === true)){
                     return;
                 }
-                console.log("scroll handle");
+                // console.log("scroll handle");
 
                 let scrollHeight = scrollContainer.scrollHeight;
                 let scrollTop = scrollContainer.scrollTop;
@@ -300,7 +300,7 @@ export default {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    min-width: 600px;
+    min-width: max(600px, 50vw);
     max-width: 100%;
     width: 100%;
     height: 600px;

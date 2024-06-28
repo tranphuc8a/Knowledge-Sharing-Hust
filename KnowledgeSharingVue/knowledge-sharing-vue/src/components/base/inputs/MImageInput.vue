@@ -81,13 +81,13 @@ export default {
     methods: {
         ...input.methods,
 
-        handleFileInput(e){
-            console.log(e.target.files)
+        handleFileInput(){
+            // console.log(e.target.files)
         },
 
         async resolveOnChange(){
             try {
-                console.log("change data");
+                // console.log("change data");
                 let file = this.components.input.files[0];
                 this.data.file = file;
                 let that = this;
@@ -136,7 +136,8 @@ label{
     height: fit-content;
 }
 
-.p-image-input{
+.p-input .p-image-input{
+    margin-top: 16px;
     width: 100px;
     height: 100px;
     display: flex;

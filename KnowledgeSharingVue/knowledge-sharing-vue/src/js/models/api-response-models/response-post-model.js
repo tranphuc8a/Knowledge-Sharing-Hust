@@ -1,7 +1,7 @@
 
 import ViewPost from '../view-models/view-post-model';
 import ResponseCommentModel from './response-comment-model';
-import Category from '../entities/category';
+// import Category from '../entities/category';
 
 class ResponsePostModel extends ViewPost {
     constructor() {
@@ -26,13 +26,6 @@ class ResponsePostModel extends ViewPost {
                 let comm = new ResponseCommentModel();
                 comm.copy(com);
                 return comm;
-            });
-        }
-        if (this.Categories?.length > 0){
-            this.Categories = this.Categories.map(function(cat){
-                let cate = new Category();
-                cate.copy(cat);
-                return cate;
             });
         }
         return this;

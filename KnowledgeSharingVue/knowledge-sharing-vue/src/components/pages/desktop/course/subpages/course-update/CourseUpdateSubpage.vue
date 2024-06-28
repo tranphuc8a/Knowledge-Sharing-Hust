@@ -144,7 +144,7 @@
 
 
 <script>
-/* global grecaptcha */
+// /* global grecaptcha */
 import MSecondaryButton from './../../../../../base/buttons/MSecondaryButton.vue';
 import MButton from './../../../../../base/buttons/MButton.vue'
 import { myEnum } from '@/js/resources/enum';
@@ -366,11 +366,6 @@ export default {
         },
 
         async resolveOnClickCaptcha(){
-            try {
-                console.log(grecaptcha.getResponse());
-            } catch (error) {
-                console.error(error);
-            }
         },
 
         resolveClickDeleteLesson(index){

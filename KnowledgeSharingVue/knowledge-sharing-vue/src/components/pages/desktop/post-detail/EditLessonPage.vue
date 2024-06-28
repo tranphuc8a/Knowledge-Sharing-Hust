@@ -43,8 +43,9 @@
 
                 <div class="p-row">
                     <div class="p-input-category">
-                        <CategoryInput :label="'Nhập category'" 
+                        <CategoryInput :label="'Chọn danh mục'" 
                             ref="category" :validator="validators.category"
+                            :is-show-title="true" :is-show-error="true" :is-obligate="false"
                         />
                     </div>
 
@@ -258,11 +259,11 @@ export default {
                 let estimateTimeInMinutes = await this.$refs.estimate.getValue();
                 let content = await this.$refs.content.getValue();
                 let lesson = {
-                    Textitle: title,
+                    Title: title,
                     Abstract: abstract,
                     Thumbnail: thumbnail,
                     Categories: categories,
-                    PositiveNumberValidatorrivacy: privacy,
+                    Privacy: privacy,
                     EstimateTimeInMinutes: estimateTimeInMinutes,
                     Content: content
                 }
@@ -284,7 +285,7 @@ export default {
                     this.inputs.title.setValue(lesson.Title);
                     this.inputs.abstract.setValue(lesson.Abstract);
                     this.inputs.thumbnail.setValue(lesson.Thumbnail);
-                    this.inputs.category.setValue(lesson.Categories.map(cat => cat.CategoryName));
+                    this.inputs.category.setValue(lesson.Categories);
                     this.inputs.privacy.setValue(lesson.Privacy);
                     this.inputs.estimate.setValue(lesson.EstimateTimeInMinutes);
                     this.inputs.content.setValue(lesson.Content);
