@@ -167,6 +167,14 @@ namespace KnowledgeSharingApi.Services.Interfaces.UserIteractions
         Task<ServiceResult> AdminUnblockUser(Guid uid);
 
         /// <summary>
+        /// Promote an user to become an admin
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (28/6/24)
+        /// Modified: None
+        Task<ServiceResult> PromoteToAdmin(Guid uid);
+
+        /// <summary>
         /// Admin xóa một user
         /// </summary>
         /// <returns></returns>

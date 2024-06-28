@@ -214,5 +214,13 @@ namespace KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIte
         /// Created: PhucTV (10/4/24)
         /// Modified: None
         Task<Guid?> RegisterUser(Guid userId, User user, string password, string fullName, string? avatar = null);
+
+        /// <summary>
+        /// Promote an user to become an admin
+        /// </summary>
+        /// <returns></returns>
+        /// Created: PhucTV (28/6/24)
+        /// Modified: None
+        Task PromoteToAdmin(Guid uid);
     }
 }

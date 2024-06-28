@@ -249,5 +249,12 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             // Tam thoi chua cho xoa user
             return Task.FromResult(0);
         }
+
+        public virtual async Task PromoteToAdmin(Guid uid)
+        {
+            User u = await DbContext.Users.FindAsync(uid) ?? throw new Exception("User not found");
+            u.Role = UserRoles.Admin;
+            await DbContext.SaveChangesAsync();
+        }
     }
 }

@@ -202,6 +202,20 @@ namespace KnowledgeSharingApi.Services.Services.UserIterations
             );
         }
 
+        public virtual async Task<ServiceResult> PromoteToAdmin(Guid uid)
+        {
+            User u = await UserRepository.CheckExisted(uid, ResponseResource.NotExistUser());
+
+            if (u.Role == UserRoles.Banned)
+                return ServiceResult.BadRequest("Người dùng đang bị khóa tài khoản");
+            if (u.Role == UserRoles.Admin)
+                return ServiceResult.BadRequest("Người dùng đang là quản trị viên rồi");
+
+            await UserRepository.PromoteToAdmin(uid);
+            return ServiceResult.Success(ResponseResource.Success());
+        }
+
+
         public virtual async Task<ServiceResult> AdminUpdateUserInfo(Guid uid, UpdateUserModel model)
         {
             // Kiểm tra uid phải tồn tại trong cơ sở dữ liệu

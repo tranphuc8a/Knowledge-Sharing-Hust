@@ -282,6 +282,22 @@ namespace KnowledgeSharingApi.Controllers.UserIteractions
 
 
         /// <summary>
+        /// Xử lý yêu cầu khóa một tài khoản của quản trị viên
+        /// </summary>
+        /// <param name="uid"> userid của tài khoản duoc promoted </param>
+        /// <returns></returns>
+        /// Created: PhucTV (17/3/24)
+        /// Modified: None
+        [HttpPost("admin/promote-admin/{uid}")]
+        [CustomAuthorization(Roles: "Admin")]
+        public virtual async Task<IActionResult> AdminPromoteUserToAdmin(Guid uid)
+        {
+            ServiceResult service = await UserService.PromoteToAdmin(uid);
+            return StatusCode(service);
+        }
+
+
+        /// <summary>
         /// Xử lý yêu cầu tìm kiếm tài khoản của quản trị viên
         /// </summary>
         /// <param name="searchKey"> Từ khóa tìm kiếm </param>
