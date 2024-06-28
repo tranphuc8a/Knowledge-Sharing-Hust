@@ -90,6 +90,7 @@ export default {
             getIsMyCourse: this.isMyCourse,
             registerScrollHandler: this.registerScrollHandler,
             refreshCoursePage: this.createPage,
+            onCourseDeleted: this.resolveDeletedCourse,
         }
     },
     methods: {
@@ -203,6 +204,10 @@ export default {
             } finally {
                 this.getLoadingPanel().hide();
             }
+        },
+
+        async resolveDeletedCourse(){
+            window.location.reload();
         }
     },
     watch: {
@@ -218,8 +223,8 @@ export default {
     },
     inject: {
         getPopupManager: {},
-        getLoadingPanel: {}
-    }
+        getLoadingPanel: {},
+    },
 }
 
 </script>

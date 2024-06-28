@@ -34,7 +34,9 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             using var transaction = await DbContext.BeginTransaction();
             try
             {
-                new DeleteCourseQuery().Execute(DbContext, courseId);
+                Course? course = await DbContext.Courses.FindAsync(courseId);
+                if (course == null) return 0;
+                DbContext.Courses.Remove(course);
 
                 int effectRows = await DbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -43,7 +45,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             catch (Exception)
             {
                 await transaction.RollbackAsync();
-                throw;
+                return 0;
             }
         }
 

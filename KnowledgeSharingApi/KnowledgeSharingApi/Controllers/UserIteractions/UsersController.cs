@@ -3,16 +3,11 @@ using KnowledgeSharingApi.Domains.Interfaces.ResourcesInterfaces;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels;
 using KnowledgeSharingApi.Domains.Models.ApiRequestModels.UserProfileModels;
 using KnowledgeSharingApi.Domains.Models.Dtos;
-using KnowledgeSharingApi.Domains.Models.Entities;
 using KnowledgeSharingApi.Infrastructures.Encrypts;
-using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories;
 using KnowledgeSharingApi.Services.Filters;
 using KnowledgeSharingApi.Services.Interfaces.UserIteractions;
-using KnowledgeSharingApi.Services.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
 using System.Security.Claims;
 
 namespace KnowledgeSharingApi.Controllers.UserIteractions

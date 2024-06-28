@@ -341,7 +341,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
         public virtual async Task<ServiceResult> UserDeleteCourse(Guid myUid, Guid courseId)
         {
             // Check course existed and owner
-            ViewCourse course = await CourseRepository.CheckExistedCourse(courseId, NotExistedCourse);
+            Course course = await CourseRepository.CheckExisted(courseId, NotExistedCourse);
             if (course.UserId != myUid)
                 return ServiceResult.Forbidden("Đây không phải khóa học của bạn");
 
@@ -375,6 +375,10 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
             Course courseToUpdate = new();
             courseToUpdate.Copy(course);
             courseToUpdate.Copy(model);
+            if (model.Fee > 0)
+            {
+                courseToUpdate.IsFree = false;
+            }
             courseToUpdate.ModifiedTime = DateTime.UtcNow;
             courseToUpdate.ModifiedBy = myUid.ToString();
             if (thumbnail != null) courseToUpdate.Thumbnail = thumbnail;

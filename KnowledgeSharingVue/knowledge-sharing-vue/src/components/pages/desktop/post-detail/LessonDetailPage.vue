@@ -86,7 +86,9 @@ export default {
 
     },
     methods: {
-
+        async resolveDeletedLesson() {
+            location.reload();
+        }
     },
     props: {
 
@@ -96,6 +98,11 @@ export default {
         getToastManager: {},
         getPopupManager: {},
         getLoadingPanel: {}
+    },
+    provide(){
+        return {
+            onPostDeleted: this.resolveDeletedLesson,
+        }
     }
 }
 </script>

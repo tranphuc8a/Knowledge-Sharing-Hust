@@ -244,10 +244,13 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
         }
 
         // override delete user:
-        public override Task<int> Delete(Guid userId)
+        public override async Task<int> Delete(Guid userId)
         {
-            // Tam thoi chua cho xoa user
-            return Task.FromResult(0);
+            User? u = await DbContext.Users.FindAsync(userId);
+            if (u == null) return 0;
+
+            DbContext.Users.Remove(u);
+            return await DbContext.SaveChangesAsync();
         }
 
         public virtual async Task PromoteToAdmin(Guid uid)

@@ -99,7 +99,7 @@ namespace KnowledgeSharingApi.Services.Services.UserIterations
             if (res <= 0)
                 return ServiceResult.ServerError(ResponseResource.DeleteFailure(ResponseTableName));
 
-            return ServiceResult.ServerError(ResponseResource.DeleteSuccess(ResponseTableName));
+            return ServiceResult.Success(ResponseResource.DeleteSuccess(ResponseTableName));
         }
 
         public virtual async Task<ServiceResult> AdminGetUserProfile(string unOruid)

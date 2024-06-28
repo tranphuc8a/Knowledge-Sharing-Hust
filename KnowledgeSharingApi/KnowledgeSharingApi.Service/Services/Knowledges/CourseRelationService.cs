@@ -399,7 +399,7 @@ namespace KnowledgeSharingApi.Services.Services.Knowledges
                 return ServiceResult.Forbidden("Đây không phải yêu cầu của bạn");
 
             // OK Delete
-            int deleted = await CourseRegisterRepository.Delete(requestId);
+            int deleted = await CourseRelationRepository.Delete(requestId);
             if (deleted <= 0) return ServiceResult.ServerError(ResponseResource.DeleteFailure());
 
             // return Success
