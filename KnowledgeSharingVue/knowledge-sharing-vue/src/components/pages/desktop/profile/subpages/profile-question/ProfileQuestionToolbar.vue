@@ -86,7 +86,7 @@ export default {
     props: {
         onClickSearch: {
             type: Function,
-            default: async function(config){
+            default: async function(){
                 // console.log(config);
             }
         }

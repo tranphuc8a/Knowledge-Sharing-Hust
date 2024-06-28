@@ -1,7 +1,7 @@
 
 import ViewPost from '../view-models/view-post-model';
 import ResponseCommentModel from './response-comment-model';
-import Category from '../entities/category';
+// import Category from '../entities/category';
 
 class ResponsePostModel extends ViewPost {
     constructor() {
