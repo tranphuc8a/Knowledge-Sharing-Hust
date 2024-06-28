@@ -102,7 +102,7 @@ export default {
                     parsedParams[parts[0]] = parts[1];
                 });
                 this.params = parsedParams;
-                console.log(this.params);
+                // console.log(this.params);
                 return this.params;
             } catch (error) {
                 console.error(error);

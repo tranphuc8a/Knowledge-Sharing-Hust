@@ -176,7 +176,7 @@ export default {
                 });
                 if (tempListPosts.length < limit){
                     this.isOutOfPost = true;
-                    console.log("Out of posts");
+                    // console.log("Out of posts");
                 } 
                 
                 if (tempListPosts.length > 0){

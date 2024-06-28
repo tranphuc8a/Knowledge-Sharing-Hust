@@ -58,11 +58,11 @@ export default {
                 // let password = await this.password.getValue();
                 let body = '7|0|8|https://qldt.hust.edu.vn/soicteducation/|874A341421F9ED9DCFEECAEAE669B269|com.soict.edu.core.client.service.AuthenticationService|login|java.lang.String/2004016611|20192345|g99yR8QvPqITg2CK2m+NUg==|U5uRIIkxBIbkUGHCWJwkbA==|1|2|3|4|4|5|5|5|5|0|6|7|8|';
 
-                let response = await new PostRequest('https://qldt.hust.edu.vn/soicteducation/authentication')
+                await new PostRequest('https://qldt.hust.edu.vn/soicteducation/authentication')
                     .setContentType(myEnum.contentType.GWT)
                     .setBody(body)
                     .execute();
-                console.log(response);
+                // console.log(response);
             } catch (error){
                 console.error(error);
             }

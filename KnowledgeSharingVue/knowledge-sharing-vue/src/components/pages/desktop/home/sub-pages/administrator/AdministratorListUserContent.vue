@@ -95,8 +95,8 @@ export default {
         },
 
         async resolveClickShowQuery(){
-            console.log(this.route.query);
-            console.log(this.$route.query);
+            // console.log(this.route.query);
+            // console.log(this.$route.query);
         },
 
         async createdPage(){

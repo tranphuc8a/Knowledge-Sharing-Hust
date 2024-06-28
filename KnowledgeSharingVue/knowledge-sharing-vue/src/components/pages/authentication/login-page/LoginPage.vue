@@ -184,7 +184,7 @@ export default {
                 if (this.button?.resolveOnclick){
                     await this.button.resolveOnclick();
                 } else {
-                    console.log(this.button);
+                    // console.log(this.button);
                 }
             } catch (error){
                 console.error(error);

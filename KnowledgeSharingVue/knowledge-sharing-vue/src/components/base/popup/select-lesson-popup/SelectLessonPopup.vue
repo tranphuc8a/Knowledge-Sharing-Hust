@@ -185,7 +185,7 @@ export default {
                 if (this.isOutOfLesson || this.isLoadingMore || !(this.dIsShow === true)){
                     return;
                 }
-                console.log("scroll handle");
+                // console.log("scroll handle");
 
                 let scrollHeight = scrollContainer.scrollHeight;
                 let scrollTop = scrollContainer.scrollTop;

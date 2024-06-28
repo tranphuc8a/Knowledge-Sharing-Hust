@@ -150,7 +150,7 @@ export default {
                 });
                 if (tempListPosts.length <= 0){
                     this.isOutOfPost = true;
-                    console.log("Out of posts");
+                    // console.log("Out of posts");
                 } else {
                     this.listPosts = this.listPosts.concat(tempListPosts);
                 }
@@ -165,7 +165,7 @@ export default {
 
         async refresh(){
             try {
-                console.log("Refresh");
+                // console.log("Refresh");
                 this.isLoaded = false;
                 this.isMySelf = await this.getIsMySelf();
                 this.currentUser = await CurrentUser.getInstance();

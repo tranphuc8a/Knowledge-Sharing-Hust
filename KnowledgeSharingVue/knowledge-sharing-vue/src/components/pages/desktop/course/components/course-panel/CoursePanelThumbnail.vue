@@ -71,11 +71,6 @@ export default {
     },
     methods: {
         async resolveClickButton(){
-            try {
-                console.log("click edit course thumbnail button");
-            } catch (e) {
-                console.error(e);
-            }
         },
 
         async resolveClickThumbnail(){

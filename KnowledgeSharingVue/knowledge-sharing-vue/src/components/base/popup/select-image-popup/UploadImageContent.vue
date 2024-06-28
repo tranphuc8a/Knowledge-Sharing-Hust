@@ -57,7 +57,7 @@ export default {
     },
     methods: {
         resolveResponse(response){
-            console.log(response);
+            // console.log(response);
             this.response = response;
         },
 

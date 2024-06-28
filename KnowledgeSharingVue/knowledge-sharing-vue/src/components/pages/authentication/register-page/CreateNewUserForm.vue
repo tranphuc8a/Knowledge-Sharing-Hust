@@ -284,8 +284,8 @@ export default {
     props: {
         registerUserCallback: {
             type: Function,
-            default: async function(username, password){
-                console.log("Call registerUserCallback: ", username, password);
+            default: async function(){
+                // console.log("Call registerUserCallback: ", username, password);
             }
         }
     }

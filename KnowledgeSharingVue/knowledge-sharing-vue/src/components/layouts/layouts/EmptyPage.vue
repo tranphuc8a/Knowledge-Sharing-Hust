@@ -58,10 +58,10 @@ export default {
             try {
                 if (lang === this.languageEnum.VIETNAMESE && this.getLanguage() !== language['vi']){
                     this.inject.language = language['vi'];
-                    console.log("Change language to " + 'vi');
+                    // console.log("Change language to " + 'vi');
                 } else if (lang === this.languageEnum.ENGLISH){
                     this.inject.language = language['en'];
-                    console.log("Change language to " + 'en');
+                    // console.log("Change language to " + 'en');
                 }
             } catch (error){
                 console.error(error);

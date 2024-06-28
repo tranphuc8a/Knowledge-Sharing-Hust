@@ -81,13 +81,13 @@ export default {
     methods: {
         ...input.methods,
 
-        handleFileInput(e){
-            console.log(e.target.files)
+        handleFileInput(){
+            // console.log(e.target.files)
         },
 
         async resolveOnChange(){
             try {
-                console.log("change data");
+                // console.log("change data");
                 let file = this.components.input.files[0];
                 this.data.file = file;
                 let that = this;

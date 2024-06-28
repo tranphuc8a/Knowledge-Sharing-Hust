@@ -68,7 +68,7 @@ export default {
                 if (currentUser?.Role == null) return false;
                 return currentUser.Role == myEnum.EUserRole.Admin;
             } catch (e){
-                console.log(e);
+                console.error(e);
                 return false;
             }
         }

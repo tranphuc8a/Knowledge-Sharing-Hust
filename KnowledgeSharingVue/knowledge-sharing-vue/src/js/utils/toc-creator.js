@@ -45,7 +45,7 @@ class TocCreator{
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlString, 'text/html');
             const headers = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
-            console.log(headers);
+            // console.log(headers);
             let tocStack = [{
                 level: 0,
                 title: 'Table of Contents',

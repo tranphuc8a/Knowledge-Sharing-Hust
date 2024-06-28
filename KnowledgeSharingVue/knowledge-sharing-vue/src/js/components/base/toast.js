@@ -57,19 +57,19 @@ let toast = {
         onClose: {
             type: Function,
             default: async function(){
-                console.log("Close Toast");
+                // console.log("Close Toast");
             }
         },
         onUndo: {
             type: Function,
             default: async function(){
-                console.log("Undo Toast");
+                // console.log("Undo Toast");
             }
         },
         onHelp: {
             type: Function,
             default: async function(){
-                console.log("Help Toast");
+                // console.log("Help Toast");
             }
         }
     },

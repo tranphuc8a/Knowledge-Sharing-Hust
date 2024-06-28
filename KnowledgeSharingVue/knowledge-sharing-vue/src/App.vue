@@ -82,10 +82,10 @@ export default {
             try {
                 if (lang === this.languageEnum.VIETNAMESE){
                     this.globalData.lang = language['vi'];
-                    console.log("Change language to " + 'vi');
+                    // console.log("Change language to " + 'vi');
                 } else if (lang === this.languageEnum.ENGLISH){
                     this.globalData.lang = language['en'];
-                    console.log("Change language to " + 'en');
+                    // console.log("Change language to " + 'en');
                 }
             } catch (error){
                 console.error(error);

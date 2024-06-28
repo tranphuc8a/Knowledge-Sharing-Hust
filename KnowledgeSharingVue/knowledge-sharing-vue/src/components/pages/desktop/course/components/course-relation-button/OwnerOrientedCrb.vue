@@ -138,21 +138,9 @@ export default {
         },
 
         async resolveOnEditCost(){
-            try {
-                console.log("Click Edit Course Cost");
-                // Create update cost popup
-            } catch (e){
-                console.error(e);
-            }
         },
 
         async resolveOnEditPrivacy(){
-            try {
-                console.log("Click Edit Course Privacy");
-                // Create update privacy popup
-            } catch (e){
-                console.error(e);
-            }
         },
 
         async resolveOnDelete(){

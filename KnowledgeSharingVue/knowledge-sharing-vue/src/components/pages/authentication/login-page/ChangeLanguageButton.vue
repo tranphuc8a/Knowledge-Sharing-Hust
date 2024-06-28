@@ -48,7 +48,7 @@ export default {
         this.getLabel();
     },
     updated() {
-        console.log("Is Update: " + this.isUpdate);
+        // console.log("Is Update: " + this.isUpdate);
     },
     methods: {
         /**

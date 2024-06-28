@@ -148,10 +148,10 @@ export default {
         async validate(){
             try {
                 let isValid = true;
-                console.log(this.inputs);
+                // console.log(this.inputs);
                 for (let key of this.keys) {
                     let input = this.inputs[key];
-                    console.log(input);
+                    // console.log(input);
                     if(! await input?.validate?.()){
                         isValid = false;
                         break;

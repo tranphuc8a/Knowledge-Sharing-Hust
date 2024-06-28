@@ -87,7 +87,7 @@ export default {
         onClickSearch: {
             type: Function,
             default: async function(config){
-                console.log(config);
+                // console.log(config);
             }
         }
     },
