@@ -87,7 +87,9 @@ let myEnum = {
     commentFilterType: {
         Best: 0,
         All: 1,
-        Recent: 2
+        Recent: 2,
+        Newest: 3,
+        Oldest: 4,
     },
 
     editorViewMode: {

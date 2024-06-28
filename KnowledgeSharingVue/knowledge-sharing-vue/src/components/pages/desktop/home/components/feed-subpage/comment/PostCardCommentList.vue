@@ -127,28 +127,31 @@ export default {
                 this.listPostedComment = [];
 
                 this.isLoaded = false;
-                let url = null;
                 let postId = this.getPost()?.UserItemId;
                 if (postId == null){
                     return;
                 }
+                let url = 'Comments/anonymous/' + postId;
                 let orderString = "";
+
                 if (this.order == myEnum.commentFilterType.Best){
                     // api for best comments
-                    if (this.currentUser == null){
-                        url = 'Comments/anonymous/' + postId;
-                    } else {
-                        url = 'Comments/' + postId;
-                    }
                     orderString = 'TotalStar:desc,AverageStar:desc,TotalComment:desc';
+                } else if (this.order == myEnum.commentFilterType.Newest){
+                    // default api for top comments
+                    orderString = 'CreatedTime:desc';
+                } else if (this.order == myEnum.commentFilterType.Oldest){
+                    // default api for top comments
+                    orderString = 'CreatedTime:asc';
                 } else {
                     // default api for top comments
-                    if (this.currentUser == null){
-                        url = 'Comments/anonymous/' + postId;
-                    } else {
-                        url = 'Comments/' + postId;
-                    }
                     orderString = '';
+                }
+
+                if (this.currentUser == null){
+                    url = 'Comments/anonymous/' + postId;
+                } else {
+                    url = 'Comments/' + postId;
                 }
 
                 let pageSize = 3;
@@ -180,28 +183,30 @@ export default {
         async getMoreComments(){
             try {
                 let numComs = this.listComments.length;
-                let url = null;
                 let postId = this.getPost()?.UserItemId;
                 if (postId == null){
                     return;
                 }
+                let url = 'Comments/anonymous/' + postId;
                 let orderString = "";
                 if (this.order == myEnum.commentFilterType.Best){
                     // api for best comments
-                    if (this.currentUser == null){
-                        url = 'Comments/anonymous/' + postId;
-                    } else {
-                        url = 'Comments/' + postId;
-                    }
                     orderString = 'TotalStar:desc,AverageStar:desc,TotalComment:desc';
+                } else if (this.order == myEnum.commentFilterType.Newest){
+                    // default api for top comments
+                    orderString = 'CreatedTime:desc';
+                } else if (this.order == myEnum.commentFilterType.Oldest){
+                    // default api for top comments
+                    orderString = 'CreatedTime:asc';
                 } else {
                     // default api for top comments
-                    if (this.currentUser == null){
-                        url = 'Comments/anonymous/' + postId;
-                    } else {
-                        url = 'Comments/' + postId;
-                    }
                     orderString = '';
+                }
+
+                if (this.currentUser == null){
+                    url = 'Comments/anonymous/' + postId;
+                } else {
+                    url = 'Comments/' + postId;
                 }
                 
                 let res = await new GetRequest(url)

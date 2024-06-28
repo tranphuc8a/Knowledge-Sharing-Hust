@@ -43,8 +43,8 @@ export default{
             },
             listOptions: [
                 myEnum.commentFilterType.Best,
-                myEnum.commentFilterType.Recent,
-                myEnum.commentFilterType.All
+                myEnum.commentFilterType.Newest,
+                myEnum.commentFilterType.Oldest
             ],
             options: {
                 [myEnum.commentFilterType.Best]: {
@@ -61,7 +61,17 @@ export default{
                     label: 'Tất cả bình luận',
                     fa: 'list-ol',
                     onClick: this.resolveClickOption(myEnum.commentFilterType.All),
-                }
+                },
+                [myEnum.commentFilterType.Oldest]: {
+                    label: 'Cũ nhất',
+                    fa: 'history',
+                    onClick: this.resolveClickOption(myEnum.commentFilterType.Oldest),
+                },
+                [myEnum.commentFilterType.Newest]: {
+                    label: 'Mới nhất',
+                    fa: 'clock',
+                    onClick: this.resolveClickOption(myEnum.commentFilterType.Newest),
+                },
             }
         }
     },
