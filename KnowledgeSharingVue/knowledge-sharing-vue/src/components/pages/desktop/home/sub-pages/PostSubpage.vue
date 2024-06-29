@@ -180,6 +180,12 @@ export default {
                 } 
                 
                 if (tempListPosts.length > 0){
+                    let listLoadedIds = this.listPosts.map(function(post){
+                        return post.UserItemId;
+                    });
+                    tempListPosts = tempListPosts.filter(function(post){
+                        return !listLoadedIds.includes(post.UserItemId);
+                    });
                     this.listPosts = this.listPosts.concat(tempListPosts);
                 }
 

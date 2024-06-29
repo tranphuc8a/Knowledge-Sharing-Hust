@@ -143,6 +143,12 @@ export default {
                     return new ResponseCourseLessonModel().copy(item);
                 });
                 if (tempCourseLessonModels.length > 0){
+                    let listLoadedIds = this.listCourseLesson.map(function(item){
+                        return item.CourseLessonId;
+                    });
+                    tempCourseLessonModels = tempCourseLessonModels.filter(function(item){
+                        return !listLoadedIds.includes(item.CourseLessonId);
+                    });
                     this.listCourseLesson = this.listCourseLesson.concat(tempCourseLessonModels);
                 }
             } catch (error) {

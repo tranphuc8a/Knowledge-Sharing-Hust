@@ -209,6 +209,12 @@ export default {
                     return new ResponseUserCardModel().copy(item);
                 });
                 if (tempListUser.length > 0){
+                    let listLoadedIds = this.listUser.map(function(user){
+                        return user.UserId;
+                    });
+                    tempListUser = tempListUser.filter(function(user){
+                        return !listLoadedIds.includes(user.UserId);
+                    });
                     this.listUser = this.listUser.concat(tempListUser);
                 }
             } catch (e){

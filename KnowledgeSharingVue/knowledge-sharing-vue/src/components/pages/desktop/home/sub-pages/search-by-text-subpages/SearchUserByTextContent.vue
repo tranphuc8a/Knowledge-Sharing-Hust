@@ -142,6 +142,12 @@ export default {
                     let tempUsers = body.map(function(user){
                         return new ResponseUserCardModel().copy(user);
                     });
+                    let listLoadedIds = this.listUser.map(function(user){
+                        return user.UserId;
+                    });
+                    tempUsers = tempUsers.filter(function(user){
+                        return !listLoadedIds.includes(user.UserId);
+                    });
                     this.listUser = this.listUser.concat(tempUsers);
                 }
             } catch (e){

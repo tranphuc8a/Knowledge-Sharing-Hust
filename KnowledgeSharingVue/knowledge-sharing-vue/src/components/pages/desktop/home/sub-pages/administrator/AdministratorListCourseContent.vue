@@ -139,6 +139,12 @@ export default {
                     let tempCourses = body.map(function(tCourse){
                         return new ViewCourse().copy(tCourse);
                     });
+                    let listLoadedIds = this.listCourse.map(function(tCourse){
+                        return tCourse.UserItemId;
+                    });
+                    tempCourses = tempCourses.filter(function(tCourse){
+                        return !listLoadedIds.includes(tCourse.UserItemId);
+                    });
                     this.listCourse = this.listCourse.concat(tempCourses);
                 }
             } catch (e){

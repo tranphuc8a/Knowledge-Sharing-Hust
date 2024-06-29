@@ -231,6 +231,12 @@ export default {
                     this.isOutOfMember = true;
                 }
                 if (tempMembers.length > 0){
+                    let listLoadedIds = this.listMember.map(function(item){
+                        return item.UserId;
+                    });
+                    tempMembers = tempMembers.filter(function(item){
+                        return !listLoadedIds.includes(item.UserId);
+                    });
                     this.listMember = this.listMember.concat(tempMembers);
                 }
             } catch (e){

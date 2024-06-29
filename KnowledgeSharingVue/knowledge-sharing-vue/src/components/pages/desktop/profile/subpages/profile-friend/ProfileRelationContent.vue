@@ -161,6 +161,12 @@ export default {
                     this.isOutOfUser = true;
                 }
                 if (tempResponseUserModel.length > 0){
+                    let listLoadedIds = this.listUser.map(function(item){
+                        return item.UserId;
+                    });
+                    tempResponseUserModel = tempResponseUserModel.filter(function(item){
+                        return !listLoadedIds.includes(item.UserId);
+                    });
                     this.listUser = this.listUser.concat(tempResponseUserModel);
                 }
             } catch (e){
