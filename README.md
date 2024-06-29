@@ -17,7 +17,7 @@
 - **Cài đặt dependencies và chạy frontend:**
 ```
 npm install
-npm run serve
+npm run serve -- --port 8080
 ```  
 Frontend sẽ chạy trên địa chỉ [localhost:8080](http://localhost:8080)
 
@@ -27,7 +27,7 @@ Frontend sẽ chạy trên địa chỉ [localhost:8080](http://localhost:8080)
 - **Cài đặt dependencies và khởi động backend:**
 ```
 dotnet build
-dotnet run
+dotnet run --project KnowledgeSharingApi/KnowledgeSharingApi.csproj --urls=http://localhost:5000
 ```
 Backend sẽ chạy trên địa chỉ [localhost:5000](http://localhost:5000)
 
