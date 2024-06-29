@@ -152,6 +152,12 @@ export default {
                     this.isOutOfPost = true;
                     // console.log("Out of posts");
                 } else {
+                    let listLoadedPostIds = this.listPosts.map(function(post){
+                        return post.UserItemId;
+                    });
+                    tempListPosts = tempListPosts.filter(function(post){
+                        return !listLoadedPostIds.includes(post.UserItemId);
+                    });
                     this.listPosts = this.listPosts.concat(tempListPosts);
                 }
 

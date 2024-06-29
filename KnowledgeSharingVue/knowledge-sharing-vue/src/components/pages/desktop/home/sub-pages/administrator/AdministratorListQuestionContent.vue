@@ -140,6 +140,12 @@ export default {
                     let tempPosts = body.map(function(post){
                         return new ViewQuestion().copy(post);
                     });
+                    let listLoadedIds = this.listPost.map(function(post){
+                        return post.UserItemId;
+                    });
+                    tempPosts = tempPosts.filter(function(post){
+                        return !listLoadedIds.includes(post.UserItemId);
+                    });
                     this.listPost = this.listPost.concat(tempPosts);
                 }
             } catch (e){

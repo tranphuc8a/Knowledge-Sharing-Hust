@@ -146,6 +146,8 @@ export default {
                             return new ViewQuestion().copy(post);
                         }
                     });
+                    let listLoadedIds = this.listPost.map(post => post.UserItemId);
+                    tempPosts = tempPosts.filter(post => !listLoadedIds.includes(post.UserItemId));
                     this.listPost = this.listPost.concat(tempPosts);
                 }
             } catch (e){

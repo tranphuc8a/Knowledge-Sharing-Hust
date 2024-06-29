@@ -87,6 +87,12 @@ export default {
                     this.isOutOfMessage = true;
                 }
                 if (tempListMessage.length > 0){
+                    let listLoadedIds = this.listMessages.map(function(item){
+                        return item.MessageId;
+                    });
+                    tempListMessage = tempListMessage.filter(function(item){
+                        return !listLoadedIds.includes(item.MessageId);
+                    });
                     this.listMessages = this.listMessages.concat(tempListMessage);
                 }
 

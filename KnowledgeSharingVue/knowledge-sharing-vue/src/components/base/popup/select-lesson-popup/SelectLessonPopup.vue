@@ -246,6 +246,12 @@ export default {
                     return new ResponseLessonModel().copy(item);
                 });
                 if (tempListLesson.length > 0){
+                    let listLoadedIds = this.listLesson.map(function(item){
+                        return item.UserItemId;
+                    });
+                    tempListLesson = tempListLesson.filter(function(item){
+                        return !listLoadedIds.includes(item.UserItemId);
+                    });
                     this.listLesson = this.listLesson.concat(tempListLesson);
                 }
             } catch (e){

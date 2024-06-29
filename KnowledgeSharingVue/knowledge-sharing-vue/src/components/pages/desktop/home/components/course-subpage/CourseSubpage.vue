@@ -172,6 +172,12 @@ export default {
                 } 
                 
                 if (tempListCourses.length > 0){
+                    let listLoadedIds = this.listCourses.map(function(course){
+                        return course?.UserItemId;
+                    });
+                    tempListCourses = tempListCourses.filter(function(course){
+                        return !listLoadedIds.includes(course?.UserItemId);
+                    });
                     this.listCourses = this.listCourses.concat(tempListCourses);
                 }
 
