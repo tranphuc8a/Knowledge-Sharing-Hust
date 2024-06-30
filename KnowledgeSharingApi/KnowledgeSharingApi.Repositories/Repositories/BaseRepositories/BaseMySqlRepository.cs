@@ -45,7 +45,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.BaseRepositories
             NameField = $"{TableName}Name";
         }
 
-        //protected abstract DbSet<T> GetDbContext();
+        protected abstract DbSet<T> GetDbSet();
 
         #region Get Records
         public virtual async Task<List<T>> Get()
@@ -59,8 +59,23 @@ namespace KnowledgeSharingApi.Repositories.Repositories.BaseRepositories
             //DbSet<T> dbContext = GetDbContext();
             //int count = dbContext.Count();
             //List<T> listObjects = await dbContext.Skip(offset).Take(limit).ToListAsync();
-            string sqlCommand = $"Select * from {TableName} ";
-            PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, pagination: page);
+            //string sqlCommand = $"Select * from {TableName} ";
+            //PaginationResponseModel<T> res = await GetPagination<T>(sqlCommand, pagination: page);
+
+            DbSet<T> dbContext = GetDbSet();
+            IQueryable<T> query = dbContext;
+            if (page.Filters != null) query = ApplyFilter(query, page.Filters);
+            if (page.Orders != null) query = ApplyOrder(query, page.Orders);
+            int total = await query.CountAsync();
+            var results = await ApplyLimitOffset(query, page.Limit, page.Offset).ToListAsync();
+
+            PaginationResponseModel<T> res = new()
+            {
+                Total = total,
+                Limit = page.Limit,
+                Offset = page.Offset,
+                Results = results
+            };
 
             return res;
         }
@@ -189,15 +204,22 @@ namespace KnowledgeSharingApi.Repositories.Repositories.BaseRepositories
         public virtual async Task<PaginationResponseModel<T>> Filter(string text, PaginationDto pagination)
         {
             // Tạo truy vấn:
+            DbSet<T> dbSet = GetDbSet();
             string templateText = $"%{text}%";
-            string subCommand = $"Select * from {TableName} " +
-                                $"where {NameField} like @templateText or @text like CONCAT('%',{NameField},'%') ";
+            var query = dbSet.Where(entity => EF.Functions.Like(EF.Property<string>(entity, NameField), templateText) ||
+                                      EF.Functions.Like(text, $"%{EF.Property<string>(entity, NameField)}%"));
+            if (pagination.Filters != null) query = ApplyFilter(query, pagination.Filters);
+            if (pagination.Orders != null) query = ApplyOrder(query, pagination.Orders);
+            int total = await query.CountAsync();
+            query = ApplyLimitOffset(query, pagination.Limit, pagination.Offset);
 
-            PaginationResponseModel<T> res = await GetPagination<T>(
-                subCommand: subCommand,
-                pagination: pagination,
-                subCommandParameters: new { templateText }
-            );
+            PaginationResponseModel<T> res = new()
+            {
+                Total = total,
+                Limit = pagination.Limit,
+                Offset = pagination.Offset,
+                Results = await query.ToListAsync()
+            };
             return res;
         }
 
@@ -210,29 +232,29 @@ namespace KnowledgeSharingApi.Repositories.Repositories.BaseRepositories
         {
             this.Transaction = transaction;
         }
+
         protected virtual async Task<PaginationResponseModel<Q>> GetPagination<Q>(
-            string subCommand, 
+            string subCommand,
             PaginationDto pagination,
             object? subCommandParameters = null) where Q : Entity
         {
             DynamicParameters subParams = new(subCommandParameters);
 
+            // Lấy các điều kiện lọc, sắp xếp và phân trang
             string orderClause = GetOrderClause<Q>(pagination.Orders);
             string limsetClause = GetLimitOffsetClause(pagination.Limit, pagination.Offset, out DynamicParameters limsetParams);
             string whereClause = GetWhereClause<Q>(pagination.Filters, out DynamicParameters whereParams);
 
+            // Kết hợp tất cả các tham số
             DynamicParameters totalParams = CombineDynamicParameters(subParams, limsetParams, whereParams);
 
-            // Tạo quy vấn
-            string sqlCommand =
-                // for database with required primary key
-                /* $"SET sql_require_primary_key=OFF; " +  */
-                $"DROP TEMPORARY TABLE IF EXISTS temp_selected_records; " +
-                $"CREATE TEMPORARY TABLE temp_selected_records AS {subCommand}; " +
-                $"SELECT COUNT(*) AS record_count FROM temp_selected_records; " +
-                $"SELECT * FROM temp_selected_records {whereClause} {orderClause} {limsetClause}; " +
-                $"DROP TEMPORARY TABLE IF EXISTS temp_selected_records;";
+            // Tạo truy vấn
+            string countSubCommand = $"SELECT COUNT(*) FROM ({subCommand}) AS count_subquery {whereClause}";
+            string dataSubCommand = $"{subCommand} {whereClause} {orderClause} {limsetClause}";
 
+            string sqlCommand = $@"
+                {countSubCommand};
+                {dataSubCommand};";
 
             // Thực hiện truy vấn
             using var multipleResults = await Connection.QueryMultipleAsync(sqlCommand, totalParams, Transaction);

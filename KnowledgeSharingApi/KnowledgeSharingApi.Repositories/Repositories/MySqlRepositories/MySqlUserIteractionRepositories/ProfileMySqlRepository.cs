@@ -54,6 +54,11 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             return result.FirstOrDefaultAsync();
         }
 
+        protected override DbSet<Profile> GetDbSet()
+        {
+            return DbContext.Profiles;
+        }
+
         //public virtual Task<PaginationResponseModel<Profile>> Search(Guid uid, string searchKey, int? limit, int? offset)
         //{
         //    // Không bị blockee và blocked

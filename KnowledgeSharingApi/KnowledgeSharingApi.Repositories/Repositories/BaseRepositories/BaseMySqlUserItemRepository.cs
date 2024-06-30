@@ -25,7 +25,7 @@ namespace KnowledgeSharingApi.Repositories.Repositories.BaseRepositories
         /// <returns></returns>
         /// Created: PhucTV (26/3/24)
         /// Modified: None
-        protected abstract DbSet<T> GetDbSet();
+        //protected abstract DbSet<T> GetDbSet();
 
 
         #region Get 

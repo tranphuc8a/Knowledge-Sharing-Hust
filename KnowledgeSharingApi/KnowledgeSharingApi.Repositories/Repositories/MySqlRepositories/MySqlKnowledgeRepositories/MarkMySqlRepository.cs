@@ -28,5 +28,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
 
             return result;
         }
+
+        protected override DbSet<Mark> GetDbSet()
+        {
+            return DbContext.Marks;
+        }
     }
 }

@@ -133,5 +133,9 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
             }
         }
 
+        protected override DbSet<Category> GetDbSet()
+        {
+            return DbContext.Categories;
+        }
     }
 }

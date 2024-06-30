@@ -72,5 +72,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             notifications.ForEach(noti => noti.IsRead = true);
             return await DbContext.SaveChangesAsync();
         }
+
+        protected override DbSet<Notification> GetDbSet()
+        {
+            return DbContext.Notifications;
+        }
     }
 }
