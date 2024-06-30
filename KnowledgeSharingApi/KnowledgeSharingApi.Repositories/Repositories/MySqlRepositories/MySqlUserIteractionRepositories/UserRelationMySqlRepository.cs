@@ -376,6 +376,11 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             }
         }
 
+        protected override DbSet<UserRelation> GetDbSet()
+        {
+            return DbContext.UserRelations;
+        }
+
         #endregion
     }
 }

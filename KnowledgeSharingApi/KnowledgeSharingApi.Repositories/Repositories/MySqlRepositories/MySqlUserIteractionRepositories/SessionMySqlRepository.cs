@@ -3,6 +3,7 @@ using KnowledgeSharingApi.Domains.Models.Entities.Tables;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIteractionRepositories;
 using KnowledgeSharingApi.Repositories.Repositories.BaseRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,11 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
                                 $"UserId in (Select UserId from User where Username = @username); ";
             int rowEffect = await Connection.ExecuteAsync(sqlCommand, new { username }, Transaction);
             return rowEffect;
+        }
+
+        protected override DbSet<Session> GetDbSet()
+        {
+            return DbContext.Sessions;
         }
     }
 }

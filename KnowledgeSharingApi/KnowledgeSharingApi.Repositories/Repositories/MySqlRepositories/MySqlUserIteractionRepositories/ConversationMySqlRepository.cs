@@ -206,5 +206,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
 
             return res;
         }
+
+        protected override DbSet<Conversation> GetDbSet()
+        {
+            return DbContext.Conversations;
+        }
     }
 }

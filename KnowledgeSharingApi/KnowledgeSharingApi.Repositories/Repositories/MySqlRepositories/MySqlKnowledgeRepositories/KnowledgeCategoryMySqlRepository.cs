@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.KnowledgeRepositories;
 using KnowledgeSharingApi.Repositories.Repositories.BaseRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,9 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
     public class KnowledgeCategoryMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<KnowledgeCategory>(dbContext), IKnowledgeCategoryRepository
     {
+        protected override DbSet<KnowledgeCategory> GetDbSet()
+        {
+            return DbContext.KnowledgeCategories;
+        }
     }
 }

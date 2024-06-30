@@ -286,5 +286,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
                 return 0;
             }
         }
+
+        protected override DbSet<CourseLesson> GetDbSet()
+        {
+            return DbContext.CourseLessons;
+        }
     }
 }

@@ -35,5 +35,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             }
             return 0;
         }
+
+        protected override DbSet<Image> GetDbSet()
+        {
+            return DbContext.Images;
+        }
     }
 }

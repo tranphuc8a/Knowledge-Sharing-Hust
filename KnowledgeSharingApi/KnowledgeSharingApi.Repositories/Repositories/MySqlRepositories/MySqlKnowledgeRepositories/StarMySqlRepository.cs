@@ -161,5 +161,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
                 .Where(star => star.UserId == userId && star.UserItemId == itemId)
                 .FirstOrDefaultAsync())?.Clone();
         }
+
+        protected override DbSet<Star> GetDbSet()
+        {
+            return DbContext.Stars;
+        }
     }
 }

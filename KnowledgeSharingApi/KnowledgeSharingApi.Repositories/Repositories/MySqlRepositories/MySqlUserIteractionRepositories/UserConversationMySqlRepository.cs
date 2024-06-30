@@ -2,6 +2,7 @@
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIteractionRepositories;
 using KnowledgeSharingApi.Repositories.Repositories.BaseRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,9 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
     public class UserConversationMySqlRepository(IDbContext dbContext)
         : BaseMySqlRepository<UserConversation>(dbContext), IUserConversationRepository
     {
+        protected override DbSet<UserConversation> GetDbSet()
+        {
+            return DbContext.UserConversations;
+        }
     }
 }

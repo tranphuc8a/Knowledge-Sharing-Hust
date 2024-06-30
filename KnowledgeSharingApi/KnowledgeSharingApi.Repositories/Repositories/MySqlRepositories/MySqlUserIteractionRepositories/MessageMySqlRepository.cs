@@ -3,6 +3,7 @@ using KnowledgeSharingApi.Domains.Models.Entities.Views;
 using KnowledgeSharingApi.Infrastructures.Interfaces.DbContexts;
 using KnowledgeSharingApi.Repositories.Interfaces.EntityRepositories.UserIteractionRepositories;
 using KnowledgeSharingApi.Repositories.Repositories.BaseRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,11 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
                 .Where(message => message.MessageId == messageId)
                 .FirstOrDefault()
             );
+        }
+
+        protected override DbSet<Message> GetDbSet()
+        {
+            return DbContext.Messages;
         }
     }
 }

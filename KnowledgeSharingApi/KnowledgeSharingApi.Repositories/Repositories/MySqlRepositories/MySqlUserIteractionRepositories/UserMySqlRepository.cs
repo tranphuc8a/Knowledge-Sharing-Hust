@@ -259,5 +259,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlU
             u.Role = UserRoles.Admin;
             await DbContext.SaveChangesAsync();
         }
+
+        protected override DbSet<User> GetDbSet()
+        {
+            return DbContext.Users;
+        }
     }
 }

@@ -43,5 +43,10 @@ namespace KnowledgeSharingApi.Repositories.Repositories.MySqlRepositories.MySqlK
                 .Select(projector)
                 .ToListAsync();
         }
+
+        protected override DbSet<CourseRegister> GetDbSet()
+        {
+            return DbContext.CourseRegisters;
+        }
     }
 }
