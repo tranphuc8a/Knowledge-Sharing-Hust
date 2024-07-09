@@ -172,8 +172,16 @@ namespace KnowledgeSharingApi.Infrastructures.Encrypts
 
         protected virtual bool BcryptVerifyPassword(string username, string password, string hashedPassword)
         {
-            string combineUser = $"{username}-{password}-{_passwordHashSecretKey}";
-            return BCrypt.Net.BCrypt.Verify(combineUser, hashedPassword);
+            try
+            {
+                string combineUser = $"{username}-{password}-{_passwordHashSecretKey}";
+                bool isVerified = BCrypt.Net.BCrypt.Verify(combineUser, hashedPassword);
+                return isVerified;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
 
