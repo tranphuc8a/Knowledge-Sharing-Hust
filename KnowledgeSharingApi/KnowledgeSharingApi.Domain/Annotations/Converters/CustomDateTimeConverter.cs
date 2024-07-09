@@ -15,27 +15,34 @@ namespace KnowledgeSharingApi.Domains.Annotations.Converters
     public class CustomDateTimeConverterAttribute : Attribute
     {
     }
+
     public class CustomDateTimeConverter : JsonConverter<DateTime?>
     {
+        private const string DateFormat = "dd/MM/yyyy HH:mm:ss";
+
         public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType == JsonTokenType.Null)
             {
                 return null;
             }
+
             if (reader.TokenType != JsonTokenType.String)
             {
                 throw new ValidatorException(ViConstantResource.DATETIME_FORMAT);
             }
+
             string? str = reader.GetString();
             if (str == null || str == "")
             {
                 return null;
             }
-            if (DateTime.TryParse(str, out DateTime value))
+
+            if (DateTime.TryParseExact(str, DateFormat, null, System.Globalization.DateTimeStyles.None, out DateTime value))
             {
                 return value;
             }
+
             throw new ValidatorException(ViConstantResource.DATETIME_FORMAT);
         }
 
@@ -46,7 +53,8 @@ namespace KnowledgeSharingApi.Domains.Annotations.Converters
                 writer.WriteNullValue();
                 return;
             }
-            writer.WriteStringValue(value.Value.ToString());
+
+            writer.WriteStringValue(value.Value.ToString(DateFormat));
         }
     }
 }
