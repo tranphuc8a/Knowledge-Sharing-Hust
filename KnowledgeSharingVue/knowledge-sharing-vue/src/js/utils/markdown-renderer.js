@@ -55,7 +55,7 @@ class MarkdownRenderer{
             allowedTags: [
                 'a', 'abbr', 'b', 'blockquote', 'br', 'code', 'del', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                 'hr', 'i', 'img', 'kbd', 'li', 'ol', 'p', 'pre', 's', 'sup', 'sub', 'strong', 'table', 'tbody',
-                'td', 'th', 'thead', 'tr', 'ul', 'div', 'span'
+                'td', 'th', 'thead', 'tr', 'ul', 'div', 'span', 'iframe'
             ],
             allowedAttributes: {
                 '*': ['class', 'id', 'style', 'align'],
@@ -64,6 +64,7 @@ class MarkdownRenderer{
                 'div': ['class', 'id', 'style', 'align'],
                 'span': ['class', 'id', 'style', 'align'],
                 'p': ['class', 'id', 'style', 'align'],
+                'iframe': ['src', 'width', 'height', 'frameborder', 'allowfullscreen', 'allow', 'style']
             },
             removeUnbalanced: false,
             removeUnknown: false

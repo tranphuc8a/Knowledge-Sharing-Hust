@@ -1,10 +1,12 @@
-﻿using KnowledgeSharingApi.Domains.Enums;
+﻿using KnowledgeSharingApi.Domains.Annotations.Converters;
+using KnowledgeSharingApi.Domains.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
@@ -20,6 +22,8 @@ namespace KnowledgeSharingApi.Domains.Models.Entities.Entities
         public string? Nickname { get; set; }
         public string? Bio { get; set; }
         public EGender? Gender { get; set; }
+
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         public DateTime? DateOfBirth { get; set; }
         public string? PhoneNumber { get; set; }
         public string? ContactEmail { get; set; }

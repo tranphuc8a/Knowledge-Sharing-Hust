@@ -26,7 +26,7 @@ namespace KnowledgeSharingApi.Domains.Models.ApiRequestModels.UserProfileModels
         [GenderConverter]
         public EGender? Gender { get; set; }
 
-        [CustomDateTimeConverter]
+        [JsonConverter(typeof(CustomDateTimeConverter))]
         [GreaterThanTodayValidator(ErrorMessage = ViConstantResource.DOB_GREATER_THAN_TODAY)]
         public DateTime? DateOfBirth { get; set; }
 

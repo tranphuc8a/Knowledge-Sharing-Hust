@@ -2,30 +2,73 @@
 class MyDate extends Date{
     static myDateFormat1 = /^([1-9]|0[1-9]|[12][0-9]|3[01])\/([1-9]|0[1-9]|1[0-2])\/\d{4}$/;
     static myDateFormat2 = /^([1-9]|0[1-9]|[12][0-9]|3[01])-([1-9]|0[1-9]|1[0-2])-\d{4}$/;
+    static myDateTimeFormat1 = /^([1-9]|0[1-9]|[12][0-9]|3[01])\/([1-9]|0[1-9]|1[0-2])\/\d{4} (\d{1,2}):(\d{1,2}):(\d{1,2})$/;
+    static myDateTimeFormat2 = /^([1-9]|0[1-9]|[12][0-9]|3[01])-([1-9]|0[1-9]|1[0-2])-\d{4} (\d{1,2}):(\d{1,2}):(\d{1,2})$/;
+
+    static convertToISO(dateString) {
+        if (dateString.toISOString != undefined) {
+            return dateString.toISOString();
+        }
+        if (MyDate.myDateFormat1.test(dateString)) {
+            let parts = dateString.split("/");
+            let day = parts[0].padStart(2, '0');
+            let month = parts[1].padStart(2, '0');
+            let year = parts[2];
+            return `${year}-${month}-${day}`;
+        } else if (MyDate.myDateFormat2.test(dateString)) {
+            let parts = dateString.split("-");
+            let day = parts[0].padStart(2, '0');
+            let month = parts[1].padStart(2, '0');
+            let year = parts[2];
+            return `${year}-${month}-${day}`;
+        } else if (MyDate.myDateTimeFormat1.test(dateString)) {
+            let parts = dateString.split(/\/|:|\s/);
+            let day = parts[0].padStart(2, '0');
+            let month = parts[1].padStart(2, '0');
+            let year = parts[2];
+            let hour = parts[3].padStart(2, '0');
+            let minute = parts[4].padStart(2, '0');
+            let second = parts[5].padStart(2, '0');
+            return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
+        } else if (MyDate.myDateTimeFormat2.test(dateString)) {
+            let parts = dateString.split(/-|:|\s/);
+            let day = parts[0].padStart(2, '0');
+            let month = parts[1].padStart(2, '0');
+            let year = parts[2];
+            let hour = parts[3].padStart(2, '0');
+            let minute = parts[4].padStart(2, '0');
+            let second = parts[5].padStart(2, '0');
+            return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
+        } else {
+            // Nếu định dạng không khớp, trả về chuỗi gốc
+            return dateString;
+        }
+    }
 
     /**
     * Constructor nhận date thuộc 2 format trên dd/mm/yyyy và dd-mm-yyyy
-    * @param dateStr - chuỗi date
+    * @param dateString - chuỗi date
     * @Author TVPhuc (29/11/23)
     * @Edit None
     **/
-    constructor(dateStr){
-        if (dateStr === undefined || dateStr === null || dateStr === "") {
+    constructor(dateString){
+        if (dateString === undefined || dateString === null || dateString === "") {
             super();
             return;
         }
-        if (MyDate.myDateFormat1.test(dateStr)){
-            // Tách ngày, tháng, năm từ chuỗi
-            const dateParts = dateStr.split('/');
-            // Đưa về định dạng được hỗ trợ: yyyy-mm-dd
-            let formated = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
-            super(formated);
-        } else if (MyDate.myDateFormat2.test(dateStr)){
-            const dateParts = dateStr.split('-');
-            super(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
-        }else {
-            super(dateStr);
+        
+        let formattedDateString = MyDate.convertToISO(dateString);
+
+        // Kiểm tra xem chuỗi đầu vào có chứa thông tin về múi giờ hay không
+        const hasTimeZone = /[+-]\d{2}:\d{2}$|Z$/.test(formattedDateString);
+        
+        // Nếu không có thông tin về múi giờ, thêm "Z" để chỉ định UTC
+        if (!hasTimeZone) {
+            formattedDateString += 'Z';
         }
+
+        // Gọi constructor của lớp Date
+        super(formattedDateString);
     }
 
     /**
