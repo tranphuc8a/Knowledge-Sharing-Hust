@@ -8,6 +8,10 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  schedule:
+    # Runs at midnight UTC on Saturday (6) and Sunday (0)
+  - cron: "0 0 * * 0,6"
+  workflow_dispatch:
 
 jobs:
   build:
